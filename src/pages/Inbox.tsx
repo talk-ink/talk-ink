@@ -3,6 +3,7 @@ import IconButton from "components/Button/IconButton";
 import InboxMessage from "components/InboxMessage/InboxMessage";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import React from "react";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 function InboxPage() {
   return (
@@ -19,7 +20,9 @@ function InboxPage() {
             <Badge active title="Active" />
             <Badge title="Done" />
           </nav>
-          <IconButton />
+          <IconButton>
+            <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
+          </IconButton>
         </div>
       </header>
       <ul>

@@ -1,5 +1,6 @@
 import IconButton from "components/Button/IconButton";
 import React from "react";
+import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 function InboxMessage() {
   return (
@@ -15,7 +16,8 @@ function InboxMessage() {
     last:after:block
     last:after:w-full
     last:after:h-[1px]
-    last:after:bg-neutral-200"
+    last:after:bg-neutral-200
+    "
     >
       <div className="flex items-center justify-between px-3 hover:bg-cyan-50 py-5 rounded-xl border-l-2 border-transparent hover:border-cyan-800 overflow-hidden group">
         <div className="flex items-center">
@@ -51,7 +53,9 @@ function InboxMessage() {
           </div>
         </div>
         <div className="opacity-0 group-hover:opacity-100">
-          <IconButton />
+          <IconButton>
+            <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
+          </IconButton>
         </div>
       </div>
     </a>

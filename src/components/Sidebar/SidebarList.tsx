@@ -49,7 +49,12 @@ function SidebarList({ type, active, title }: Props) {
       } hover:bg-neutral-100 flex items-center justify-between group`}
     >
       <div className="flex items-center text-sm pl-3">
-        <Icon size={20} className="mr-2 text-gray-400" />
+        <Icon
+          size={20}
+          className={`mr-2 text-gray-400 ${
+            type === "channel" && "text-cyan-500"
+          }`}
+        />
         <p>{title}</p>
       </div>
       <div

@@ -7,10 +7,12 @@ import SidebarList from "./SidebarList";
 
 function SidebarComponent() {
   return (
-    <div className="bg-[#F7FAFB]">
-      <div className="w-full flex justify-between py-2 px-3">
+    <div className="bg-[#F7FAFB] h-screen overflow-auto">
+      <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
         <ProfileButton />
-        <IconButton />
+        <IconButton>
+          <BiMoon size={18} className="text-neutral-400" />
+        </IconButton>
       </div>
       <div className="p-2 ">
         <ul className="mb-1">
