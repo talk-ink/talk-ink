@@ -1,9 +1,7 @@
-import Badge from "components/Badge/Badge";
 import Button from "components/Button/Button";
 import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-import React from "react";
 import { BiDotsHorizontalRounded, BiEdit } from "react-icons/bi";
 
 function ChannelPage() {

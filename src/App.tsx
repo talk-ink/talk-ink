@@ -1,8 +1,5 @@
-import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import SidebarComponent from "components/Sidebar/SidebarComponent";
 import ChannelPage from "pages/Channel";
-import InboxPage from "pages/Inbox";
-import React from "react";
 
 function App() {
   return (

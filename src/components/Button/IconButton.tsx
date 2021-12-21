@@ -1,5 +1,4 @@
 import React from "react";
-import { BiMoon } from "react-icons/bi";
 
 type ButtonSize = "small" | "medium" | "large";
 

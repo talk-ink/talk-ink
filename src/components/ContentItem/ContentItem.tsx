@@ -4,7 +4,7 @@ import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 function InboxMessage() {
   return (
-    <a
+    <button
       className="
     cursor-pointer
     hover:before:bg-transparent
@@ -58,7 +58,7 @@ function InboxMessage() {
           </IconButton>
         </div>
       </div>
-    </a>
+    </button>
   );
 }
 

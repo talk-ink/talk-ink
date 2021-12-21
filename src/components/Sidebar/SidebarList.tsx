@@ -42,8 +42,7 @@ function SidebarList({ type, active, title }: Props) {
       break;
   }
   return (
-    <a
-      href="#"
+    <button
       className={`w-full rounded h-8 ${
         active && "bg-cyan-100"
       } hover:bg-neutral-100 flex items-center justify-between group`}
@@ -69,7 +68,7 @@ function SidebarList({ type, active, title }: Props) {
           <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
         </button>
       )}
-    </a>
+    </button>
   );
 }
 
