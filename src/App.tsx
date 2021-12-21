@@ -1,13 +1,19 @@
-import SidebarComponent from "components/Sidebar/SidebarComponent";
-import ChannelPage from "pages/Channel";
+import { Route, Routes } from "react-router";
+
+import NotFound from "components/NotFound/NotFound";
+import ChannelPage from "routes/Channel";
+import DashboardPage from "routes/Dashboard";
+import InboxPage from "routes/Inbox";
 
 function App() {
   return (
-    <div className="w-full min-h-screen grid grid-cols-[280px_1fr] overflow-hidden">
-      <SidebarComponent />
-      {/* <InboxPage /> */}
-      <ChannelPage />
-    </div>
+    <Routes>
+      <Route caseSensitive path="/a/:workspaceId/" element={<DashboardPage />}>
+        <Route path="inbox" element={<InboxPage />} />
+        <Route path="ch/:channelId" element={<ChannelPage />} />
+      </Route>
+      <Route path="*" element={<NotFound />} />
+    </Routes>
   );
 }
 

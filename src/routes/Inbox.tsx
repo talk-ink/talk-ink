@@ -1,11 +1,21 @@
+import React, { useEffect, useState } from "react";
+
+import { BiDotsHorizontalRounded } from "react-icons/bi";
+
 import Badge from "components/Badge/Badge";
 import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
+import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-import React from "react";
-import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 function InboxPage() {
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+  }, []);
   return (
     <MainContentContainer>
       <header className="mb-2">
@@ -26,14 +36,20 @@ function InboxPage() {
         </div>
       </header>
       <ul>
-        <ContentItem />
-        <ContentItem />
-        <ContentItem />
-        <ContentItem />
-        <ContentItem />
-        <ContentItem />
-        <ContentItem />
-        <ContentItem />
+        {loading ? (
+          <ContentSkeleton />
+        ) : (
+          <>
+            <ContentItem />
+            <ContentItem />
+            <ContentItem />
+            <ContentItem />
+            <ContentItem />
+            <ContentItem />
+            <ContentItem />
+            <ContentItem />
+          </>
+        )}
       </ul>
     </MainContentContainer>
   );
