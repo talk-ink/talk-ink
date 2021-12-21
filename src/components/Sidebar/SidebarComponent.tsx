@@ -18,13 +18,13 @@ function SidebarComponent() {
       </div>
       <div className="p-2 ">
         <ul className="mb-1">
-          <SidebarList type="search" title="Search" link={`/a/:123/search`} />
-          <SidebarList type="inbox" title="Inbox" link={`/a/:123/inbox`} />
-          <SidebarList type="saved" title="Saved" link={`/a/:123/saved`} />
+          <SidebarList type="search" title="Search" link={`/a/123/search`} />
+          <SidebarList type="inbox" title="Inbox" link={`/a/123/inbox`} />
+          <SidebarList type="saved" title="Saved" link={`/a/123/saved`} />
           <SidebarList
             type="messages"
             title="Messages"
-            link={`/a/:123/messages`}
+            link={`/a/123/messages`}
           />
         </ul>
         <ChannelButton />
@@ -32,18 +32,18 @@ function SidebarComponent() {
           <SidebarList
             type="channel"
             title="General"
-            link={`/a/:123/ch/:ch1`}
+            link={`/a/123/ch/ch1`}
             isDefault
           />
           <SidebarList
             type="channel"
             title="ilham25.thedev.id"
-            link={`/a/:123/ch/:ch2`}
+            link={`/a/123/ch/ch2`}
           />
           <SidebarList
             type="channel"
             title="Twist"
-            link={`/a/:123/ch/:ch3`}
+            link={`/a/123/ch/ch3`}
             isDefault
           />
         </div>

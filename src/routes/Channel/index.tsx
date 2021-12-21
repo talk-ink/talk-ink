@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEdit } from "react-icons/bi";
+import { useLocation, useNavigate } from "react-router";
 
 import Button from "components/Button/Button";
 import IconButton from "components/Button/IconButton";
@@ -10,6 +11,27 @@ import MainContentContainer from "components/MainContentContainer/MainContentCon
 
 function ChannelPage() {
   const [loading, setLoading] = useState(true);
+  const { pathname } = useLocation();
+  const navigate = useNavigate();
+
+  const createThreadDraft = (): void => {
+    // const threadsDraft = localStorage.getItem("threadsDraft");
+    const uniqueId = Math.floor(Math.random() * 100000);
+
+    // const dataTemplate = {
+    //   title: "",
+    //   content: "",
+    // };
+    // if (!threadsDraft) {
+    //   localStorage.setItem(
+    //     "threadsDraft",
+    //     JSON.stringify({
+    //       [uniqueId]: dataTemplate,
+    //     })
+    //   );
+    // }
+    navigate(`${pathname}/compose/${uniqueId}`);
+  };
 
   useEffect(() => {
     setTimeout(() => {
@@ -35,7 +57,13 @@ function ChannelPage() {
               <p className="text-lg uppercase text-white">IA</p>
             </div>
           </div>
-          <Button className="bg-cyan-600 hover:bg-cyan-700 flex items-center">
+          <Button
+            className="bg-cyan-600 hover:bg-cyan-700 flex items-center"
+            onClick={() => {
+              createThreadDraft();
+              //   console.log("awe");
+            }}
+          >
             <BiEdit size={18} className="text-white mr-2" />
             <p className="text-sm text-white font-medium -mb-1">New Thread</p>
           </Button>

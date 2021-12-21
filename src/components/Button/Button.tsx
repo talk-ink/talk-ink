@@ -8,7 +8,10 @@ type Props = React.PropsWithChildren<{
 
 function Button({ children, className, onClick = () => {} }: Props) {
   return (
-    <button className={`flex items-center px-3 h-8 rounded-md ${className}`}>
+    <button
+      className={`flex items-center px-3 h-8 rounded-md ${className}`}
+      onClick={onClick}
+    >
       {children}
     </button>
   );
