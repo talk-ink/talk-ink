@@ -1,24 +1,15 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import MainContentContainer from "components/MainContentContainer/MainContentContainer";
+import SidebarComponent from "components/Sidebar/SidebarComponent";
+import ChannelPage from "pages/Channel";
+import InboxPage from "pages/Inbox";
+import React from "react";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className="w-full min-h-screen grid grid-cols-[280px_1fr] overflow-hidden">
+      <SidebarComponent />
+      <InboxPage />
+      {/* <ChannelPage /> */}
     </div>
   );
 }
