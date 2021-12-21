@@ -8,8 +8,8 @@ function App() {
   return (
     <div className="w-full min-h-screen grid grid-cols-[280px_1fr] overflow-hidden">
       <SidebarComponent />
-      <InboxPage />
-      {/* <ChannelPage /> */}
+      {/* <InboxPage /> */}
+      <ChannelPage />
     </div>
   );
 }

@@ -1,6 +1,6 @@
 import Badge from "components/Badge/Badge";
 import IconButton from "components/Button/IconButton";
-import InboxMessage from "components/InboxMessage/InboxMessage";
+import ContentItem from "components/ContentItem/ContentItem";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import React from "react";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
@@ -26,14 +26,14 @@ function InboxPage() {
         </div>
       </header>
       <ul>
-        <InboxMessage />
-        <InboxMessage />
-        <InboxMessage />
-        <InboxMessage />
-        <InboxMessage />
-        <InboxMessage />
-        <InboxMessage />
-        <InboxMessage />
+        <ContentItem />
+        <ContentItem />
+        <ContentItem />
+        <ContentItem />
+        <ContentItem />
+        <ContentItem />
+        <ContentItem />
+        <ContentItem />
       </ul>
     </MainContentContainer>
   );
