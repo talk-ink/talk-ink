@@ -38,3 +38,14 @@ export interface User {
   workspaces?: Workspace[];
   channels?: Channel[];
 }
+
+export interface Login {
+  email: string;
+  password: string;
+}
+
+export interface Register {
+  firstName: string;
+  email: string;
+  password: string;
+}
