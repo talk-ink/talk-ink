@@ -17,5 +17,14 @@
     "jsx": "react-jsx",
     "baseUrl": "src"
   },
-  "include": ["src", "assets", "components", "hooks", "lib", "pages", "utils"]
+  "include": [
+    "src",
+    "assets",
+    "components",
+    "hooks",
+    "lib",
+    "routes",
+    "types",
+    "utils"
+  ]
 }

@@ -5,6 +5,7 @@ type ButtonSize = "small" | "medium" | "large";
 type Props = React.PropsWithChildren<{
   children: React.ReactNode;
   size?: ButtonSize;
+  onClick?: () => void;
 }>;
 
 type ButtonSizeValue = {
@@ -14,7 +15,7 @@ type ButtonSizeValue = {
   large: string;
 };
 
-function IconButton({ children, size = "large" }: Props) {
+function IconButton({ children, size = "large", onClick = () => {} }: Props) {
   const buttonSize: ButtonSizeValue = {
     small: "w-5 h-5",
     medium: "w-7 h-7",
@@ -23,6 +24,7 @@ function IconButton({ children, size = "large" }: Props) {
   return (
     <button
       className={`flex items-center justify-center hover:bg-neutral-200 ${buttonSize[size]} rounded-md`}
+      onClick={onClick}
     >
       {children}
     </button>

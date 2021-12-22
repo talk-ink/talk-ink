@@ -1,8 +1,10 @@
+import React from "react";
+
+import { BiMoon } from "react-icons/bi";
+
 import ChannelButton from "components/Button/ChannelButton";
 import IconButton from "components/Button/IconButton";
 import ProfileButton from "components/Button/ProfileButton";
-import React from "react";
-import { BiMoon } from "react-icons/bi";
 import SidebarList from "./SidebarList";
 
 function SidebarComponent() {
@@ -16,16 +18,34 @@ function SidebarComponent() {
       </div>
       <div className="p-2 ">
         <ul className="mb-1">
-          <SidebarList type="search" title="Search" />
-          <SidebarList type="inbox" active title="Inbox" />
-          <SidebarList type="saved" title="Saved" />
-          <SidebarList type="messages" title="Messages" />
+          <SidebarList type="search" title="Search" link={`/a/123/search`} />
+          <SidebarList type="inbox" title="Inbox" link={`/a/123/inbox`} />
+          <SidebarList type="saved" title="Saved" link={`/a/123/saved`} />
+          <SidebarList
+            type="messages"
+            title="Messages"
+            link={`/a/123/messages`}
+          />
         </ul>
         <ChannelButton />
         <div>
-          <SidebarList type="channel" title="General" />
-          <SidebarList type="channel" title="ilham25.thedev.id" />
-          <SidebarList type="channel" title="Twist" />
+          <SidebarList
+            type="channel"
+            title="General"
+            link={`/a/123/ch/ch1`}
+            isDefault
+          />
+          <SidebarList
+            type="channel"
+            title="ilham25.thedev.id"
+            link={`/a/123/ch/ch2`}
+          />
+          <SidebarList
+            type="channel"
+            title="Twist"
+            link={`/a/123/ch/ch3`}
+            isDefault
+          />
         </div>
       </div>
     </div>

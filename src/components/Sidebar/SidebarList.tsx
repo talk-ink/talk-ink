@@ -1,4 +1,5 @@
 import React from "react";
+
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 import {
@@ -6,16 +7,18 @@ import {
   HiOutlineChat,
   HiOutlineHashtag,
 } from "react-icons/hi";
+import { NavLink } from "react-router-dom";
 
 type SidebarType = "search" | "inbox" | "saved" | "messages" | "channel";
 
 type Props = React.PropsWithChildren<{
   type: SidebarType;
-  active?: boolean;
   title?: string;
+  link: string;
+  isDefault?: boolean;
 }>;
 
-function SidebarList({ type, active, title }: Props) {
+function SidebarList({ type, title, link, isDefault }: Props) {
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
 
@@ -42,33 +45,36 @@ function SidebarList({ type, active, title }: Props) {
       break;
   }
   return (
-    <button
-      className={`w-full rounded h-8 ${
-        active && "bg-cyan-100"
-      } hover:bg-neutral-100 flex items-center justify-between group`}
+    <div
+      className={`cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between relative group`}
     >
-      <div className="flex items-center text-sm pl-3">
+      <NavLink
+        to={link}
+        className={({ isActive }) =>
+          `w-full flex items-center text-sm pl-3 h-8`
+        }
+      >
         <Icon
           size={20}
           className={`mr-2 text-gray-400 ${
-            type === "channel" && "text-cyan-500"
+            type === "channel" && isDefault && "text-cyan-500"
           }`}
         />
         <p>{title}</p>
-      </div>
+      </NavLink>
       <div
-        className={`h-7 w-7 flex items-center justify-center ${
+        className={`h-7 w-8 flex items-center justify-center ${
           showOption && "group-hover:hidden"
         }`}
       >
         <p className="text-neutral-400 text-xs">4</p>
       </div>
       {showOption && (
-        <button className="hidden h-7 w-7 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md">
+        <button className="hidden h-7 w-8 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md z-10">
           <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
         </button>
       )}
-    </button>
+    </div>
   );
 }
 
