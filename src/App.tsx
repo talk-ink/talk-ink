@@ -1,10 +1,10 @@
 import { Route, Routes } from "react-router";
 
 import NotFound from "components/NotFound/NotFound";
-import ChannelPage from "routes/Channel";
-import DashboardPage from "routes/Dashboard";
-import InboxPage from "routes/Inbox";
-import Compose from "routes/Channel/Compose";
+import ChannelPage from "pages/Channel";
+import DashboardPage from "pages/Dashboard";
+import InboxPage from "pages/Inbox";
+import Compose from "pages/Channel/Compose";
 
 function App() {
   return (
