@@ -1,3 +1,11 @@
+export interface Token {
+  token: string | null;
+}
+
+export interface AuthState extends Token {
+  user: User | null;
+}
+
 export interface Comment {
   _id: string;
   content: string;
