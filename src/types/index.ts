@@ -32,7 +32,8 @@ export interface Workspace {
   id?: string;
   _id?: string;
   name: string;
-  peoples: User[];
+  domain?: string;
+  peoples?: User[];
 }
 
 export interface User {
