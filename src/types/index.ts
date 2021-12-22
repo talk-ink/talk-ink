@@ -33,7 +33,7 @@ export interface Workspace {
 export interface User {
   _id: string;
   firstName: string;
-  lastName: string;
+  lastName?: string;
   email: string;
   workspaces?: Workspace[];
   channels?: Channel[];
