@@ -1,6 +1,7 @@
 import React from "react";
 import { Navigate, useLocation } from "react-router";
 import { useAppSelector } from "hooks/useAppSelector";
+import FullscreenLoading from "components/Loading/FullscreenLoading";
 
 type Props = React.PropsWithChildren<{
   children: JSX.Element;
@@ -10,6 +11,10 @@ type Props = React.PropsWithChildren<{
 function RestrictedRoute({ children, type = "private" }: Props) {
   let auth = useAppSelector((state) => state.auth);
   let location = useLocation();
+
+  if (auth.loading) {
+    return <FullscreenLoading />;
+  }
 
   switch (type) {
     case "private":
@@ -25,7 +30,6 @@ function RestrictedRoute({ children, type = "private" }: Props) {
 
     default:
       return <Navigate to="/login" state={{ from: location }} />;
-
       break;
   }
 
