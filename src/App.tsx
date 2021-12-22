@@ -5,7 +5,9 @@ import ChannelPage from "pages/Channel";
 import DashboardPage from "pages/Dashboard";
 import InboxPage from "pages/Inbox";
 import Compose from "pages/Channel/Compose";
-import PrivateRoute from "routes/PrivateRoute";
+import RestrictedRoute from "routes/RestrictedRoute";
+import LoginPage from "pages/Login";
+import RegisterPage from "pages/Register";
 
 function App() {
   return (
@@ -14,15 +16,33 @@ function App() {
         caseSensitive
         path="/a/:workspaceId/"
         element={
-          <PrivateRoute>
+          <RestrictedRoute>
             <DashboardPage />
-          </PrivateRoute>
+          </RestrictedRoute>
         }
       >
         <Route path="inbox" element={<InboxPage />} />
         <Route path="ch/:channelId" element={<ChannelPage />} />
         <Route path="ch/:channelId/compose/:composeId" element={<Compose />} />
       </Route>
+      <Route
+        caseSensitive
+        path="/login"
+        element={
+          <RestrictedRoute type="public">
+            <LoginPage />
+          </RestrictedRoute>
+        }
+      />
+      <Route
+        caseSensitive
+        path="/register"
+        element={
+          <RestrictedRoute type="public">
+            <RegisterPage />
+          </RestrictedRoute>
+        }
+      />
       <Route path="*" element={<NotFound />} />
     </Routes>
   );
