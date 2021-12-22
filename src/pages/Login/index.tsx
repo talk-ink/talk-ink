@@ -11,10 +11,15 @@ import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
 
 import { kontenbase } from "lib/client";
-import { setAuthToken, setAuthUser } from "features/auth";
+import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Login, User } from "types";
+import { Login, User, Workspace } from "types";
+import {
+  ProfileResponse,
+  AuthResponseFailure,
+  ProfileResponseSuccess,
+} from "@kontenbase/sdk/dist/main/auth";
 
 const initialValues: Login = {
   email: "",
@@ -40,29 +45,31 @@ function LoginPage() {
         email: values.email,
         password: values.password,
       });
-      if (data) {
-        const { data: userData }: KontenbaseResponse<User> = await kontenbase
-          .service("Users")
-          .find({ where: { email: values.email } });
 
-        if (userData) {
-          const user: User = {
-            ...userData[0],
-            _id: userData[0]?._id,
-            firstName: userData[0]?.firstName,
-            email: userData[0]?.email,
-          };
-          dispatch(setAuthToken({ token: data?.token }));
-          dispatch(setAuthUser(user));
+      const { data: userData } = await kontenbase.auth.profile();
 
-          navigate(`/a/${user?.workspaces?.[0]}`);
+      if (!data) throw new Error("Invalid login");
+      if (!userData) throw new Error("Invalid user");
+
+      if (userData) {
+        const user: User = userData;
+        const { data: workspaceData }: KontenbaseResponse<Workspace> =
+          await kontenbase
+            .service("Workspaces")
+            .find({ where: { peoples: user.id } });
+
+        let toWorkspaceId: string = "";
+
+        if (workspaceData?.length > 0) {
+          toWorkspaceId = workspaceData[0]._id;
+        } else {
+          toWorkspaceId = `create_workspace`;
         }
 
-        // const user: User = {
-        //   _id: userData[0]._id,
-        //   firstName: "",
-        //   email:""
-        // }
+        dispatch(setAuthToken({ token: data?.token }));
+        dispatch(setAuthUser(user));
+
+        navigate(`/a/${toWorkspaceId}`);
       }
     } catch (error) {
       console.log("err", error);

@@ -4,34 +4,40 @@ export interface Token {
 
 export interface AuthState extends Token {
   user: User | null;
+  loading: boolean;
 }
 
 export interface Comment {
-  _id: string;
+  id?: string;
+  _id?: string;
   content: string;
 }
 export interface Thread {
-  _id: string;
+  id?: string;
+  _id?: string;
   title: string;
   content: string;
   channel: Channel;
   comments: Comment[];
 }
 export interface Channel {
-  _id: string;
+  id?: string;
+  _id?: string;
   name: string;
   threads: Thread[];
   members: User[];
 }
 
 export interface Workspace {
-  _id: string;
+  id?: string;
+  _id?: string;
   name: string;
   peoples: User[];
 }
 
 export interface User {
-  _id: string;
+  id?: string;
+  _id?: string;
   firstName: string;
   lastName?: string;
   email: string;
