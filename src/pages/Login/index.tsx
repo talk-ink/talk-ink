@@ -11,15 +11,10 @@ import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
 
 import { kontenbase } from "lib/client";
-import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
+import { setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Login, User, Workspace } from "types";
-import {
-  ProfileResponse,
-  AuthResponseFailure,
-  ProfileResponseSuccess,
-} from "@kontenbase/sdk/dist/main/auth";
 
 const initialValues: Login = {
   email: "",
@@ -29,22 +24,10 @@ const initialValues: Login = {
 function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
-  const formik = useFormik({
-    initialValues,
-    validationSchema: loginValidation,
-    onSubmit: (values, error) => {
-      if (values) {
-        onSubmit(values);
-      }
-    },
-  });
 
   const onSubmit = async (values: Login) => {
     try {
-      const { data } = await kontenbase.auth.login({
-        email: values.email,
-        password: values.password,
-      });
+      const { data } = await kontenbase.auth.login(values);
 
       const { data: userData } = await kontenbase.auth.profile();
 
@@ -76,11 +59,17 @@ function LoginPage() {
     }
   };
 
+  const formik = useFormik({
+    initialValues,
+    validationSchema: loginValidation,
+    onSubmit,
+  });
+
   return (
     <div className="w-screen h-screen flex items-center justify-center text-slightGray">
       <div className="w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
         <h1 className="text-3xl font-semibold mb-8">Login</h1>
-        <div>
+        <form onSubmit={formik.handleSubmit}>
           <FormControl>
             <FormLabel htmlFor="email">Email</FormLabel>
             <TextInput
@@ -112,7 +101,6 @@ function LoginPage() {
               <Button
                 type="submit"
                 className="bg-cyan-500 hover:bg-cyan-600 text-center text-white font-medium text-sm mr-2"
-                onClick={formik.handleSubmit}
               >
                 Login
               </Button>
@@ -121,7 +109,7 @@ function LoginPage() {
               </Link>
             </div>
           </FormControl>
-        </div>
+        </form>
       </div>
     </div>
   );

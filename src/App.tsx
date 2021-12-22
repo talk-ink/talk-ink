@@ -46,6 +46,15 @@ function App() {
     <Routes>
       <Route
         caseSensitive
+        path="/a/create_workspace"
+        element={
+          <RestrictedRoute>
+            <h1>awe</h1>
+          </RestrictedRoute>
+        }
+      />
+      <Route
+        caseSensitive
         path="/a/:workspaceId/"
         element={
           <RestrictedRoute>
