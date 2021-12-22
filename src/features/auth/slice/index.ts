@@ -14,7 +14,7 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthToken: (state, action: PayloadAction<Token>) => {
-      const cookiesToken: string = cookies.get("token");
+      const cookiesToken = cookies.get("token");
       if (!cookiesToken) {
         cookies.set("token", `${action.payload.token}`);
       }
