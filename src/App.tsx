@@ -17,6 +17,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, User } from "types";
+import CreateWorkspacePage from "pages/CreateWorkspace";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -37,7 +38,6 @@ function App() {
     } catch (error) {
       console.log("err", error);
     } finally {
-      console.log("awe");
       dispatch(setAuthLoading(false));
     }
   };
@@ -54,7 +54,7 @@ function App() {
         path="/a/create_workspace"
         element={
           <RestrictedRoute>
-            <h1>awe</h1>
+            <CreateWorkspacePage />
           </RestrictedRoute>
         }
       />

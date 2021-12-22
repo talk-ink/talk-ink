@@ -10,3 +10,8 @@ export const registerValidation = yup.object().shape({
   firstName: yup.string().min(8).max(80).required(),
   password: yup.string().min(6).max(16).required(),
 });
+
+export const createWorkspaceValidation = yup.object().shape({
+  name: yup.string().max(40).required(),
+  domain: yup.string().max(40).required(),
+});

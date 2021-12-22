@@ -48,7 +48,7 @@ function LoginPage() {
         let toWorkspaceId: string = "";
 
         if (workspaceData?.length > 0) {
-          toWorkspaceId = workspaceData[0]._id;
+          toWorkspaceId = `${workspaceData[0]._id}/inbox`;
         } else {
           toWorkspaceId = `create_workspace`;
         }
