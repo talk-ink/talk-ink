@@ -42,17 +42,17 @@ function CreateWorkspacePage() {
       if (data) {
         const generalChannel = await kontenbase.service("Channels").create({
           name: "General",
-          workspace: data?.id,
+          workspace: data?._id,
           members: auth.user.id,
         });
         const domainChannel = await kontenbase.service("Channels").create({
           name: values.domain,
-          workspace: data?.id,
+          workspace: data?._id,
           members: auth.user.id,
         });
 
         if (generalChannel && domainChannel) {
-          navigate(`/a/${data?.id}/inbox`);
+          navigate(`/a/${data?._id}/inbox`);
         }
       }
     } catch (error) {
