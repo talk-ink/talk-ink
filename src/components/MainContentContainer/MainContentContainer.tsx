@@ -1,11 +1,15 @@
 import React from "react";
 
-type Props = React.PropsWithChildren<{}>;
+type Props = React.PropsWithChildren<{
+  header?: React.ReactNode;
+  className?: string;
+}>;
 
-function MainContentContainer({ children }: Props) {
+function MainContentContainer({ children, className, header }: Props) {
   return (
-    <div className="w-full h-screen flex justify-center  overflow-auto">
-      <div className="min-h-screen w-11/12 px-10 pt-20">{children}</div>
+    <div className="w-full h-screen flex flex-col items-center overflow-auto">
+      {header}
+      <div className={`w-11/12 px-10 pt-20 ${className}`}>{children}</div>
     </div>
   );
 }

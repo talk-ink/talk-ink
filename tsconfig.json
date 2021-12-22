@@ -18,12 +18,13 @@
     "baseUrl": "src"
   },
   "include": [
-    "src",
     "assets",
     "components",
+    "features",
     "hooks",
     "lib",
     "routes",
+    "src",
     "types",
     "utils"
   ]
