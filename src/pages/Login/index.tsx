@@ -1,12 +1,74 @@
 import React from "react";
 
+import { Link, useNavigate } from "react-router-dom";
+import { useFormik } from "formik";
+import { KontenbaseResponse } from "@kontenbase/sdk";
+
 import Button from "components/Button/Button";
 import FormControl from "components/Form/FormControl";
 import FormLabel from "components/Form/FormLabel";
 import TextInput from "components/Form/TextInput";
-import { Link } from "react-router-dom";
+import SubLabel from "components/Form/SubLabel";
+
+import { kontenbase } from "lib/client";
+import { setAuthToken, setAuthUser } from "features/auth";
+import { loginValidation } from "utils/validators";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { Login, User } from "types";
+
+const initialValues: Login = {
+  email: "",
+  password: "",
+};
 
 function LoginPage() {
+  const dispatch = useAppDispatch();
+  const navigate = useNavigate();
+  const formik = useFormik({
+    initialValues,
+    validationSchema: loginValidation,
+    onSubmit: (values, error) => {
+      if (values) {
+        onSubmit(values);
+      }
+    },
+  });
+
+  const onSubmit = async (values: Login) => {
+    try {
+      const { data } = await kontenbase.auth.login({
+        email: values.email,
+        password: values.password,
+      });
+      if (data) {
+        const { data: userData }: KontenbaseResponse<User> = await kontenbase
+          .service("Users")
+          .find({ where: { email: values.email } });
+
+        if (userData) {
+          const user: User = {
+            ...userData[0],
+            _id: userData[0]?._id,
+            firstName: userData[0]?.firstName,
+            email: userData[0]?.email,
+          };
+          dispatch(setAuthToken({ token: data?.token }));
+          dispatch(setAuthUser(user));
+
+          navigate(`/a/${user?.workspaces?.[0]}`);
+        }
+
+        // const user: User = {
+        //   _id: userData[0]._id,
+        //   firstName: "",
+        //   email:""
+        // }
+      }
+    } catch (error) {
+      console.log("err", error);
+    }
+  };
+
   return (
     <div className="w-screen h-screen flex items-center justify-center text-slightGray">
       <div className="w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
@@ -14,12 +76,28 @@ function LoginPage() {
         <div>
           <FormControl>
             <FormLabel htmlFor="email">Email</FormLabel>
-            <TextInput name="email" type="email" />
+            <TextInput
+              name="email"
+              type="email"
+              onChange={formik.handleChange("email")}
+              onBlur={formik.handleBlur("email")}
+              value={formik.values.email}
+            />
+            {formik.errors.email && <SubLabel>{formik.errors.email}</SubLabel>}
           </FormControl>
 
           <FormControl>
             <FormLabel htmlFor="password">Password</FormLabel>
-            <TextInput name="password" type="password" />
+            <TextInput
+              name="password"
+              type="password"
+              onChange={formik.handleChange("password")}
+              onBlur={formik.handleBlur("password")}
+              value={formik.values.password}
+            />
+            {formik.errors.password && (
+              <SubLabel>{formik.errors.password}</SubLabel>
+            )}
           </FormControl>
 
           <FormControl>
@@ -27,9 +105,7 @@ function LoginPage() {
               <Button
                 type="submit"
                 className="bg-cyan-500 hover:bg-cyan-600 text-center text-white font-medium text-sm mr-2"
-                onClick={() => {
-                  console.log("sbm");
-                }}
+                onClick={formik.handleSubmit}
               >
                 Login
               </Button>
