@@ -3,13 +3,16 @@ import React, { useEffect, useState } from "react";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 import Badge from "components/Badge/Badge";
+import InboxEmpty from "components/EmptyContent/InboxEmpty";
 import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
+import { Thread } from "types";
 
 function InboxPage() {
   const [loading, setLoading] = useState(true);
+  const [inboxData, setInboxData] = useState([]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -35,22 +38,31 @@ function InboxPage() {
           </IconButton>
         </div>
       </header>
-      <ul>
-        {loading ? (
-          <ContentSkeleton />
-        ) : (
-          <>
-            {/* <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem /> */}
-          </>
-        )}
-      </ul>
+
+      {loading ? (
+        <ContentSkeleton />
+      ) : (
+        <>
+          {inboxData?.length > 0 ? (
+            <ul>
+              <>
+                {/* <ContentItem />
+              <ContentItem />
+              <ContentItem />
+              <ContentItem />
+              <ContentItem />
+              <ContentItem />
+              <ContentItem />
+              <ContentItem /> */}
+              </>
+            </ul>
+          ) : (
+            <>
+              <InboxEmpty />
+            </>
+          )}
+        </>
+      )}
     </MainContentContainer>
   );
 }

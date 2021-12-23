@@ -71,7 +71,7 @@ function CreateWorkspacePage() {
   return (
     <div className="w-screen h-screen flex items-center justify-center text-slightGray">
       <div className="w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
-        <h1 className="text-3xl font-semibold">Login</h1>
+        <h1 className="text-3xl font-semibold">Create Workspace/Team</h1>
 
         <form onSubmit={formik.handleSubmit} className="mt-8">
           <FormControl>

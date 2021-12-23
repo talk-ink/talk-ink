@@ -2,17 +2,20 @@ import { useEffect, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEdit } from "react-icons/bi";
 import { useLocation, useNavigate, useParams } from "react-router";
+import moment from "moment-timezone";
+import "moment/locale/id";
 
 import Button from "components/Button/Button";
+import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
 import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import { useAppSelector } from "hooks/useAppSelector";
-import { useGetChannelByIdQuery } from "features/channels";
-import { useLazyGetThreadByIdsQuery } from "features/threads";
 import { kontenbase } from "lib/client";
 import { Channel } from "types";
+
+moment.locale("id");
 
 function ChannelPage() {
   const { pathname } = useLocation();
@@ -31,8 +34,11 @@ function ChannelPage() {
     const uniqueId = Math.floor(Math.random() * 100000);
 
     const dataTemplate = {
-      title: "",
+      name: "",
       content: "",
+      channelId: params.channelId,
+      workspaceId: params.workspaceId,
+      lastChange: moment.tz("Asia/Jakarta").toISOString(),
     };
     if (!threadsDraft) {
       localStorage.setItem(
@@ -64,8 +70,24 @@ function ChannelPage() {
         .service("Threads")
         .find({ where: { channel: getChannel.data._id } });
 
+      const parsedThreadsDraft: object = JSON.parse(
+        localStorage.getItem("threadsDraft")
+      );
+
+      let draft = [];
+
+      if (parsedThreadsDraft) {
+        draft = Object.entries(parsedThreadsDraft)
+          .map(([key, value]) => ({
+            id: key,
+            draft: true,
+            ...value,
+          }))
+          .filter((data) => data.channelId === params.channelId);
+      }
+
       setChannelData(getChannel.data);
-      setThreadData(threads);
+      setThreadData([...draft, ...threads]);
     } catch (error) {
       console.log("err", error);
     } finally {
@@ -112,17 +134,33 @@ function ChannelPage() {
           </IconButton>
         </div>
       </header>
-      <ul>
-        {loading ? (
-          <ContentSkeleton />
-        ) : (
-          <>
-            {threadData?.map((thread, idx) => (
-              <ContentItem key={idx} dataSource={thread} />
-            ))}
-          </>
-        )}
-      </ul>
+      {threadData?.length > 0 ? (
+        <ul>
+          {loading ? (
+            <ContentSkeleton />
+          ) : (
+            <>
+              {threadData?.map((thread, idx) => (
+                <ContentItem
+                  key={idx}
+                  dataSource={thread}
+                  onClick={() => {
+                    if (thread.draft) {
+                      navigate(`${pathname}/compose/${thread?.id}`);
+                    } else {
+                      navigate(`${pathname}/t/${thread?._id}`);
+                    }
+                  }}
+                />
+              ))}
+            </>
+          )}
+        </ul>
+      ) : (
+        <>
+          <ChannelEmpty />
+        </>
+      )}
     </MainContentContainer>
   );
 }

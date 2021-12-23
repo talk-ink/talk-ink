@@ -17,8 +17,11 @@ export interface Thread {
   _id?: string;
   name: string;
   content: string;
-  channel: Channel;
-  comments: Comment[];
+  channel?: Channel;
+  comments?: Comment[];
+  createdAt?: Date;
+  updatedAt?: Date;
+  draft?: boolean;
 }
 export interface Channel {
   id?: string;

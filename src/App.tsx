@@ -18,6 +18,7 @@ import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, User } from "types";
 import CreateWorkspacePage from "pages/CreateWorkspace";
+import ThreadPage from "pages/Thread";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -67,8 +68,12 @@ function App() {
           </RestrictedRoute>
         }
       >
+        <Route path="search" element={<>search</>} />
         <Route path="inbox" element={<InboxPage />} />
+        <Route path="saved" element={<>saved</>} />
+        <Route path="messages" element={<>messages</>} />
         <Route path="ch/:channelId" element={<ChannelPage />} />
+        <Route path="ch/:channelId/t/:threadId" element={<ThreadPage />} />
         <Route path="ch/:channelId/compose/:composeId" element={<Compose />} />
       </Route>
       <Route

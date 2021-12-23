@@ -15,3 +15,8 @@ export const createWorkspaceValidation = yup.object().shape({
   name: yup.string().max(40).required(),
   project: yup.string().max(40).required(),
 });
+
+export const createThreadValidation = yup.object().shape({
+  name: yup.string().max(300).required(),
+  content: yup.string().required(),
+});

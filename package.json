@@ -16,11 +16,13 @@
     "formik": "^2.2.9",
     "history": "^5.2.0",
     "js-cookie": "^3.0.1",
+    "moment-timezone": "^0.5.34",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
     "react-error-boundary": "^3.1.4",
     "react-icons": "^4.3.1",
     "react-markdown": "^7.1.1",
+    "react-moment": "^1.1.1",
     "react-redux": "^7.2.6",
     "react-router-dom": "^6.2.1",
     "react-scripts": "5.0.0",
@@ -53,6 +55,7 @@
     ]
   },
   "devDependencies": {
+    "@tailwindcss/typography": "^0.5.0",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.7"
