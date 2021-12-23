@@ -9,17 +9,19 @@ import GithubButton from "./GithubButton";
 
 function LandingHeader() {
   return (
-    <header className="h-20 flex items-center justify-between sticky top-0 bg-white overflow-hidden max-w-[1400px] m-auto px-20 2xl:px-0">
-      <div>
-        <Link to="/">
-          <div className="">
-            <img className="w-40" src={Brand} />
-          </div>
-        </Link>
-      </div>
-      <div className="flex items-center justify-end gap-2">
-        <GetStartedButton />
-        <GithubButton />
+    <header className="sticky top-0 bg-white">
+      <div className="h-20 flex items-center justify-between overflow-hidden max-w-[1400px] px-20 2xl:px-0 m-auto">
+        <div>
+          <Link to="/">
+            <div className="">
+              <img className="w-40" src={Brand} />
+            </div>
+          </Link>
+        </div>
+        <div className="flex items-center justify-end gap-2">
+          <GetStartedButton />
+          <GithubButton />
+        </div>
       </div>
     </header>
   );
