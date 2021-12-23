@@ -4,6 +4,7 @@ import { FormikProps } from "formik";
 import ReactMarkdown from "react-markdown";
 import Button from "components/Button/Button";
 import { Thread } from "types";
+import { useNavigate, useParams } from "react-router";
 
 type Props = React.PropsWithChildren<{
   formik: FormikProps<Thread>;
@@ -13,6 +14,8 @@ type Props = React.PropsWithChildren<{
 
 function TextEditor({ formik, loading, deleteDraft }: Props) {
   const [preview, setPreview] = useState(false);
+  const navigate = useNavigate();
+  const params = useParams();
 
   const isDisabled =
     !formik.values.name ||
@@ -66,7 +69,10 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
 
           <Button
             className=" hover:bg-neutral-200 rounded text-xs font-medium px-5"
-            onClick={deleteDraft}
+            onClick={() => {
+              deleteDraft();
+              navigate(`/a/${params?.workspaceId}/ch/${params?.channelId}`);
+            }}
           >
             Discard
           </Button>

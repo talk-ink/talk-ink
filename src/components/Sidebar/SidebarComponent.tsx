@@ -9,6 +9,7 @@ import SidebarList from "./SidebarList";
 import { useAppSelector } from "hooks/useAppSelector";
 import { Channel, Workspace } from "types";
 import { kontenbase } from "lib/client";
+import { useParams } from "react-router";
 
 type Props = React.PropsWithChildren<{
   dataSource: Workspace | null | undefined;
@@ -16,6 +17,7 @@ type Props = React.PropsWithChildren<{
 
 function SidebarComponent({ dataSource }: Props) {
   const auth = useAppSelector((state) => state.auth);
+  const params = useParams();
 
   const [channelData, setChannelData] = useState([]);
   const [apiLoading, setApiLoading] = useState(false);
@@ -36,7 +38,7 @@ function SidebarComponent({ dataSource }: Props) {
 
   useEffect(() => {
     getChannels(dataSource.channels);
-  }, []);
+  }, [params]);
 
   return (
     <div className="bg-[#F7FAFB] h-screen overflow-auto">

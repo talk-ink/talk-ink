@@ -1,6 +1,7 @@
 import React from "react";
 
 import { BiDotsHorizontalRounded } from "react-icons/bi";
+import ReactMoment from "react-moment";
 
 import IconButton from "components/Button/IconButton";
 import { Thread } from "types";
@@ -39,7 +40,11 @@ function InboxMessage({ onClick = () => {}, dataSource }: Props) {
           <div>
             <div className="flex items-center">
               <p className="font-body text-sm mr-2">{dataSource.name}</p>
-              <span className="text-xs text-neutral-500">4h</span>
+              <span className="text-xs text-neutral-500">
+                <ReactMoment fromNow>
+                  {dataSource?.updatedAt || dataSource?.createdAt}
+                </ReactMoment>
+              </span>
             </div>
             <div className="overflow-hidden whitespace-nowrap text-ellipsis max-w-3xl text-xs text-neutral-500 pr-2">
               <small className="text-xs text-neutral-500">

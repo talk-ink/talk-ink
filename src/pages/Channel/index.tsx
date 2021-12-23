@@ -9,8 +9,6 @@ import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import { useAppSelector } from "hooks/useAppSelector";
-import { useGetChannelByIdQuery } from "features/channels";
-import { useLazyGetThreadByIdsQuery } from "features/threads";
 import { kontenbase } from "lib/client";
 import { Channel } from "types";
 

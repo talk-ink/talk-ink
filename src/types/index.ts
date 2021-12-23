@@ -19,6 +19,8 @@ export interface Thread {
   content: string;
   channel?: Channel;
   comments?: Comment[];
+  createdAt?: Date;
+  updatedAt?: Date;
 }
 export interface Channel {
   id?: string;
