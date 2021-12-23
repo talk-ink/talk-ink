@@ -1,31 +1,25 @@
 import React from "react";
-import Button from "components/Button/Button";
+import { GoMarkGithub } from "react-icons/go";
 import { Link } from "react-router-dom";
+
+import Button from "components/Button/Button";
+import Brand from "assets/image/landing/brand.svg";
+import GetStartedButton from "./GetStartedButton";
+import GithubButton from "./GithubButton";
 
 function LandingHeader() {
   return (
-    <header className="flex h-16 items-center justify-between px-20 sticky top-0 bg-white">
+    <header className="flex h-20 items-center justify-between px-20 sticky top-0 bg-white overflow-hidden">
       <div>
         <Link to="/">
-          <div className="relative flex items-center">
-            <div className="h-9 w-9 absolute left-0 bg-cyan-500 -skew-y-6 rounded"></div>
-            <h1 className="ml-1 text-cyan-500 text-2xl font-semibold relative z-10">
-              <span className="italic font-bold text-white">Ta </span>lk.Ink
-            </h1>
+          <div className="">
+            <img className="w-40" src={Brand} />
           </div>
         </Link>
       </div>
       <div className="flex items-center justify-end gap-2">
-        <Link to="/login">
-          <Button className="text-sm font-medium hover:bg-neutral-100">
-            Log In
-          </Button>
-        </Link>
-        <Link to="/register">
-          <Button className="text-sm bg-cyan-500 hover:bg-cyan-600 text-white font-medium">
-            Sign Up
-          </Button>
-        </Link>
+        <GetStartedButton />
+        <GithubButton />
       </div>
     </header>
   );
