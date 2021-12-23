@@ -2,15 +2,23 @@ import Button from "components/Button/Button";
 import { createBrowserHistory } from "history";
 import React from "react";
 import { HiChevronLeft } from "react-icons/hi";
+import { useNavigate, useParams } from "react-router";
 
 type Props = React.PropsWithChildren<{
   channel: string;
   title: string;
   thread?: boolean;
+  onBackClick?: () => void;
 }>;
 
-function MainContentHeader({ channel, title, thread }: Props) {
-  let history = createBrowserHistory();
+function MainContentHeader({
+  channel,
+  title,
+  thread,
+  onBackClick = () => {},
+}: Props) {
+  const navigate = useNavigate();
+  const params = useParams();
 
   return (
     <div className="w-full py-4 px-3 sticky top-0 grid grid-cols-3 border-b border-b-neutral-100 bg-white">
@@ -18,7 +26,8 @@ function MainContentHeader({ channel, title, thread }: Props) {
         <Button
           className=" hover:bg-neutral-200 flex items-center"
           onClick={() => {
-            history.back();
+            onBackClick();
+            navigate(`/a/${params.workspaceId}/ch/${params.channelId}`);
           }}
         >
           <HiChevronLeft size={18} className="text-neutral-500 mr-2 " />

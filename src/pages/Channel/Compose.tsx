@@ -1,22 +1,24 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
-import { HiChevronLeft } from "react-icons/hi";
+import { useNavigate, useParams } from "react-router";
+import moment from "moment-timezone";
+import "moment/locale/id";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-import Button from "components/Button/Button";
-import { createBrowserHistory } from "history";
+
 import TextEditor from "components/TextEditor/TextEditor";
 import { useFormik } from "formik";
 import { Thread } from "types";
 import { createThreadValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
-import { useLocation, useNavigate, useParams } from "react-router";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
 
 const initialValues: Thread = {
   name: "",
   content: "",
 };
+
+moment.locale("id");
 
 function Compose() {
   const params = useParams();
@@ -30,13 +32,42 @@ function Compose() {
     onSubmit: (values) => {
       onSubmit(values);
     },
+    enableReinitialize: true,
   });
+
+  const checkDraftAvailable = () => {
+    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
+    const selectedDraft = parsedThreadDraft[+params.composeId];
+
+    if (selectedDraft) {
+      formik.setFieldValue("name", selectedDraft.name);
+      formik.setFieldValue("content", selectedDraft.content);
+    }
+  };
+
+  useEffect(() => {
+    checkDraftAvailable();
+  }, [params.composeId]);
 
   const deleteDraft = () => {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
     delete parsedThreadDraft[params?.composeId];
 
     localStorage.setItem("threadsDraft", JSON.stringify(parsedThreadDraft));
+  };
+
+  const saveDraft = () => {
+    const parsedThreadsDraft = JSON.parse(localStorage.getItem("threadsDraft"));
+
+    const newDraft = {
+      ...parsedThreadsDraft,
+      [+params.composeId]: {
+        ...parsedThreadsDraft[+params.composeId],
+        ...formik.values,
+        lastChange: moment.tz("Asia/Jakarta").toISOString(),
+      },
+    };
+    localStorage.setItem("threadsDraft", JSON.stringify(newDraft));
   };
 
   const onSubmit = async (values: Thread) => {
@@ -51,9 +82,11 @@ function Compose() {
 
       deleteDraft();
 
-      navigate(
-        `/a${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`
-      );
+      if (createThread) {
+        navigate(
+          `/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`
+        );
+      }
     } catch (error) {
       console.log("err", error);
     } finally {
@@ -66,7 +99,15 @@ function Compose() {
   return (
     <MainContentContainer
       className="pt-10 h-full"
-      header={<MainContentHeader channel="General" title="New Thread" />}
+      header={
+        <MainContentHeader
+          channel="General"
+          title="New Thread"
+          onBackClick={() => {
+            saveDraft();
+          }}
+        />
+      }
     >
       <div className="w-full h-5/6 px-14">
         <div className="w-full h-full border border-neutral-300 rounded-lg p-5">

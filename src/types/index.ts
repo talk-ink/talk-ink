@@ -21,6 +21,7 @@ export interface Thread {
   comments?: Comment[];
   createdAt?: Date;
   updatedAt?: Date;
+  draft?: boolean;
 }
 export interface Channel {
   id?: string;
