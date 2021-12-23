@@ -40,14 +40,14 @@ function InboxPage() {
           <ContentSkeleton />
         ) : (
           <>
+            {/* <ContentItem />
             <ContentItem />
             <ContentItem />
             <ContentItem />
             <ContentItem />
             <ContentItem />
             <ContentItem />
-            <ContentItem />
-            <ContentItem />
+            <ContentItem /> */}
           </>
         )}
       </ul>

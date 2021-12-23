@@ -10,6 +10,9 @@ import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useGetChannelByIdQuery } from "features/channels";
+import { useLazyGetThreadByIdsQuery } from "features/threads";
+import { kontenbase } from "lib/client";
+import { Channel } from "types";
 
 function ChannelPage() {
   const { pathname } = useLocation();
@@ -19,37 +22,62 @@ function ChannelPage() {
   const auth = useAppSelector((state) => state.auth);
   const userId: any = auth.user.id;
 
-  const { data, isLoading: channelLoading } = useGetChannelByIdQuery(
-    params.channelId
-  );
+  const [threadData, setThreadData] = useState([]);
+  const [channelData, setChannelData] = useState<Channel | undefined>();
+  const [apiLoading, setApiLoading] = useState(false);
 
-  const createThreadDraft = (): void => {
-    // const threadsDraft = localStorage.getItem("threadsDraft");
+  const createThreadDraft = () => {
+    const threadsDraft = localStorage.getItem("threadsDraft");
     const uniqueId = Math.floor(Math.random() * 100000);
 
-    // const dataTemplate = {
-    //   title: "",
-    //   content: "",
-    // };
-    // if (!threadsDraft) {
-    //   localStorage.setItem(
-    //     "threadsDraft",
-    //     JSON.stringify({
-    //       [uniqueId]: dataTemplate,
-    //     })
-    //   );
-    // }
+    const dataTemplate = {
+      title: "",
+      content: "",
+    };
+    if (!threadsDraft) {
+      localStorage.setItem(
+        "threadsDraft",
+        JSON.stringify({
+          [uniqueId]: dataTemplate,
+        })
+      );
+    } else {
+      const parsedThreadsDraft: object = JSON.parse(threadsDraft);
+      const newDraft = {
+        ...parsedThreadsDraft,
+        [uniqueId]: dataTemplate,
+      };
+      localStorage.setItem("threadsDraft", JSON.stringify(newDraft));
+    }
     navigate(`${pathname}/compose/${uniqueId}`);
   };
 
-  useEffect(() => {
-    if (!channelLoading) {
-      if (!data) throw new Error("Invalid channel");
-      if (!data.members.includes(userId)) throw new Error("Invalid channel");
-    }
-  }, [data, channelLoading]);
+  const getChannelData = async () => {
+    setApiLoading(true);
+    try {
+      const getChannel = await kontenbase
+        .service("Channels")
+        .findById(params.channelId);
+      if (!getChannel.data) throw new Error("Invalid channel");
 
-  const loading = channelLoading;
+      const { data: threads } = await kontenbase
+        .service("Threads")
+        .find({ where: { channel: getChannel.data._id } });
+
+      setChannelData(getChannel.data);
+      setThreadData(threads);
+    } catch (error) {
+      console.log("err", error);
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getChannelData();
+  }, [params?.channelId]);
+
+  const loading = apiLoading;
 
   return (
     <MainContentContainer>
@@ -61,7 +89,7 @@ function ChannelPage() {
         `}
       >
         <div>
-          <h1 className="font-bold text-3xl">General</h1>
+          <h1 className="font-bold text-3xl">{channelData?.name}</h1>
           <p className="text-neutral-500 font-body">Public</p>
         </div>
         <div className="flex items-center gap-3">
@@ -74,7 +102,6 @@ function ChannelPage() {
             className="bg-cyan-600 hover:bg-cyan-700 flex items-center"
             onClick={() => {
               createThreadDraft();
-              //   console.log("awe");
             }}
           >
             <BiEdit size={18} className="text-white mr-2" />
@@ -90,8 +117,8 @@ function ChannelPage() {
           <ContentSkeleton />
         ) : (
           <>
-            {data?.threads?.map((thread, idx) => (
-              <ContentItem key={idx} />
+            {threadData?.map((thread, idx) => (
+              <ContentItem key={idx} dataSource={thread} />
             ))}
           </>
         )}

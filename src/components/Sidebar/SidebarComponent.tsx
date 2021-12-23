@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 import { BiMoon } from "react-icons/bi";
 
@@ -8,14 +8,35 @@ import WorkspaceButton from "components/Button/WorkspaceButton";
 import SidebarList from "./SidebarList";
 import { useAppSelector } from "hooks/useAppSelector";
 import { Channel, Workspace } from "types";
-import { useGetChannelByIdsQuery } from "features/channels";
+import { kontenbase } from "lib/client";
 
 type Props = React.PropsWithChildren<{
   dataSource: Workspace | null | undefined;
 }>;
 
 function SidebarComponent({ dataSource }: Props) {
-  const { data } = useGetChannelByIdsQuery(dataSource.channels);
+  const auth = useAppSelector((state) => state.auth);
+
+  const [channelData, setChannelData] = useState([]);
+  const [apiLoading, setApiLoading] = useState(false);
+
+  const getChannels = async (ids: string[]) => {
+    setApiLoading(true);
+    try {
+      const { data } = await kontenbase
+        .service("Channels")
+        .find({ where: { members: auth.user.id, workspace: dataSource.id } });
+      setChannelData(data);
+    } catch (error) {
+      console.log("err", error);
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getChannels(dataSource.channels);
+  }, []);
 
   return (
     <div className="bg-[#F7FAFB] h-screen overflow-auto">
@@ -50,7 +71,7 @@ function SidebarComponent({ dataSource }: Props) {
         </ul>
         <ChannelButton />
         <div>
-          {data?.map((channel, idx) => (
+          {channelData?.map((channel, idx) => (
             <SidebarList
               key={idx + channel._id}
               type="channel"

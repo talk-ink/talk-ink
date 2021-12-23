@@ -15,7 +15,7 @@ export interface Comment {
 export interface Thread {
   id?: string;
   _id?: string;
-  title: string;
+  name: string;
   content: string;
   channel: Channel;
   comments: Comment[];
