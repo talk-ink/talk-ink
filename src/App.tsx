@@ -9,7 +9,8 @@ import Compose from "pages/Channel/Compose";
 import RestrictedRoute from "routes/RestrictedRoute";
 import LoginPage from "pages/Login";
 import RegisterPage from "pages/Register";
-import LandingPage from "pages/Landing/Landing";
+import LandingPage from "pages/Landing";
+import CreateWorkspacePage from "pages/CreateWorkspace";
 
 import NotFound from "components/NotFound/NotFound";
 
@@ -17,7 +18,6 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, User } from "types";
-import CreateWorkspacePage from "pages/CreateWorkspace";
 import ThreadPage from "pages/Thread";
 
 function App() {
