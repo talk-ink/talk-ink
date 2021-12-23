@@ -5,7 +5,7 @@ import { GoMarkGithub } from "react-icons/go";
 function GithubButton() {
   return (
     <Button
-      className="text-sm flex items-center justify-center px-5 py-5 border border-neutral-700"
+      className="text-sm flex items-center justify-center px-5 py-5 border rounded border-neutral-700"
       onClick={() => {
         window.open("https://github.com/talk-ink/talk-ink");
       }}
