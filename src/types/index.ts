@@ -24,7 +24,7 @@ export interface Channel {
   id?: string;
   _id?: string;
   name: string;
-  threads: Thread[];
+  threads: string[];
   members: User[];
 }
 
@@ -32,8 +32,9 @@ export interface Workspace {
   id?: string;
   _id?: string;
   name: string;
-  domain?: string;
+  project?: string;
   peoples?: User[];
+  channels?: string[];
 }
 
 export interface User {

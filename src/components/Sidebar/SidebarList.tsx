@@ -13,12 +13,13 @@ type SidebarType = "search" | "inbox" | "saved" | "messages" | "channel";
 
 type Props = React.PropsWithChildren<{
   type: SidebarType;
-  title?: string;
+  name?: string;
   link: string;
   isDefault?: boolean;
+  count?: number | string;
 }>;
 
-function SidebarList({ type, title, link, isDefault }: Props) {
+function SidebarList({ type, name, link, isDefault, count }: Props) {
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
 
@@ -60,14 +61,14 @@ function SidebarList({ type, title, link, isDefault }: Props) {
             type === "channel" && isDefault && "text-cyan-500"
           }`}
         />
-        <p>{title}</p>
+        <p>{name}</p>
       </NavLink>
       <div
         className={`h-7 w-8 flex items-center justify-center ${
           showOption && "group-hover:hidden"
         }`}
       >
-        <p className="text-neutral-400 text-xs">4</p>
+        <p className="text-neutral-400 text-xs">{count}</p>
       </div>
       {showOption && (
         <button className="hidden h-7 w-8 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md z-10">

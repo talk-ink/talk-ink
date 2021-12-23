@@ -1,18 +1,27 @@
 import { useEffect, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEdit } from "react-icons/bi";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useParams } from "react-router";
 
 import Button from "components/Button/Button";
 import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
+import { useAppSelector } from "hooks/useAppSelector";
+import { useGetChannelByIdQuery } from "features/channels";
 
 function ChannelPage() {
-  const [loading, setLoading] = useState(true);
   const { pathname } = useLocation();
+
+  const params = useParams();
   const navigate = useNavigate();
+  const auth = useAppSelector((state) => state.auth);
+  const userId: any = auth.user.id;
+
+  const { data, isLoading: channelLoading } = useGetChannelByIdQuery(
+    params.channelId
+  );
 
   const createThreadDraft = (): void => {
     // const threadsDraft = localStorage.getItem("threadsDraft");
@@ -34,10 +43,14 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 1000);
-  }, []);
+    if (!channelLoading) {
+      if (!data) throw new Error("Invalid channel");
+      if (!data.members.includes(userId)) throw new Error("Invalid channel");
+    }
+  }, [data, channelLoading]);
+
+  const loading = channelLoading;
+
   return (
     <MainContentContainer>
       <header
@@ -77,14 +90,9 @@ function ChannelPage() {
           <ContentSkeleton />
         ) : (
           <>
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
-            <ContentItem />
+            {data?.threads?.map((thread, idx) => (
+              <ContentItem key={idx} />
+            ))}
           </>
         )}
       </ul>
