@@ -15,7 +15,7 @@ import { kontenbase } from "lib/client";
 
 const initialValues: Workspace = {
   name: "",
-  domain: "",
+  project: "",
 };
 
 function CreateWorkspacePage() {
@@ -45,13 +45,13 @@ function CreateWorkspacePage() {
           workspace: data?._id,
           members: auth.user.id,
         });
-        const domainChannel = await kontenbase.service("Channels").create({
-          name: values.domain,
+        const projectChannel = await kontenbase.service("Channels").create({
+          name: values.project,
           workspace: data?._id,
           members: auth.user.id,
         });
 
-        if (generalChannel && domainChannel) {
+        if (generalChannel && projectChannel) {
           navigate(`/a/${data?._id}/inbox`);
         }
       }
@@ -63,9 +63,9 @@ function CreateWorkspacePage() {
   };
   const isDisabled =
     !formik.values.name ||
-    !formik.values.domain ||
+    !formik.values.project ||
     !!formik.errors.name ||
-    !!formik.errors.domain ||
+    !!formik.errors.project ||
     apiLoading;
 
   return (
@@ -78,25 +78,25 @@ function CreateWorkspacePage() {
             <FormLabel htmlFor="name">Workspace/Team name</FormLabel>
             <TextInput
               name="name"
-              type="name"
               onChange={formik.handleChange("name")}
               onBlur={formik.handleBlur("name")}
               value={formik.values.name}
+              placeholder="E.g Iruha Team"
             />
             {formik.errors.name && <SubLabel>{formik.errors.name}</SubLabel>}
           </FormControl>
 
           <FormControl>
-            <FormLabel htmlFor="domain">Domain name</FormLabel>
+            <FormLabel htmlFor="project">Project name</FormLabel>
             <TextInput
-              name="domain"
-              type="domain"
-              onChange={formik.handleChange("domain")}
-              onBlur={formik.handleBlur("domain")}
-              value={formik.values.domain}
+              name="project"
+              onChange={formik.handleChange("project")}
+              onBlur={formik.handleBlur("project")}
+              value={formik.values.project}
+              placeholder="E.g CRM App or Web apps"
             />
-            {formik.errors.domain && (
-              <SubLabel>{formik.errors.domain}</SubLabel>
+            {formik.errors.project && (
+              <SubLabel>{formik.errors.project}</SubLabel>
             )}
           </FormControl>
 

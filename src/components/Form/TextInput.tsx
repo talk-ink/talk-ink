@@ -7,6 +7,7 @@ type Props = React.PropsWithChildren<{
   onChange?(event: React.ChangeEvent): void;
   onBlur?: (event: React.ChangeEvent) => void;
   value?: string;
+  placeholder?: string;
 }>;
 
 function TextInput({
@@ -16,6 +17,7 @@ function TextInput({
   onBlur = () => {},
   onChange = () => {},
   value,
+  placeholder,
 }: Props) {
   return (
     <input
@@ -26,6 +28,7 @@ function TextInput({
       onBlur={onBlur}
       onChange={onChange}
       value={value}
+      placeholder={placeholder}
     />
   );
 }

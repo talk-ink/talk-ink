@@ -3,12 +3,14 @@ import React from "react";
 import { BiDotsHorizontalRounded } from "react-icons/bi";
 
 import IconButton from "components/Button/IconButton";
+import { Thread } from "types";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
+  dataSource: Thread | null | undefined;
 }>;
 
-function InboxMessage({ onClick = () => {} }: Props) {
+function InboxMessage({ onClick = () => {}, dataSource }: Props) {
   return (
     <div
       className="
@@ -36,24 +38,12 @@ function InboxMessage({ onClick = () => {} }: Props) {
           </div>
           <div>
             <div className="flex items-center">
-              <p className="font-body text-sm mr-2">Get started in 4 steps</p>
+              <p className="font-body text-sm mr-2">{dataSource.name}</p>
               <span className="text-xs text-neutral-500">4h</span>
             </div>
             <div className="overflow-hidden whitespace-nowrap text-ellipsis max-w-3xl text-xs text-neutral-500 pr-2">
               <small className="text-xs text-neutral-500">
-                Lorem ipsum dolor sit amet consectetur adipisicing elit.
-                Delectus quo autem assumenda ullam natus? Fugit aliquid,
-                voluptate dolores blanditiis voluptatem non dicta velit veniam
-                minima quisquam quos quaerat neque molestiae doloremque itaque
-                incidunt cupiditate beatae natus perferendis? Esse saepe, quos
-                recusandae beatae officia placeat aperiam eos. Nam libero nobis
-                fugit qui repellendus eum. Atque quisquam eius officia quia
-                consectetur! Corporis dolorum in corrupti dolor? Ut accusantium
-                illo iste est dolorum voluptates dolor animi ratione, minus
-                fugiat repudiandae quae, sunt quasi esse, tenetur facilis
-                perspiciatis temporibus corrupti nisi provident praesentium a!
-                Quasi, repellat magnam? Exercitationem, ad. Facere nisi quam
-                quod autem!
+                {dataSource.content}
               </small>
             </div>
           </div>

@@ -15,7 +15,7 @@ export interface Comment {
 export interface Thread {
   id?: string;
   _id?: string;
-  title: string;
+  name: string;
   content: string;
   channel: Channel;
   comments: Comment[];
@@ -24,7 +24,7 @@ export interface Channel {
   id?: string;
   _id?: string;
   name: string;
-  threads: Thread[];
+  threads: string[];
   members: User[];
 }
 
@@ -32,8 +32,9 @@ export interface Workspace {
   id?: string;
   _id?: string;
   name: string;
-  domain?: string;
+  project?: string;
   peoples?: User[];
+  channels?: string[];
 }
 
 export interface User {

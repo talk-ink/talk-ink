@@ -13,5 +13,5 @@ export const registerValidation = yup.object().shape({
 
 export const createWorkspaceValidation = yup.object().shape({
   name: yup.string().max(40).required(),
-  domain: yup.string().max(40).required(),
+  project: yup.string().max(40).required(),
 });
