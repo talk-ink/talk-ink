@@ -27,8 +27,8 @@ function InboxMessage({ onClick = () => {}, dataSource }: Props) {
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 py-5 rounded-xl border-l-2 border-transparent hover:border-cyan-800 overflow-hidden group">
-        <button className="flex items-center" onClick={onClick}>
+      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800 overflow-hidden group">
+        <button className="flex items-center w-full py-5 " onClick={onClick}>
           <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
             <img
               src="https://picsum.photos/100"

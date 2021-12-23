@@ -33,6 +33,8 @@ function ChannelPage() {
     const dataTemplate = {
       title: "",
       content: "",
+      channelId: params.channelId,
+      workspaceId: params.workspaceId,
     };
     if (!threadsDraft) {
       localStorage.setItem(
@@ -118,7 +120,13 @@ function ChannelPage() {
         ) : (
           <>
             {threadData?.map((thread, idx) => (
-              <ContentItem key={idx} dataSource={thread} />
+              <ContentItem
+                key={idx}
+                dataSource={thread}
+                onClick={() => {
+                  navigate(`${pathname}/t/${thread?._id}`);
+                }}
+              />
             ))}
           </>
         )}

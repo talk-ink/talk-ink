@@ -13,5 +13,5 @@ module.exports = {
       body: ["Rubik", "sans-serif"],
     },
   },
-  plugins: [],
+  plugins: [require("@tailwindcss/typography")],
 };
