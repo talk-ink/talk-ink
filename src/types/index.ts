@@ -29,6 +29,14 @@ export interface Channel {
   name: string;
   threads: string[];
   members: User[];
+  description?: string;
+  privacy?: "private" | "public";
+}
+
+export interface CreateChannel {
+  name: string;
+  description?: string;
+  privacy?: "private" | "public";
 }
 
 export interface Workspace {
