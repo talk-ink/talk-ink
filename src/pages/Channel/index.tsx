@@ -14,6 +14,9 @@ import MainContentContainer from "components/MainContentContainer/MainContentCon
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { Channel } from "types";
+import Popup from "components/Popup/Popup";
+import Menu from "components/Menu/Menu";
+import MenuItem from "components/Menu/MenuItem";
 
 moment.locale("id");
 
@@ -129,9 +132,23 @@ function ChannelPage() {
             <BiEdit size={18} className="text-white mr-2" />
             <p className="text-sm text-white font-medium -mb-1">New Thread</p>
           </Button>
-          <IconButton size="medium">
-            <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
-          </IconButton>
+          <Popup
+            content={
+              <div>
+                <Menu>
+                  <MenuItem
+                    icon={<BiEdit size={20} className="text-neutral-400" />}
+                    title="Edit channel..."
+                  />
+                </Menu>
+              </div>
+            }
+            position="bottom"
+          >
+            <IconButton size="medium">
+              <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
+            </IconButton>
+          </Popup>
         </div>
       </header>
       {threadData?.length > 0 ? (

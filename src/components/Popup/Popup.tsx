@@ -20,10 +20,13 @@ function Popup({ children, content, position = "left" }: Props) {
       onClick={() => {
         setShowPopup((prev) => !prev);
       }}
+      onBlur={() => {
+        setShowPopup(false);
+      }}
     >
       {showPopup && (
         <div
-          className={`absolute ${popupPosition[position]} w-60 shadow rounded-xl bg-white p-3`}
+          className={`absolute ${popupPosition[position]} w-60 shadow rounded-xl bg-white p-3 z-50`}
         >
           {content}
         </div>
