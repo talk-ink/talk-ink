@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Dispatch, SetStateAction } from "react";
 
 import { BiDotsHorizontalRounded, BiEdit, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
@@ -12,9 +12,14 @@ import Menu from "components/Menu/Menu";
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
+  setSelectedThread: Dispatch<SetStateAction<Thread | null | undefined>>;
 }>;
 
-function InboxMessage({ onClick = () => {}, dataSource }: Props) {
+function InboxMessage({
+  onClick = () => {},
+  dataSource,
+  setSelectedThread,
+}: Props) {
   return (
     <div
       className="
@@ -76,7 +81,7 @@ function InboxMessage({ onClick = () => {}, dataSource }: Props) {
                     icon={<BiTrash size={20} className="text-neutral-400" />}
                     title="Delete thread..."
                     onClick={() => {
-                      console.log("del");
+                      setSelectedThread(dataSource);
                     }}
                   />
                   <MenuItem

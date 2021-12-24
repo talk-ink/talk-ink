@@ -20,9 +20,6 @@ function Popup({ children, content, position = "left" }: Props) {
       onClick={() => {
         setShowPopup((prev) => !prev);
       }}
-      onBlur={() => {
-        setShowPopup(false);
-      }}
     >
       {showPopup && (
         <div
