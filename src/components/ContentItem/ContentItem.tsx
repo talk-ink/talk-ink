@@ -86,6 +86,7 @@ function InboxMessage({ onClick = () => {}, dataSource }: Props) {
                 </Menu>
               </div>
             }
+            position="top"
           >
             <IconButton className="group">
               <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
