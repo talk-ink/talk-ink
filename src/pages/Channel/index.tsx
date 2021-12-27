@@ -13,7 +13,11 @@ import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
-import { Channel } from "types";
+import { Channel, Thread } from "types";
+import Popup from "components/Popup/Popup";
+import Menu from "components/Menu/Menu";
+import MenuItem from "components/Menu/MenuItem";
+import Modal from "components/Modal/Modal";
 
 moment.locale("id");
 
@@ -28,6 +32,10 @@ function ChannelPage() {
   const [threadData, setThreadData] = useState([]);
   const [channelData, setChannelData] = useState<Channel | undefined>();
   const [apiLoading, setApiLoading] = useState(false);
+
+  const [selectedThread, setSelectedThread] = useState<
+    Thread | null | undefined
+  >();
 
   const createThreadDraft = () => {
     const threadsDraft = localStorage.getItem("threadsDraft");
@@ -95,6 +103,26 @@ function ChannelPage() {
     }
   };
 
+  const threadDeleteHandler = async () => {
+    setApiLoading(true);
+    try {
+      if (!selectedThread?.draft) {
+        const deleteThread = await kontenbase
+          .service("Threads")
+          .deleteById(selectedThread?._id);
+
+        if (deleteThread?.data) {
+          setSelectedThread(null);
+          getChannelData();
+        }
+      }
+    } catch (error) {
+      console.log("err", error);
+    } finally {
+      setApiLoading(false);
+    }
+  };
+
   useEffect(() => {
     getChannelData();
   }, [params?.channelId]);
@@ -129,9 +157,23 @@ function ChannelPage() {
             <BiEdit size={18} className="text-white mr-2" />
             <p className="text-sm text-white font-medium -mb-1">New Thread</p>
           </Button>
-          <IconButton size="medium">
-            <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
-          </IconButton>
+          <Popup
+            content={
+              <div>
+                <Menu>
+                  <MenuItem
+                    icon={<BiEdit size={20} className="text-neutral-400" />}
+                    title="Edit channel..."
+                  />
+                </Menu>
+              </div>
+            }
+            position="bottom"
+          >
+            <IconButton size="medium">
+              <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
+            </IconButton>
+          </Popup>
         </div>
       </header>
       {threadData?.length > 0 ? (
@@ -151,6 +193,7 @@ function ChannelPage() {
                       navigate(`${pathname}/t/${thread?._id}`);
                     }
                   }}
+                  setSelectedThread={setSelectedThread}
                 />
               ))}
             </>
@@ -161,6 +204,23 @@ function ChannelPage() {
           <ChannelEmpty />
         </>
       )}
+
+      <Modal
+        header="Delete Thread"
+        visible={!!selectedThread}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+        onConfirm={() => {
+          threadDeleteHandler();
+        }}
+        okButtonText="Confirm"
+      >
+        Are you sure you want to delete this thread?
+      </Modal>
     </MainContentContainer>
   );
 }
