@@ -36,7 +36,7 @@ function InboxMessage({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800">
+      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800 group">
         <button className="flex items-center w-full py-5 " onClick={onClick}>
           <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
             <img
@@ -72,7 +72,7 @@ function InboxMessage({
             </div>
           </div>
         </button>
-        <div className="">
+        <div className="hidden active:block group-hover:block">
           <Popup
             content={
               <div>
