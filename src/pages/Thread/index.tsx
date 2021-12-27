@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { Link } from "react-router-dom";
 import { useParams } from "react-router";
@@ -8,32 +8,17 @@ import MainContentContainer from "components/MainContentContainer/MainContentCon
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
 import { Thread } from "types";
 import { kontenbase } from "lib/client";
+import { useAppSelector } from "hooks/useAppSelector";
 
 function ThreadPage() {
   const params = useParams();
-  const [threadData, setThreadData] = useState<Thread | undefined>();
 
-  const [apiLoading, setApiLoading] = useState<boolean>(false);
+  const thread = useAppSelector((state) => state.thread);
 
-  const getThreadData = async () => {
-    setApiLoading(true);
-    try {
-      const { data } = await kontenbase
-        .service("Threads")
-        .findById(params.threadId);
-      if (!data) throw new Error("Invalid thread");
+  const threadData: Thread = useMemo(() => {
+    return thread.threads.find((data) => data._id === params.threadId);
+  }, [params.threadId]);
 
-      setThreadData(data);
-    } catch (error) {
-      console.log("err", error);
-    } finally {
-      setApiLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    getThreadData();
-  }, [params?.threadId]);
   return (
     <MainContentContainer
       header={

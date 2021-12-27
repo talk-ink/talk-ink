@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEdit } from "react-icons/bi";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -14,6 +14,8 @@ import MainContentContainer from "components/MainContentContainer/MainContentCon
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { Channel } from "types";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { fetchThreads } from "features/threads";
 
 moment.locale("id");
 
@@ -22,12 +24,12 @@ function ChannelPage() {
 
   const params = useParams();
   const navigate = useNavigate();
-  const auth = useAppSelector((state) => state.auth);
-  const userId: any = auth.user.id;
 
-  const [threadData, setThreadData] = useState([]);
-  const [channelData, setChannelData] = useState<Channel | undefined>();
-  const [apiLoading, setApiLoading] = useState(false);
+  const auth = useAppSelector((state) => state.auth);
+  const channel = useAppSelector((state) => state.channel);
+  const thread = useAppSelector((state) => state.thread);
+
+  const dispatch = useAppDispatch();
 
   const createThreadDraft = () => {
     const threadsDraft = localStorage.getItem("threadsDraft");
@@ -58,48 +60,19 @@ function ChannelPage() {
     navigate(`${pathname}/compose/${uniqueId}`);
   };
 
-  const getChannelData = async () => {
-    setApiLoading(true);
-    try {
-      const getChannel = await kontenbase
-        .service("Channels")
-        .findById(params.channelId);
-      if (!getChannel.data) throw new Error("Invalid channel");
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === params.channelId);
+  }, [params.channelId]);
 
-      const { data: threads } = await kontenbase
-        .service("Threads")
-        .find({ where: { channel: getChannel.data._id } });
-
-      const parsedThreadsDraft: object = JSON.parse(
-        localStorage.getItem("threadsDraft")
-      );
-
-      let draft = [];
-
-      if (parsedThreadsDraft) {
-        draft = Object.entries(parsedThreadsDraft)
-          .map(([key, value]) => ({
-            id: key,
-            draft: true,
-            ...value,
-          }))
-          .filter((data) => data.channelId === params.channelId);
-      }
-
-      setChannelData(getChannel.data);
-      setThreadData([...draft, ...threads]);
-    } catch (error) {
-      console.log("err", error);
-    } finally {
-      setApiLoading(false);
-    }
-  };
+  const threadData = useMemo(() => {
+    return thread.threads;
+  }, [thread.threads]);
 
   useEffect(() => {
-    getChannelData();
-  }, [params?.channelId]);
+    dispatch(fetchThreads({ channelId: params.channelId }));
+  }, [params.channelId]);
 
-  const loading = apiLoading;
+  const loading = channel.loading || thread.loading;
 
   return (
     <MainContentContainer>
