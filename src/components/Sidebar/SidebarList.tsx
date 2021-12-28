@@ -2,7 +2,7 @@ import IconButton from "components/Button/IconButton";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Popup from "components/Popup/Popup";
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useMemo } from "react";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
 import { BiDotsHorizontalRounded, BiEditAlt, BiLogOut } from "react-icons/bi";
@@ -11,7 +11,7 @@ import {
   HiOutlineChat,
   HiOutlineHashtag,
 } from "react-icons/hi";
-import { NavLink } from "react-router-dom";
+import { NavLink, useLocation, useParams } from "react-router-dom";
 
 import { Channel } from "types";
 
@@ -41,6 +41,17 @@ function SidebarList({
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
 
+  const params = useParams();
+  const { pathname } = useLocation();
+
+  let isActive = useMemo(() => {
+    if (!data) {
+      return pathname.includes(type);
+    } else {
+      return params.channelId === data?._id;
+    }
+  }, [params, pathname]);
+
   switch (type) {
     case "search":
       Icon = AiOutlineSearch;
@@ -65,7 +76,9 @@ function SidebarList({
   }
   return (
     <div
-      className={`cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between relative group`}
+      className={`cursor-pointer w-full ${
+        isActive && "bg-cyan-100"
+      } rounded hover:bg-neutral-100 flex items-center justify-between relative group`}
     >
       <NavLink
         to={link}
