@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 
 import { BiLogOut, BiMoon } from "react-icons/bi";
 import cookies from "js-cookie";
@@ -18,37 +18,28 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { logout } from "features/auth";
 import Modal from "components/Modal/Modal";
 import CreateChannelForm from "components/CreateChannelForm/CreateChannelForm";
+import { fetchChannels } from "features/channels/slice";
 
-type Props = React.PropsWithChildren<{
-  dataSource: Workspace | null | undefined;
-}>;
-
-function SidebarComponent({ dataSource }: Props) {
+function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
+  const workspace = useAppSelector((state) => state.workspace);
+  const channel = useAppSelector((state) => state.channel);
+
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-
-  const [channelData, setChannelData] = useState([]);
 
   const [apiLoading, setApiLoading] = useState(false);
   const [createLoading, setCreateLoading] = useState(false);
 
   const [createChannelModal, setCreateChannelModal] = useState(false);
 
-  const getChannels = async () => {
-    setApiLoading(true);
-    try {
-      const { data } = await kontenbase
-        .service("Channels")
-        .find({ where: { members: auth.user.id, workspace: dataSource.id } });
-      setChannelData(data);
-    } catch (error) {
-      console.log("err", error);
-    } finally {
-      setApiLoading(false);
-    }
-  };
+  const workspaceData: Workspace = workspace.workspaces.find(
+    (data) => data._id === params.workspaceId
+  );
+
+  const channelData: Channel[] = channel.channels;
+  const userId: string = auth.user.id;
 
   const handleLogout = async () => {
     try {
@@ -71,7 +62,7 @@ function SidebarComponent({ dataSource }: Props) {
         workspace: params.workspaceId,
       });
       if (createChannel) {
-        getChannels();
+        // getChannels();
         setCreateChannelModal(false);
         navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
       }
@@ -83,86 +74,93 @@ function SidebarComponent({ dataSource }: Props) {
   };
 
   useEffect(() => {
-    getChannels();
-  }, [params]);
+    // getChannels();
+    dispatch(fetchChannels({ userId, workspaceId: params.workspaceId }));
+  }, [params.workspaceId]);
+
+  const loading = workspace.loading || channel.loading;
 
   return (
-    <div className="bg-[#F7FAFB] h-screen ">
-      <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
-        <Popup
-          content={
+    !loading && (
+      <div>
+        <div className="bg-[#F7FAFB] h-screen overflow-auto">
+          <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
+            <Popup
+              content={
+                <div>
+                  <Menu>
+                    <MenuItem
+                      icon={<BiLogOut size={20} className="text-neutral-400" />}
+                      title="Log Out"
+                      onClick={handleLogout}
+                    />
+                  </Menu>
+                </div>
+              }
+              position="right"
+            >
+              <WorkspaceButton title={workspaceData?.name} />
+            </Popup>
+            <IconButton>
+              <BiMoon size={18} className="text-neutral-400" />
+            </IconButton>
+          </div>
+          <div className="p-2 ">
+            <ul className="mb-1">
+              <SidebarList
+                type="search"
+                name="Search"
+                link={`/a/${workspaceData?._id}/search`}
+              />
+              <SidebarList
+                type="inbox"
+                name="Inbox"
+                link={`/a/${workspaceData?._id}/inbox`}
+              />
+              <SidebarList
+                type="saved"
+                name="Saved"
+                link={`/a/${workspaceData?._id}/saved`}
+              />
+              <SidebarList
+                type="messages"
+                name="Messages"
+                link={`/a/${workspaceData?._id}/messages`}
+              />
+            </ul>
+            <ChannelButton setCreateChannelModal={setCreateChannelModal} />
             <div>
-              <Menu>
-                <MenuItem
-                  icon={<BiLogOut size={20} className="text-neutral-400" />}
-                  title="Log Out"
-                  onClick={handleLogout}
+              {channelData?.map((channel, idx) => (
+                <SidebarList
+                  key={idx + channel._id}
+                  type="channel"
+                  name={channel.name}
+                  link={`/a/${workspaceData?._id}/ch/${channel._id}`}
+                  isDefault
+                  count={channel.threads.length}
                 />
-              </Menu>
+              ))}
             </div>
-          }
-          position="right"
-        >
-          <WorkspaceButton title={dataSource.name} />
-        </Popup>
-        <IconButton>
-          <BiMoon size={18} className="text-neutral-400" />
-        </IconButton>
-      </div>
-      <div className="p-2 ">
-        <ul className="mb-1">
-          <SidebarList
-            type="search"
-            name="Search"
-            link={`/a/${dataSource._id}/search`}
-          />
-          <SidebarList
-            type="inbox"
-            name="Inbox"
-            link={`/a/${dataSource._id}/inbox`}
-          />
-          <SidebarList
-            type="saved"
-            name="Saved"
-            link={`/a/${dataSource._id}/saved`}
-          />
-          <SidebarList
-            type="messages"
-            name="Messages"
-            link={`/a/${dataSource._id}/messages`}
-          />
-        </ul>
-        <ChannelButton setCreateChannelModal={setCreateChannelModal} />
-        <div>
-          {channelData?.map((channel, idx) => (
-            <SidebarList
-              key={idx + channel._id}
-              type="channel"
-              name={channel.name}
-              link={`/a/${dataSource._id}/ch/${channel._id}`}
-              isDefault
-              count={channel.threads.length}
-            />
-          ))}
+          </div>
         </div>
-      </div>
-      <Modal
-        header="Create new channel"
-        onClose={() => {
-          setCreateChannelModal(false);
-        }}
-        visible={createChannelModal}
-        footer={null}
-      >
-        <CreateChannelForm
-          onSubmit={createChannelHandler}
-          loading={createLoading}
-          onCancel={() => {
+        <Modal
+          header="Create new channel"
+          onClose={() => {
             setCreateChannelModal(false);
           }}
-        />
-      </Modal>
-    </div>
+          visible={createChannelModal}
+          footer={null}
+        >
+          <CreateChannelForm
+            onSubmit={createChannelHandler}
+            loading={createLoading}
+            onCancel={() => {
+              setCreateChannelModal(false);
+            }}
+          />
+        </Modal>
+      </div>
+    )
   );
 }
 

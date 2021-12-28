@@ -1,16 +1,32 @@
-import { configureStore } from "@reduxjs/toolkit";
+import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import { setupListeners } from "@reduxjs/toolkit/dist/query";
-import { api } from "api";
+import storage from "redux-persist/lib/storage";
+import { persistStore, persistReducer } from "redux-persist";
+
 import { authReducer } from "features/auth";
+import { channelReducer } from "features/channels/slice";
+import { workspaceReducer } from "features/workspaces";
+import { threadReducer } from "features/threads";
+
+const persistConfig = {
+  key: "root",
+  storage,
+};
+
+const appReducer = combineReducers({
+  auth: authReducer,
+  workspace: workspaceReducer,
+  channel: channelReducer,
+  thread: threadReducer,
+});
+
+const persistedReducer = persistReducer(persistConfig, appReducer);
 
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    [api.reducerPath]: api.reducer,
-  },
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware().concat(api.middleware),
+  reducer: persistedReducer,
 });
+
+export const persistor = persistStore(store);
 
 setupListeners(store.dispatch);
 export type RootState = ReturnType<typeof store.getState>;
