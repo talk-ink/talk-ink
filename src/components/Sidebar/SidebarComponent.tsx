@@ -89,26 +89,19 @@ function SidebarComponent() {
   };
 
   const leaveChannelHandler = async () => {
-    setModalLoading(true);
     try {
       let members = selectedChannel.members.filter((data) => data !== userId);
 
-      const leaveChannel = await kontenbase
-        .service("Channels")
-        .updateById(selectedChannel?._id, {
-          members,
-        });
+      await kontenbase.service("Channels").updateById(selectedChannel?._id, {
+        members,
+      });
 
-      if (leaveChannel.data) {
-        dispatch(deleteChannel(selectedChannel));
-        setSelectedChannel(null);
-        setLeaveChannelModal(false);
-        navigate(`/a/${params.workspaceId}/inbox`);
-      }
+      dispatch(deleteChannel(selectedChannel));
+      setSelectedChannel(null);
+      setLeaveChannelModal(false);
+      navigate(`/a/${params.workspaceId}/inbox`);
     } catch (error) {
       console.log("err", error);
-    } finally {
-      setModalLoading(false);
     }
   };
 
@@ -245,7 +238,6 @@ function SidebarComponent() {
         onConfirm={() => {
           leaveChannelHandler();
         }}
-        okButtonProps={{ disabled: modalLoading }}
       >
         <p className="text-sm">
           Are you sure you want to leave this channel? You can always join it

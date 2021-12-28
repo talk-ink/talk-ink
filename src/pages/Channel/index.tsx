@@ -1,6 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 
-import { BiDotsHorizontalRounded, BiEdit } from "react-icons/bi";
+import {
+  BiDotsHorizontalRounded,
+  BiEdit,
+  BiEditAlt,
+  BiLogOut,
+} from "react-icons/bi";
 import { useLocation, useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
@@ -11,15 +16,18 @@ import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
+import Popup from "components/Popup/Popup";
+import Menu from "components/Menu/Menu";
+import MenuItem from "components/Menu/MenuItem";
+import Modal from "components/Modal/Modal";
+
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchThreads } from "features/threads";
 import { Channel, Thread } from "types";
-import Popup from "components/Popup/Popup";
-import Menu from "components/Menu/Menu";
-import MenuItem from "components/Menu/MenuItem";
-import Modal from "components/Modal/Modal";
+import EditChannelForm from "components/ChannelForm/EditChannelForm";
+import { deleteChannel } from "features/channels/slice";
 
 moment.locale("id");
 
@@ -33,12 +41,17 @@ function ChannelPage() {
   const channel = useAppSelector((state) => state.channel);
   const thread = useAppSelector((state) => state.thread);
 
+  const userId: string = auth.user.id;
+
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] = useState<
     Thread | null | undefined
   >();
   const [apiLoading, setApiLoading] = useState<boolean>();
+
+  const [editChannelModal, setEditChannelModal] = useState<boolean>();
+  const [leaveChannelModal, setLeaveChannelModal] = useState<boolean>();
 
   const createThreadDraft = () => {
     const threadsDraft = localStorage.getItem("threadsDraft");
@@ -71,7 +84,7 @@ function ChannelPage() {
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === params.channelId);
-  }, [params.channelId]);
+  }, [params.channelId, channel.channels]);
 
   const threadData = useMemo(() => {
     return thread.threads;
@@ -93,6 +106,22 @@ function ChannelPage() {
       console.log("err", error);
     } finally {
       setApiLoading(false);
+    }
+  };
+
+  const leaveChannelHandler = async () => {
+    try {
+      let members = channelData.members.filter((data) => data !== userId);
+
+      await kontenbase.service("Channels").updateById(channelData?._id, {
+        members,
+      });
+
+      dispatch(deleteChannel(channelData));
+      setLeaveChannelModal(false);
+      navigate(`/a/${params.workspaceId}/inbox`);
+    } catch (error) {
+      console.log("err", error);
     }
   };
 
@@ -135,8 +164,18 @@ function ChannelPage() {
               <div>
                 <Menu>
                   <MenuItem
-                    icon={<BiEdit size={20} className="text-neutral-400" />}
-                    title="Edit channel..."
+                    icon={<BiEditAlt size={20} className="text-neutral-400" />}
+                    onClick={() => {
+                      setEditChannelModal(true);
+                    }}
+                    title="Edit channel"
+                  />
+                  <MenuItem
+                    icon={<BiLogOut size={20} className="text-neutral-400" />}
+                    onClick={() => {
+                      setLeaveChannelModal(true);
+                    }}
+                    title="Leave channel"
                   />
                 </Menu>
               </div>
@@ -193,6 +232,46 @@ function ChannelPage() {
         okButtonText="Confirm"
       >
         Are you sure you want to delete this thread?
+      </Modal>
+      <Modal
+        header="Edit channel"
+        visible={editChannelModal}
+        onClose={() => {
+          setEditChannelModal(false);
+        }}
+        onCancel={() => {
+          setEditChannelModal(false);
+        }}
+        footer={null}
+      >
+        <EditChannelForm
+          data={channelData}
+          onClose={() => {
+            setEditChannelModal(false);
+          }}
+        />
+      </Modal>
+
+      <Modal
+        header={`Leave ${
+          channelData?.privacy === "private" ? "private" : "public"
+        } channel?`}
+        okButtonText="Leave channel"
+        visible={!!channelData && leaveChannelModal}
+        onCancel={() => {
+          setLeaveChannelModal(false);
+        }}
+        onClose={() => {
+          setLeaveChannelModal(false);
+        }}
+        onConfirm={() => {
+          leaveChannelHandler();
+        }}
+      >
+        <p className="text-sm">
+          Are you sure you want to leave this channel? You can always join it
+          again later.
+        </p>
       </Modal>
     </MainContentContainer>
   );

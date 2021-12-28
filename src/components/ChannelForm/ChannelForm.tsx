@@ -39,8 +39,6 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
     enableReinitialize: true,
   });
 
-  console.log(editedData);
-
   const isDisabled: boolean =
     !formik.values.name ||
     !formik.values.description ||
