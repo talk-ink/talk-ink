@@ -3,34 +3,29 @@ import { Outlet, Route, Routes, useParams } from "react-router";
 
 import SidebarComponent from "components/Sidebar/SidebarComponent";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
-import { useGetWorkspaceByIdQuery } from "features/workspaces";
 import { useAppSelector } from "hooks/useAppSelector";
 import { Workspace } from "types";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { fetchWorkspaces } from "features/workspaces/slice";
 
 function DashboardPage() {
-  const params = useParams();
   const auth = useAppSelector((state) => state.auth);
-  const userId: any = auth.user.id;
+  const workspace = useAppSelector((state) => state.workspace);
+  const dispatch = useAppDispatch();
 
-  const { data: workspaceData, isLoading: workspaceLoading } =
-    useGetWorkspaceByIdQuery(params.workspaceId);
+  const userId: string = auth.user.id;
 
   useEffect(() => {
-    if (!workspaceLoading) {
-      if (!workspaceData) throw new Error("Invalid workspace");
-      if (!workspaceData?.peoples?.includes(userId))
-        throw new Error("Invalid workspace");
-      console.log(workspaceData);
-    }
-  }, [workspaceData, workspaceLoading]);
+    dispatch(fetchWorkspaces({ userId }));
+  }, [userId]);
 
-  const loading = workspaceLoading;
+  const loading = workspace.loading;
 
   return loading ? (
     <FullscreenLoading />
   ) : (
     <div className="w-full min-h-screen grid grid-cols-[280px_1fr] overflow-hidden text-slightGray">
-      <SidebarComponent dataSource={workspaceData} />
+      <SidebarComponent />
       <Outlet />
     </div>
   );
