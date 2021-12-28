@@ -1,28 +1,30 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { BiLogOut, BiMoon } from "react-icons/bi";
 import cookies from "js-cookie";
+import { useNavigate, useParams } from "react-router";
 
 import ChannelButton from "components/Button/ChannelButton";
 import IconButton from "components/Button/IconButton";
 import WorkspaceButton from "components/Button/WorkspaceButton";
-import SidebarList from "./SidebarList";
-import { useAppSelector } from "hooks/useAppSelector";
-import { Channel, CreateChannel, Workspace } from "types";
-import { kontenbase } from "lib/client";
-import { useNavigate, useParams } from "react-router";
 import Popup from "components/Popup/Popup";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { logout } from "features/auth";
 import Modal from "components/Modal/Modal";
-import CreateChannelForm from "components/CreateChannelForm/CreateChannelForm";
+import ChannelForm from "components/ChannelForm/ChannelForm";
+import SidebarList from "./SidebarList";
+
+import { kontenbase } from "lib/client";
+import { Channel, CreateChannel, Workspace } from "types";
+import { useAppSelector } from "hooks/useAppSelector";
+import { logout } from "features/auth";
 import {
   addChannel,
   deleteChannel,
   fetchChannels,
 } from "features/channels/slice";
+import EditChannelForm from "components/ChannelForm/EditChannelForm";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -33,11 +35,11 @@ function SidebarComponent() {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
 
-  const [apiLoading, setApiLoading] = useState(false);
-
   const [modalLoading, setModalLoading] = useState(false);
 
   const [createChannelModal, setCreateChannelModal] = useState(false);
+  const [editChannelModal, setEditChannelModal] = useState(false);
+  const [leaveChannelModal, setLeaveChannelModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -100,8 +102,9 @@ function SidebarComponent() {
       if (leaveChannel.data) {
         dispatch(deleteChannel(selectedChannel));
         setSelectedChannel(null);
+        setLeaveChannelModal(false);
+        navigate(`/a/${params.workspaceId}/inbox`);
       }
-      navigate(`/a/${params.workspaceId}/inbox`);
     } catch (error) {
       console.log("err", error);
     } finally {
@@ -174,7 +177,14 @@ function SidebarComponent() {
                   link={`/a/${workspaceData?._id}/ch/${channel._id}`}
                   isDefault
                   count={channel.threads.length}
-                  setSelectedChannel={setSelectedChannel}
+                  leaveModalHandler={(channel) => {
+                    setLeaveChannelModal(true);
+                    setSelectedChannel(channel);
+                  }}
+                  editModalHandler={(channel) => {
+                    setEditChannelModal(true);
+                    setSelectedChannel(channel);
+                  }}
                 />
               ))}
             </div>
@@ -189,7 +199,7 @@ function SidebarComponent() {
         visible={createChannelModal}
         footer={null}
       >
-        <CreateChannelForm
+        <ChannelForm
           onSubmit={createChannelHandler}
           loading={modalLoading}
           onCancel={() => {
@@ -198,16 +208,39 @@ function SidebarComponent() {
         />
       </Modal>
       <Modal
+        header="Edit channel"
+        visible={editChannelModal}
+        onClose={() => {
+          setEditChannelModal(false);
+          setSelectedChannel(null);
+        }}
+        onCancel={() => {
+          setEditChannelModal(false);
+          setSelectedChannel(null);
+        }}
+        footer={null}
+      >
+        <EditChannelForm
+          data={selectedChannel}
+          onClose={() => {
+            setEditChannelModal(false);
+            setSelectedChannel(null);
+          }}
+        />
+      </Modal>
+      <Modal
         header={`Leave ${
           selectedChannel?.privacy === "private" ? "private" : "public"
         } channel?`}
         okButtonText="Leave channel"
-        visible={!!selectedChannel}
+        visible={!!selectedChannel && leaveChannelModal}
         onCancel={() => {
           setSelectedChannel(null);
+          setLeaveChannelModal(false);
         }}
         onClose={() => {
           setSelectedChannel(null);
+          setLeaveChannelModal(false);
         }}
         onConfirm={() => {
           leaveChannelHandler();

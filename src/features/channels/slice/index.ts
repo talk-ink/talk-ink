@@ -40,6 +40,16 @@ const channelSlice = createSlice({
       );
       state.channels.splice(deletedIndex, 1);
     },
+    updateChannel: (state, action) => {
+      const updatedIndex = state.channels.findIndex(
+        (channel) => channel._id === action.payload._id
+      );
+
+      state.channels[updatedIndex] = {
+        ...state.channels[updatedIndex],
+        ...action.payload,
+      };
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchChannels.pending, (state) => {
@@ -58,5 +68,6 @@ const channelSlice = createSlice({
   },
 });
 
-export const { addChannel, deleteChannel } = channelSlice.actions;
+export const { addChannel, deleteChannel, updateChannel } =
+  channelSlice.actions;
 export const channelReducer = channelSlice.reducer;

@@ -5,7 +5,7 @@ import FormLabel from "components/Form/FormLabel";
 import TextArea from "components/Form/TextArea";
 import TextInput from "components/Form/TextInput";
 import { useFormik } from "formik";
-import { CreateChannel } from "types";
+import { Channel, CreateChannel } from "types";
 import { createChannelValidation } from "utils/validators";
 import Button from "components/Button/Button";
 import SubLabel from "components/Form/SubLabel";
@@ -20,16 +20,26 @@ type TProps = React.PropsWithChildren<{
   onSubmit: (values: CreateChannel) => Promise<void>;
   loading: boolean;
   onCancel: () => void;
+  editedData?: Channel;
 }>;
 
-function CreateChannelForm({ onSubmit, loading, onCancel }: TProps) {
+function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
   const formik = useFormik({
-    initialValues,
+    initialValues: editedData
+      ? {
+          name: editedData.name,
+          description: editedData.description,
+          privacy: editedData.privacy,
+        }
+      : initialValues,
     validationSchema: createChannelValidation,
     onSubmit: (values) => {
       onSubmit(values);
     },
+    enableReinitialize: true,
   });
+
+  console.log(editedData);
 
   const isDisabled: boolean =
     !formik.values.name ||
@@ -68,6 +78,7 @@ function CreateChannelForm({ onSubmit, loading, onCancel }: TProps) {
         <FormLabel>Privacy</FormLabel>
         <select
           value={formik.values.privacy}
+          defaultValue="public"
           onChange={formik.handleChange("privacy")}
           onBlur={formik.handleBlur("privacy")}
           className="w-full text-sm p-2 rounded-md outline-0 border bg-white border-neutral-200 focus:border-neutral-300"
@@ -96,4 +107,4 @@ function CreateChannelForm({ onSubmit, loading, onCancel }: TProps) {
   );
 }
 
-export default CreateChannelForm;
+export default ChannelForm;

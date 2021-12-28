@@ -4,7 +4,7 @@ import Popup from "components/Popup/Popup";
 import React, { Dispatch, SetStateAction } from "react";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
-import { BiDotsHorizontalRounded, BiLogOut } from "react-icons/bi";
+import { BiDotsHorizontalRounded, BiEditAlt, BiLogOut } from "react-icons/bi";
 import {
   HiOutlineBookmark,
   HiOutlineChat,
@@ -22,7 +22,8 @@ type Props = React.PropsWithChildren<{
   link: string;
   isDefault?: boolean;
   count?: number | string;
-  setSelectedChannel?: Dispatch<SetStateAction<Channel | null | undefined>>;
+  leaveModalHandler?: (channel: Channel) => void;
+  editModalHandler?: (channel: Channel) => void;
   data?: Channel;
 }>;
 
@@ -32,7 +33,8 @@ function SidebarList({
   link,
   isDefault,
   count,
-  setSelectedChannel,
+  leaveModalHandler,
+  editModalHandler,
   data,
 }: Props) {
   let Icon = AiOutlineInbox;
@@ -91,9 +93,16 @@ function SidebarList({
             <div>
               <Menu>
                 <MenuItem
+                  icon={<BiEditAlt size={20} className="text-neutral-400" />}
+                  onClick={() => {
+                    editModalHandler(data);
+                  }}
+                  title="Edit channel"
+                />
+                <MenuItem
                   icon={<BiLogOut size={20} className="text-neutral-400" />}
                   onClick={() => {
-                    setSelectedChannel(data);
+                    leaveModalHandler(data);
                   }}
                   title="Leave channel"
                 />
