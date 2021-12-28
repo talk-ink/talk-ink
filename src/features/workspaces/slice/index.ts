@@ -25,7 +25,11 @@ const initialState: { workspaces: Workspace[]; loading: boolean } = {
 const workspaceSlice = createSlice({
   name: "workspace",
   initialState,
-  reducers: {},
+  reducers: {
+    addWorkspace: (state, action: PayloadAction<Workspace>) => {
+      state.workspaces.push(action.payload);
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchWorkspaces.pending, (state) => {
       state.loading = true;
@@ -43,4 +47,5 @@ const workspaceSlice = createSlice({
   },
 });
 
+export const { addWorkspace } = workspaceSlice.actions;
 export const workspaceReducer = workspaceSlice.reducer;

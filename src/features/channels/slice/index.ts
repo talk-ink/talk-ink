@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
-import { Channel, Workspace } from "types";
+import { Channel, CreateChannel, Workspace } from "types";
 
 type FetchChannelsProps = {
   userId: string;
@@ -30,7 +30,27 @@ const initialState: InitChannelState = {
 const channelSlice = createSlice({
   name: "channel",
   initialState,
-  reducers: {},
+  reducers: {
+    addChannel: (state, action) => {
+      state.channels.push(action.payload);
+    },
+    deleteChannel: (state, action: PayloadAction<Channel>) => {
+      let deletedIndex = state.channels.findIndex(
+        (data) => data._id === action.payload._id
+      );
+      state.channels.splice(deletedIndex, 1);
+    },
+    updateChannel: (state, action) => {
+      const updatedIndex = state.channels.findIndex(
+        (channel) => channel._id === action.payload._id
+      );
+
+      state.channels[updatedIndex] = {
+        ...state.channels[updatedIndex],
+        ...action.payload,
+      };
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchChannels.pending, (state) => {
       state.loading = true;
@@ -48,4 +68,6 @@ const channelSlice = createSlice({
   },
 });
 
+export const { addChannel, deleteChannel, updateChannel } =
+  channelSlice.actions;
 export const channelReducer = channelSlice.reducer;

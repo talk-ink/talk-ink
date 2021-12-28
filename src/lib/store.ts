@@ -7,10 +7,12 @@ import { authReducer } from "features/auth";
 import { channelReducer } from "features/channels/slice";
 import { workspaceReducer } from "features/workspaces";
 import { threadReducer } from "features/threads";
+import { toastReducer } from "features/toast/slice";
 
 const persistConfig = {
   key: "root",
   storage,
+  whitelist: ["thread", "toast"],
 };
 
 const appReducer = combineReducers({
@@ -18,6 +20,7 @@ const appReducer = combineReducers({
   workspace: workspaceReducer,
   channel: channelReducer,
   thread: threadReducer,
+  toast: toastReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appReducer);

@@ -46,7 +46,17 @@ const initialState: InitThreadState = {
 const threadSlice = createSlice({
   name: "thread",
   initialState,
-  reducers: {},
+  reducers: {
+    addThread: (state, action: PayloadAction<Thread>) => {
+      state.threads.push(action.payload);
+    },
+    deleteThread: (state, action: PayloadAction<Thread>) => {
+      let deletedIndex = state.threads.findIndex(
+        (data) => data._id === action.payload._id
+      );
+      state.threads.splice(deletedIndex, 1);
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(fetchThreads.pending, (state) => {
       state.loading = true;
@@ -64,4 +74,5 @@ const threadSlice = createSlice({
   },
 });
 
+export const { addThread, deleteThread } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

@@ -20,3 +20,9 @@ export const createThreadValidation = yup.object().shape({
   name: yup.string().max(300).required(),
   content: yup.string().required(),
 });
+
+export const createChannelValidation = yup.object().shape({
+  name: yup.string().max(40).required(),
+  description: yup.string().max(300).required(),
+  privacy: yup.string().oneOf(["public", "private"]).required(),
+});

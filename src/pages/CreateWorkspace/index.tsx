@@ -12,6 +12,9 @@ import SubLabel from "components/Form/SubLabel";
 import Button from "components/Button/Button";
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { addWorkspace } from "features/workspaces";
+import { useToast } from "hooks/useToast";
 
 const initialValues: Workspace = {
   name: "",
@@ -19,8 +22,12 @@ const initialValues: Workspace = {
 };
 
 function CreateWorkspacePage() {
-  const auth = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
+  const [showToast] = useToast();
+
+  const auth = useAppSelector((state) => state.auth);
+
+  const dispatch = useAppDispatch();
 
   const [apiLoading, setApiLoading] = useState(false);
 
@@ -39,16 +46,20 @@ function CreateWorkspacePage() {
         .service("Workspaces")
         .create({ name: values.name, peoples: auth.user.id });
 
+      dispatch(addWorkspace(data));
+
       if (data) {
         const generalChannel = await kontenbase.service("Channels").create({
           name: "General",
           workspace: data?._id,
           members: auth.user.id,
+          privacy: "public",
         });
         const projectChannel = await kontenbase.service("Channels").create({
           name: values.project,
           workspace: data?._id,
           members: auth.user.id,
+          privacy: "public",
         });
 
         if (generalChannel && projectChannel) {
@@ -57,6 +68,7 @@ function CreateWorkspacePage() {
       }
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     } finally {
       setApiLoading(false);
     }

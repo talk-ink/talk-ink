@@ -26,6 +26,15 @@ const authSlice = createSlice({
     setAuthLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
     },
+    login: (state, action: PayloadAction<AuthState>) => {
+      const cookiesToken = cookies.get("token");
+      if (!cookiesToken) {
+        cookies.set("token", `${action.payload.token}`);
+      }
+      state.loading = false;
+      state.user = action.payload.user;
+      state.token = action.payload.token;
+    },
     logout: (state) => {
       state.token = null;
       state.user = null;
@@ -33,6 +42,6 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAuthToken, setAuthUser, setAuthLoading, logout } =
+export const { setAuthToken, setAuthUser, setAuthLoading, logout, login } =
   authSlice.actions;
 export const authReducer = authSlice.reducer;

@@ -28,7 +28,15 @@ export interface Channel {
   _id?: string;
   name: string;
   threads: string[];
-  members: User[];
+  members: string[];
+  description?: string;
+  privacy?: "private" | "public";
+}
+
+export interface CreateChannel {
+  name: string;
+  description?: string;
+  privacy?: "private" | "public";
 }
 
 export interface Workspace {
@@ -59,4 +67,9 @@ export interface Register {
   firstName: string;
   email: string;
   password: string;
+}
+
+export interface Toast {
+  message: string | null;
+  duration?: number;
 }

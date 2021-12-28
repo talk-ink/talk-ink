@@ -13,7 +13,7 @@ function WorkspaceButton({ onClick = () => {}, title }: Props) {
       onClick={onClick}
     >
       <div className="w-6 h-6 bg-[#a8a8a8] rounded-md flex items-center justify-center">
-        <p className="text-white uppercase font-bold text-sm">{title[0]}</p>
+        <p className="text-white uppercase font-bold text-sm">{title?.[0]}</p>
       </div>
       <p className="font-bold px-2 text-sm">{title}</p>
       <HiChevronDown className="text-neutral-400 -mb-1" />
