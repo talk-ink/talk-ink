@@ -24,7 +24,7 @@ import Modal from "components/Modal/Modal";
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { fetchThreads } from "features/threads";
+import { deleteThread, fetchThreads } from "features/threads";
 import { Channel, Thread } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel } from "features/channels/slice";
@@ -94,13 +94,14 @@ function ChannelPage() {
     setApiLoading(true);
     try {
       if (!selectedThread?.draft) {
-        const deleteThread = await kontenbase
+        const deletedThread = await kontenbase
           .service("Threads")
           .deleteById(selectedThread?._id);
 
-        if (deleteThread?.data) {
+        if (deletedThread?.data) {
           setSelectedThread(null);
         }
+        dispatch(deleteThread(deletedThread.data));
       }
     } catch (error) {
       console.log("err", error);
