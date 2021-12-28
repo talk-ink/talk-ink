@@ -18,7 +18,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { logout } from "features/auth";
 import Modal from "components/Modal/Modal";
 import CreateChannelForm from "components/CreateChannelForm/CreateChannelForm";
-import { fetchChannels } from "features/channels/slice";
+import { addChannel, fetchChannels } from "features/channels/slice";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -53,6 +53,10 @@ function SidebarComponent() {
     }
   };
 
+  const getChannels = () => {
+    dispatch(fetchChannels({ userId, workspaceId: params.workspaceId }));
+  };
+
   const createChannelHandler = async (values: CreateChannel) => {
     setCreateLoading(true);
     try {
@@ -62,7 +66,8 @@ function SidebarComponent() {
         workspace: params.workspaceId,
       });
       if (createChannel) {
-        // getChannels();
+        dispatch(addChannel(createChannel.data));
+        getChannels();
         setCreateChannelModal(false);
         navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
       }
@@ -74,37 +79,36 @@ function SidebarComponent() {
   };
 
   useEffect(() => {
-    // getChannels();
-    dispatch(fetchChannels({ userId, workspaceId: params.workspaceId }));
+    getChannels();
   }, [params.workspaceId]);
 
   const loading = workspace.loading || channel.loading;
 
   return (
-    !loading && (
-      <div>
-        <div className="bg-[#F7FAFB] h-screen overflow-auto">
-          <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
-            <Popup
-              content={
-                <div>
-                  <Menu>
-                    <MenuItem
-                      icon={<BiLogOut size={20} className="text-neutral-400" />}
-                      title="Log Out"
-                      onClick={handleLogout}
-                    />
-                  </Menu>
-                </div>
-              }
-              position="right"
-            >
-              <WorkspaceButton title={workspaceData?.name} />
-            </Popup>
-            <IconButton>
-              <BiMoon size={18} className="text-neutral-400" />
-            </IconButton>
-          </div>
+    <div>
+      <div className="bg-[#F7FAFB] h-screen overflow-auto">
+        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
+          <Popup
+            content={
+              <div>
+                <Menu>
+                  <MenuItem
+                    icon={<BiLogOut size={20} className="text-neutral-400" />}
+                    title="Log Out"
+                    onClick={handleLogout}
+                  />
+                </Menu>
+              </div>
+            }
+            position="right"
+          >
+            <WorkspaceButton title={workspaceData?.name} />
+          </Popup>
+          <IconButton>
+            <BiMoon size={18} className="text-neutral-400" />
+          </IconButton>
+        </div>
+        {!loading && (
           <div className="p-2 ">
             <ul className="mb-1">
               <SidebarList
@@ -142,25 +146,25 @@ function SidebarComponent() {
               ))}
             </div>
           </div>
-        </div>
-        <Modal
-          header="Create new channel"
-          onClose={() => {
+        )}
+      </div>
+      <Modal
+        header="Create new channel"
+        onClose={() => {
+          setCreateChannelModal(false);
+        }}
+        visible={createChannelModal}
+        footer={null}
+      >
+        <CreateChannelForm
+          onSubmit={createChannelHandler}
+          loading={createLoading}
+          onCancel={() => {
             setCreateChannelModal(false);
           }}
-          visible={createChannelModal}
-          footer={null}
-        >
-          <CreateChannelForm
-            onSubmit={createChannelHandler}
-            loading={createLoading}
-            onCancel={() => {
-              setCreateChannelModal(false);
-            }}
-          />
-        </Modal>
-      </div>
-    )
+        />
+      </Modal>
+    </div>
   );
 }
 
