@@ -12,6 +12,8 @@ import { Thread } from "types";
 import { createThreadValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { addThread } from "features/threads";
 
 const initialValues: Thread = {
   name: "",
@@ -23,6 +25,8 @@ moment.locale("id");
 function Compose() {
   const params = useParams();
   const navigate = useNavigate();
+
+  const dispatch = useAppDispatch();
 
   const [apiLoading, setApiLoading] = useState(false);
 
@@ -82,7 +86,8 @@ function Compose() {
 
       deleteDraft();
 
-      if (createThread) {
+      if (createThread.data) {
+        dispatch(addThread(createThread.data));
         navigate(
           `/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`
         );
