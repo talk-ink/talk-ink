@@ -84,10 +84,10 @@ function InboxMessage({
                       setSelectedThread(dataSource);
                     }}
                   />
-                  <MenuItem
+                  {/* <MenuItem
                     icon={<BiEdit size={20} className="text-neutral-400" />}
                     title="Edit thread title..."
-                  />
+                  /> */}
                 </Menu>
               </div>
             }
