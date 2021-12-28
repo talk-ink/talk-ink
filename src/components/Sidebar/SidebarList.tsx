@@ -1,13 +1,18 @@
-import React from "react";
+import Menu from "components/Menu/Menu";
+import MenuItem from "components/Menu/MenuItem";
+import Popup from "components/Popup/Popup";
+import React, { Dispatch, SetStateAction } from "react";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
-import { BiDotsHorizontalRounded } from "react-icons/bi";
+import { BiDotsHorizontalRounded, BiLogOut } from "react-icons/bi";
 import {
   HiOutlineBookmark,
   HiOutlineChat,
   HiOutlineHashtag,
 } from "react-icons/hi";
 import { NavLink } from "react-router-dom";
+
+import { Channel } from "types";
 
 type SidebarType = "search" | "inbox" | "saved" | "messages" | "channel";
 
@@ -17,9 +22,19 @@ type Props = React.PropsWithChildren<{
   link: string;
   isDefault?: boolean;
   count?: number | string;
+  setSelectedChannel?: Dispatch<SetStateAction<Channel | null | undefined>>;
+  data?: Channel;
 }>;
 
-function SidebarList({ type, name, link, isDefault, count }: Props) {
+function SidebarList({
+  type,
+  name,
+  link,
+  isDefault,
+  count,
+  setSelectedChannel,
+  data,
+}: Props) {
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
 
@@ -71,9 +86,26 @@ function SidebarList({ type, name, link, isDefault, count }: Props) {
         <p className="text-neutral-400 text-xs">{count}</p>
       </div>
       {showOption && (
-        <button className="hidden h-7 w-8 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md z-10">
-          <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
-        </button>
+        <Popup
+          content={
+            <div>
+              <Menu>
+                <MenuItem
+                  icon={<BiLogOut size={20} className="text-neutral-400" />}
+                  onClick={() => {
+                    setSelectedChannel(data);
+                  }}
+                  title="Leave channel"
+                />
+              </Menu>
+            </div>
+          }
+          position="bottom"
+        >
+          <button className="hidden h-7 w-8 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md z-10">
+            <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
+          </button>
+        </Popup>
       )}
     </div>
   );

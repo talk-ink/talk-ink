@@ -34,6 +34,12 @@ const channelSlice = createSlice({
     addChannel: (state, action) => {
       state.channels.push(action.payload);
     },
+    deleteChannel: (state, action: PayloadAction<Channel>) => {
+      let deletedIndex = state.channels.findIndex(
+        (data) => data._id === action.payload._id
+      );
+      state.channels.splice(deletedIndex, 1);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchChannels.pending, (state) => {
@@ -52,5 +58,5 @@ const channelSlice = createSlice({
   },
 });
 
-export const { addChannel } = channelSlice.actions;
+export const { addChannel, deleteChannel } = channelSlice.actions;
 export const channelReducer = channelSlice.reducer;

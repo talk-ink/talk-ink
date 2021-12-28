@@ -18,7 +18,11 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { logout } from "features/auth";
 import Modal from "components/Modal/Modal";
 import CreateChannelForm from "components/CreateChannelForm/CreateChannelForm";
-import { addChannel, fetchChannels } from "features/channels/slice";
+import {
+  addChannel,
+  deleteChannel,
+  fetchChannels,
+} from "features/channels/slice";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -30,9 +34,14 @@ function SidebarComponent() {
   const dispatch = useAppDispatch();
 
   const [apiLoading, setApiLoading] = useState(false);
-  const [createLoading, setCreateLoading] = useState(false);
+
+  const [modalLoading, setModalLoading] = useState(false);
 
   const [createChannelModal, setCreateChannelModal] = useState(false);
+
+  const [selectedChannel, setSelectedChannel] = useState<
+    Channel | null | undefined
+  >(null);
 
   const workspaceData: Workspace = workspace.workspaces.find(
     (data) => data._id === params.workspaceId
@@ -58,7 +67,7 @@ function SidebarComponent() {
   };
 
   const createChannelHandler = async (values: CreateChannel) => {
-    setCreateLoading(true);
+    setModalLoading(true);
     try {
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
@@ -67,14 +76,36 @@ function SidebarComponent() {
       });
       if (createChannel) {
         dispatch(addChannel(createChannel.data));
-        getChannels();
         setCreateChannelModal(false);
         navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
       }
     } catch (error) {
       console.log("err", error);
     } finally {
-      setCreateLoading(false);
+      setModalLoading(false);
+    }
+  };
+
+  const leaveChannelHandler = async () => {
+    setModalLoading(true);
+    try {
+      let members = selectedChannel.members.filter((data) => data !== userId);
+
+      const leaveChannel = await kontenbase
+        .service("Channels")
+        .updateById(selectedChannel?._id, {
+          members,
+        });
+
+      if (leaveChannel.data) {
+        dispatch(deleteChannel(selectedChannel));
+        setSelectedChannel(null);
+      }
+      navigate(`/a/${params.workspaceId}/inbox`);
+    } catch (error) {
+      console.log("err", error);
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -86,7 +117,7 @@ function SidebarComponent() {
 
   return (
     <div>
-      <div className="bg-[#F7FAFB] h-screen overflow-auto">
+      <div className="bg-[#F7FAFB] h-screen">
         <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
           <Popup
             content={
@@ -139,9 +170,11 @@ function SidebarComponent() {
                   key={idx + channel._id}
                   type="channel"
                   name={channel.name}
+                  data={channel}
                   link={`/a/${workspaceData?._id}/ch/${channel._id}`}
                   isDefault
                   count={channel.threads.length}
+                  setSelectedChannel={setSelectedChannel}
                 />
               ))}
             </div>
@@ -158,11 +191,33 @@ function SidebarComponent() {
       >
         <CreateChannelForm
           onSubmit={createChannelHandler}
-          loading={createLoading}
+          loading={modalLoading}
           onCancel={() => {
             setCreateChannelModal(false);
           }}
         />
+      </Modal>
+      <Modal
+        header={`Leave ${
+          selectedChannel?.privacy === "private" ? "private" : "public"
+        } channel?`}
+        okButtonText="Leave channel"
+        visible={!!selectedChannel}
+        onCancel={() => {
+          setSelectedChannel(null);
+        }}
+        onClose={() => {
+          setSelectedChannel(null);
+        }}
+        onConfirm={() => {
+          leaveChannelHandler();
+        }}
+        okButtonProps={{ disabled: modalLoading }}
+      >
+        <p className="text-sm">
+          Are you sure you want to leave this channel? You can always join it
+          again later.
+        </p>
       </Modal>
     </div>
   );

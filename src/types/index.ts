@@ -28,7 +28,7 @@ export interface Channel {
   _id?: string;
   name: string;
   threads: string[];
-  members: User[];
+  members: string[];
   description?: string;
   privacy?: "private" | "public";
 }
