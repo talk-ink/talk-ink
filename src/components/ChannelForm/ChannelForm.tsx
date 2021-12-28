@@ -56,7 +56,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
           name="name"
           onChange={formik.handleChange("name")}
           onBlur={formik.handleBlur("name")}
-          value={formik.values.name}
+          value={formik.values.name || ""}
         />
         {formik.errors.name && <SubLabel>{formik.errors.name}</SubLabel>}
       </FormControl>
@@ -66,7 +66,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
           name="description"
           onChange={formik.handleChange("description")}
           onBlur={formik.handleBlur("description")}
-          value={formik.values.description}
+          value={formik.values.description || ""}
         />{" "}
         {formik.errors.description && (
           <SubLabel>{formik.errors.description}</SubLabel>
@@ -76,7 +76,6 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
         <FormLabel>Privacy</FormLabel>
         <select
           value={formik.values.privacy}
-          defaultValue="public"
           onChange={formik.handleChange("privacy")}
           onBlur={formik.handleBlur("privacy")}
           className="w-full text-sm p-2 rounded-md outline-0 border bg-white border-neutral-200 focus:border-neutral-300"
@@ -98,7 +97,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
           className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
           disabled={isDisabled}
         >
-          Create
+          {!editedData ? "Create" : "Save"}
         </Button>
       </div>
     </form>

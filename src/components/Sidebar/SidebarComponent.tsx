@@ -129,7 +129,7 @@ function SidebarComponent() {
             }
             position="right"
           >
-            <WorkspaceButton title={workspaceData?.name} />
+            {!loading && <WorkspaceButton title={workspaceData?.name} />}
           </Popup>
           <IconButton>
             <BiMoon size={18} className="text-neutral-400" />

@@ -11,7 +11,7 @@ import { threadReducer } from "features/threads";
 const persistConfig = {
   key: "root",
   storage,
-  blacklist: ["auth"],
+  whitelist: ["thread"],
 };
 
 const appReducer = combineReducers({
