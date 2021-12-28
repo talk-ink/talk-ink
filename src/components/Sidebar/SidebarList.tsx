@@ -1,3 +1,4 @@
+import IconButton from "components/Button/IconButton";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Popup from "components/Popup/Popup";
@@ -111,9 +112,9 @@ function SidebarList({
           }
           position="bottom"
         >
-          <button className="hidden h-7 w-8 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md z-10">
+          <IconButton className="hidden group-hover:flex" size="medium">
             <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
-          </button>
+          </IconButton>
         </Popup>
       )}
     </div>

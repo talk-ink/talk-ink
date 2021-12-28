@@ -4,6 +4,7 @@ import { BiDotsHorizontalRounded, BiPlus } from "react-icons/bi";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Popup from "components/Popup/Popup";
+import IconButton from "./IconButton";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -38,12 +39,13 @@ function ChannelButton({
         }
         position="bottom"
       >
-        <button
-          className="hidden h-7 w-8 group-hover:flex items-center justify-center hover:bg-neutral-300 rounded-md"
+        <IconButton
+          className="hidden group-hover:flex"
+          size="medium"
           onClick={onOptionClick}
         >
           <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
-        </button>
+        </IconButton>
       </Popup>
     </div>
   );
