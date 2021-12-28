@@ -68,3 +68,8 @@ export interface Register {
   email: string;
   password: string;
 }
+
+export interface Toast {
+  message: string | null;
+  duration?: number;
+}

@@ -1,6 +1,7 @@
 import Button from "components/Button/Button";
 import { updateChannel } from "features/channels/slice";
 import { useAppDispatch } from "hooks/useAppDispatch";
+import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import React, { useState } from "react";
 import { Channel, CreateChannel } from "types";
@@ -14,6 +15,7 @@ type TProps = {
 function EditChannelForm({ data, onClose }: TProps) {
   const [edit, setEdit] = useState(false);
   const dispatch = useAppDispatch();
+  const [showToast] = useToast();
 
   const onSubmit = async (value: CreateChannel) => {
     try {
@@ -23,6 +25,7 @@ function EditChannelForm({ data, onClose }: TProps) {
       onClose();
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     }
   };
   const privacyStr = {

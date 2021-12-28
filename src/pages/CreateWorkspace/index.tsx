@@ -14,6 +14,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { addWorkspace } from "features/workspaces";
+import { useToast } from "hooks/useToast";
 
 const initialValues: Workspace = {
   name: "",
@@ -22,6 +23,7 @@ const initialValues: Workspace = {
 
 function CreateWorkspacePage() {
   const navigate = useNavigate();
+  const [showToast] = useToast();
 
   const auth = useAppSelector((state) => state.auth);
 
@@ -66,6 +68,7 @@ function CreateWorkspacePage() {
       }
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     } finally {
       setApiLoading(false);
     }

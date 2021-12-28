@@ -28,11 +28,13 @@ import { deleteThread, fetchThreads } from "features/threads";
 import { Channel, Thread } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel } from "features/channels/slice";
+import { useToast } from "hooks/useToast";
 
 moment.locale("id");
 
 function ChannelPage() {
   const { pathname } = useLocation();
+  const [showToast] = useToast();
 
   const params = useParams();
   const navigate = useNavigate();
@@ -105,6 +107,7 @@ function ChannelPage() {
       }
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     } finally {
       setApiLoading(false);
     }
@@ -123,6 +126,7 @@ function ChannelPage() {
       navigate(`/a/${params.workspaceId}/inbox`);
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     }
   };
 

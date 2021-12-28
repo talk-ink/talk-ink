@@ -25,11 +25,13 @@ import {
   fetchChannels,
 } from "features/channels/slice";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
+import { useToast } from "hooks/useToast";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const channel = useAppSelector((state) => state.channel);
+  const [showToast] = useToast();
 
   const params = useParams();
   const navigate = useNavigate();
@@ -61,6 +63,7 @@ function SidebarComponent() {
       navigate("/login");
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     }
   };
 
@@ -83,6 +86,7 @@ function SidebarComponent() {
       }
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     } finally {
       setModalLoading(false);
     }
@@ -102,6 +106,7 @@ function SidebarComponent() {
       navigate(`/a/${params.workspaceId}/inbox`);
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     }
   };
 

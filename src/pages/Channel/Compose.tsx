@@ -14,6 +14,7 @@ import { kontenbase } from "lib/client";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { addThread } from "features/threads";
+import { useToast } from "hooks/useToast";
 
 const initialValues: Thread = {
   name: "",
@@ -25,6 +26,7 @@ moment.locale("id");
 function Compose() {
   const params = useParams();
   const navigate = useNavigate();
+  const [showToast] = useToast();
 
   const dispatch = useAppDispatch();
 
@@ -94,6 +96,7 @@ function Compose() {
       }
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     } finally {
       setApiLoading(false);
     }

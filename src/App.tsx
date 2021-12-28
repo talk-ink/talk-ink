@@ -19,9 +19,12 @@ import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, User } from "types";
 import ThreadPage from "pages/Thread";
+import ToastProvider from "components/ToastProvider/ToastProvider";
+import { useToast } from "hooks/useToast";
 
 function App() {
   const dispatch = useAppDispatch();
+  const [showToast] = useToast();
   const checkUser = async () => {
     try {
       const cookiesToken = cookies.get("token");
@@ -38,6 +41,7 @@ function App() {
       dispatch(setAuthUser(user));
     } catch (error) {
       console.log("err", error);
+      showToast({ message: `${error}` });
     } finally {
       dispatch(setAuthLoading(false));
     }
@@ -48,54 +52,59 @@ function App() {
   }, []);
 
   return (
-    <Routes>
-      <Route caseSensitive path="/" element={<LandingPage />} />
-      <Route
-        caseSensitive
-        path="/a/create_workspace"
-        element={
-          <RestrictedRoute>
-            <CreateWorkspacePage />
-          </RestrictedRoute>
-        }
-      />
-      <Route
-        caseSensitive
-        path="/a/:workspaceId/"
-        element={
-          <RestrictedRoute>
-            <DashboardPage />
-          </RestrictedRoute>
-        }
-      >
-        <Route path="search" element={<>search</>} />
-        <Route path="inbox" element={<InboxPage />} />
-        <Route path="saved" element={<>saved</>} />
-        <Route path="messages" element={<>messages</>} />
-        <Route path="ch/:channelId" element={<ChannelPage />} />
-        <Route path="ch/:channelId/t/:threadId" element={<ThreadPage />} />
-        <Route path="ch/:channelId/compose/:composeId" element={<Compose />} />
-      </Route>
-      <Route
-        caseSensitive
-        path="/login"
-        element={
-          <RestrictedRoute type="public">
-            <LoginPage />
-          </RestrictedRoute>
-        }
-      />
-      <Route
-        caseSensitive
-        path="/register"
-        element={
-          <RestrictedRoute type="public">
-            <RegisterPage />
-          </RestrictedRoute>
-        }
-      />
-      <Route path="*" element={<NotFound />} />
-    </Routes>
+    <ToastProvider>
+      <Routes>
+        <Route caseSensitive path="/" element={<LandingPage />} />
+        <Route
+          caseSensitive
+          path="/a/create_workspace"
+          element={
+            <RestrictedRoute>
+              <CreateWorkspacePage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          caseSensitive
+          path="/a/:workspaceId/"
+          element={
+            <RestrictedRoute>
+              <DashboardPage />
+            </RestrictedRoute>
+          }
+        >
+          <Route path="search" element={<>search</>} />
+          <Route path="inbox" element={<InboxPage />} />
+          <Route path="saved" element={<>saved</>} />
+          <Route path="messages" element={<>messages</>} />
+          <Route path="ch/:channelId" element={<ChannelPage />} />
+          <Route path="ch/:channelId/t/:threadId" element={<ThreadPage />} />
+          <Route
+            path="ch/:channelId/compose/:composeId"
+            element={<Compose />}
+          />
+        </Route>
+        <Route
+          caseSensitive
+          path="/login"
+          element={
+            <RestrictedRoute type="public">
+              <LoginPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          caseSensitive
+          path="/register"
+          element={
+            <RestrictedRoute type="public">
+              <RegisterPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </ToastProvider>
   );
 }
 
