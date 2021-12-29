@@ -25,7 +25,7 @@ function ThreadPage() {
         <MainContentHeader channel="Channel" title={threadData?.name} thread />
       }
     >
-      <div className="w-full px-20 pb-10">
+      <div className="w-full px-60 pb-10">
         <div className="mb-8">
           <h1 className="font-bold text-3xl">{threadData?.name}</h1>
           <p className="text-neutral-500 text-sm font-body">
@@ -38,7 +38,7 @@ function ThreadPage() {
             </Link>
           </p>
         </div>
-        <div className="flex items-start">
+        <div className="flex items-start ">
           <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
             <img
               src="https://picsum.photos/100"
@@ -50,6 +50,7 @@ function ThreadPage() {
             <ReactMarkdown>{threadData?.content}</ReactMarkdown>
           </div>
         </div>
+        <div className="border-t-2 border-gray-200 mb-8 mt-8" />
       </div>
     </MainContentContainer>
   );

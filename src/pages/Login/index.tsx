@@ -84,7 +84,7 @@ function LoginPage() {
 
   return (
     <div className="w-screen h-screen flex items-center justify-center text-slightGray">
-      <div className="w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
+      <div className="w-4/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
         <h1 className="text-3xl font-semibold">Login</h1>
         {apiError && (
           <div className="mt-3 -mb-5 px-3 py-2 text-sm rounded-md bg-red-200 text-center text-red-500">
