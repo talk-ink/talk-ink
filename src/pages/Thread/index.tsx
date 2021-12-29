@@ -6,7 +6,7 @@ import ReactMarkdown from "react-markdown";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
-import { Thread } from "types";
+import { Channel, Thread } from "types";
 import { kontenbase } from "lib/client";
 import { useAppSelector } from "hooks/useAppSelector";
 
@@ -14,15 +14,24 @@ function ThreadPage() {
   const params = useParams();
 
   const thread = useAppSelector((state) => state.thread);
+  const channel = useAppSelector((state) => state.channel);
 
   const threadData: Thread = useMemo(() => {
     return thread.threads.find((data) => data._id === params.threadId);
   }, [params.threadId]);
 
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === params.channelId);
+  }, [params.channelId, channel.channels]);
+
   return (
     <MainContentContainer
       header={
-        <MainContentHeader channel="Channel" title={threadData?.name} thread />
+        <MainContentHeader
+          channel={channelData?.name}
+          title={threadData?.name}
+          thread
+        />
       }
     >
       <div className="w-full px-20 pb-10">
