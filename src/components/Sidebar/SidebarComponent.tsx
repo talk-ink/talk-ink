@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { BiLogOut, BiMoon } from "react-icons/bi";
+import { BiLogOut, BiMoon, BiUserPlus } from "react-icons/bi";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 
@@ -124,6 +124,11 @@ function SidebarComponent() {
             content={
               <div>
                 <Menu>
+                  <MenuItem
+                    icon={<BiUserPlus size={20} className="text-neutral-400" />}
+                    title="Members"
+                    onClick={() => {}}
+                  />
                   <MenuItem
                     icon={<BiLogOut size={20} className="text-neutral-400" />}
                     title="Log Out"
