@@ -66,8 +66,6 @@ function JoinChannelPage() {
     };
 
     try {
-      // TODO : there is some bug when creating workspace invite link
-
       const userData = await kontenbase.service("Users").findById(userId);
 
       if (userData.data.workspaces.includes(params.workspaceId)) {

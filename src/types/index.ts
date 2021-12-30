@@ -76,7 +76,7 @@ export interface Toast {
 }
 
 export interface SendEmail {
-  email: string;
+  emails: string[];
   subject: string;
   message: string;
 }

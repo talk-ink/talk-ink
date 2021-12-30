@@ -146,7 +146,12 @@ function AddMembers() {
           </div>
         </>
       )}
-      {showInvitePeople && <InvitePeopleForm />}
+      {showInvitePeople && (
+        <InvitePeopleForm
+          setShowInvitePeople={setShowInvitePeople}
+          workspaceData={workspaceData}
+        />
+      )}
     </div>
   );
 }
