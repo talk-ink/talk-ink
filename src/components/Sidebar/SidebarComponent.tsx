@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { BiLogOut, BiMoon, BiUserPlus } from "react-icons/bi";
+import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 
@@ -27,6 +27,8 @@ import {
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { useToast } from "hooks/useToast";
 import AddMembers from "components/Members/AddMembers";
+import WorkspaceListButton from "components/Button/WorkspaceListButton";
+import Divider from "components/Divider/Divider";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -126,6 +128,27 @@ function SidebarComponent() {
             content={
               <div>
                 <Menu>
+                  {workspace.workspaces.map((data, idx) => (
+                    <WorkspaceListButton
+                      key={idx}
+                      data={data}
+                      onClick={() => {
+                        navigate(`/a/${data._id}/inbox`);
+                      }}
+                    />
+                  ))}
+
+                  <Divider />
+                  <MenuItem
+                    icon={<BiPlus size={20} className="text-neutral-400" />}
+                    title="Create new workspace"
+                    onClick={() => {
+                      navigate("/a/create_workspace");
+                    }}
+                  />
+
+                  <Divider />
+
                   <MenuItem
                     icon={<BiUserPlus size={20} className="text-neutral-400" />}
                     title="Members"
