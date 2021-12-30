@@ -23,7 +23,7 @@ function Popup({ children, content, position = "left" }: Props) {
     >
       {showPopup && (
         <div
-          className={`absolute ${popupPosition[position]} w-60 shadow rounded-xl bg-white p-3 z-50`}
+          className={`absolute ${popupPosition[position]} w-60 shadow rounded-xl bg-white p-3`}
         >
           {content}
         </div>

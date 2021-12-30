@@ -123,7 +123,7 @@ function SidebarComponent() {
   return (
     <div>
       <div className="bg-[#F7FAFB] h-screen">
-        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
+        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-10">
           <Popup
             content={
               <div>
@@ -173,7 +173,7 @@ function SidebarComponent() {
           </IconButton>
         </div>
         {!loading && (
-          <div className="p-2 ">
+          <div className="p-2">
             <ul className="mb-1">
               <SidebarList
                 type="search"
