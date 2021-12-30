@@ -15,7 +15,7 @@ function WorkspaceListButton({ data, onClick = () => {} }: TProps) {
     >
       <div className="flex items-center">
         <div className="h-8 w-8 rounded bg-cyan-500 mr-2 text-white flex items-center justify-center">
-          <p className="text-lg">{getNameInitial(data.name)}</p>
+          <p className="text-lg uppercase">{getNameInitial(data.name)}</p>
         </div>
         <div className="flex flex-col items-start">
           <p className="text-sm">{data.name}</p>
