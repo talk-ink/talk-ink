@@ -45,9 +45,7 @@ function AddMembers() {
         });
 
       if (update.data) {
-        dispatch(
-          updateWorkspace({ _id: workspaceData._id, inviteId: randomString() })
-        );
+        dispatch(updateWorkspace({ _id: workspaceData._id, inviteId }));
       }
     } catch (error) {
       console.log("err", error);
@@ -76,7 +74,17 @@ function AddMembers() {
           <div className="w-full border-b border-neutral-100 py-3">
             <p className="text-sm font-semibold">Invite link</p>
             <p className="text-sm text-neutral-500">
-              Share this link with others to grant access to your team!
+              Share this link with others to grant access to your team!{" "}
+              <span
+                className="text-red-500 text-sm cursor-pointer hover:underline"
+                onClick={() => {
+                  if (!apiLoading) {
+                    workspaceInviteIdHandler();
+                  }
+                }}
+              >
+                Reset Link
+              </span>
             </p>
             <div
               className={`w-6/12 rounded border border-neutral-100 p-2 flex justify-between ${
