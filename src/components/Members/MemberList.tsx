@@ -12,7 +12,7 @@ function MemberList({ data }: TProps) {
     <div className="border-b border-neutral-100 py-3 first:border-t flex items-center justify-between">
       <div className="flex items-center">
         <div className="mr-2">
-          <NameInitial name="Ilham Adiputra" />
+          <NameInitial name={getNameInitial(data.firstName)} />
         </div>
         <div>
           <p className="-mb-2">{data.firstName}</p>
