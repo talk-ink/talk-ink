@@ -46,6 +46,7 @@ export interface Workspace {
   project?: string;
   peoples?: User[];
   channels?: string[];
+  inviteId?: string;
 }
 
 export interface User {
@@ -72,4 +73,10 @@ export interface Register {
 export interface Toast {
   message: string | null;
   duration?: number;
+}
+
+export interface SendEmail {
+  email: string;
+  subject: string;
+  message: string;
 }

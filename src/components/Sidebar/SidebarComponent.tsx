@@ -26,6 +26,7 @@ import {
 } from "features/channels/slice";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { useToast } from "hooks/useToast";
+import AddMembers from "components/Members/AddMembers";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -42,6 +43,7 @@ function SidebarComponent() {
   const [createChannelModal, setCreateChannelModal] = useState(false);
   const [editChannelModal, setEditChannelModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
+  const [membersModal, setMembersModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -127,7 +129,9 @@ function SidebarComponent() {
                   <MenuItem
                     icon={<BiUserPlus size={20} className="text-neutral-400" />}
                     title="Members"
-                    onClick={() => {}}
+                    onClick={() => {
+                      setMembersModal(true);
+                    }}
                   />
                   <MenuItem
                     icon={<BiLogOut size={20} className="text-neutral-400" />}
@@ -253,6 +257,16 @@ function SidebarComponent() {
           Are you sure you want to leave this channel? You can always join it
           again later.
         </p>
+      </Modal>
+      <Modal
+        header="Members"
+        footer={null}
+        visible={membersModal}
+        onClose={() => {
+          setMembersModal(false);
+        }}
+      >
+        <AddMembers />
       </Modal>
     </div>
   );

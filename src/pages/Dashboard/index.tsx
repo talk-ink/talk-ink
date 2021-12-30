@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Outlet, Route, Routes, useParams } from "react-router";
+import { Outlet, Route, Routes, useParams, useNavigate } from "react-router";
 
 import SidebarComponent from "components/Sidebar/SidebarComponent";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
@@ -12,6 +12,7 @@ function DashboardPage() {
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   const userId: string = auth.user.id;
 
@@ -19,7 +20,15 @@ function DashboardPage() {
     dispatch(fetchWorkspaces({ userId }));
   }, [userId]);
 
-  const loading = workspace.loading;
+  useEffect(() => {
+    if (!loading) {
+      if (workspace.workspaces.length === 0) {
+        navigate("/404");
+      }
+    }
+  }, [workspace.workspaces]);
+
+  const loading = workspace.loading || workspace.workspaces.length === 0;
 
   return loading ? (
     <FullscreenLoading />
