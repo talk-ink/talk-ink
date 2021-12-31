@@ -67,13 +67,20 @@ function JoinChannelPage() {
 
     try {
       const userData = await kontenbase.service("Users").findById(userId);
+      let workspaces = [];
 
-      if (userData.data.workspaces.includes(params.workspaceId)) {
-        return showToast({ message: "Already in this workspace!" });
+      if (userData.data.workspaces) {
+        if (userData.data.workspaces.includes(params.workspaceId)) {
+          return showToast({ message: "Already in this workspace!" });
+        }
+        workspaces = [params.workspaceId, ...userData.data.workspaces];
+      } else {
+        workspaces = [params.workspaceId];
       }
 
       const updateUser = await kontenbase.service("Users").updateById(userId, {
-        workspaces: [params.workspaceId, ...userData.data.workspaces],
+        workspaces,
+        channels: selectedChannels,
       });
 
       const workspaceData = await kontenbase
