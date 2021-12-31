@@ -181,13 +181,16 @@ function ChannelPage() {
         </div>
         <div className="flex items-center gap-3">
           <div className="flex flex-row-reverse mr-2">
-            {memberList.map((member) => (
-              <NameInitial
-                key={member._id}
-                name={getNameInitial(member.firstName)}
-                className="border-2 border-white -mr-2 bg-red-400"
-              />
-            ))}
+            {memberList.map(
+              (member, idx) =>
+                idx <= 3 && (
+                  <NameInitial
+                    key={member._id}
+                    name={getNameInitial(member.firstName)}
+                    className="border-2 border-white -mr-2 bg-red-400"
+                  />
+                )
+            )}
           </div>
           <Button
             className="bg-cyan-600 hover:bg-cyan-700 flex items-center"
