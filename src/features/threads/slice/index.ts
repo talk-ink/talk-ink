@@ -12,7 +12,7 @@ type InitThreadState = {
 };
 
 export const fetchThreads = createAsyncThunk(
-  "channel/fetchThreads",
+  "thread/fetchThreads",
   async ({ channelId }: FetchThreadsProps) => {
     const response = await kontenbase
       .service("Threads")

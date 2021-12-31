@@ -22,6 +22,7 @@ export interface Thread {
   createdAt?: Date;
   updatedAt?: Date;
   draft?: boolean;
+  createdBy?: User;
 }
 export interface Channel {
   id?: string;
@@ -46,6 +47,7 @@ export interface Workspace {
   project?: string;
   peoples?: User[];
   channels?: string[];
+  inviteId?: string;
 }
 
 export interface User {
@@ -72,4 +74,10 @@ export interface Register {
 export interface Toast {
   message: string | null;
   duration?: number;
+}
+
+export interface SendEmail {
+  emails: string[];
+  subject: string;
+  message: string;
 }

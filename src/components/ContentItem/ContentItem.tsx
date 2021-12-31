@@ -8,6 +8,8 @@ import { Thread } from "types";
 import Popup from "components/Popup/Popup";
 import MenuItem from "components/Menu/MenuItem";
 import Menu from "components/Menu/Menu";
+import NameInitial from "components/Avatar/NameInitial";
+import { getNameInitial } from "utils/helper";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -15,7 +17,7 @@ type Props = React.PropsWithChildren<{
   setSelectedThread: Dispatch<SetStateAction<Thread | null | undefined>>;
 }>;
 
-function InboxMessage({
+function ContentItem({
   onClick = () => {},
   dataSource,
   setSelectedThread,
@@ -38,13 +40,17 @@ function InboxMessage({
     >
       <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800 group">
         <button className="flex items-center w-full py-5 " onClick={onClick}>
-          <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
+          {/* <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
             <img
               src="https://picsum.photos/100"
               className="h-full w-full"
               alt="img"
             />
-          </div>
+          </div> */}
+          <NameInitial
+            name={getNameInitial(dataSource.createdBy.firstName)}
+            className="mr-4"
+          />
           <div>
             <div className="flex items-center">
               <p
@@ -102,4 +108,4 @@ function InboxMessage({
   );
 }
 
-export default InboxMessage;
+export default ContentItem;

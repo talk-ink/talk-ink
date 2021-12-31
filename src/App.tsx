@@ -21,6 +21,7 @@ import { Token, User } from "types";
 import ThreadPage from "pages/Thread";
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import { useToast } from "hooks/useToast";
+import JoinChannelPage from "pages/JoinChannel";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -85,6 +86,14 @@ function App() {
           />
         </Route>
         <Route
+          path="/a/:workspaceId/join_channels"
+          element={
+            <RestrictedRoute>
+              <JoinChannelPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
           caseSensitive
           path="/login"
           element={
@@ -96,6 +105,24 @@ function App() {
         <Route
           caseSensitive
           path="/register"
+          element={
+            <RestrictedRoute type="public">
+              <RegisterPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          caseSensitive
+          path="/j/:inviteId/login"
+          element={
+            <RestrictedRoute type="public">
+              <LoginPage />
+            </RestrictedRoute>
+          }
+        />
+        <Route
+          caseSensitive
+          path="/j/:inviteId/register"
           element={
             <RestrictedRoute type="public">
               <RegisterPage />

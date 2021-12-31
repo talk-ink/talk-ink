@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 
 import Button from "components/Button/Button";
@@ -9,11 +9,12 @@ import FormLabel from "components/Form/FormLabel";
 import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
 
-import { Register, User } from "types";
+import { Register, User, Workspace } from "types";
 import { registerValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthToken, setAuthUser } from "features/auth";
+import { KontenbaseResponse } from "@kontenbase/sdk";
 
 const initialValues: Register = {
   email: "",
@@ -24,6 +25,7 @@ const initialValues: Register = {
 function RegisterPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const params = useParams();
 
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -40,10 +42,23 @@ function RegisterPage() {
       if (userData) {
         const user: User = userData;
 
+        let toWorkspaceId = "create_workspace";
+
+        if (params.inviteId) {
+          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+            await kontenbase
+              .service("Workspaces")
+              .find({ where: { inviteId: params.inviteId } });
+
+          if (workspaceData?.length > 0) {
+            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+          }
+        }
+
         dispatch(setAuthToken({ token: data?.token }));
         dispatch(setAuthUser(user));
 
-        navigate(`/a/create_workspace`);
+        navigate(`/a/${toWorkspaceId}`);
       }
     } catch (error: any) {
       console.log("error");
@@ -51,6 +66,11 @@ function RegisterPage() {
     } finally {
       setApiLoading(false);
     }
+  };
+
+  const handleLink = () => {
+    if (params.inviteId) return `/j/${params.inviteId}/login`;
+    return "/login";
   };
 
   const formik = useFormik({
@@ -125,7 +145,7 @@ function RegisterPage() {
               >
                 Register
               </Button>
-              <Link to="/login">
+              <Link to={handleLink()}>
                 <p className="text-sm text-cyan-500">Sign In</p>
               </Link>
             </div>

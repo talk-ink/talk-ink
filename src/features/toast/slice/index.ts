@@ -4,7 +4,7 @@ import { Toast } from "types";
 
 const initialState: Toast = {
   message: "",
-  duration: 1500,
+  duration: 2000,
 };
 
 const toastSlice = createSlice({

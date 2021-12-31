@@ -8,6 +8,7 @@ import { channelReducer } from "features/channels/slice";
 import { workspaceReducer } from "features/workspaces";
 import { threadReducer } from "features/threads";
 import { toastReducer } from "features/toast/slice";
+import { memberReducer } from "features/members/slice";
 
 const persistConfig = {
   key: "root",
@@ -21,6 +22,7 @@ const appReducer = combineReducers({
   channel: channelReducer,
   thread: threadReducer,
   toast: toastReducer,
+  member: memberReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appReducer);
