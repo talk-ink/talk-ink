@@ -29,6 +29,7 @@ function Compose() {
   const navigate = useNavigate();
   const [showToast] = useToast();
 
+  const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
@@ -95,7 +96,12 @@ function Compose() {
       deleteDraft();
 
       if (createThread.data) {
-        dispatch(addThread(createThread.data));
+        dispatch(
+          addThread({
+            ...createThread.data,
+            createdBy: auth.user,
+          })
+        );
         navigate(
           `/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`
         );

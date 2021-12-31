@@ -22,6 +22,7 @@ export interface Thread {
   createdAt?: Date;
   updatedAt?: Date;
   draft?: boolean;
+  createdBy?: User;
 }
 export interface Channel {
   id?: string;

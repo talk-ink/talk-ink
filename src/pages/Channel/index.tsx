@@ -65,6 +65,7 @@ function ChannelPage() {
       channelId: params.channelId,
       workspaceId: params.workspaceId,
       lastChange: moment.tz("Asia/Jakarta").toISOString(),
+      createdBy: auth.user,
     };
     if (!threadsDraft) {
       localStorage.setItem(
