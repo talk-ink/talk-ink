@@ -92,6 +92,13 @@ function ChannelPage() {
     return thread.threads;
   }, [thread.threads]);
 
+  const deleteDraft = (id: string) => {
+    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
+    delete parsedThreadDraft[+id];
+
+    localStorage.setItem("threadsDraft", JSON.stringify(parsedThreadDraft));
+  };
+
   const threadDeleteHandler = async () => {
     setApiLoading(true);
     try {
@@ -104,6 +111,10 @@ function ChannelPage() {
           setSelectedThread(null);
         }
         dispatch(deleteThread(deletedThread.data));
+      } else {
+        deleteDraft(selectedThread.id);
+        dispatch(deleteThread(selectedThread));
+        setSelectedThread(null);
       }
     } catch (error) {
       console.log("err", error);

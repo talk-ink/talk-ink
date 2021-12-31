@@ -133,7 +133,7 @@ function AddMembers() {
               </Button>
             </div>
           </div>
-          <div>
+          <div className="h-[35vh] overflow-auto">
             {loading ? (
               <ContentSkeleton count={2} />
             ) : (
