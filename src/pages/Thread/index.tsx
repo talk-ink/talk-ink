@@ -139,7 +139,7 @@ function ThreadPage() {
           </div>
         </div>
         <div className="border-t-2 border-gray-200 mb-8 mt-8" />
-        <div className="mb-10">
+        <div className="mb-10 ">
           {thread.commentLoading ? (
             <LoadingSkeleton />
           ) : (

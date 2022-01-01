@@ -8,25 +8,10 @@ type InitThreadState = {
   commentLoading: boolean;
 };
 
-<<<<<<< HEAD
 type TCommentsPayload = {
   comments: IComment[];
   threadId: string;
 };
-=======
-export const fetchThreads = createAsyncThunk(
-  "thread/fetchThreads",
-  async ({ channelId }: FetchThreadsProps) => {
-    const response = await kontenbase
-      .service("Threads")
-      .find({ where: { channel: channelId } });
-
-    const parsedThreadsDraft: object = JSON.parse(
-      localStorage.getItem("threadsDraft")
-    );
-
-    let draft = [];
->>>>>>> 6769f50c972be635b963ab26b8f39090f3d24632
 
 type TCommentPayload = {
   comment: IComment;

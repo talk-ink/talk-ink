@@ -30,6 +30,7 @@ const CustomEditor: React.FC<IProps> = ({ editorState, setEditorState }) => {
       editorClassName="editor"
       onEditorStateChange={onEditorStateChange}
       toolbar={toolbar}
+      stripPastedStyles={true}
     />
   );
 };

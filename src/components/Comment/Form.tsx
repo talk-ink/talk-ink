@@ -46,14 +46,14 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-auto right-auto w-5/12   bg-gray-50 z-50">
+    <div className="fixed bottom-0 left-auto right-auto w-6/12   bg-gray-50 z-30">
       {!isShowEditor && (
         <div className="flex items-center py-5 ">
           <div>
             <Avatar src="https://picsum.photos/100" />
           </div>
           <input
-            className="ml-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+            className="ml-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
             placeholder="Input Your Message"
             readOnly

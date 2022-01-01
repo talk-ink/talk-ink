@@ -4,9 +4,11 @@ import axios, { AxiosResponse } from "axios";
 const EMAIL_API: string = process.env.REACT_APP_EMAIL_API;
 
 export const getNameInitial = (name: string): string => {
-  const splitted = name.split(" ");
-  if (splitted[1]) return splitted[0][0] + splitted[1][0];
-  return name[0];
+  if (name) {
+    const splitted = name.split(" ");
+    if (splitted[1]) return splitted[0][0] + splitted[1][0];
+    return name[0];
+  }
 };
 
 export const sendEmail = async ({

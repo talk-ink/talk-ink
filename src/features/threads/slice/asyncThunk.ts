@@ -57,3 +57,25 @@ export const createComment = createAsyncThunk(
     return data;
   }
 );
+
+export const deleteComment = createAsyncThunk(
+  "channel/thread/deleteComment",
+  async ({ commentId }: { commentId: string }) => {
+    const { data } = await kontenbase.service("Comments").deleteById(commentId);
+
+    return data;
+  }
+);
+
+export const updateComment = createAsyncThunk(
+  "channel/thread/deleteComment",
+  async ({ commentId, content }: { commentId: string; content: string }) => {
+    const { data } = await kontenbase
+      .service("Comments")
+      .updateById(commentId, {
+        content,
+      });
+
+    return data;
+  }
+);
