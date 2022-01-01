@@ -10,13 +10,15 @@ interface IProps {
 
 const Preview: React.FC<IProps> = ({ content }) => {
   return (
-    <Editor
-      readOnly={true}
-      editorState={EditorState.createWithContent(
-        convertFromRaw(JSON.parse(content))
-      )}
-      toolbarHidden
-    />
+    typeof content === "string" && (
+      <Editor
+        readOnly={true}
+        editorState={EditorState.createWithContent(
+          convertFromRaw(JSON.parse(content))
+        )}
+        toolbarHidden
+      />
+    )
   );
 };
 

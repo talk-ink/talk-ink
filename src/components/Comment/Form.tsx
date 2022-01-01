@@ -4,7 +4,7 @@ import { convertToRaw, EditorState } from "draft-js";
 
 import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
-import Editor from "components/Editor/Editor";
+import CommentEditor from "components/Editor/Editor";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -52,17 +52,22 @@ const Form: React.FC<IProps> = ({
             type="text"
             placeholder="Input Your Message"
             readOnly
-            onClick={() => setIsShowEditor(true)}
+            onClick={() => {
+              setIsShowEditor(true);
+            }}
           />
         </div>
       )}
 
       {isShowEditor && (
         <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-5	">
-          <Editor editorState={editorState} setEditorState={setEditorState} />
+          <CommentEditor
+            editorState={editorState}
+            setEditorState={setEditorState}
+          />
           <div className="flex justify-between">
             icon
-            <div className="flex items-center">
+            <div className="flex items-center py-2">
               <Button
                 type="submit"
                 className="mr-3 text-sm flex items-center justify-center bg-cyan-100 min-w-[5rem] text-black"

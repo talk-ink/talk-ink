@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef, useEffect } from "react";
 
 import { EditorState } from "draft-js";
 import { toolbar } from "utils/editor-toolbar";
@@ -11,12 +11,19 @@ interface IProps {
 }
 
 const CustomEditor: React.FC<IProps> = ({ editorState, setEditorState }) => {
+  const editorRef = useRef(null);
+
   const onEditorStateChange = (editorState: EditorState) => {
     setEditorState(editorState);
   };
 
+  useEffect(() => {
+    editorRef.current.focus();
+  }, []);
+
   return (
     <Editor
+      editorRef={(ref) => (editorRef.current = ref)}
       editorState={editorState}
       toolbarClassName="toolbarClassName"
       wrapperClassName="editor-wrapper"

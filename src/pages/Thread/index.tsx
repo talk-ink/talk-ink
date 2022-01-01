@@ -31,8 +31,6 @@ function ThreadPage() {
     let key: string;
     kontenbase.realtime
       .subscribe("Comments", async (message) => {
-        console.log(message);
-
         const { payload, event } = message;
         const isCurrentThread =
           event === "UPDATE_RECORD"
@@ -46,6 +44,7 @@ function ThreadPage() {
             .find({ where: { id: payload.createdBy } });
           _createdBy = data?.[0];
         }
+        // note: response dari notification kalau ada relasi ke created by kok malah return id aja?
 
         if (isCurrentThread) {
           switch (event) {
@@ -65,6 +64,7 @@ function ThreadPage() {
                   comment: {
                     ...payload.before,
                     ...payload.after,
+                    createdBy: _createdBy,
                   },
                 })
               );
@@ -125,7 +125,7 @@ function ThreadPage() {
           </div>
         </div>
         <div className="border-t-2 border-gray-200 mb-8 mt-8" />
-        <div className="overflow-auto">
+        <div className="overflow-auto mb-10">
           {thread.commentLoading ? (
             <LoadingSkeleton />
           ) : (
