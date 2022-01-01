@@ -3,6 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@draft-js-plugins/editor": "^4.1.0",
+    "@draft-js-plugins/static-toolbar": "^4.1.2",
     "@kontenbase/sdk": "^0.0.8",
     "@reduxjs/toolkit": "^1.7.1",
     "@testing-library/jest-dom": "^5.16.1",
@@ -13,12 +15,15 @@
     "@types/node": "^16.11.14",
     "@types/react": "^17.0.37",
     "@types/react-dom": "^17.0.11",
+    "draft-js": "^0.11.7",
+    "draftjs-to-html": "^0.9.1",
     "formik": "^2.2.9",
     "history": "^5.2.0",
     "js-cookie": "^3.0.1",
     "moment-timezone": "^0.5.34",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-draft-wysiwyg": "^1.14.7",
     "react-error-boundary": "^3.1.4",
     "react-icons": "^4.3.1",
     "react-markdown": "^7.1.1",
@@ -57,6 +62,8 @@
   },
   "devDependencies": {
     "@tailwindcss/typography": "^0.5.0",
+    "@types/draftjs-to-html": "^0.8.1",
+    "@types/react-draft-wysiwyg": "^1.13.3",
     "autoprefixer": "^10.4.0",
     "postcss": "^8.4.5",
     "tailwindcss": "^3.0.7"

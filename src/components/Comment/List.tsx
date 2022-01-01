@@ -1,6 +1,6 @@
 import React from "react";
 
-import CommentC from "components/Comment/Comment";
+import Comment from "components/Comment/Comment";
 import { IComment } from "types";
 
 interface IProps {
@@ -11,7 +11,7 @@ const List: React.FC<IProps> = ({ dataSource }) => {
   return (
     <>
       {dataSource.map((item, index) => (
-        <CommentC comment={item} key={index} />
+        <Comment comment={item} key={index} />
       ))}
     </>
   );

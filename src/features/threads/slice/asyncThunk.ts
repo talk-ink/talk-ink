@@ -45,3 +45,15 @@ export const fetchComments = createAsyncThunk(
     };
   }
 );
+
+export const createComment = createAsyncThunk(
+  "channel/thread/createComment",
+  async ({ content, threadId }: { content: any; threadId: string }) => {
+    const { data } = await kontenbase.service("Comments").create({
+      content,
+      threads: [threadId],
+    });
+
+    return data;
+  }
+);
