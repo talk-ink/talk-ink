@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { KontenbaseResponse } from "@kontenbase/sdk";
 
@@ -15,6 +15,7 @@ import { setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Login, User, Workspace } from "types";
+import { useToast } from "hooks/useToast";
 
 const initialValues: Login = {
   email: "",
@@ -24,6 +25,8 @@ const initialValues: Login = {
 function LoginPage() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const params = useParams();
+  const [showToast] = useToast();
 
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -40,17 +43,31 @@ function LoginPage() {
 
       if (userData) {
         const user: User = userData;
-        const { data: workspaceData }: KontenbaseResponse<Workspace> =
-          await kontenbase
-            .service("Workspaces")
-            .find({ where: { peoples: user.id } });
 
         let toWorkspaceId: string = "";
 
-        if (workspaceData?.length > 0) {
-          toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+        if (params.inviteId) {
+          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+            await kontenbase
+              .service("Workspaces")
+              .find({ where: { inviteId: params.inviteId } });
+
+          if (workspaceData?.length > 0) {
+            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+          } else {
+            return showToast({ message: "Invite link not valid!" });
+          }
         } else {
-          toWorkspaceId = `create_workspace`;
+          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+            await kontenbase
+              .service("Workspaces")
+              .find({ where: { peoples: user.id } });
+
+          if (workspaceData?.length > 0) {
+            toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+          } else {
+            toWorkspaceId = `create_workspace`;
+          }
         }
 
         dispatch(setAuthToken({ token: data?.token }));
@@ -65,6 +82,11 @@ function LoginPage() {
     } finally {
       setApiLoading(false);
     }
+  };
+
+  const handleLink = () => {
+    if (params.inviteId) return `/j/${params.inviteId}/register`;
+    return "/register";
   };
 
   const formik = useFormik({
@@ -127,7 +149,7 @@ function LoginPage() {
               >
                 Login
               </Button>
-              <Link to="/register">
+              <Link to={handleLink()}>
                 <p className="text-sm text-cyan-500">Register</p>
               </Link>
             </div>

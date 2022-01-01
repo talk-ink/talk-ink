@@ -11,7 +11,7 @@ import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
-import { Thread } from "types";
+import { Channel, Thread } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import { addComment, deleteComment, updateComment } from "features/threads";
 
@@ -24,6 +24,7 @@ function ThreadPage() {
   const listRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
   const thread = useAppSelector((state) => state.thread);
+  const channel = useAppSelector((state) => state.channel);
 
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
 
@@ -103,10 +104,18 @@ function ThreadPage() {
     listRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === channelId);
+  }, [channelId, channel.channels]);
+
   return (
     <MainContentContainer
       header={
-        <MainContentHeader channel="Channel" title={threadData?.name} thread />
+        <MainContentHeader
+          channel={channelData?.name}
+          title={threadData?.name}
+          thread
+        />
       }
       listRef={listRef}
     >

@@ -26,10 +26,12 @@ import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { Channel, Thread } from "types";
+import { Channel, Thread, User } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
+import NameInitial from "components/Avatar/NameInitial";
+import { getNameInitial } from "utils/helper";
 
 moment.locale("id");
 
@@ -55,6 +57,7 @@ function ChannelPage() {
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [leaveChannelModal, setLeaveChannelModal] = useState<boolean>();
+  const [memberList, setMemberList] = useState<User[]>([]);
 
   const createThreadDraft = () => {
     const threadsDraft = localStorage.getItem("threadsDraft");
@@ -66,6 +69,7 @@ function ChannelPage() {
       channelId: params.channelId,
       workspaceId: params.workspaceId,
       lastChange: moment.tz("Asia/Jakarta").toISOString(),
+      createdBy: auth.user,
     };
     if (!threadsDraft) {
       localStorage.setItem(
@@ -93,6 +97,13 @@ function ChannelPage() {
     return thread.threads;
   }, [thread.threads]);
 
+  const deleteDraft = (id: string) => {
+    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
+    delete parsedThreadDraft[+id];
+
+    localStorage.setItem("threadsDraft", JSON.stringify(parsedThreadDraft));
+  };
+
   const threadDeleteHandler = async () => {
     setApiLoading(true);
     try {
@@ -105,6 +116,10 @@ function ChannelPage() {
           setSelectedThread(null);
         }
         dispatch(deleteThread(deletedThread.data));
+      } else {
+        deleteDraft(selectedThread.id);
+        dispatch(deleteThread(selectedThread));
+        setSelectedThread(null);
       }
     } catch (error) {
       console.log("err", error);
@@ -131,8 +146,23 @@ function ChannelPage() {
     }
   };
 
+  const getMemberHandler = async () => {
+    try {
+      const memberList = await kontenbase.service("Users").find({
+        where: { workspaces: params.workspaceId, channels: params.channelId },
+      });
+      if (memberList.data) {
+        setMemberList(memberList.data);
+      }
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error)}` });
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchThreads({ channelId: params.channelId }));
+    getMemberHandler();
   }, [params.channelId]);
 
   const loading = channel.loading || thread.loading;
@@ -151,10 +181,17 @@ function ChannelPage() {
           <p className="text-neutral-500 font-body">Public</p>
         </div>
         <div className="flex items-center gap-3">
-          <div>
-            <div className="h-8 w-8 rounded-full bg-red-500 flex items-center justify-center">
-              <p className="text-lg uppercase text-white">IA</p>
-            </div>
+          <div className="flex flex-row-reverse mr-2">
+            {memberList.map(
+              (member, idx) =>
+                idx <= 3 && (
+                  <NameInitial
+                    key={member._id}
+                    name={getNameInitial(member.firstName)}
+                    className="border-2 border-white -mr-2 bg-red-400"
+                  />
+                )
+            )}
           </div>
           <Button
             className="bg-cyan-600 hover:bg-cyan-700 flex items-center"

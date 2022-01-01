@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
@@ -8,13 +8,14 @@ import MainContentContainer from "components/MainContentContainer/MainContentCon
 
 import TextEditor from "components/TextEditor/TextEditor";
 import { useFormik } from "formik";
-import { Thread } from "types";
+import { Channel, Thread } from "types";
 import { createThreadValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { addThread } from "features/threads";
 import { useToast } from "hooks/useToast";
+import { useAppSelector } from "hooks/useAppSelector";
 
 const initialValues: Thread = {
   name: "",
@@ -28,6 +29,8 @@ function Compose() {
   const navigate = useNavigate();
   const [showToast] = useToast();
 
+  const auth = useAppSelector((state) => state.auth);
+  const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
   const [apiLoading, setApiLoading] = useState(false);
@@ -50,6 +53,10 @@ function Compose() {
       formik.setFieldValue("content", selectedDraft.content);
     }
   };
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === params.channelId);
+  }, [params.channelId, channel.channels]);
 
   useEffect(() => {
     checkDraftAvailable();
@@ -89,7 +96,12 @@ function Compose() {
       deleteDraft();
 
       if (createThread.data) {
-        dispatch(addThread(createThread.data));
+        dispatch(
+          addThread({
+            ...createThread.data,
+            createdBy: auth.user,
+          })
+        );
         navigate(
           `/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`
         );
@@ -109,7 +121,7 @@ function Compose() {
       className="pt-10 h-full"
       header={
         <MainContentHeader
-          channel="General"
+          channel={channelData?.name}
           title="New Thread"
           onBackClick={() => {
             saveDraft();

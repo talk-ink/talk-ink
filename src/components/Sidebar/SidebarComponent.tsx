@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-import { BiLogOut, BiMoon } from "react-icons/bi";
+import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 
@@ -26,6 +26,9 @@ import {
 } from "features/channels/slice";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { useToast } from "hooks/useToast";
+import AddMembers from "components/Members/AddMembers";
+import WorkspaceListButton from "components/Button/WorkspaceListButton";
+import Divider from "components/Divider/Divider";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -42,6 +45,7 @@ function SidebarComponent() {
   const [createChannelModal, setCreateChannelModal] = useState(false);
   const [editChannelModal, setEditChannelModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
+  const [membersModal, setMembersModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -76,7 +80,7 @@ function SidebarComponent() {
     try {
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
-        members: auth.user.id,
+        members: [...workspaceData.peoples, auth.user.id],
         workspace: params.workspaceId,
       });
       if (createChannel) {
@@ -119,11 +123,39 @@ function SidebarComponent() {
   return (
     <div>
       <div className="bg-[#F7FAFB] h-screen">
-        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0">
+        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-10">
           <Popup
             content={
               <div>
                 <Menu>
+                  {workspace.workspaces.map((data, idx) => (
+                    <WorkspaceListButton
+                      key={idx}
+                      data={data}
+                      onClick={() => {
+                        navigate(`/a/${data._id}/inbox`);
+                      }}
+                    />
+                  ))}
+
+                  <Divider />
+                  <MenuItem
+                    icon={<BiPlus size={20} className="text-neutral-400" />}
+                    title="Create new workspace"
+                    onClick={() => {
+                      navigate("/a/create_workspace");
+                    }}
+                  />
+
+                  <Divider />
+
+                  <MenuItem
+                    icon={<BiUserPlus size={20} className="text-neutral-400" />}
+                    title="Members"
+                    onClick={() => {
+                      setMembersModal(true);
+                    }}
+                  />
                   <MenuItem
                     icon={<BiLogOut size={20} className="text-neutral-400" />}
                     title="Log Out"
@@ -141,7 +173,7 @@ function SidebarComponent() {
           </IconButton>
         </div>
         {!loading && (
-          <div className="p-2 ">
+          <div className="p-2">
             <ul className="mb-1">
               <SidebarList
                 type="search"
@@ -248,6 +280,16 @@ function SidebarComponent() {
           Are you sure you want to leave this channel? You can always join it
           again later.
         </p>
+      </Modal>
+      <Modal
+        header="Members"
+        footer={null}
+        visible={membersModal}
+        onClose={() => {
+          setMembersModal(false);
+        }}
+      >
+        <AddMembers />
       </Modal>
     </div>
   );
