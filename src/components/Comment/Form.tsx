@@ -13,12 +13,14 @@ interface IProps {
   isShowEditor: boolean;
   setIsShowEditor: React.Dispatch<React.SetStateAction<boolean>>;
   threadId: string;
+  scrollToBottom: () => void;
 }
 
 const Form: React.FC<IProps> = ({
   isShowEditor,
   setIsShowEditor,
   threadId,
+  scrollToBottom,
 }) => {
   const dispatch = useAppDispatch();
   const [editorState, setEditorState] = useState<EditorState>(
@@ -38,6 +40,9 @@ const Form: React.FC<IProps> = ({
       })
     );
     discardComment();
+    setTimeout(() => {
+      scrollToBottom();
+    }, 500);
   };
 
   return (

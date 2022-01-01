@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState } from "react";
+import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
 import { useParams } from "react-router";
@@ -21,8 +21,8 @@ import { kontenbase } from "lib/client";
 
 function ThreadPage() {
   const { threadId, workspaceId, channelId } = useParams();
+  const listRef = useRef<HTMLDivElement>(null);
   const dispatch = useAppDispatch();
-
   const thread = useAppSelector((state) => state.thread);
 
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
@@ -99,13 +99,18 @@ function ThreadPage() {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
 
+  const scrollToBottom = () => {
+    listRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
   return (
     <MainContentContainer
       header={
         <MainContentHeader channel="Channel" title={threadData?.name} thread />
       }
+      listRef={listRef}
     >
-      <div className="w-full px-60 pb-10 overflow-auto ">
+      <div className="w-full px-60 pb-10 ">
         <div className="mb-8">
           <h1 className="font-bold text-3xl">{threadData?.name}</h1>
           <p className="text-neutral-500 text-sm font-body">
@@ -125,7 +130,7 @@ function ThreadPage() {
           </div>
         </div>
         <div className="border-t-2 border-gray-200 mb-8 mt-8" />
-        <div className="overflow-auto mb-10">
+        <div className="mb-10">
           {thread.commentLoading ? (
             <LoadingSkeleton />
           ) : (
@@ -137,6 +142,7 @@ function ThreadPage() {
           isShowEditor={isShowEditor}
           setIsShowEditor={setIsShowEditor}
           threadId={threadId}
+          scrollToBottom={scrollToBottom}
         />
       </div>
     </MainContentContainer>

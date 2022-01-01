@@ -13,7 +13,7 @@ interface IProps {
 
 const Comment: React.FC<IProps> = ({ comment }) => {
   return (
-    <div className="flex items-start mb-8">
+    <div className="flex items-start mb-8 ">
       <Avatar src="https://picsum.photos/100" />
       <div className="prose flex-grow-0 ml-4">
         <div className="-mt-1.5 flex items-center justify-start">

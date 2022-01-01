@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Fragment } from "react";
 
 import Comment from "components/Comment/Comment";
 import { IComment } from "types";
@@ -9,11 +9,11 @@ interface IProps {
 
 const List: React.FC<IProps> = ({ dataSource }) => {
   return (
-    <>
+    <div>
       {dataSource.map((item, index) => (
         <Comment comment={item} key={index} />
       ))}
-    </>
+    </div>
   );
 };
 

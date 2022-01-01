@@ -3,8 +3,6 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@draft-js-plugins/editor": "^4.1.0",
-    "@draft-js-plugins/static-toolbar": "^4.1.2",
     "@kontenbase/sdk": "^0.0.8",
     "@reduxjs/toolkit": "^1.7.1",
     "@testing-library/jest-dom": "^5.16.1",
