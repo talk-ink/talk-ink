@@ -15,7 +15,7 @@ function MenuItem({ title, onClick = () => {}, icon }: TProps) {
     >
       <div className="flex-grow-0 flex items-center gap-2">
         {icon}
-        <p className="text-sm -mb-1">{title}</p>
+        <p className="text-sm -mb-1 -mt-1">{title}</p>
       </div>
       <div></div>
     </button>

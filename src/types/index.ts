@@ -7,10 +7,14 @@ export interface AuthState extends Token {
   loading: boolean;
 }
 
-export interface Comment {
+export interface IComment {
   id?: string;
   _id?: string;
   content: string;
+  createdAt: string;
+  createdBy: User;
+  threads: string[];
+  updatedAt?: string | null;
 }
 export interface Thread {
   id?: string;
@@ -18,7 +22,7 @@ export interface Thread {
   name: string;
   content: string;
   channel?: Channel;
-  comments?: Comment[];
+  comments?: IComment[];
   createdAt?: Date;
   updatedAt?: Date;
   draft?: boolean;

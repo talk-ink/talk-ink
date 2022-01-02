@@ -4,3 +4,50 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* width */
+::-webkit-scrollbar {
+  width: 16px;
+  height: 16px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  border-radius: 100vh;
+  background: #edf2f7;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 100vh;
+  border: 3px solid #edf2f7;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.editor {
+  min-height: 200px;
+  max-height: 200px;
+  overflow: auto;
+  padding-top: 5px;
+}
+
+.public-DraftEditor-content .public-DraftStyleDefault-block {
+  margin: 0;
+  padding: 0;
+}
+
+.editor-wrapper {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.rdw-link-modal,
+.rdw-emoji-modal {
+  top: auto !important;
+  bottom: 25px !important;
+}

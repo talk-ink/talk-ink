@@ -48,7 +48,7 @@ function ContentItem({
             />
           </div> */}
           <NameInitial
-            name={getNameInitial(dataSource.createdBy.firstName)}
+            name={getNameInitial(dataSource.createdBy?.firstName)}
             className="mr-4"
           />
           <div>

@@ -30,7 +30,6 @@ function RestrictedRoute({ children, type = "private" }: Props) {
 
     default:
       return <Navigate to="/login" state={{ from: location }} />;
-      break;
   }
 
   return children;

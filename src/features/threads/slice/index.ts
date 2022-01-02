@@ -1,46 +1,32 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { kontenbase } from "lib/client";
-import { Thread } from "types";
-
-type FetchThreadsProps = {
-  channelId: string;
-};
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { Thread, IComment } from "types";
+import { fetchComments, fetchThreads } from "./asyncThunk";
 
 type InitThreadState = {
   threads: Thread[];
   loading: boolean;
+  commentLoading: boolean;
 };
 
-export const fetchThreads = createAsyncThunk(
-  "thread/fetchThreads",
-  async ({ channelId }: FetchThreadsProps) => {
-    const response = await kontenbase
-      .service("Threads")
-      .find({ where: { channel: channelId } });
+type TCommentsPayload = {
+  comments: IComment[];
+  threadId: string;
+};
 
-    const parsedThreadsDraft: object = JSON.parse(
-      localStorage.getItem("threadsDraft")
-    );
+type TCommentPayload = {
+  comment: IComment;
+  threadId: string;
+};
 
-    let draft = [];
-
-    if (parsedThreadsDraft) {
-      draft = Object.entries(parsedThreadsDraft)
-        .map(([key, value]) => ({
-          id: key,
-          draft: true,
-          ...value,
-        }))
-        .filter((data) => data.channelId === channelId);
-    }
-
-    return [...draft, ...response.data];
-  }
-);
+type TDeleteCommentPayload = {
+  deletedId: string;
+  threadId: string;
+};
 
 const initialState: InitThreadState = {
   threads: [],
   loading: true,
+  commentLoading: true,
 };
 
 const threadSlice = createSlice({
@@ -56,8 +42,53 @@ const threadSlice = createSlice({
       );
       state.threads.splice(deletedIndex, 1);
     },
+    addComment: (state, action: PayloadAction<TCommentPayload>) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: [...item.comments, action.payload.comment],
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    updateComment: (state, action: PayloadAction<TCommentPayload>) => {
+      console.log(action.payload);
+
+      const updatedThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments.map((comment) =>
+                comment._id === action.payload.comment._id
+                  ? action.payload.comment
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = updatedThread;
+    },
+    deleteComment: (state, action: PayloadAction<TDeleteCommentPayload>) => {
+      const filteredThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments.filter(
+                (comment) => comment._id !== action.payload.deletedId
+              ),
+            }
+          : item
+      );
+
+      state.threads = filteredThread;
+    },
   },
   extraReducers: (builder) => {
+    //fetch thread
     builder.addCase(fetchThreads.pending, (state) => {
       state.loading = true;
     });
@@ -71,8 +102,38 @@ const threadSlice = createSlice({
     builder.addCase(fetchThreads.rejected, (state) => {
       state.loading = false;
     });
+
+    //fetch comment
+    builder.addCase(fetchComments.pending, (state) => {
+      state.commentLoading = true;
+    });
+    builder.addCase(
+      fetchComments.fulfilled,
+      (state, action: PayloadAction<TCommentsPayload>) => {
+        const newThread = state.threads.map((item) =>
+          item._id === action.payload.threadId
+            ? {
+                ...item,
+                comments: action.payload.comments,
+              }
+            : item
+        );
+
+        state.threads = newThread;
+        state.commentLoading = false;
+      }
+    );
+    builder.addCase(fetchComments.rejected, (state) => {
+      state.commentLoading = false;
+    });
   },
 });
 
-export const { addThread, deleteThread } = threadSlice.actions;
+export const {
+  addThread,
+  deleteThread,
+  addComment,
+  deleteComment,
+  updateComment,
+} = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

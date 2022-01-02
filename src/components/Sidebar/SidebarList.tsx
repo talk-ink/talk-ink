@@ -2,7 +2,7 @@ import IconButton from "components/Button/IconButton";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Popup from "components/Popup/Popup";
-import React, { Dispatch, SetStateAction, useMemo } from "react";
+import React, { useMemo } from "react";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
 import { BiDotsHorizontalRounded, BiEditAlt, BiLogOut } from "react-icons/bi";
