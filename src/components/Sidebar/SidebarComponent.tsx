@@ -199,7 +199,7 @@ function SidebarComponent() {
               />
             </ul>
             <ChannelButton setCreateChannelModal={setCreateChannelModal} />
-            <div>
+            <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
                   key={idx + channel._id}

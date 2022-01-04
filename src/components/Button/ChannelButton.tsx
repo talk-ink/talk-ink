@@ -18,7 +18,7 @@ function ChannelButton({
   setCreateChannelModal,
 }: Props) {
   return (
-    <div className="w-full rounded h-9 hover:bg-neutral-100 flex items-center justify-between group relative z-0">
+    <div className="w-full rounded h-9 hover:bg-neutral-100 flex items-center justify-between group">
       <button className="pl-3 h-full w-full text-left" onClick={onClick}>
         <p className="font-bold text-xs text-neutral-500">Channels</p>
       </button>

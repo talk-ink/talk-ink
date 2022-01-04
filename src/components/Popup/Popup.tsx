@@ -16,7 +16,7 @@ function Popup({ children, content, position = "left" }: Props) {
   };
   return (
     <div
-      className="relative z-10"
+      className="relative z-[9999]"
       onClick={() => {
         setShowPopup((prev) => !prev);
       }}
