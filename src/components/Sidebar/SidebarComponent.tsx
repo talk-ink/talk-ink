@@ -128,15 +128,17 @@ function SidebarComponent() {
             content={
               <div>
                 <Menu>
-                  {workspace.workspaces.map((data, idx) => (
-                    <WorkspaceListButton
-                      key={idx}
-                      data={data}
-                      onClick={() => {
-                        navigate(`/a/${data._id}/inbox`);
-                      }}
-                    />
-                  ))}
+                  <div className="h-40 overflow-auto">
+                    {workspace.workspaces.map((data, idx) => (
+                      <WorkspaceListButton
+                        key={idx}
+                        data={data}
+                        onClick={() => {
+                          navigate(`/a/${data._id}/inbox`);
+                        }}
+                      />
+                    ))}
+                  </div>
 
                   <Divider />
                   <MenuItem

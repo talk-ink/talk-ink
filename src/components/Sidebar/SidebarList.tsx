@@ -78,7 +78,7 @@ function SidebarList({
     <div
       className={`cursor-pointer w-full ${
         isActive && "bg-cyan-100"
-      } rounded hover:bg-neutral-100 flex items-center justify-between relative group`}
+      } rounded hover:bg-neutral-100 flex items-center justify-between relative z-0 group`}
     >
       <NavLink
         to={link}
