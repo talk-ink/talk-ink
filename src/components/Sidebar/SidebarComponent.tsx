@@ -84,6 +84,7 @@ function SidebarComponent() {
         members: [...workspaceData.peoples, auth.user.id],
         workspace: params.workspaceId,
       });
+
       if (createChannel) {
         dispatch(addChannel(createChannel.data));
         setCreateChannelModal(false);

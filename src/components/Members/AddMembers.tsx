@@ -71,7 +71,7 @@ function AddMembers() {
     <div className="min-h-[50vh]">
       {!showInvitePeople && (
         <>
-          <div className="w-full border-b border-neutral-100 py-3">
+          <div className="w-full border-b border-neutral-100 pb-3 pt-0">
             <p className="text-sm font-semibold">Invite link</p>
             <p className="text-sm text-neutral-500">
               Share this link with others to grant access to your team!{" "}
