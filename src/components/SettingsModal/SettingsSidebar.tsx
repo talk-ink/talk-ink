@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { SetStateAction, useMemo, useState, Dispatch } from "react";
 import SidebarButton from "components/SettingsModal/SidebarButton";
 import { useAppSelector } from "hooks/useAppSelector";
 import {
@@ -14,7 +14,12 @@ import {
 import { RiAccountCircleFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 
-function SettingsSidebar() {
+type TProps = React.PropsWithChildren<{
+  currentActive: string;
+  setCurrentActive: Dispatch<SetStateAction<string>>;
+}>;
+
+function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
   const params = useParams();
 
   const auth = useAppSelector((state) => state.auth);
@@ -24,7 +29,10 @@ function SettingsSidebar() {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
 
-  const [currentActive, setCurrentActive] = useState("members");
+  const [header, setHeader] = useState({
+    title: "",
+    from: null,
+  });
 
   return (
     <div className="bg-[#F7FAFB]">
@@ -43,7 +51,6 @@ function SettingsSidebar() {
               icon={
                 <RiAccountCircleFill size={20} className="text-neutral-200" />
               }
-              text="Account"
               type="account"
               onClick={() => {
                 setCurrentActive("account");
@@ -52,7 +59,6 @@ function SettingsSidebar() {
             />
             <SidebarButton
               icon={<BiSliderAlt size={20} className="text-neutral-400" />}
-              text="Preferences"
               type="preferences"
               onClick={() => {
                 setCurrentActive("preferences");
@@ -61,7 +67,6 @@ function SettingsSidebar() {
             />
             <SidebarButton
               icon={<BiUser size={20} className="text-neutral-400" />}
-              text="Profile"
               type="profile"
               onClick={() => {
                 setCurrentActive("profile");
@@ -71,7 +76,6 @@ function SettingsSidebar() {
 
             <SidebarButton
               icon={<BiBell size={20} className="text-neutral-400" />}
-              text="Notifications"
               type="notifications"
               onClick={() => {
                 setCurrentActive("notifications");
@@ -80,10 +84,9 @@ function SettingsSidebar() {
             />
             <SidebarButton
               icon={<BiMoon size={20} className="text-neutral-400" />}
-              text="Do Not Disturb"
-              type="donotdisturb"
+              type="doNotDisturb"
               onClick={() => {
-                setCurrentActive("donotdisturb");
+                setCurrentActive("doNotDisturb");
               }}
               active={currentActive}
             />
@@ -104,7 +107,6 @@ function SettingsSidebar() {
                   </p>
                 </div>
               }
-              text="General"
               type="general"
               onClick={() => {
                 setCurrentActive("general");
@@ -113,7 +115,6 @@ function SettingsSidebar() {
             />
             <SidebarButton
               icon={<BiUserPlus size={20} className="text-neutral-400" />}
-              text="Members & Group"
               type="members"
               onClick={() => {
                 setCurrentActive("members");
@@ -124,7 +125,6 @@ function SettingsSidebar() {
               icon={
                 <BiCreditCardFront size={20} className="text-neutral-400" />
               }
-              text="Billing"
               type="billing"
               onClick={() => {
                 setCurrentActive("billing");
@@ -133,7 +133,6 @@ function SettingsSidebar() {
             />
             <SidebarButton
               icon={<BiCustomize size={20} className="text-neutral-400" />}
-              text="Integrations"
               type="integrations"
               onClick={() => {
                 setCurrentActive("integrations");
@@ -142,7 +141,6 @@ function SettingsSidebar() {
             />
             <SidebarButton
               icon={<BiImport size={20} className="text-neutral-400" />}
-              text="Import"
               type="import"
               onClick={() => {
                 setCurrentActive("import");

@@ -1,9 +1,9 @@
 import React from "react";
 import { BiUserPlus } from "react-icons/bi";
+import { SettingsModalHeader } from "utils/text-constants";
 
 type TProps = React.PropsWithChildren<{
   icon: React.ReactNode;
-  text: string;
   type: string;
   onClick?: () => void;
   className?: string;
@@ -12,7 +12,6 @@ type TProps = React.PropsWithChildren<{
 
 const SidebarButton = ({
   icon,
-  text,
   type,
   onClick = () => {},
   className,
@@ -27,7 +26,7 @@ const SidebarButton = ({
     >
       <div className={`w-full flex items-center text-sm pl-3 h-8`}>
         {icon}
-        <p className="ml-2">{text}</p>
+        <p className="ml-2">{SettingsModalHeader[type]}</p>
       </div>
     </button>
   );

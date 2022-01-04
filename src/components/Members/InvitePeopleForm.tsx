@@ -56,7 +56,7 @@ function InvitePeopleForm({ setShowInvitePeople, workspaceData }: TProps) {
   }, [emailStrDebounce]);
 
   return (
-    <div className="min-h-[50vh] flex flex-col justify-between">
+    <div className="min-h-[60vh] flex flex-col justify-between">
       <div>
         <div>
           <p className="text-sm font-semibold">Invite by email</p>
