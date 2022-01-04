@@ -55,7 +55,8 @@ function GeneralSettings() {
         <div>
           <p className="text-sm font-semibold mb-2">Delete team</p>
           <p className="text-sm">
-            This will immediately and permanently delete the Iruhaa team and its
+            This will immediately and permanently delete the{" "}
+            <span className="font-bold">{workspaceData.name}</span> team and its
             data for everyone — including all channels, threads, messages, and
             files. This cannot be undone. Learn more.
           </p>
