@@ -16,14 +16,14 @@ function Popup({ children, content, position = "left" }: Props) {
   };
   return (
     <div
-      className="relative z-[9999]"
+      className="relative"
       onClick={() => {
         setShowPopup((prev) => !prev);
       }}
     >
       {showPopup && (
         <div
-          className={`absolute ${popupPosition[position]} w-60 shadow rounded-xl bg-white p-3`}
+          className={`absolute z-[9999] ${popupPosition[position]} w-60 shadow rounded-xl bg-white p-3`}
         >
           {content}
         </div>

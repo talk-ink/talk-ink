@@ -29,6 +29,7 @@ import { useToast } from "hooks/useToast";
 import AddMembers from "components/Members/AddMembers";
 import WorkspaceListButton from "components/Button/WorkspaceListButton";
 import Divider from "components/Divider/Divider";
+import SettingsModal from "components/Modal/SettingsModal";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -45,7 +46,7 @@ function SidebarComponent() {
   const [createChannelModal, setCreateChannelModal] = useState(false);
   const [editChannelModal, setEditChannelModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
-  const [membersModal, setMembersModal] = useState(false);
+  const [settingsModal, setSettingsModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -155,7 +156,7 @@ function SidebarComponent() {
                     icon={<BiUserPlus size={20} className="text-neutral-400" />}
                     title="Members"
                     onClick={() => {
-                      setMembersModal(true);
+                      setSettingsModal(true);
                     }}
                   />
                   <MenuItem
@@ -283,16 +284,13 @@ function SidebarComponent() {
           again later.
         </p>
       </Modal>
-      <Modal
-        header="Members"
+      <SettingsModal
         footer={null}
-        visible={membersModal}
+        visible={settingsModal}
         onClose={() => {
-          setMembersModal(false);
+          setSettingsModal(false);
         }}
-      >
-        <AddMembers />
-      </Modal>
+      />
     </div>
   );
 }
