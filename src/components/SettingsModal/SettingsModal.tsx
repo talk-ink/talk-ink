@@ -39,24 +39,6 @@ function SettingsModal({
               </button>
             </header>
             <div className="p-3">{children}</div>
-            {/* {footer !== null && (
-          <div className="p-3 flex items-center justify-end gap-2">
-            <Button
-              className="text-sm flex items-center justify-center hover:bg-neutral-50 min-w-[5rem]"
-              {...cancelButtonProps}
-              onClick={onCancel}
-            >
-              {cancelButtonText}
-            </Button>
-            <Button
-              className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
-              {...okButtonProps}
-              onClick={onConfirm}
-            >
-              {okButtonText}
-            </Button>
-          </div>
-        )} */}
           </div>
         </div>
       </div>

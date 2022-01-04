@@ -29,7 +29,7 @@ import { useToast } from "hooks/useToast";
 import AddMembers from "components/Members/AddMembers";
 import WorkspaceListButton from "components/Button/WorkspaceListButton";
 import Divider from "components/Divider/Divider";
-import SettingsModal from "components/Modal/SettingsModal";
+import SettingsModal from "components/SettingsModal/SettingsModal";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);

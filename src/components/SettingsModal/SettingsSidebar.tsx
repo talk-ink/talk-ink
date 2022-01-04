@@ -1,5 +1,5 @@
-import React, { useMemo } from "react";
-import MenuButton from "components/Button/MenuButton";
+import React, { useMemo, useState } from "react";
+import SidebarButton from "components/SettingsModal/SidebarButton";
 import { useAppSelector } from "hooks/useAppSelector";
 import {
   BiBell,
@@ -24,6 +24,8 @@ function SettingsSidebar() {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
 
+  const [currentActive, setCurrentActive] = useState("members");
+
   return (
     <div className="bg-[#F7FAFB]">
       <header className="flex items-center p-3">
@@ -37,33 +39,53 @@ function SettingsSidebar() {
             </p>
           </div>
           <ul>
-            <MenuButton
+            <SidebarButton
               icon={
                 <RiAccountCircleFill size={20} className="text-neutral-200" />
               }
               text="Account"
               type="account"
+              onClick={() => {
+                setCurrentActive("account");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={<BiSliderAlt size={20} className="text-neutral-400" />}
               text="Preferences"
               type="preferences"
+              onClick={() => {
+                setCurrentActive("preferences");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={<BiUser size={20} className="text-neutral-400" />}
               text="Profile"
               type="profile"
+              onClick={() => {
+                setCurrentActive("profile");
+              }}
+              active={currentActive}
             />
 
-            <MenuButton
+            <SidebarButton
               icon={<BiBell size={20} className="text-neutral-400" />}
               text="Notifications"
-              type="members"
+              type="notifications"
+              onClick={() => {
+                setCurrentActive("notifications");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={<BiMoon size={20} className="text-neutral-400" />}
               text="Do Not Disturb"
               type="donotdisturb"
+              onClick={() => {
+                setCurrentActive("donotdisturb");
+              }}
+              active={currentActive}
             />
           </ul>
         </div>
@@ -74,7 +96,7 @@ function SettingsSidebar() {
             </p>
           </div>
           <ul>
-            <MenuButton
+            <SidebarButton
               icon={
                 <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center">
                   <p className="text-white uppercase font-bold text-xs">
@@ -84,28 +106,48 @@ function SettingsSidebar() {
               }
               text="General"
               type="general"
+              onClick={() => {
+                setCurrentActive("general");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={<BiUserPlus size={20} className="text-neutral-400" />}
               text="Members & Group"
               type="members"
+              onClick={() => {
+                setCurrentActive("members");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={
                 <BiCreditCardFront size={20} className="text-neutral-400" />
               }
               text="Billing"
               type="billing"
+              onClick={() => {
+                setCurrentActive("billing");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={<BiCustomize size={20} className="text-neutral-400" />}
               text="Integrations"
               type="integrations"
+              onClick={() => {
+                setCurrentActive("integrations");
+              }}
+              active={currentActive}
             />
-            <MenuButton
+            <SidebarButton
               icon={<BiImport size={20} className="text-neutral-400" />}
               text="Import"
               type="import"
+              onClick={() => {
+                setCurrentActive("import");
+              }}
+              active={currentActive}
             />
           </ul>
         </div>

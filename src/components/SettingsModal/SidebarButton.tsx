@@ -7,18 +7,22 @@ type TProps = React.PropsWithChildren<{
   type: string;
   onClick?: () => void;
   className?: string;
+  active?: string;
 }>;
 
-const MenuButton = ({
+const SidebarButton = ({
   icon,
   text,
   type,
   onClick = () => {},
   className,
+  active,
 }: TProps) => {
   return (
     <button
-      className={`cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between group ${className}`}
+      className={`cursor-pointer w-full rounded ${
+        active === type && "bg-cyan-100"
+      } hover:bg-neutral-100 flex items-center justify-between group ${className} outline-none`}
       onClick={onClick}
     >
       <div className={`w-full flex items-center text-sm pl-3 h-8`}>
@@ -29,4 +33,4 @@ const MenuButton = ({
   );
 };
 
-export default MenuButton;
+export default SidebarButton;
