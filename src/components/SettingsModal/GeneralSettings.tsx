@@ -67,6 +67,7 @@ function GeneralSettings() {
       formik.setFieldValue("logo", e.target.files[0]);
       getBase64(e.target.files[0], (result) => {
         setLogoPreview(result);
+        dispatch(updateWorkspace({ _id: workspaceData._id, logo: result }));
       });
     }
   };
@@ -100,9 +101,9 @@ function GeneralSettings() {
                   {getNameInitial(workspaceData.name)}
                 </p>
               )}
-              {logoPreview && (
+              {(logoPreview || workspaceData?.logo) && (
                 <img
-                  src={logoPreview}
+                  src={logoPreview || workspaceData?.logo}
                   alt="logo"
                   className="h-full w-full object-cover"
                 />

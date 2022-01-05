@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
 import cookies from "js-cookie";
@@ -52,9 +52,9 @@ function SidebarComponent() {
     Channel | null | undefined
   >(null);
 
-  const workspaceData: Workspace = workspace.workspaces.find(
-    (data) => data._id === params.workspaceId
-  );
+  const workspaceData = useMemo(() => {
+    return workspace.workspaces.find((data) => data._id === params.workspaceId);
+  }, [workspace.workspaces, params.workspaceId]);
 
   const channelData: Channel[] = channel.channels;
   const userId: string = auth.user.id;
@@ -170,7 +170,7 @@ function SidebarComponent() {
             }
             position="right"
           >
-            {!loading && <WorkspaceButton title={workspaceData?.name} />}
+            {!loading && <WorkspaceButton workspaceData={workspaceData} />}
           </Popup>
           <IconButton>
             <BiMoon size={18} className="text-neutral-400" />
