@@ -26,3 +26,7 @@ export const createChannelValidation = yup.object().shape({
   description: yup.string().max(300).required(),
   privacy: yup.string().oneOf(["public", "private"]).required(),
 });
+
+export const updateWorkspaceGeneral = yup.object().shape({
+  name: yup.string().max(40).required(),
+});

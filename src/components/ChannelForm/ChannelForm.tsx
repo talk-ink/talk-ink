@@ -95,6 +95,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
         <Button
           className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
           disabled={isDisabled}
+          type="submit"
         >
           {!editedData ? "Create" : "Save"}
         </Button>

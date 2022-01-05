@@ -52,6 +52,7 @@ export interface Workspace {
   peoples?: User[];
   channels?: string[];
   inviteId?: string;
+  logo?: string;
 }
 
 export interface User {

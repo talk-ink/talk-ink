@@ -43,3 +43,12 @@ export const inviteWorkspaceTemplate = (inviteLink: string): string => {
 </html>
   `;
 };
+
+export const getBase64 = (
+  img: File,
+  callback: (result: string | ArrayBuffer) => void
+) => {
+  const reader = new FileReader();
+  reader.addEventListener("load", () => callback(reader.result));
+  reader.readAsDataURL(img);
+};
