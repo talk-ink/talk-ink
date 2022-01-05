@@ -13,4 +13,6 @@ export const SettingsModalHeader: {
   import: "Import",
   invitePeople: "Invite People",
   manageEmail: "Manage email",
+  leaveWorkspace: "Leave workspace",
+  deleteWorkspace: "Delete workspace",
 };

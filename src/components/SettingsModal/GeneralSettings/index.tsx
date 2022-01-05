@@ -15,6 +15,7 @@ import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateWorkspace } from "features/workspaces";
 import { SettingsModalRouteState } from "types";
+import LeaveWorkspace from "./LeaveWorkspace";
 
 type TypeInitialValues = {
   name: string;
@@ -26,7 +27,7 @@ type TProps = {
   setCurrentRoute: Dispatch<SetStateAction<SettingsModalRouteState>>;
 };
 
-function GeneralSettings({ setCurrentRoute }: TProps) {
+function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
   const params = useParams();
 
   const [showToast] = useToast();
@@ -39,6 +40,14 @@ function GeneralSettings({ setCurrentRoute }: TProps) {
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
+
+  const showLeaveWorkspace = useMemo(() => {
+    return currentRoute.current === "leaveWorkspace";
+  }, [currentRoute.current]);
+
+  const showDeleteWorkspace = useMemo(() => {
+    return currentRoute.current === "deleteWorkspace";
+  }, [currentRoute.current]);
 
   const initialValues: TypeInitialValues = {
     name: workspaceData.name,
@@ -96,106 +105,128 @@ function GeneralSettings({ setCurrentRoute }: TProps) {
     !formik.values.name || !!formik.errors.name || !!formik.errors.logo;
 
   return (
-    <form className="min-h-[50vh] overflow-auto" onSubmit={formik.handleSubmit}>
-      <div className="border-b border-neutral-100 pb-5">
-        <p className="text-sm font-semibold">Logo</p>
-        <div className="my-5">
-          <div className="flex items-end ">
-            <div className="h-24 w-24 rounded-xl bg-[#a8a8a8] flex items-center justify-center overflow-hidden">
-              {!logoPreview && !workspaceData.logo && (
-                <p className="text-6xl text-white uppercase">
-                  {getNameInitial(workspaceData.name)}
-                </p>
-              )}
-              {(logoPreview || workspaceData?.logo) && (
-                <img
-                  src={logoPreview || workspaceData?.logo}
-                  alt="logo"
-                  className="h-full w-full object-cover"
-                />
+    <div className="min-h-[50vh] overflow-auto">
+      {currentRoute.current === "general" && (
+        <form onSubmit={formik.handleSubmit}>
+          <div className="border-b border-neutral-100 pb-5">
+            <p className="text-sm font-semibold">Logo</p>
+            <div className="my-5">
+              <div className="flex items-end ">
+                <div className="h-24 w-24 rounded-xl bg-[#a8a8a8] flex items-center justify-center overflow-hidden">
+                  {!logoPreview && !workspaceData.logo && (
+                    <p className="text-6xl text-white uppercase">
+                      {getNameInitial(workspaceData.name)}
+                    </p>
+                  )}
+                  {(logoPreview || workspaceData?.logo) && (
+                    <img
+                      src={logoPreview || workspaceData?.logo}
+                      alt="logo"
+                      className="h-full w-full object-cover"
+                    />
+                  )}
+                </div>
+                <div className="ml-5 ">
+                  <Upload onChange={uploadFile}>
+                    <span className="text-sm font-semibold">Upload logo</span>
+                  </Upload>
+                  <p className="text-sm text-neutral-500 my-3">
+                    Pick an image up to 4MB
+                  </p>
+                </div>
+              </div>
+              {formik.errors.logo && (
+                <div className="flex gap-2 items-center mt-2">
+                  <BiErrorCircle size={20} className="text-red-700" />
+                  <p className="text-sm -mb-1">{formik.errors.logo}</p>
+                </div>
               )}
             </div>
-            <div className="ml-5 ">
-              <Upload onChange={uploadFile}>
-                <span className="text-sm font-semibold">Upload logo</span>
-              </Upload>
-              <p className="text-sm text-neutral-500 my-3">
-                Pick an image up to 4MB
-              </p>
+            <p className="text-sm font-semibold">Workspace name</p>
+            <div className="flex flex-col">
+              <TextInput
+                className="max-w-sm"
+                defaultValue={workspaceData.name}
+                onBlur={formik.handleBlur("name")}
+                onChange={formik.handleChange("name")}
+              />
+              <small className="text-neutral-500 text-xs mt-2">
+                The name of your group or company. Keep it simple.
+              </small>
             </div>
           </div>
-          {formik.errors.logo && (
-            <div className="flex gap-2 items-center mt-2">
-              <BiErrorCircle size={20} className="text-red-700" />
-              <p className="text-sm -mb-1">{formik.errors.logo}</p>
+          <div>
+            <h3 className="text-lg font-bold my-5">Danger zone</h3>
+            <div className="my-5">
+              <p className="text-sm font-semibold mb-2">Leave workspace</p>
+              <p className="text-sm">
+                By leaving, you'll immediately have no access to the{" "}
+                <span className="font-bold">{workspaceData.name}</span>. You wil
+                need to be re-invited to join again.{" "}
+                <span className="text-cyan-500 hover:underline cursor-pointer">
+                  Learn more.
+                </span>
+              </p>
+              <Button
+                className="border border-red-400 text-sm text-red-500 font-semibold hover:border-red-700 hover:text-red-700 mt-2"
+                onClick={() => {
+                  setCurrentRoute((prev) => ({
+                    ...prev,
+                    current: "leaveWorkspace",
+                  }));
+                }}
+              >
+                Leave workspace
+              </Button>
+            </div>
+            <div>
+              <p className="text-sm font-semibold mb-2">Delete workspace</p>
+              <p className="text-sm">
+                This will immediately and permanently delete the{" "}
+                <span className="font-bold">{workspaceData.name}</span>{" "}
+                workspace and its data for everyone — including all channels,
+                threads, messages, and files. This cannot be undone.{" "}
+                <span className="text-cyan-500 hover:underline cursor-pointer">
+                  Learn more.
+                </span>
+              </p>
+              <Button
+                className="border border-red-400 text-sm text-red-500 font-semibold hover:border-red-700 hover:text-red-700 mt-2"
+                onClick={() => {
+                  setCurrentRoute((prev) => ({
+                    ...prev,
+                    current: "deleteWorkspace",
+                  }));
+                }}
+              >
+                Delete workspace
+              </Button>
+            </div>
+          </div>
+
+          {formik.values.name !== workspaceData.name && (
+            <div className="w-full h-14 mt-10 flex items-center  justify-end p-1">
+              <div className="flex items-center justify-end gap-2">
+                <Button
+                  className="text-sm flex items-center justify-center hover:bg-neutral-50 min-w-[5rem]"
+                  // onClick={onCancel}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+                  disabled={isDisabled}
+                  type="submit"
+                >
+                  Update
+                </Button>
+              </div>
             </div>
           )}
-        </div>
-        <p className="text-sm font-semibold">Workspace name</p>
-        <div className="flex flex-col">
-          <TextInput
-            className="max-w-sm"
-            defaultValue={workspaceData.name}
-            onBlur={formik.handleBlur("name")}
-            onChange={formik.handleChange("name")}
-            value={formik.values.name}
-          />
-          <small className="text-neutral-500 text-xs mt-2">
-            The name of your group or company. Keep it simple.
-          </small>
-        </div>
-      </div>
-      <div>
-        <h3 className="text-lg font-bold my-5">Danger zone</h3>
-        <div className="my-5">
-          <p className="text-sm font-semibold mb-2">Leave workspace</p>
-          <p className="text-sm">
-            By leaving, you'll immediately have no access to the{" "}
-            <span className="font-bold">{workspaceData.name}</span>. You wil
-            need to be re-invited to join again.{" "}
-            <span className="text-cyan-500 hover:underline cursor-pointer">
-              Learn more.
-            </span>
-          </p>
-          <Button className="border border-red-400 text-sm text-red-500 font-semibold hover:border-red-700 hover:text-red-700 mt-2">
-            Leave workspace
-          </Button>
-        </div>
-        <div>
-          <p className="text-sm font-semibold mb-2">Delete workspace</p>
-          <p className="text-sm">
-            This will immediately and permanently delete the{" "}
-            <span className="font-bold">{workspaceData.name}</span> workspace
-            and its data for everyone — including all channels, threads,
-            messages, and files. This cannot be undone.{" "}
-            <span className="text-cyan-500 hover:underline cursor-pointer">
-              Learn more.
-            </span>
-          </p>
-          <Button className="border border-red-400 text-sm text-red-500 font-semibold hover:border-red-700 hover:text-red-700 mt-2">
-            Delete workspace
-          </Button>
-        </div>
-      </div>
-
-      <div className="w-full h-14 mt-10 flex items-center  justify-end">
-        <div className="flex items-center justify-end gap-2">
-          <Button
-            className="text-sm flex items-center justify-center hover:bg-neutral-50 min-w-[5rem]"
-            // onClick={onCancel}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
-            disabled={isDisabled}
-            type="submit"
-          >
-            Update
-          </Button>
-        </div>
-      </div>
-    </form>
+        </form>
+      )}
+      {currentRoute.current === "leaveWorkspace" && <LeaveWorkspace />}
+    </div>
   );
 }
 

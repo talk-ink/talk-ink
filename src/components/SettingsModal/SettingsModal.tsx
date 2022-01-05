@@ -32,8 +32,8 @@ function SettingsModal({
   footer,
 }: TProps) {
   const [currentRoute, setCurrentRoute] = useState<SettingsModalRouteState>({
-    route: "member",
-    current: "member",
+    route: "members",
+    current: "members",
   });
 
   const settingsRender = (type: string) => {

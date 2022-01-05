@@ -39,6 +39,12 @@ const workspaceSlice = createSlice({
         ...action.payload,
       };
     },
+    leaveWorkspace: (state, action) => {
+      const workspaceIndex = state.workspaces.findIndex(
+        (workspace) => workspace._id === action.payload._id
+      );
+      state.workspaces.splice(workspaceIndex, 1);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchWorkspaces.pending, (state) => {
@@ -57,5 +63,6 @@ const workspaceSlice = createSlice({
   },
 });
 
-export const { addWorkspace, updateWorkspace } = workspaceSlice.actions;
+export const { addWorkspace, updateWorkspace, leaveWorkspace } =
+  workspaceSlice.actions;
 export const workspaceReducer = workspaceSlice.reducer;
