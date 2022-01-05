@@ -16,6 +16,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateWorkspace } from "features/workspaces";
 import { SettingsModalRouteState } from "types";
 import LeaveWorkspace from "./LeaveWorkspace";
+import DeleteWorkspace from "./DeleteWorkspace";
 
 type TypeInitialValues = {
   name: string;
@@ -225,7 +226,8 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
           )}
         </form>
       )}
-      {currentRoute.current === "leaveWorkspace" && <LeaveWorkspace />}
+      {showLeaveWorkspace && <LeaveWorkspace />}
+      {showDeleteWorkspace && <DeleteWorkspace />}
     </div>
   );
 }

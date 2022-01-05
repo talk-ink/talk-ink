@@ -130,7 +130,7 @@ function SidebarComponent() {
             content={
               <div>
                 <Menu>
-                  <div className="h-40 overflow-auto">
+                  <div className="max-h-40 overflow-auto">
                     {workspace.workspaces.map((data, idx) => (
                       <WorkspaceListButton
                         key={idx}

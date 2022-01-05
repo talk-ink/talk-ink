@@ -13,7 +13,12 @@ export const fetchWorkspaces = createAsyncThunk(
       .service("Workspaces")
       .find({ where: { peoples: userId } });
 
-    return response.data;
+    const remap = response.data.map((workspace) => ({
+      ...workspace,
+      logo: workspace.logo.length > 0 ? workspace.logo : null,
+    }));
+
+    return remap;
   }
 );
 
