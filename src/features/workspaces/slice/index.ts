@@ -15,7 +15,7 @@ export const fetchWorkspaces = createAsyncThunk(
 
     const remap = response.data.map((workspace) => ({
       ...workspace,
-      logo: workspace.logo.length > 0 ? workspace.logo : null,
+      logo: workspace?.logo?.length > 0 ? workspace.logo : null,
     }));
 
     return remap;
