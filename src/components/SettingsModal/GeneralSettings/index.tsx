@@ -96,7 +96,7 @@ function GeneralSettings() {
         <div className="my-5">
           <div className="flex items-end ">
             <div className="h-24 w-24 rounded-xl bg-[#a8a8a8] flex items-center justify-center overflow-hidden">
-              {!logoPreview && (
+              {!logoPreview && !workspaceData.logo && (
                 <p className="text-6xl text-white uppercase">
                   {getNameInitial(workspaceData.name)}
                 </p>

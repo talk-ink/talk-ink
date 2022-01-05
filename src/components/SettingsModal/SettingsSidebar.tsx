@@ -13,6 +13,7 @@ import {
 } from "react-icons/bi";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
+import { getNameInitial } from "utils/helper";
 
 type TProps = React.PropsWithChildren<{
   currentActive: string;
@@ -101,10 +102,19 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
           <ul>
             <SidebarButton
               icon={
-                <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center">
-                  <p className="text-white uppercase font-bold text-xs">
-                    {workspaceData.name[0]}
-                  </p>
+                <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center overflow-hidden">
+                  {!workspaceData.logo && (
+                    <p className="text-6xl text-white uppercase">
+                      {getNameInitial(workspaceData.name)}
+                    </p>
+                  )}
+                  {workspaceData?.logo && (
+                    <img
+                      src={workspaceData?.logo}
+                      alt="logo"
+                      className="h-full w-full object-cover"
+                    />
+                  )}
                 </div>
               }
               type="general"
