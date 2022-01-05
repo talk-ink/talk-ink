@@ -13,11 +13,10 @@ import {
 } from "react-icons/bi";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
-import { getNameInitial } from "utils/helper";
 
 type TProps = React.PropsWithChildren<{
   currentActive: string;
-  setCurrentActive: Dispatch<SetStateAction<string>>;
+  setCurrentActive: (value: string) => void;
 }>;
 
 function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
@@ -29,11 +28,6 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
-
-  const [header, setHeader] = useState({
-    title: "",
-    from: null,
-  });
 
   return (
     <div className="bg-[#F7FAFB]">
@@ -99,16 +93,17 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
               {workspaceData.name}
             </p>
           </div>
+          {/* text-white uppercase font-bold text-xs */}
           <ul>
             <SidebarButton
               icon={
-                <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center overflow-hidden">
+                <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center">
                   {!workspaceData.logo && (
-                    <p className="text-6xl text-white uppercase">
-                      {getNameInitial(workspaceData.name)}
+                    <p className="text-white uppercase font-bold text-sm">
+                      {workspaceData.name?.[0]}
                     </p>
                   )}
-                  {workspaceData?.logo && (
+                  {workspaceData.logo && (
                     <img
                       src={workspaceData?.logo}
                       alt="logo"
