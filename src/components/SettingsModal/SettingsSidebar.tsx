@@ -97,7 +97,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
           <ul>
             <SidebarButton
               icon={
-                <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center">
+                <div className="w-5 h-5 bg-[#a8a8a8] rounded-md flex items-center justify-center overflow-hidden">
                   {!workspaceData.logo && (
                     <p className="text-white uppercase font-bold text-sm">
                       {workspaceData.name?.[0]}

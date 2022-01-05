@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAppSelector } from "hooks/useAppSelector";
@@ -14,13 +14,19 @@ import { BiErrorCircle } from "react-icons/bi";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateWorkspace } from "features/workspaces";
+import { SettingsModalRouteState } from "types";
 
 type TypeInitialValues = {
   name: string;
   logo?: File | null | undefined;
 };
 
-function GeneralSettings() {
+type TProps = {
+  currentRoute: SettingsModalRouteState;
+  setCurrentRoute: Dispatch<SetStateAction<SettingsModalRouteState>>;
+};
+
+function GeneralSettings({ setCurrentRoute }: TProps) {
   const params = useParams();
 
   const [showToast] = useToast();

@@ -86,3 +86,8 @@ export interface SendEmail {
   subject: string;
   message: string;
 }
+
+export interface SettingsModalRouteState {
+  route: string;
+  current: string;
+}

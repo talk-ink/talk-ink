@@ -1,8 +1,10 @@
 import Button from "components/Button/Button";
 import AddMembers from "components/Members/AddMembers";
 import React, { useState } from "react";
+import { BiArrowBack } from "react-icons/bi";
 
 import { GrClose } from "react-icons/gr";
+import { SettingsModalRouteState } from "types";
 import { SettingsModalHeader } from "utils/text-constants";
 import GeneralSettings from "./GeneralSettings";
 import SettingsSidebar from "./SettingsSidebar";
@@ -29,7 +31,7 @@ function SettingsModal({
   visible,
   footer,
 }: TProps) {
-  const [currentRoute, setCurrentRoute] = useState({
+  const [currentRoute, setCurrentRoute] = useState<SettingsModalRouteState>({
     route: "member",
     current: "member",
   });
@@ -37,9 +39,19 @@ function SettingsModal({
   const settingsRender = (type: string) => {
     switch (type) {
       case "members":
-        return <AddMembers />;
+        return (
+          <AddMembers
+            currentRoute={currentRoute}
+            setCurrentRoute={setCurrentRoute}
+          />
+        );
       case "general":
-        return <GeneralSettings />;
+        return (
+          <GeneralSettings
+            currentRoute={currentRoute}
+            setCurrentRoute={setCurrentRoute}
+          />
+        );
       default:
         break;
     }
@@ -60,10 +72,28 @@ function SettingsModal({
           />
           <div>
             <header className="flex items-center justify-between p-3 border-b border-neutral-100">
-              <h2 className="text-lg font-bold -mb-1">
-                {SettingsModalHeader[currentRoute.current]}
-              </h2>
-              <button onClick={onClose}>
+              <div className="flex gap-2 items-center">
+                {currentRoute.route !== currentRoute.current && (
+                  <button
+                    onClick={() => {
+                      setCurrentRoute((prev) => ({
+                        route: prev.route,
+                        current: prev.route,
+                      }));
+                    }}
+                    className="hover:bg-neutral-200 p-1 rounded"
+                  >
+                    <BiArrowBack size={18} />
+                  </button>
+                )}
+                <h2 className="text-lg font-bold">
+                  {SettingsModalHeader[currentRoute.current]}
+                </h2>
+              </div>
+              <button
+                onClick={onClose}
+                className="hover:bg-neutral-200 p-1 rounded"
+              >
                 <GrClose size={18} />
               </button>
             </header>

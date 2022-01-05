@@ -9,10 +9,10 @@ import { inviteWorkspaceTemplate, sendEmail } from "utils/helper";
 
 type TProps = {
   workspaceData: Workspace;
-  setShowInvitePeople: Dispatch<SetStateAction<boolean>>;
+  onCancel: () => void;
 };
 
-function InvitePeopleForm({ setShowInvitePeople, workspaceData }: TProps) {
+function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
   const [showToast] = useToast();
   const [emailStr, setEmailStr] = useState("");
   const [emailArr, setEmailArr] = useState([]);
@@ -74,7 +74,7 @@ function InvitePeopleForm({ setShowInvitePeople, workspaceData }: TProps) {
       <div className="pt-2 flex items-center justify-end gap-2">
         <Button
           className="text-sm flex items-center justify-center hover:bg-neutral-50 min-w-[5rem]"
-          onClick={() => setShowInvitePeople(false)}
+          onClick={() => onCancel()}
         >
           Cancel
         </Button>

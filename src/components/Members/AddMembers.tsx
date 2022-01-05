@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+  Dispatch,
+} from "react";
 
 import { useParams } from "react-router-dom";
 import copy from "copy-to-clipboard";
@@ -14,8 +20,14 @@ import { useToast } from "hooks/useToast";
 import { updateWorkspace } from "features/workspaces";
 import { randomString } from "utils/helper";
 import { kontenbase } from "lib/client";
+import { SettingsModalRouteState } from "types";
 
-function AddMembers() {
+type TProps = {
+  currentRoute: SettingsModalRouteState;
+  setCurrentRoute: Dispatch<SetStateAction<SettingsModalRouteState>>;
+};
+
+function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const params = useParams();
   const [showToast] = useToast();
 
@@ -23,7 +35,12 @@ function AddMembers() {
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
 
-  const [showInvitePeople, setShowInvitePeople] = useState<boolean>(false);
+  // const [showInvitePeople, setShowInvitePeople] = useState<boolean>(false);
+
+  const showInvitePeople = useMemo(() => {
+    return currentRoute.current === "invitePeople";
+  }, [currentRoute]);
+
   const [apiLoading, setApiLoading] = useState<boolean>(false);
 
   const workspaceData = useMemo(() => {
@@ -126,7 +143,10 @@ function AddMembers() {
               <Button
                 className="text-sm text-white bg-cyan-600"
                 onClick={() => {
-                  setShowInvitePeople(true);
+                  setCurrentRoute((prev) => ({
+                    ...prev,
+                    current: "invitePeople",
+                  }));
                 }}
               >
                 Invite People
@@ -148,7 +168,12 @@ function AddMembers() {
       )}
       {showInvitePeople && (
         <InvitePeopleForm
-          setShowInvitePeople={setShowInvitePeople}
+          onCancel={() => {
+            setCurrentRoute((prev) => ({
+              route: prev.route,
+              current: prev.route,
+            }));
+          }}
           workspaceData={workspaceData}
         />
       )}
