@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
+import { FiSettings } from "react-icons/fi";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 
@@ -154,8 +155,8 @@ function SidebarComponent() {
                   <Divider />
 
                   <MenuItem
-                    icon={<BiUserPlus size={20} className="text-neutral-400" />}
-                    title="Members"
+                    icon={<FiSettings size={20} className="text-neutral-400" />}
+                    title="Settings & members"
                     onClick={() => {
                       setSettingsModal(true);
                     }}
