@@ -54,11 +54,6 @@ export const getBase64 = (
   reader.readAsDataURL(img);
 };
 
-export const validateEmail = (email: string) => {
-  const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
-
-  return emailRegex.test(email);
-};
 export const resizeFile = (file: File, maxSize: number): Promise<any> =>
   new Promise((resolve) => {
     FileResizer.imageFileResizer(
