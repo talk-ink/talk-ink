@@ -7,6 +7,7 @@ import { GrClose } from "react-icons/gr";
 import { SettingsModalRouteState } from "types";
 import { SettingsModalHeader } from "utils/text-constants";
 import AccountSettings from "./AccountSettings";
+import ComingSoonSettings from "./ComingSoon";
 import GeneralSettings from "./GeneralSettings";
 import SettingsSidebar from "./SettingsSidebar";
 
@@ -61,6 +62,7 @@ function SettingsModal({
           />
         );
       default:
+        return <ComingSoonSettings />;
         break;
     }
   };

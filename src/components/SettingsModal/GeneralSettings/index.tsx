@@ -34,6 +34,8 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
   const [showToast] = useToast();
 
   const workspace = useAppSelector((state) => state.workspace);
+  const auth = useAppSelector((state) => state.auth);
+
   const dispatch = useAppDispatch();
 
   const [logoPreview, setLogoPreview] = useState(null);
@@ -41,6 +43,10 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
+
+  const userData = useMemo(() => {
+    return auth.user;
+  }, [auth.user]);
 
   const showLeaveWorkspace = useMemo(() => {
     return currentRoute.current === "leaveWorkspace";
@@ -209,29 +215,31 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
                 Leave workspace
               </Button>
             </div>
-            <div>
-              <p className="text-sm font-semibold mb-2">Delete workspace</p>
-              <p className="text-sm">
-                This will immediately and permanently delete the{" "}
-                <span className="font-bold">{workspaceData.name}</span>{" "}
-                workspace and its data for everyone — including all channels,
-                threads, messages, and files. This cannot be undone.{" "}
-                <span className="text-cyan-500 hover:underline cursor-pointer">
-                  Learn more.
-                </span>
-              </p>
-              <Button
-                className="border border-red-400 text-sm text-red-500 font-semibold hover:border-red-700 hover:text-red-700 mt-2"
-                onClick={() => {
-                  setCurrentRoute((prev) => ({
-                    ...prev,
-                    current: "deleteWorkspace",
-                  }));
-                }}
-              >
-                Delete workspace
-              </Button>
-            </div>
+            {workspaceData?.createdBy?._id === userData.id && (
+              <div>
+                <p className="text-sm font-semibold mb-2">Delete workspace</p>
+                <p className="text-sm">
+                  This will immediately and permanently delete the{" "}
+                  <span className="font-bold">{workspaceData.name}</span>{" "}
+                  workspace and its data for everyone — including all channels,
+                  threads, messages, and files. This cannot be undone.{" "}
+                  <span className="text-cyan-500 hover:underline cursor-pointer">
+                    Learn more.
+                  </span>
+                </p>
+                <Button
+                  className="border border-red-400 text-sm text-red-500 font-semibold hover:border-red-700 hover:text-red-700 mt-2"
+                  onClick={() => {
+                    setCurrentRoute((prev) => ({
+                      ...prev,
+                      current: "deleteWorkspace",
+                    }));
+                  }}
+                >
+                  Delete workspace
+                </Button>
+              </div>
+            )}
           </div>
 
           {formik.values.name !== workspaceData.name && (
