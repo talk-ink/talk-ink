@@ -77,14 +77,40 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
     return isImage && isOverSize;
   };
 
-  const uploadFile: React.ChangeEventHandler<HTMLInputElement> = (e) => {
-    const check = beforeUpload(e.target.files[0]);
+  const uploadFile: React.ChangeEventHandler<HTMLInputElement> = async (e) => {
+    const file: File = e.target.files[0];
+    const check = beforeUpload(file);
     if (check) {
       formik.setFieldValue("logo", e.target.files[0]);
       getBase64(e.target.files[0], (result) => {
         setLogoPreview(result);
         dispatch(updateWorkspace({ _id: workspaceData._id, logo: result }));
       });
+
+      try {
+        const name = `${workspaceData.name
+          .toString()
+          .toLowerCase()
+          .replace("/s/g", "-")}-logo`;
+        const uploadImage = await kontenbase.storage.upload(e.target.files[0]);
+
+        const createAttachment = await kontenbase
+          .service("Attachments")
+          .create({
+            name,
+            ext: uploadImage.data.mimeType,
+            file: uploadImage.data.url,
+          });
+
+        const submitUpdate = await kontenbase
+          .service("Workspaces")
+          .link(params.workspaceId, {
+            logo: createAttachment.data._id,
+          });
+      } catch (error) {
+        console.log("err", error);
+        showToast({ message: `${JSON.stringify(error)}` });
+      }
     }
   };
 
