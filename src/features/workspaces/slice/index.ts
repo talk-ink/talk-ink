@@ -11,13 +11,13 @@ export const fetchWorkspaces = createAsyncThunk(
   async ({ userId }: FetchWorkspacesProps) => {
     const response = await kontenbase
       .service("Workspaces")
-      .find({ where: { peoples: userId } });
+      .find({ where: { peoples: userId }, lookup: ["logo"] });
 
     const remap = response.data.map((workspace) => {
       let logo = null;
 
       if (workspace.logo) {
-        logo = workspace?.logo?.length > 0 ? workspace.logo : null;
+        logo = workspace?.logo?.length > 0 ? workspace.logo[0].file : null;
       }
 
       return {
