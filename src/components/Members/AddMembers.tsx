@@ -35,8 +35,6 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
 
-  // const [showInvitePeople, setShowInvitePeople] = useState<boolean>(false);
-
   const showInvitePeople = useMemo(() => {
     return currentRoute.current === "invitePeople";
   }, [currentRoute]);

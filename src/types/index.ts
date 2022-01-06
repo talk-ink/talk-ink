@@ -53,6 +53,7 @@ export interface Workspace {
   channels?: string[];
   inviteId?: string;
   logo?: string;
+  createdBy?: User;
 }
 
 export interface User {
