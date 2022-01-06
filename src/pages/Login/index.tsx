@@ -11,7 +11,7 @@ import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
 
 import { kontenbase } from "lib/client";
-import { setAuthToken, setAuthUser } from "features/auth";
+import { fetchAvatar, setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Login, User, Workspace } from "types";
@@ -71,6 +71,7 @@ function LoginPage() {
         }
 
         dispatch(setAuthToken({ token: data?.token }));
+        dispatch(fetchAvatar({ user }));
         dispatch(setAuthUser(user));
 
         navigate(`/a/${toWorkspaceId}`);

@@ -15,7 +15,12 @@ import CreateWorkspacePage from "pages/CreateWorkspace";
 import NotFound from "components/NotFound/NotFound";
 
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
+import {
+  fetchAvatar,
+  setAuthLoading,
+  setAuthToken,
+  setAuthUser,
+} from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, User } from "types";
 import ThreadPage from "pages/Thread";
@@ -40,6 +45,7 @@ function App() {
 
       dispatch(setAuthToken(token));
       dispatch(setAuthUser(user));
+      dispatch(fetchAvatar({ user }));
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${error}` });

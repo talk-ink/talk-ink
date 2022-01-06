@@ -6,6 +6,7 @@ import { BiArrowBack } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 import { SettingsModalRouteState } from "types";
 import { SettingsModalHeader } from "utils/text-constants";
+import AccountSettings from "./AccountSettings";
 import GeneralSettings from "./GeneralSettings";
 import SettingsSidebar from "./SettingsSidebar";
 
@@ -48,6 +49,13 @@ function SettingsModal({
       case "general":
         return (
           <GeneralSettings
+            currentRoute={currentRoute}
+            setCurrentRoute={setCurrentRoute}
+          />
+        );
+      case "account":
+        return (
+          <AccountSettings
             currentRoute={currentRoute}
             setCurrentRoute={setCurrentRoute}
           />

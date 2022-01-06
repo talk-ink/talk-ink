@@ -1,7 +1,23 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cookies from "js-cookie";
+import { kontenbase } from "lib/client";
 
 import { AuthState, Token, User } from "types";
+
+type FetchAvatarProps = {
+  user: User;
+};
+
+export const fetchAvatar = createAsyncThunk(
+  "auth/fetchAvatar",
+  async ({ user }: FetchAvatarProps) => {
+    if (!user.avatar) return null;
+    const response = await kontenbase
+      .service("Attachments")
+      .getById(user.avatar);
+    return response.data.file;
+  }
+);
 
 const initialState: AuthState = {
   token: null,
@@ -46,8 +62,32 @@ const authSlice = createSlice({
       };
     },
   },
+  extraReducers: (builder) => {
+    builder.addCase(fetchAvatar.pending, (state) => {
+      state.loading = true;
+    });
+    builder.addCase(
+      fetchAvatar.fulfilled,
+      (state, action: PayloadAction<string | null>) => {
+        state.user = {
+          ...state.user,
+          avatar: action.payload,
+        };
+        state.loading = false;
+      }
+    );
+    builder.addCase(fetchAvatar.rejected, (state) => {
+      state.loading = false;
+    });
+  },
 });
 
-export const { setAuthToken, setAuthUser, setAuthLoading, logout, login } =
-  authSlice.actions;
+export const {
+  setAuthToken,
+  setAuthUser,
+  setAuthLoading,
+  logout,
+  login,
+  updateUser,
+} = authSlice.actions;
 export const authReducer = authSlice.reducer;
