@@ -47,9 +47,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
     return workspaceData?.hideEmail?.includes(auth.user.id);
   }, [workspaceData]);
 
-  const [displayEmail, setDisplayEmail] = useState(
-    workspaceData?.hideEmail?.includes(auth.user.id)
-  );
+  const [displayEmail, setDisplayEmail] = useState(!isHideEmail);
 
   const initialValues = {
     about: auth.user?.about || "",
@@ -59,20 +57,31 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
   const onSubmit = async (values: TypeInitialValues) => {
     try {
       await kontenbase.auth.updateProfile({ ...values });
-      if (displayEmail) {
+      let hideEmail: string[] = [];
+
+      if (workspaceData.hideEmail) {
+        hideEmail = workspaceData.hideEmail;
+      }
+
+      if (!displayEmail) {
+        if (!isHideEmail) {
+          hideEmail = [...hideEmail, auth.user.id];
+        }
+      } else {
+        hideEmail = hideEmail.filter((email) => email !== auth.user.id);
+      }
+
+      if (!displayEmail) {
         await kontenbase
           .service("Workspaces")
           .link(params.workspaceId, { hideEmail: auth.user.id });
-        let hideEmail: string[] = [];
-        if (!workspaceData.hideEmail) {
-          hideEmail.push(auth.user.id);
-        } else {
-          if (!isHideEmail) {
-            hideEmail = [...workspaceData.hideEmail, auth.user.id];
-          }
-        }
-        dispatch(updateWorkspace({ _id: params.workspaceId, hideEmail }));
+      } else {
+        await kontenbase
+          .service("Workspaces")
+          .unlink(params.workspaceId, { hideEmail: auth.user.id });
       }
+
+      dispatch(updateWorkspace({ _id: params.workspaceId, hideEmail }));
       dispatch(updateUser({ ...values }));
     } catch (error) {
       console.log("err", error);
@@ -89,7 +98,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
   });
 
   const showSubmit =
-    isHideEmail !== displayEmail ||
+    isHideEmail !== !displayEmail ||
     auth.user.about !== formik.values.about ||
     auth.user.contact !== formik.values.contact;
 

@@ -5,9 +5,10 @@ import { getNameInitial } from "utils/helper";
 
 type TProps = {
   data: User;
+  hideEmail: boolean;
 };
 
-function MemberList({ data }: TProps) {
+function MemberList({ data, hideEmail }: TProps) {
   return (
     <div className="border-b border-neutral-100 py-3 first:border-t flex items-center justify-between">
       <div className="flex items-center">
@@ -15,8 +16,10 @@ function MemberList({ data }: TProps) {
           <NameInitial name={getNameInitial(data.firstName)} />
         </div>
         <div>
-          <p className="-mb-2">{data.firstName}</p>
-          <small className="text-xs text-neutral-500">{data.email}</small>
+          <p className={!hideEmail && "-mb-2"}>{data.firstName}</p>
+          {!hideEmail && (
+            <small className="text-xs text-neutral-500">{data.email}</small>
+          )}
         </div>
       </div>
       <div></div>
