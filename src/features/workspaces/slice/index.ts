@@ -17,7 +17,10 @@ export const fetchWorkspaces = createAsyncThunk(
       let logo = null;
 
       if (workspace.logo) {
-        logo = workspace?.logo?.length > 0 ? workspace.logo[0].file : null;
+        logo =
+          workspace?.logo?.length > 0
+            ? workspace.logo[workspace.logo.length - 1].file
+            : null;
       }
 
       return {

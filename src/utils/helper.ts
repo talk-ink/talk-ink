@@ -1,5 +1,6 @@
 import { SendEmail } from "types";
 import axios, { AxiosResponse } from "axios";
+import FileResizer from "react-image-file-resizer";
 
 const EMAIL_API: string = process.env.REACT_APP_EMAIL_API;
 
@@ -52,3 +53,19 @@ export const getBase64 = (
   reader.addEventListener("load", () => callback(reader.result));
   reader.readAsDataURL(img);
 };
+
+export const resizeFile = (file: File, maxSize: number): Promise<any> =>
+  new Promise((resolve) => {
+    FileResizer.imageFileResizer(
+      file,
+      maxSize,
+      maxSize,
+      "WEBP",
+      75,
+      0,
+      (uri) => {
+        resolve(uri);
+      },
+      "file"
+    );
+  });

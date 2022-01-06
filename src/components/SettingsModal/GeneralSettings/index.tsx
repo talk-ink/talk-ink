@@ -2,7 +2,7 @@ import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 
 import { useAppSelector } from "hooks/useAppSelector";
-import { getBase64, getNameInitial } from "utils/helper";
+import { getBase64, getNameInitial, resizeFile } from "utils/helper";
 import Upload from "components/Form/Upload";
 import TextInput from "components/Form/TextInput";
 import Button from "components/Button/Button";
@@ -92,7 +92,9 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
           .toString()
           .toLowerCase()
           .replace("/s/g", "-")}-logo`;
-        const uploadImage = await kontenbase.storage.upload(e.target.files[0]);
+
+        const resized = await resizeFile(file, 500);
+        const uploadImage = await kontenbase.storage.upload(resized);
 
         const createAttachment = await kontenbase
           .service("Attachments")
