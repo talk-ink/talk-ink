@@ -53,12 +53,12 @@ function IconLink({ link, type }: Props) {
 
 function LandingFooter() {
   return (
-    <footer className=" border-t border-neutral-300">
-      <div className="max-w-[1400px] flex items-center justify-between h-14 m-auto px-20 2xl:px-0">
+    <footer className=" border-t border-neutral-300 py-2 md:py-0">
+      <div className="max-w-[1400px] flex items-center justify-between h-full md:h-14 m-auto px-5 md:px-20 2xl:px-0 ">
         <div>
           <p className="text-sm text-neutral-400">© 2021 Talk.ink</p>
         </div>
-        <div className="flex gap-4">
+        <div className="flex flex-col items-end md:flex-row gap-4">
           <div>
             <p className="text-sm text-neutral-400">Join us on</p>
           </div>
