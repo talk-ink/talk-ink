@@ -58,9 +58,9 @@ function LeaveWorkspace() {
         <span className="italic">{workspaceData.name}</span> workspace?
       </p>
       <p className="text-sm">
-        By leaving, you’ll immediately lose access to the team. Everything you
-        have posted will remain accessible. You’ll need to be re-invited to join
-        again. Learn more.
+        By leaving, you’ll immediately lose access to the workspace. Everything
+        you have posted will remain accessible. You’ll need to be re-invited to
+        join again. Learn more.
       </p>
       <div className="my-3">
         <input
