@@ -53,7 +53,7 @@ function JoinChannelPage() {
 
     const joinBulkChannelHandler = () => {
       const join = selectedChannels.map(async (data) => {
-        const channelData = await kontenbase.service("Channels").findById(data);
+        const channelData = await kontenbase.service("Channels").getById(data);
         const joinChannel = await kontenbase
           .service("Channels")
           .updateById(data, {
@@ -66,7 +66,7 @@ function JoinChannelPage() {
     };
 
     try {
-      const userData = await kontenbase.service("Users").findById(userId);
+      const userData = await kontenbase.service("Users").getById(userId);
       let workspaces = [];
 
       if (userData.data.workspaces) {
@@ -85,7 +85,7 @@ function JoinChannelPage() {
 
       const workspaceData = await kontenbase
         .service("Workspaces")
-        .findById(params.workspaceId);
+        .getById(params.workspaceId);
 
       const joinWorkspace = await kontenbase
         .service("Workspaces")

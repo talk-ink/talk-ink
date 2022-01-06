@@ -47,6 +47,7 @@
 }
 
 .rdw-link-modal,
+.rdw-image-modal,
 .rdw-emoji-modal {
   top: auto !important;
   bottom: 25px !important;
