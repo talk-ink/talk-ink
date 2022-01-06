@@ -99,10 +99,24 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
     }
   };
 
+  const onSubmit = async (values: { firstName: string }) => {
+    try {
+      const submitUpdate = await kontenbase.auth.updateProfile({
+        firstName: values.firstName,
+      });
+      dispatch(updateUser({ firstName: values.firstName }));
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error)}` });
+    }
+  };
+
   const formik = useFormik({
     initialValues,
     validationSchema: updateAccount,
-    onSubmit: (values) => {},
+    onSubmit: (values) => {
+      onSubmit(values);
+    },
   });
 
   return (
