@@ -6,6 +6,7 @@ import { BiArrowBack } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 import { SettingsModalRouteState } from "types";
 import { SettingsModalHeader } from "utils/text-constants";
+import ComingSoonSettings from "./ComingSoon";
 import GeneralSettings from "./GeneralSettings";
 import SettingsSidebar from "./SettingsSidebar";
 
@@ -53,6 +54,7 @@ function SettingsModal({
           />
         );
       default:
+        return <ComingSoonSettings />;
         break;
     }
   };
