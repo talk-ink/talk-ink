@@ -4,10 +4,11 @@ type Props = React.PropsWithChildren<{
   name?: string;
   type?: string;
   className?: string;
-  onChange?(event: React.ChangeEvent): void;
-  onBlur?: (event: React.ChangeEvent) => void;
-  value?: string;
+  onChange?: React.ChangeEventHandler<HTMLInputElement>;
+  onBlur?: React.FocusEventHandler<HTMLInputElement>;
+  value?: string | number;
   placeholder?: string;
+  defaultValue?: string | number;
 }>;
 
 function TextInput({
@@ -18,6 +19,7 @@ function TextInput({
   onChange = () => {},
   value,
   placeholder,
+  defaultValue,
 }: Props) {
   return (
     <input
@@ -29,6 +31,7 @@ function TextInput({
       onChange={onChange}
       value={value}
       placeholder={placeholder}
+      defaultValue={defaultValue}
     />
   );
 }

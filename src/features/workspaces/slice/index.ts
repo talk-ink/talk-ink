@@ -11,9 +11,25 @@ export const fetchWorkspaces = createAsyncThunk(
   async ({ userId }: FetchWorkspacesProps) => {
     const response = await kontenbase
       .service("Workspaces")
-      .find({ where: { peoples: userId } });
+      .find({ where: { peoples: userId }, lookup: ["logo"] });
 
-    return response.data;
+    const remap = response.data.map((workspace) => {
+      let logo = null;
+
+      if (workspace.logo) {
+        logo =
+          workspace?.logo?.length > 0
+            ? workspace.logo[workspace.logo.length - 1].file
+            : null;
+      }
+
+      return {
+        ...workspace,
+        logo,
+      };
+    });
+
+    return remap;
   }
 );
 
@@ -39,6 +55,12 @@ const workspaceSlice = createSlice({
         ...action.payload,
       };
     },
+    leaveWorkspace: (state, action) => {
+      const workspaceIndex = state.workspaces.findIndex(
+        (workspace) => workspace._id === action.payload._id
+      );
+      state.workspaces.splice(workspaceIndex, 1);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchWorkspaces.pending, (state) => {
@@ -57,5 +79,6 @@ const workspaceSlice = createSlice({
   },
 });
 
-export const { addWorkspace, updateWorkspace } = workspaceSlice.actions;
+export const { addWorkspace, updateWorkspace, leaveWorkspace } =
+  workspaceSlice.actions;
 export const workspaceReducer = workspaceSlice.reducer;

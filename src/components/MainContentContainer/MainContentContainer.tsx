@@ -8,7 +8,7 @@ type Props = React.PropsWithChildren<{
 
 function MainContentContainer({ children, className, header, listRef }: Props) {
   return (
-    <div className="w-full h-screen flex flex-col items-center overflow-auto relative">
+    <div className="w-full h-screen flex flex-col items-center overflow-auto">
       {header}
       <div className={`w-11/12 px-10 pt-20 ${className}`}>{children}</div>
       <div ref={listRef} />

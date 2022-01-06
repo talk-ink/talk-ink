@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+  Dispatch,
+} from "react";
 
 import { useParams } from "react-router-dom";
 import copy from "copy-to-clipboard";
@@ -14,8 +20,14 @@ import { useToast } from "hooks/useToast";
 import { updateWorkspace } from "features/workspaces";
 import { randomString } from "utils/helper";
 import { kontenbase } from "lib/client";
+import { SettingsModalRouteState } from "types";
 
-function AddMembers() {
+type TProps = {
+  currentRoute: SettingsModalRouteState;
+  setCurrentRoute: Dispatch<SetStateAction<SettingsModalRouteState>>;
+};
+
+function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const params = useParams();
   const [showToast] = useToast();
 
@@ -23,7 +35,10 @@ function AddMembers() {
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
 
-  const [showInvitePeople, setShowInvitePeople] = useState<boolean>(false);
+  const showInvitePeople = useMemo(() => {
+    return currentRoute.current === "invitePeople";
+  }, [currentRoute]);
+
   const [apiLoading, setApiLoading] = useState<boolean>(false);
 
   const workspaceData = useMemo(() => {
@@ -71,7 +86,7 @@ function AddMembers() {
     <div className="min-h-[50vh]">
       {!showInvitePeople && (
         <>
-          <div className="w-full border-b border-neutral-100 py-3">
+          <div className="w-full border-b border-neutral-100 pb-3 pt-0">
             <p className="text-sm font-semibold">Invite link</p>
             <p className="text-sm text-neutral-500">
               Share this link with others to grant access to your team!{" "}
@@ -126,7 +141,10 @@ function AddMembers() {
               <Button
                 className="text-sm text-white bg-cyan-600"
                 onClick={() => {
-                  setShowInvitePeople(true);
+                  setCurrentRoute((prev) => ({
+                    ...prev,
+                    current: "invitePeople",
+                  }));
                 }}
               >
                 Invite People
@@ -148,7 +166,12 @@ function AddMembers() {
       )}
       {showInvitePeople && (
         <InvitePeopleForm
-          setShowInvitePeople={setShowInvitePeople}
+          onCancel={() => {
+            setCurrentRoute((prev) => ({
+              route: prev.route,
+              current: prev.route,
+            }));
+          }}
           workspaceData={workspaceData}
         />
       )}

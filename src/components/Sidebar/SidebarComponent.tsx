@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
+import { FiSettings } from "react-icons/fi";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 
@@ -29,6 +30,7 @@ import { useToast } from "hooks/useToast";
 import AddMembers from "components/Members/AddMembers";
 import WorkspaceListButton from "components/Button/WorkspaceListButton";
 import Divider from "components/Divider/Divider";
+import SettingsModal from "components/SettingsModal/SettingsModal";
 
 function SidebarComponent() {
   const auth = useAppSelector((state) => state.auth);
@@ -45,15 +47,15 @@ function SidebarComponent() {
   const [createChannelModal, setCreateChannelModal] = useState(false);
   const [editChannelModal, setEditChannelModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
-  const [membersModal, setMembersModal] = useState(false);
+  const [settingsModal, setSettingsModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
   >(null);
 
-  const workspaceData: Workspace = workspace.workspaces.find(
-    (data) => data._id === params.workspaceId
-  );
+  const workspaceData = useMemo(() => {
+    return workspace.workspaces.find((data) => data._id === params.workspaceId);
+  }, [workspace.workspaces, params.workspaceId]);
 
   const channelData: Channel[] = channel.channels;
   const userId: string = auth.user.id;
@@ -83,6 +85,7 @@ function SidebarComponent() {
         members: [...workspaceData.peoples, auth.user.id],
         workspace: params.workspaceId,
       });
+
       if (createChannel) {
         dispatch(addChannel(createChannel.data));
         setCreateChannelModal(false);
@@ -128,15 +131,17 @@ function SidebarComponent() {
             content={
               <div>
                 <Menu>
-                  {workspace.workspaces.map((data, idx) => (
-                    <WorkspaceListButton
-                      key={idx}
-                      data={data}
-                      onClick={() => {
-                        navigate(`/a/${data._id}/inbox`);
-                      }}
-                    />
-                  ))}
+                  <div className="max-h-40 overflow-auto">
+                    {workspace.workspaces.map((data, idx) => (
+                      <WorkspaceListButton
+                        key={idx}
+                        data={data}
+                        onClick={() => {
+                          navigate(`/a/${data._id}/inbox`);
+                        }}
+                      />
+                    ))}
+                  </div>
 
                   <Divider />
                   <MenuItem
@@ -150,10 +155,10 @@ function SidebarComponent() {
                   <Divider />
 
                   <MenuItem
-                    icon={<BiUserPlus size={20} className="text-neutral-400" />}
-                    title="Members"
+                    icon={<FiSettings size={20} className="text-neutral-400" />}
+                    title="Settings & members"
                     onClick={() => {
-                      setMembersModal(true);
+                      setSettingsModal(true);
                     }}
                   />
                   <MenuItem
@@ -166,7 +171,7 @@ function SidebarComponent() {
             }
             position="right"
           >
-            {!loading && <WorkspaceButton title={workspaceData?.name} />}
+            {!loading && <WorkspaceButton workspaceData={workspaceData} />}
           </Popup>
           <IconButton>
             <BiMoon size={18} className="text-neutral-400" />
@@ -197,7 +202,7 @@ function SidebarComponent() {
               />
             </ul>
             <ChannelButton setCreateChannelModal={setCreateChannelModal} />
-            <div>
+            <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
                   key={idx + channel._id}
@@ -281,16 +286,13 @@ function SidebarComponent() {
           again later.
         </p>
       </Modal>
-      <Modal
-        header="Members"
+      <SettingsModal
         footer={null}
-        visible={membersModal}
+        visible={settingsModal}
         onClose={() => {
-          setMembersModal(false);
+          setSettingsModal(false);
         }}
-      >
-        <AddMembers />
-      </Modal>
+      />
     </div>
   );
 }

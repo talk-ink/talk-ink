@@ -52,6 +52,8 @@ export interface Workspace {
   peoples?: User[];
   channels?: string[];
   inviteId?: string;
+  logo?: string;
+  createdBy?: User;
 }
 
 export interface User {
@@ -84,4 +86,9 @@ export interface SendEmail {
   emails: string[];
   subject: string;
   message: string;
+}
+
+export interface SettingsModalRouteState {
+  route: string;
+  current: string;
 }
