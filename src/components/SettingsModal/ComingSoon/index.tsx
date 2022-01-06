@@ -11,7 +11,7 @@ function ComingSoonSettings() {
         className="w-6/12 object-cover"
       />
 
-      <h3 className="text-xl text-neutral-500 mt-4">Coming soon</h3>
+      <h3 className="text-xl text-neutral-500 mt-4 font-bold">Coming soon</h3>
     </div>
   );
 }
