@@ -33,7 +33,7 @@ function DashboardPage() {
   return loading ? (
     <FullscreenLoading />
   ) : (
-    <div className="w-full min-h-screen grid grid-cols-[280px_1fr] overflow-hidden text-slightGray">
+    <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-hidden text-slightGray">
       <SidebarComponent />
       <Outlet />
     </div>

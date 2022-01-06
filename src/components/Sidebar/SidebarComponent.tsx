@@ -125,7 +125,7 @@ function SidebarComponent() {
 
   return (
     <div>
-      <div className="bg-[#F7FAFB] h-screen">
+      <div className="bg-[#F7FAFB] h-screen hidden md:block">
         <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-10">
           <Popup
             content={
