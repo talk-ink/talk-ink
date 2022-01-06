@@ -178,6 +178,7 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
                 defaultValue={workspaceData.name}
                 onBlur={formik.handleBlur("name")}
                 onChange={formik.handleChange("name")}
+                value={formik.values.name}
               />
               <small className="text-neutral-500 text-xs mt-2">
                 The name of your group or company. Keep it simple.
@@ -238,7 +239,9 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
               <div className="flex items-center justify-end gap-2">
                 <Button
                   className="text-sm flex items-center justify-center hover:bg-neutral-50 min-w-[5rem]"
-                  // onClick={onCancel}
+                  onClick={() =>
+                    formik.setFieldValue("name", workspaceData.name)
+                  }
                 >
                   Cancel
                 </Button>
