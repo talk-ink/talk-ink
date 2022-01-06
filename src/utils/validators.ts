@@ -38,3 +38,8 @@ export const changePasswordValidation = yup.object().shape({
   newPassword: yup.string().min(8).max(24).required(),
   confirmPassword: yup.string().min(8).max(24).required(),
 });
+
+export const profileSettingsValidation = yup.object().shape({
+  about: yup.string().max(100),
+  contact: yup.string().max(100),
+});

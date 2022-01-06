@@ -54,6 +54,7 @@ export interface Workspace {
   inviteId?: string;
   logo?: string;
   createdBy?: User;
+  hideEmail?: string[];
 }
 
 export interface User {
