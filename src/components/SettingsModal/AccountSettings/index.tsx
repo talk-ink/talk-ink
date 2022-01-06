@@ -207,7 +207,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
                 <span className="font-semibold">{userData.email}</span> and your
                 password.
               </p>
-              <Button
+              {/* <Button
                 className=" text-sm font-semibold bg-neutral-200 hover:bg-neutral-300 mt-3"
                 onClick={() => {
                   setCurrentRoute((prev) => ({
@@ -217,7 +217,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
                 }}
               >
                 Change password
-              </Button>
+              </Button> */}
             </div>
           </div>
 
