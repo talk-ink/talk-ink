@@ -17,15 +17,18 @@ function LandingPage() {
         <SectionContent
           header="Simple as Email"
           subHeader="Your inbox gathers all threads only you’re part of, and mark it done as you go."
+          type="email"
         />
         <SectionContent
           header="Readable as Thread"
           subHeader="Go to channel, create a thread, and start deep discussion without worrying important topic got burried."
           reverse
+          type="thread"
         />
         <SectionContent
           header="Realtime as Chat"
           subHeader="the discussion will notify you realtime or you can catch up in your time."
+          type="chat"
         />
         <FooterHero />
       </main>
