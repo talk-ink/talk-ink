@@ -47,12 +47,14 @@ function ContentItem({
               alt="img"
             />
           </div> */}
-          <NameInitial
-            name={getNameInitial(dataSource.createdBy?.firstName)}
-            className="mr-4"
-          />
           <div>
-            <div className="flex items-center">
+            <NameInitial
+              name={getNameInitial(dataSource.createdBy?.firstName)}
+              className="mr-4"
+            />
+          </div>
+          <div>
+            <div className="flex flex-col items-start md:flex-row md:items-center">
               <p
                 className={`font-body text-sm mr-2 ${
                   dataSource?.draft && "text-blue-500"
@@ -70,8 +72,8 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="overflow-hidden whitespace-nowrap text-ellipsis max-w-3xl text-xs text-neutral-500 pr-2">
-              <small className="text-xs text-neutral-500">
+            <div className="text-left overflow-hidden whitespace-normal  text-ellipsis md:whitespace-nowrap max-w-3xl text-xs text-neutral-500 pr-2">
+              <small className=" text-xs text-neutral-500">
                 {dataSource?.draft ? "Me: " : ""}
                 {dataSource.content}
               </small>
