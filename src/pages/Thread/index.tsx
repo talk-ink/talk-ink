@@ -30,6 +30,7 @@ function ThreadPage() {
 
   useEffect(() => {
     let key: string;
+
     kontenbase.realtime
       .subscribe("Comments", async (message) => {
         const { payload, event } = message;
@@ -38,14 +39,22 @@ function ThreadPage() {
             ? payload.before.threads?.[0] === threadId
             : payload.threads?.[0] === threadId;
 
+        console.log(payload);
+
         let _createdBy;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
           const { data } = await kontenbase
             .service("Users")
-            .find({ where: { id: payload.createdBy } });
+            .find({
+              where: {
+                id:
+                  event === "UPDATE_RECORD"
+                    ? payload.before.createdBy
+                    : payload.createdBy,
+              },
+            });
           _createdBy = data?.[0];
         }
-        // note: response dari notification kalau ada relasi ke created by kok malah return id aja?
 
         if (isCurrentThread) {
           switch (event) {
