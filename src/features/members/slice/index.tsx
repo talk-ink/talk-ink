@@ -16,7 +16,7 @@ export const fetchMembers = createAsyncThunk(
   async ({ workspaceId }: FetchMembersProps) => {
     const response = await kontenbase
       .service("Users")
-      .find({ where: { workspaces: workspaceId } });
+      .find({ where: { workspaces: workspaceId }, lookup: ["avatar"] });
 
     return response.data;
   }

@@ -64,6 +64,8 @@ export interface User {
   workspaces?: Workspace[];
   channels?: Channel[];
   avatar?: string;
+  about?: string;
+  contact?: string;
 }
 
 export interface Login {
