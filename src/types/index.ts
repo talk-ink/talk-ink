@@ -92,3 +92,15 @@ export interface SettingsModalRouteState {
   route: string;
   current: string;
 }
+
+export interface Attachment {
+  _id?: string;
+  id?: string;
+  name?: string;
+  ext?: string;
+  file: string;
+}
+
+export interface Member extends Omit<User, "avatar"> {
+  avatar?: Attachment[];
+}

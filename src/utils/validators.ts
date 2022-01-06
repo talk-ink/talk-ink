@@ -33,3 +33,8 @@ export const updateWorkspaceGeneral = yup.object().shape({
 export const updateAccount = yup.object().shape({
   firstName: yup.string().max(40).required(),
 });
+
+export const changePasswordValidation = yup.object().shape({
+  newPassword: yup.string().min(8).max(24).required(),
+  confirmPassword: yup.string().min(8).max(24).required(),
+});

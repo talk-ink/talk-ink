@@ -15,4 +15,5 @@ export const SettingsModalHeader: {
   manageEmail: "Manage email",
   leaveWorkspace: "Leave workspace",
   deleteWorkspace: "Delete workspace",
+  changePassword: "Change password",
 };
