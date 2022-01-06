@@ -59,14 +59,10 @@ function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
         <div>
           <p className="text-sm font-semibold">Invite by email</p>
           <p className="text-sm">
-            New people will be added to the team as member
+            New people will be added to the workspace as member
           </p>
         </div>
         <div className="mt-3">
-          {/* <textarea
-            className="w-full text-sm p-2 rounded-md outline-0 border border-neutral-200 focus:border-neutral-300"
-            onChange={(e) => setEmailStr(e.target.value)}
-          /> */}
           <div className="w-full text-sm p-2 rounded-md outline-0 border border-neutral-200 focus:border-neutral-300 flex flex-wrap gap-2">
             {emailArr.map((email, idx) => (
               <ClosableBadge
