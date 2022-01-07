@@ -219,27 +219,32 @@ function SidebarComponent({
                 type="search"
                 name="Search"
                 link={`/a/${workspaceData?._id}/search`}
+                setIsSidebarOpen={setIsSidebarOpen}
               />
               <SidebarList
                 type="inbox"
                 name="Inbox"
                 link={`/a/${workspaceData?._id}/inbox`}
+                setIsSidebarOpen={setIsSidebarOpen}
               />
               <SidebarList
                 type="saved"
                 name="Saved"
                 link={`/a/${workspaceData?._id}/saved`}
+                setIsSidebarOpen={setIsSidebarOpen}
               />
               <SidebarList
                 type="messages"
                 name="Messages"
                 link={`/a/${workspaceData?._id}/messages`}
+                setIsSidebarOpen={setIsSidebarOpen}
               />
             </ul>
             <ChannelButton setCreateChannelModal={setCreateChannelModal} />
             <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
+                  setIsSidebarOpen={setIsSidebarOpen}
                   key={idx + channel._id}
                   type="channel"
                   name={channel.name}
