@@ -111,7 +111,7 @@ export interface Attachment {
 }
 
 export interface Member extends Omit<User, "avatar"> {
-  avatar?: Attachment[];
+  avatar?: Avatar[];
 }
 
 export interface TUserProfile extends Omit<User, "avatar"> {
