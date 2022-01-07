@@ -14,7 +14,7 @@ export const fetchAvatar = createAsyncThunk(
     if (!user.avatar) return null;
     const response = await kontenbase
       .service("Attachments")
-      .getById(user.avatar);
+      .getById(user.avatar?.[0]);
     return response.data.file;
   }
 );

@@ -83,7 +83,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
             file: uploadImage.data.url,
           });
         const submitUpdate = await kontenbase.auth.updateProfile({
-          avatar: createAttachment.data._id,
+          avatar: [createAttachment.data._id],
         });
       } catch (error) {
         console.log("err", error);
