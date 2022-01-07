@@ -111,6 +111,10 @@ function ThreadPage() {
     listRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
+  useEffect(() => {
+    scrollToBottom();
+  }, []);
+
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === channelId);
   }, [channelId, channel.channels]);
@@ -126,7 +130,7 @@ function ThreadPage() {
       }
       listRef={listRef}
     >
-      <div className="max-w-screen-lg pb-10 mx-auto">
+      <div className="w-full md:px-60 pb-10 ">
         <div className="mb-8">
           <h1 className="font-bold text-3xl">{threadData?.name}</h1>
           <p className="text-neutral-500 text-sm font-body">
@@ -140,7 +144,9 @@ function ThreadPage() {
           </p>
         </div>
         <div className="flex items-start ">
-          <Avatar src="https://picsum.photos/100" />
+          <div>
+            <Avatar src="https://picsum.photos/100" />
+          </div>
           <div className="prose flex-grow-0 ml-4">
             <ReactMarkdown>{threadData?.content}</ReactMarkdown>
           </div>

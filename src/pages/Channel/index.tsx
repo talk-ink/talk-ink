@@ -199,8 +199,10 @@ function ChannelPage() {
               createThreadDraft();
             }}
           >
-            <BiEdit size={18} className="text-white mr-2" />
-            <p className="text-sm text-white font-medium -mb-1">New Thread</p>
+            <BiEdit size={18} className="text-white md:mr-2" />
+            <p className="hidden md:block text-sm text-white font-medium -mb-1">
+              New Thread
+            </p>
           </Button>
           <Popup
             content={

@@ -46,7 +46,7 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div className="fixed bottom-0 left-auto right-auto w-6/12   bg-gray-50 z-30">
+    <div className="fixed bottom-0 px-5 md:px-0 left-0 md:left-auto md:right-auto w-full md:w-6/12 bg-white z-30">
       {!isShowEditor && (
         <div className="flex items-center py-5 ">
           <div>

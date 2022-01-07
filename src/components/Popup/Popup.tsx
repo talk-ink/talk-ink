@@ -11,7 +11,7 @@ function Popup({ children, content, position = "left" }: Props) {
   const popupPosition: any = {
     left: "top-0 -left-2 transform -translate-x-full",
     right: "top-0 -right-2 transform translate-x-full",
-    bottom: "-bottom-2 right-0 transform translate-y-full",
+    bottom: "-bottom-2 -left transform translate-y-full",
     top: "-top-2 right-0 transform -translate-y-full",
   };
   return (

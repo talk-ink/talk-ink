@@ -1,7 +1,14 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
+import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 
@@ -32,7 +39,17 @@ import WorkspaceListButton from "components/Button/WorkspaceListButton";
 import Divider from "components/Divider/Divider";
 import SettingsModal from "components/SettingsModal/SettingsModal";
 
-function SidebarComponent() {
+type TProps = {
+  isMobile: boolean;
+  isSidebarOpen: boolean;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
+};
+
+function SidebarComponent({
+  isMobile,
+  isSidebarOpen,
+  setIsSidebarOpen,
+}: TProps) {
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const channel = useAppSelector((state) => state.channel);
@@ -125,7 +142,17 @@ function SidebarComponent() {
 
   return (
     <div>
-      <div className="bg-[#F7FAFB] h-screen">
+      <div
+        className={
+          isMobile
+            ? `bg-[#F7FAFB] top-0 left-0 fixed h-full z-40  ease-in-out duration-300 ${
+                isSidebarOpen
+                  ? "translate-x-0 w-[80vw] "
+                  : "-translate-x-full w-full"
+              } md:block`
+            : `bg-[#F7FAFB] h-screen hidden md:block`
+        }
+      >
         <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-10">
           <Popup
             content={
@@ -169,12 +196,20 @@ function SidebarComponent() {
                 </Menu>
               </div>
             }
-            position="right"
+            position={isMobile ? "bottom" : "right"}
           >
             {!loading && <WorkspaceButton workspaceData={workspaceData} />}
           </Popup>
           <IconButton>
-            <BiMoon size={18} className="text-neutral-400" />
+            {isMobile ? (
+              <MdClose
+                size={18}
+                className="text-neutral-400"
+                onClick={() => setIsSidebarOpen(false)}
+              />
+            ) : (
+              <BiMoon size={18} className="text-neutral-400" />
+            )}
           </IconButton>
         </div>
         {!loading && (
