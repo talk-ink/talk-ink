@@ -43,16 +43,14 @@ function ThreadPage() {
 
         let _createdBy;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
-          const { data } = await kontenbase
-            .service("Users")
-            .find({
-              where: {
-                id:
-                  event === "UPDATE_RECORD"
-                    ? payload.before.createdBy
-                    : payload.createdBy,
-              },
-            });
+          const { data } = await kontenbase.service("Users").find({
+            where: {
+              id:
+                event === "UPDATE_RECORD"
+                  ? payload.before.createdBy
+                  : payload.createdBy,
+            },
+          });
           _createdBy = data?.[0];
         }
 
@@ -128,16 +126,16 @@ function ThreadPage() {
       }
       listRef={listRef}
     >
-      <div className="w-full px-60 pb-10 ">
+      <div className="max-w-screen-lg pb-10 mx-auto">
         <div className="mb-8">
           <h1 className="font-bold text-3xl">{threadData?.name}</h1>
           <p className="text-neutral-500 text-sm font-body">
-            2 Participants{" "}
+            {channelData?.members?.length} Participants{" "}
             <Link
               to={`/a/${workspaceId}/ch/${channelId}`}
               className="text-cyan-600"
             >
-              #Channel
+              #{channelData.name}
             </Link>
           </p>
         </div>
