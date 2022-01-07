@@ -11,10 +11,10 @@ import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
 
 import { kontenbase } from "lib/client";
-import { fetchAvatar, setAuthToken, setAuthUser } from "features/auth";
+import { setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Login, User, Workspace } from "types";
+import { Login, TUserProfile, User, Workspace } from "types";
 import { useToast } from "hooks/useToast";
 
 const initialValues: Login = {
@@ -42,7 +42,7 @@ function LoginPage() {
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
-        const user: User = userData;
+        const user: TUserProfile = userData;
 
         let toWorkspaceId: string = "";
 
@@ -71,7 +71,6 @@ function LoginPage() {
         }
 
         dispatch(setAuthToken({ token: data?.token }));
-        dispatch(fetchAvatar({ user }));
         dispatch(setAuthUser(user));
 
         navigate(`/a/${toWorkspaceId}`);

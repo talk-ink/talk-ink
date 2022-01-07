@@ -75,15 +75,9 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
           .replace("/s/g", "-")}-logo`;
         const resized = await resizeFile(file, 500);
         const uploadImage = await kontenbase.storage.upload(resized);
-        const createAttachment = await kontenbase
-          .service("Attachments")
-          .create({
-            name,
-            ext: uploadImage.data.mimeType,
-            file: uploadImage.data.url,
-          });
+
         const submitUpdate = await kontenbase.auth.updateProfile({
-          avatar: [createAttachment.data._id],
+          avatar: [uploadImage.data],
         });
       } catch (error) {
         console.log("err", error);

@@ -57,6 +57,11 @@ export interface Workspace {
   hideEmail?: string[];
 }
 
+export interface Avatar {
+  fileName: string;
+  url: string;
+}
+
 export interface User {
   id?: string;
   _id?: string;
@@ -107,4 +112,8 @@ export interface Attachment {
 
 export interface Member extends Omit<User, "avatar"> {
   avatar?: Attachment[];
+}
+
+export interface TUserProfile extends Omit<User, "avatar"> {
+  avatar?: Avatar[];
 }
