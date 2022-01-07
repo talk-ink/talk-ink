@@ -2,22 +2,7 @@ import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cookies from "js-cookie";
 import { kontenbase } from "lib/client";
 
-import { AuthState, Token, User } from "types";
-
-type FetchAvatarProps = {
-  user: User;
-};
-
-export const fetchAvatar = createAsyncThunk(
-  "auth/fetchAvatar",
-  async ({ user }: FetchAvatarProps) => {
-    if (!user.avatar) return null;
-    const response = await kontenbase
-      .service("Attachments")
-      .getById(user.avatar?.[0]);
-    return response.data.file;
-  }
-);
+import { AuthState, Avatar, Token, TUserProfile, User } from "types";
 
 const initialState: AuthState = {
   token: null,
@@ -36,8 +21,16 @@ const authSlice = createSlice({
       }
       state.token = action.payload.token;
     },
-    setAuthUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+    setAuthUser: (state, action: PayloadAction<TUserProfile>) => {
+      let avatar = null;
+
+      if (action.payload.avatar) {
+        avatar = action.payload.avatar[0]?.url;
+      }
+      state.user = {
+        ...action.payload,
+        avatar,
+      };
     },
     setAuthLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -79,24 +72,6 @@ const authSlice = createSlice({
       );
       state.user.doneThreads.splice(deletedIndex, 1);
     },
-  },
-  extraReducers: (builder) => {
-    builder.addCase(fetchAvatar.pending, (state) => {
-      state.loading = true;
-    });
-    builder.addCase(
-      fetchAvatar.fulfilled,
-      (state, action: PayloadAction<string | null>) => {
-        state.user = {
-          ...state.user,
-          avatar: action.payload,
-        };
-        state.loading = false;
-      }
-    );
-    builder.addCase(fetchAvatar.rejected, (state) => {
-      state.loading = false;
-    });
   },
 });
 
