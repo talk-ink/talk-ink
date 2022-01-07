@@ -134,12 +134,12 @@ function ThreadPage() {
         <div className="mb-8">
           <h1 className="font-bold text-3xl">{threadData?.name}</h1>
           <p className="text-neutral-500 text-sm font-body">
-            2 Participants{" "}
+            {channelData?.members?.length} Participants{" "}
             <Link
               to={`/a/${workspaceId}/ch/${channelId}`}
               className="text-cyan-600"
             >
-              #Channel
+              #{channelData.name}
             </Link>
           </p>
         </div>

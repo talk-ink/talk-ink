@@ -129,14 +129,12 @@ function Compose() {
         />
       }
     >
-      <div className="w-full md:h-5/6 md:px-14">
-        <div className="w-full h-full border border-neutral-300 rounded-lg p-5">
-          <TextEditor
-            formik={formik}
-            loading={loading}
-            deleteDraft={deleteDraft}
-          />
-        </div>
+      <div className="w-[50vw] h-[80vh] border border-neutral-300 rounded-lg p-5 mx-auto">
+        <TextEditor
+          formik={formik}
+          loading={loading}
+          deleteDraft={deleteDraft}
+        />
       </div>
     </MainContentContainer>
   );
