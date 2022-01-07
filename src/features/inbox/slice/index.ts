@@ -39,6 +39,12 @@ const inboxSlice = createSlice({
     addInbox: (state, action: PayloadAction<Thread>) => {
       state.inbox.push(action.payload);
     },
+    deleteInbox: (state, action: PayloadAction<Thread>) => {
+      let deletedIndex = state.inbox.findIndex(
+        (data) => data._id === action.payload._id
+      );
+      state.inbox.splice(deletedIndex, 1);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchInbox.pending, (state) => {
@@ -59,5 +65,5 @@ const inboxSlice = createSlice({
   },
 });
 
-export const { addInbox } = inboxSlice.actions;
+export const { addInbox, deleteInbox } = inboxSlice.actions;
 export const inboxReducer = inboxSlice.reducer;

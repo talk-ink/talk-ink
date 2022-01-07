@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
@@ -12,6 +12,9 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 import { addDoneThread, deleteDoneThread } from "features/auth";
+import Modal from "components/Modal/Modal";
+import { kontenbase } from "lib/client";
+import { deleteInbox } from "features/inbox";
 
 type TProps = {
   type?: "active" | "done";
@@ -27,13 +30,19 @@ function InboxList({ type = "active" }: TProps) {
   const inbox = useAppSelector((state) => state.inbox);
   const dispatch = useAppDispatch();
 
+  const userId: string = auth.user.id;
+
+  const [selectedThread, setSelectedThread] = useState(null);
+  const [apiLoading, setApiLoading] = useState(false);
+
   const isDoneThread = useMemo(() => {
     return type === "done";
   }, [type]);
 
   const inboxData = useMemo(() => {
     return inbox.inbox.filter((data) => {
-      if (!auth.user.doneThreads) return true;
+      if (!auth.user.doneThreads && isDoneThread) return false;
+      if (!auth.user.doneThreads && !isDoneThread) return true;
       if (isDoneThread) return auth.user.doneThreads.includes(data._id);
       return !auth.user.doneThreads.includes(data._id);
     });
@@ -49,6 +58,25 @@ function InboxList({ type = "active" }: TProps) {
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error)}` });
+    }
+  };
+
+  const threadDeleteHandler = async () => {
+    setApiLoading(true);
+    try {
+      const deletedThread = await kontenbase
+        .service("Threads")
+        .deleteById(selectedThread?._id);
+
+      if (deletedThread?.data) {
+        setSelectedThread(null);
+      }
+      dispatch(deleteInbox(deletedThread.data));
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${error}` });
+    } finally {
+      setApiLoading(false);
     }
   };
 
@@ -84,7 +112,7 @@ function InboxList({ type = "active" }: TProps) {
                       )}
                     </IconButton>
                   }
-                  //  setSelectedThread={setSelectedThread}
+                  setSelectedThread={setSelectedThread}
                 />
               ))}
             </ul>
@@ -95,6 +123,23 @@ function InboxList({ type = "active" }: TProps) {
           )}
         </>
       )}
+
+      <Modal
+        header="Delete Thread"
+        visible={!!selectedThread}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+        onConfirm={() => {
+          threadDeleteHandler();
+        }}
+        okButtonText="Confirm"
+      >
+        Are you sure you want to delete this thread?
+      </Modal>
     </div>
   );
 }

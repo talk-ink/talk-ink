@@ -25,6 +25,18 @@ function InboxPage() {
 
   const userId: string = auth.user.id;
 
+  const isDoneThread = useMemo(() => {
+    return pathname.includes("inbox/done");
+  }, [pathname]);
+
+  const inboxData = useMemo(() => {
+    return inbox.inbox.filter((data) => {
+      if (!auth.user.doneThreads) return true;
+      if (isDoneThread) return auth.user.doneThreads.includes(data._id);
+      return !auth.user.doneThreads.includes(data._id);
+    });
+  }, [inbox.inbox, auth.user, params]);
+
   useEffect(() => {
     dispatch(fetchInbox({ workspaceId: params.workspaceId, userId }));
   }, [params.workspaceId]);
@@ -36,9 +48,24 @@ function InboxPage() {
       <header className="mb-2">
         <div className="mb-7">
           <h1 className="font-bold text-3xl">Inbox</h1>
-          <p className="text-neutral-500 font-body">
-            Good morning! 1 thread to Inbox Zero
-          </p>
+          {!isDoneThread && (
+            <>
+              {inboxData.length > 0 ? (
+                <p className="text-neutral-500 font-body">
+                  {inboxData.length} thread to Inbox Zero
+                </p>
+              ) : (
+                <p className="text-neutral-500 font-body">
+                  You’ve hit Inbox Zero!
+                </p>
+              )}
+            </>
+          )}
+          {isDoneThread && (
+            <p className="text-neutral-500 font-body">
+              Done is better than perfect.
+            </p>
+          )}
         </div>
         <div className="flex justify-between">
           <nav className="flex gap-2 items-center">
@@ -59,33 +86,6 @@ function InboxPage() {
         </div>
       </header>
       <Outlet />
-
-      {/* {loading ? (
-        <ContentSkeleton />
-      ) : (
-        <>
-          {inboxData?.length > 0 ? (
-            <ul>
-              {inboxData.map((inbox, idx) => (
-                <ContentItem
-                  key={idx}
-                  dataSource={inbox}
-                  onClick={() => {
-                    navigate(
-                      `/a/${params.workspaceId}/ch/${inbox?.channel?.[0]}/t/${inbox?._id}`
-                    );
-                  }}
-                  //  setSelectedThread={setSelectedThread}
-                />
-              ))}
-            </ul>
-          ) : (
-            <>
-              <InboxEmpty />
-            </>
-          )}
-        </>
-      )} */}
     </MainContentContainer>
   );
 }
