@@ -9,6 +9,7 @@ import { workspaceReducer } from "features/workspaces";
 import { threadReducer } from "features/threads";
 import { toastReducer } from "features/toast/slice";
 import { memberReducer } from "features/members/slice";
+import { inboxReducer } from "features/inbox";
 
 const persistConfig = {
   key: "root",
@@ -23,6 +24,7 @@ const appReducer = combineReducers({
   thread: threadReducer,
   toast: toastReducer,
   member: memberReducer,
+  inbox: inboxReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appReducer);

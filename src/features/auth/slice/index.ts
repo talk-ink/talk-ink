@@ -61,6 +61,24 @@ const authSlice = createSlice({
         ...action.payload,
       };
     },
+    addDoneThread: (state, action: PayloadAction<string>) => {
+      let doneThreads = [];
+      if (!state.user.doneThreads) {
+        doneThreads.push(action.payload);
+      } else {
+        doneThreads = [...state.user.doneThreads, action.payload];
+      }
+      state.user = {
+        ...state.user,
+        doneThreads,
+      };
+    },
+    deleteDoneThread: (state, action: PayloadAction<string>) => {
+      let deletedIndex = state.user.doneThreads.findIndex(
+        (data) => data === action.payload
+      );
+      state.user.doneThreads.splice(deletedIndex, 1);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchAvatar.pending, (state) => {
@@ -89,5 +107,7 @@ export const {
   logout,
   login,
   updateUser,
+  addDoneThread,
+  deleteDoneThread,
 } = authSlice.actions;
 export const authReducer = authSlice.reducer;

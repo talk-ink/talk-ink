@@ -21,12 +21,13 @@ export interface Thread {
   _id?: string;
   name: string;
   content: string;
-  channel?: Channel;
+  channel?: Channel[];
   comments?: IComment[];
   createdAt?: Date;
   updatedAt?: Date;
   draft?: boolean;
   createdBy?: User;
+  workspace?: string;
 }
 export interface Channel {
   id?: string;
@@ -68,6 +69,7 @@ export interface User {
   avatar?: string;
   about?: string;
   contact?: string;
+  doneThreads?: string[];
 }
 
 export interface Login {

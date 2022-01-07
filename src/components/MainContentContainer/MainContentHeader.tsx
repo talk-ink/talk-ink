@@ -9,6 +9,7 @@ type Props = React.PropsWithChildren<{
   title: string;
   thread?: boolean;
   onBackClick?: () => void;
+  from?: "inbox";
 }>;
 
 function MainContentHeader({
@@ -16,9 +17,17 @@ function MainContentHeader({
   title,
   thread,
   onBackClick = () => {},
+  from,
 }: Props) {
   const navigate = useNavigate();
   const params = useParams();
+
+  const backButtonHandler = (): string => {
+    if (from) {
+      return `/a/${params.workspaceId}/${from}`;
+    }
+    return `/a/${params.workspaceId}/ch/${params.channelId}`;
+  };
 
   return (
     <div className="w-full py-4 px-3 sticky top-0 grid grid-cols-3 border-b border-b-neutral-100 bg-white z-1">
@@ -27,7 +36,7 @@ function MainContentHeader({
           className=" hover:bg-neutral-200 flex items-center"
           onClick={() => {
             onBackClick();
-            navigate(`/a/${params.workspaceId}/ch/${params.channelId}`);
+            navigate(backButtonHandler());
           }}
         >
           <HiChevronLeft size={18} className="text-neutral-500 mr-2 " />

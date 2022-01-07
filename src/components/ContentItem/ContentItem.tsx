@@ -14,13 +14,15 @@ import { getNameInitial } from "utils/helper";
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
-  setSelectedThread: Dispatch<SetStateAction<Thread | null | undefined>>;
+  setSelectedThread?: Dispatch<SetStateAction<Thread | null | undefined>>;
+  otherButton?: React.ReactNode;
 }>;
 
 function ContentItem({
   onClick = () => {},
   dataSource,
   setSelectedThread,
+  otherButton,
 }: Props) {
   return (
     <div
@@ -78,7 +80,8 @@ function ContentItem({
             </div>
           </div>
         </button>
-        <div className="hidden active:block group-hover:block">
+        <div className="flex active:flex group-hover:flex gap-2">
+          {otherButton}
           <Popup
             content={
               <div>
