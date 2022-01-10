@@ -97,7 +97,7 @@ function App() {
           caseSensitive
           path="/login"
           element={
-            <RestrictedRoute type="public">
+            <RestrictedRoute type="public" from="login">
               <LoginPage />
             </RestrictedRoute>
           }
@@ -106,7 +106,7 @@ function App() {
           caseSensitive
           path="/register"
           element={
-            <RestrictedRoute type="public">
+            <RestrictedRoute type="public" from="register">
               <RegisterPage />
             </RestrictedRoute>
           }
