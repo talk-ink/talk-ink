@@ -25,7 +25,18 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
       break;
     case "public":
       if (auth.token) {
-        if (["login", "register"].includes(from)) {
+        if (
+          ["login", "register"].includes(from) &&
+          (!auth.user?.workspaces || auth.user?.workspaces?.length === 0)
+        ) {
+          return (
+            <Navigate to={`/a/create_workspace`} state={{ from: location }} />
+          );
+        }
+        if (
+          ["login", "register"].includes(from) &&
+          auth.user?.workspaces?.length > 0
+        ) {
           return (
             <Navigate
               to={`/a/${auth.user?.workspaces[0]}/inbox`}
