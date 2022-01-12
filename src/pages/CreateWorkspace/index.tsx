@@ -83,17 +83,17 @@ function CreateWorkspacePage() {
   return (
     <div className="w-screen h-screen flex items-center justify-center text-slightGray px-5 md:px-0">
       <div className="w-full md:w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-5 md:px-20 py-16 flex flex-col justify-center">
-        <h1 className="text-3xl font-semibold">Create Workspace/Team</h1>
+        <h1 className="text-3xl font-semibold">Create Workspace</h1>
 
         <form onSubmit={formik.handleSubmit} className="mt-8">
           <FormControl>
-            <FormLabel htmlFor="name">Workspace/Team name</FormLabel>
+            <FormLabel htmlFor="name">Workspace name</FormLabel>
             <TextInput
               name="name"
               onChange={formik.handleChange("name")}
               onBlur={formik.handleBlur("name")}
               value={formik.values.name}
-              placeholder="E.g Iruha Team"
+              placeholder="Your workspace name"
             />
             {formik.errors.name && <SubLabel>{formik.errors.name}</SubLabel>}
           </FormControl>
@@ -105,7 +105,7 @@ function CreateWorkspacePage() {
               onChange={formik.handleChange("project")}
               onBlur={formik.handleBlur("project")}
               value={formik.values.project}
-              placeholder="E.g CRM App or Web apps"
+              placeholder="First project name"
             />
             {formik.errors.project && (
               <SubLabel>{formik.errors.project}</SubLabel>
