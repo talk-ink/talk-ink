@@ -9,7 +9,13 @@ import FormLabel from "components/Form/FormLabel";
 import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
 
-import { Register, TUserProfile, User, Workspace } from "types";
+import {
+  Register,
+  TUserProfile,
+  User,
+  Workspace,
+  WorkspaceResponse,
+} from "types";
 import { registerValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -47,13 +53,20 @@ function RegisterPage() {
         let toWorkspaceId = "create_workspace";
 
         if (params.inviteId) {
-          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+          const { data: workspaceData }: KontenbaseResponse<WorkspaceResponse> =
             await kontenbase
               .service("Workspaces")
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
-            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            let invitedEmails: string[] = [];
+
+            if (workspaceData[0].invitedEmails) {
+              invitedEmails = JSON.parse(workspaceData[0].invitedEmails);
+            }
+
+            if (invitedEmails.includes(user.email))
+              toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
           }
         }
 

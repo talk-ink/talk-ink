@@ -14,7 +14,7 @@ import { kontenbase } from "lib/client";
 import { setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Login, TUserProfile, User, Workspace } from "types";
+import { Login, TUserProfile, User, Workspace, WorkspaceResponse } from "types";
 import { useToast } from "hooks/useToast";
 
 const initialValues: Login = {
@@ -47,12 +47,21 @@ function LoginPage() {
         let toWorkspaceId: string = "";
 
         if (params.inviteId) {
-          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+          const { data: workspaceData }: KontenbaseResponse<WorkspaceResponse> =
             await kontenbase
               .service("Workspaces")
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
+            let invitedEmails: string[] = [];
+
+            if (workspaceData[0].invitedEmails) {
+              invitedEmails = JSON.parse(workspaceData[0].invitedEmails);
+            }
+
+            if (!invitedEmails.includes(user.email))
+              return showToast({ message: "Invite link not valid!" });
+
             if (user.id === workspaceData[0]?.createdBy?._id) {
               toWorkspaceId = `${workspaceData[0]._id}/inbox`;
             } else {
