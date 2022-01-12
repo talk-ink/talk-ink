@@ -92,14 +92,17 @@
 }
 
 .markdown-overrides h1 {
+  margin-top: 0 !important;
   font-size: 2em !important;
 }
 
 .markdown-overrides h2 {
+  margin-top: 0 !important;
   font-size: 1.5em !important;
 }
 
 .markdown-overrides h3 {
+  margin-top: 0 !important;
   font-size: 1.17em !important;
 }
 
@@ -124,6 +127,8 @@
   margin-bottom: 1em;
 }
 
-.markdown-overrides :nth-child(1) {
+.markdown-overrides > div {
   height: inherit !important;
+  overflow: auto;
+  padding-right: 0.5em;
 }

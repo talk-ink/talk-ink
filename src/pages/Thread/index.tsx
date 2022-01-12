@@ -2,7 +2,7 @@ import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
 import { useParams } from "react-router";
-import ReactMarkdown from "react-markdown";
+import Editor from "rich-markdown-editor";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
@@ -144,11 +144,15 @@ function ThreadPage() {
           </p>
         </div>
         <div className="flex items-start ">
-          <div>
+          <div className="mr-4">
             <Avatar src="https://picsum.photos/100" />
           </div>
-          <div className="prose flex-grow-0 ml-4">
-            <ReactMarkdown>{threadData?.content}</ReactMarkdown>
+          <div className="flex-grow">
+            <Editor
+              value={threadData?.content}
+              readOnly
+              className="markdown-overrides w-[70vw] md:w-full"
+            />
           </div>
         </div>
         <div className="border-t-2 border-gray-200 mb-8 mt-8" />

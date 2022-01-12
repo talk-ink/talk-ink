@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { FormikProps } from "formik";
-import ReactMarkdown from "react-markdown";
 import Button from "components/Button/Button";
 import { Thread } from "types";
 import { useNavigate, useParams } from "react-router";
@@ -14,6 +13,22 @@ type Props = React.PropsWithChildren<{
   loading: boolean;
   deleteDraft: () => void;
 }>;
+
+type PropsDelay = React.PropsWithChildren<{
+  waitBeforeShow?: number;
+}>;
+
+const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
+  const [isShown, setIsShown] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsShown(true);
+    }, waitBeforeShow);
+  }, [waitBeforeShow]);
+
+  return isShown ? children : null;
+};
 
 function TextEditor({ formik, loading, deleteDraft }: Props) {
   const [preview, setPreview] = useState(false);
@@ -40,21 +55,32 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
         />
 
         {!preview && (
+          //@ts-ignore
+          <Delayed>
+            <Editor
+              key="editor"
+              onChange={(getContent) =>
+                formik.setFieldValue("content", getContent())
+              }
+              onBlur={() => formik.handleBlur("content")}
+              defaultValue={formik.values.content}
+              uploadImage={async (file: File) => {
+                const { data } = await kontenbase.storage.upload(file);
+                return data.url;
+              }}
+              className="markdown-overrides"
+            />
+          </Delayed>
+        )}
+
+        {preview && (
           <Editor
-            onChange={(getContent) =>
-              formik.setFieldValue("content", getContent())
-            }
-            onBlur={() => formik.handleBlur("content")}
-            defaultValue={formik.values.content}
-            uploadImage={async (file: File) => {
-              const { data } = await kontenbase.storage.upload(file);
-              return data.url;
-            }}
+            key="preview"
+            value={formik.values.content}
+            readOnly
             className="markdown-overrides"
           />
         )}
-
-        {preview && <Editor value={formik.values.content} readOnly />}
       </div>
       <div className="w-full flex justify-between items-center">
         <div></div>

@@ -48,6 +48,8 @@ function Compose() {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
     const selectedDraft = parsedThreadDraft[+params.composeId];
 
+    console.log(selectedDraft);
+
     if (selectedDraft) {
       formik.setFieldValue("name", selectedDraft.name);
       formik.setFieldValue("content", selectedDraft.content);
