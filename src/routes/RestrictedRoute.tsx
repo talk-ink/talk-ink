@@ -6,9 +6,10 @@ import FullscreenLoading from "components/Loading/FullscreenLoading";
 type Props = React.PropsWithChildren<{
   children: JSX.Element;
   type?: "public" | "private";
+  from?: string;
 }>;
 
-function RestrictedRoute({ children, type = "private" }: Props) {
+function RestrictedRoute({ children, type = "private", from }: Props) {
   let auth = useAppSelector((state) => state.auth);
   let location = useLocation();
 
@@ -24,6 +25,25 @@ function RestrictedRoute({ children, type = "private" }: Props) {
       break;
     case "public":
       if (auth.token) {
+        if (
+          ["login", "register"].includes(from) &&
+          (!auth.user?.workspaces || auth.user?.workspaces?.length === 0)
+        ) {
+          return (
+            <Navigate to={`/a/create_workspace`} state={{ from: location }} />
+          );
+        }
+        if (
+          ["login", "register"].includes(from) &&
+          auth.user?.workspaces?.length > 0
+        ) {
+          return (
+            <Navigate
+              to={`/a/${auth.user?.workspaces[0]}/inbox`}
+              state={{ from: location }}
+            />
+          );
+        }
         return <Navigate to="/404" state={{ from: location }} />;
       }
       break;

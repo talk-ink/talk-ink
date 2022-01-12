@@ -5,16 +5,15 @@ import { useFormik } from "formik";
 
 import { Workspace } from "types";
 import { createWorkspaceValidation } from "utils/validators";
-import FormControl from "components/Form/FormControl";
-import FormLabel from "components/Form/FormLabel";
-import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
-import Button from "components/Button/Button";
 import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { addWorkspace } from "features/workspaces";
 import { useToast } from "hooks/useToast";
+
+import Layout from "components/Layout/LoginRegister";
+import Hero from "../../assets/image/landing/chat.svg";
 
 const initialValues: Workspace = {
   name: "",
@@ -81,51 +80,53 @@ function CreateWorkspacePage() {
     apiLoading;
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center text-slightGray px-5 md:px-0">
-      <div className="w-full md:w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-5 md:px-20 py-16 flex flex-col justify-center">
-        <h1 className="text-3xl font-semibold">Create Workspace/Team</h1>
+    <Layout hero={Hero} title="Workspace">
+      <form onSubmit={formik.handleSubmit}>
+        <div>
+          <div className="text-sm font-bold text-gray-700 tracking-wide">
+            Workspace Name
+          </div>
+          <input
+            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+            onChange={formik.handleChange("name")}
+            onBlur={formik.handleBlur("name")}
+            value={formik.values.name}
+            placeholder="Your workspace name"
+          />
+          {formik.errors.name && <SubLabel>{formik.errors.name}</SubLabel>}
+        </div>
 
-        <form onSubmit={formik.handleSubmit} className="mt-8">
-          <FormControl>
-            <FormLabel htmlFor="name">Workspace/Team name</FormLabel>
-            <TextInput
-              name="name"
-              onChange={formik.handleChange("name")}
-              onBlur={formik.handleBlur("name")}
-              value={formik.values.name}
-              placeholder="E.g Iruha Team"
-            />
-            {formik.errors.name && <SubLabel>{formik.errors.name}</SubLabel>}
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="project">Project name</FormLabel>
-            <TextInput
-              name="project"
-              onChange={formik.handleChange("project")}
-              onBlur={formik.handleBlur("project")}
-              value={formik.values.project}
-              placeholder="E.g CRM App or Web apps"
-            />
-            {formik.errors.project && (
-              <SubLabel>{formik.errors.project}</SubLabel>
-            )}
-          </FormControl>
-
-          <FormControl>
-            <div className="flex items-center">
-              <Button
-                type="submit"
-                className="bg-cyan-500 hover:bg-cyan-600 text-center text-white font-medium text-sm mr-2"
-                disabled={isDisabled}
-              >
-                Create Workspace
-              </Button>
+        <div className="mt-8">
+          <div className="flex justify-between items-center">
+            <div className="text-sm font-bold text-gray-700 tracking-wide">
+              Project Name
             </div>
-          </FormControl>
-        </form>
-      </div>
-    </div>
+          </div>
+          <input
+            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+            name="project"
+            onChange={formik.handleChange("project")}
+            onBlur={formik.handleBlur("project")}
+            value={formik.values.project}
+            placeholder="First project name"
+          />
+          {formik.errors.project && (
+            <SubLabel>{formik.errors.project}</SubLabel>
+          )}
+        </div>
+        <div className="mt-10">
+          <button
+            type="submit"
+            className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
+                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600
+                            shadow-lg"
+            disabled={isDisabled}
+          >
+            Create Workspace
+          </button>
+        </div>
+      </form>
+    </Layout>
   );
 }
 

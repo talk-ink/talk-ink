@@ -14,12 +14,12 @@ function WorkspaceButton({ onClick = () => {}, workspaceData }: Props) {
       onClick={onClick}
     >
       <div className="w-6 h-6 bg-[#a8a8a8] rounded-md flex items-center justify-center overflow-hidden">
-        {!workspaceData.logo && (
+        {!workspaceData?.logo && (
           <p className="text-white uppercase font-bold text-sm">
-            {workspaceData.name?.[0]}
+            {workspaceData?.name?.[0]}
           </p>
         )}
-        {workspaceData.logo && (
+        {workspaceData?.logo && (
           <img
             src={workspaceData?.logo}
             alt="logo"
@@ -27,7 +27,7 @@ function WorkspaceButton({ onClick = () => {}, workspaceData }: Props) {
           />
         )}
       </div>
-      <p className="font-bold px-2 text-sm">{workspaceData.name}</p>
+      <p className="font-bold px-2 text-sm">{workspaceData?.name}</p>
       <HiChevronDown className="text-neutral-400 -mb-1" />
     </button>
   );

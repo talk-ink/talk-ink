@@ -13,7 +13,7 @@ import { memberReducer } from "features/members/slice";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["thread", "toast"],
+  whitelist: ["thread", "toast", "auth"],
 };
 
 const appReducer = combineReducers({

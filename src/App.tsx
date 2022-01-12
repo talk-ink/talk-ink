@@ -31,12 +31,12 @@ function App() {
       const cookiesToken = cookies.get("token");
       if (!cookiesToken) return;
 
-      const { data } = await kontenbase.auth.profile();
+      const { user: userData } = await kontenbase.auth.user();
 
-      if (!data) throw new Error("Invalid user");
+      if (!userData) throw new Error("Invalid user");
 
       const token: Token = { token: cookiesToken };
-      const user: User = data;
+      const user: User = userData;
 
       dispatch(setAuthToken(token));
       dispatch(setAuthUser(user));
@@ -97,7 +97,7 @@ function App() {
           caseSensitive
           path="/login"
           element={
-            <RestrictedRoute type="public">
+            <RestrictedRoute type="public" from="login">
               <LoginPage />
             </RestrictedRoute>
           }
@@ -106,7 +106,7 @@ function App() {
           caseSensitive
           path="/register"
           element={
-            <RestrictedRoute type="public">
+            <RestrictedRoute type="public" from="register">
               <RegisterPage />
             </RestrictedRoute>
           }
