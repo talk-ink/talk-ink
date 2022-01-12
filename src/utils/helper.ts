@@ -31,9 +31,11 @@ export const randomString = (): string => {
 export const inviteWorkspaceTemplate = ({
   inviteLink,
   workspaceName,
+  invitee,
 }: {
   inviteLink: string;
   workspaceName: string;
+  invitee: string;
 }): string => {
   return `
   <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
@@ -66,7 +68,7 @@ export const inviteWorkspaceTemplate = ({
           background-color: #f9f9f9;
         }
         .table-container {
-          padding: 15px 0;
+          padding: 100px 0;
         }
         .table-content {
           padding: 30px;
@@ -117,7 +119,7 @@ export const inviteWorkspaceTemplate = ({
               </tr>
               <tr>
                 <td style="padding-top: 30px">
-                  <p>You are invited to join to workspace :</p>
+                  <p>You are invited by <strong>${invitee}</strong> to join into workspace :</p>
                 </td>
               </tr>
               <tr>
@@ -142,6 +144,7 @@ export const inviteWorkspaceTemplate = ({
       </table>
     </body>
   </html>
+  
   
   `;
 };

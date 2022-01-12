@@ -12,6 +12,7 @@ import {
 } from "utils/helper";
 import ClosableBadge from "components/Badge/ClosableBadge";
 import { BiErrorCircle } from "react-icons/bi";
+import { useAppSelector } from "hooks/useAppSelector";
 
 type TProps = {
   workspaceData: Workspace;
@@ -20,6 +21,7 @@ type TProps = {
 
 function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
   const [showToast] = useToast();
+  const auth = useAppSelector((state) => state.auth);
 
   const [emailStr, setEmailStr] = useState("");
   const [emailArr, setEmailArr] = useState([]);
@@ -38,6 +40,7 @@ function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
             workspaceData?.inviteId ?? ""
           }/login`,
           workspaceName: workspaceData.name,
+          invitee: auth.user.firstName,
         }),
       });
 
