@@ -139,7 +139,7 @@ function ThreadPage() {
               to={`/a/${workspaceId}/ch/${channelId}`}
               className="text-cyan-600"
             >
-              #{channelData.name}
+              #{channelData?.name}
             </Link>
           </p>
         </div>
