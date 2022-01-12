@@ -28,20 +28,121 @@ export const randomString = (): string => {
   );
 };
 
-export const inviteWorkspaceTemplate = (inviteLink: string): string => {
+export const inviteWorkspaceTemplate = ({
+  inviteLink,
+  workspaceName,
+}: {
+  inviteLink: string;
+  workspaceName: string;
+}): string => {
   return `
-  <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Workspace Invitation</title>
-</head>
-<body>
-    
-    <a href="${inviteLink}"clicktracking="off">Join Workspace</a>
-
-</body>
-</html>
+  <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <html xmlns="http://www.w3.org/1999/xhtml" lang="en-GB">
+    <head>
+      <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+      <title>Workspace Invitation</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <link rel="preconnect" href="https://fonts.gstatic.com" />
+      <link
+        href="https://fonts.googleapis.com/css2?family=Poppins"
+        rel="stylesheet"
+      />
+      <style>
+        body {
+          margin: 0;
+          padding: 0;
+          font-family: "Poppins", sans-serif;
+        }
+        a {
+          text-decoration: none;
+        }
+        .bg-primary {
+          background-color: #6f6cd9;
+        }
+        .bg-grey {
+          background-color: #f0f0f0;
+        }
+        .bg-white {
+          background-color: #f9f9f9;
+        }
+        .table-container {
+          padding: 15px 0;
+        }
+        .table-content {
+          padding: 30px;
+          border-radius: 3px;
+          border-top: 3px solid #6f6cd9;
+        }
+        p {
+          line-height: 1.8;
+        }
+        p,
+        strong {
+          margin: 0;
+        }
+        .button {
+          padding: 10px 30px;
+          border-radius: 3px;
+        }
+      </style>
+    </head>
+    <body>
+      <table
+        border="0"
+        align="center"
+        role="presentation"
+        cellpadding="0"
+        cellspacing="0"
+        width="100%"
+        class="bg-grey table-container"
+      >
+        <tr>
+          <td>
+            <table
+              width="600px"
+              border="0"
+              align="center"
+              cellpadding="0"
+              cellspacing="0"
+              class="bg-white table-content"
+            >
+              <tr>
+                <td>
+                  <img
+                    src="https://bit.ly/3r508kl"
+                    alt="logo"
+                    style="width: 150px"
+                  />
+                </td>
+              </tr>
+              <tr>
+                <td style="padding-top: 30px">
+                  <p>You are invited to join to workspace :</p>
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 30px 0px">
+                  <strong>${workspaceName}</strong>
+                </td>
+              </tr>
+              <tr>
+                <td style="text-align: center; padding-top: 15px">
+                  <a
+                    href="${inviteLink}"
+                    target="_blank"
+                    class="bg-primary button"
+                    style="color: white"
+                    >Join into workspace</a
+                  >
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
+    </body>
+  </html>
+  
   `;
 };
 

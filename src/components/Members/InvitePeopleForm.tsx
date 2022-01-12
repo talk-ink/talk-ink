@@ -33,11 +33,12 @@ function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
       const sendBulkEmail = await sendEmail({
         emails: emailArr,
         subject: "Workspace Invitation",
-        message: inviteWorkspaceTemplate(
-          `${process.env.REACT_APP_FRONTEND_URL}/j/${
+        message: inviteWorkspaceTemplate({
+          inviteLink: `${process.env.REACT_APP_FRONTEND_URL}/j/${
             workspaceData?.inviteId ?? ""
-          }/login`
-        ),
+          }/login`,
+          workspaceName: workspaceData.name,
+        }),
       });
 
       if (sendBulkEmail.data) {
