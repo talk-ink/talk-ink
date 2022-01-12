@@ -157,7 +157,11 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
             ) : (
               <>
                 {memberData.map((data, idx) => (
-                  <MemberList key={idx} data={data} />
+                  <MemberList
+                    key={idx}
+                    data={data}
+                    hideEmail={workspaceData?.hideEmail?.includes(data._id)}
+                  />
                 ))}
               </>
             )}

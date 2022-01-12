@@ -54,6 +54,12 @@ export interface Workspace {
   inviteId?: string;
   logo?: string;
   createdBy?: User;
+  hideEmail?: string[];
+}
+
+export interface Avatar {
+  fileName: string;
+  url: string;
 }
 
 export interface User {
@@ -64,6 +70,9 @@ export interface User {
   email: string;
   workspaces?: Workspace[];
   channels?: Channel[];
+  avatar?: string;
+  about?: string;
+  contact?: string;
 }
 
 export interface Login {
@@ -91,4 +100,20 @@ export interface SendEmail {
 export interface SettingsModalRouteState {
   route: string;
   current: string;
+}
+
+export interface Attachment {
+  _id?: string;
+  id?: string;
+  name?: string;
+  ext?: string;
+  file: string;
+}
+
+export interface Member extends Omit<User, "avatar"> {
+  avatar?: Avatar[];
+}
+
+export interface TUserProfile extends Omit<User, "avatar"> {
+  avatar?: Avatar[];
 }

@@ -17,7 +17,7 @@ import NotFound from "components/NotFound/NotFound";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
-import { Token, User } from "types";
+import { Token, TUserProfile, User } from "types";
 import ThreadPage from "pages/Thread";
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import { useToast } from "hooks/useToast";
@@ -36,7 +36,7 @@ function App() {
       if (!userData) throw new Error("Invalid user");
 
       const token: Token = { token: cookiesToken };
-      const user: User = userData;
+      const user: TUserProfile = userData;
 
       dispatch(setAuthToken(token));
       dispatch(setAuthUser(user));

@@ -7,7 +7,7 @@ import SubLabel from "components/Form/SubLabel";
 import Hero from "../../assets/image/landing/email.svg";
 import Layout from "components/Layout/LoginRegister";
 
-import { Register, User, Workspace } from "types";
+import { Register, TUserProfile, User, Workspace } from "types";
 import { registerValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -40,7 +40,7 @@ function RegisterPage() {
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
-        const user: User = userData;
+        const user: TUserProfile = userData;
 
         let toWorkspaceId = "create_workspace";
 

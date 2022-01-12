@@ -1,7 +1,8 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cookies from "js-cookie";
+import { kontenbase } from "lib/client";
 
-import { AuthState, Token, User } from "types";
+import { AuthState, Avatar, Token, TUserProfile, User } from "types";
 
 const initialState: AuthState = {
   token: null,
@@ -20,8 +21,16 @@ const authSlice = createSlice({
       }
       state.token = action.payload.token;
     },
-    setAuthUser: (state, action: PayloadAction<User>) => {
-      state.user = action.payload;
+    setAuthUser: (state, action: PayloadAction<TUserProfile>) => {
+      let avatar = null;
+
+      if (action.payload.avatar) {
+        avatar = action.payload.avatar[0]?.url;
+      }
+      state.user = {
+        ...action.payload,
+        avatar,
+      };
     },
     setAuthLoading: (state, action: PayloadAction<boolean>) => {
       state.loading = action.payload;
@@ -48,6 +57,12 @@ const authSlice = createSlice({
   },
 });
 
-export const { setAuthToken, setAuthUser, setAuthLoading, logout, login } =
-  authSlice.actions;
+export const {
+  setAuthToken,
+  setAuthUser,
+  setAuthLoading,
+  logout,
+  login,
+  updateUser,
+} = authSlice.actions;
 export const authReducer = authSlice.reducer;

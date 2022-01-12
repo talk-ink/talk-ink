@@ -6,8 +6,10 @@ import { BiArrowBack } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 import { SettingsModalRouteState } from "types";
 import { SettingsModalHeader } from "utils/text-constants";
+import AccountSettings from "./AccountSettings";
 import ComingSoonSettings from "./ComingSoon";
 import GeneralSettings from "./GeneralSettings";
+import ProfileSettings from "./ProfileSettings";
 import SettingsSidebar from "./SettingsSidebar";
 
 type TProps = React.PropsWithChildren<{
@@ -53,6 +55,20 @@ function SettingsModal({
             setCurrentRoute={setCurrentRoute}
           />
         );
+      case "account":
+        return (
+          <AccountSettings
+            currentRoute={currentRoute}
+            setCurrentRoute={setCurrentRoute}
+          />
+        );
+      case "profile":
+        return (
+          <ProfileSettings
+            currentRoute={currentRoute}
+            setCurrentRoute={setCurrentRoute}
+          />
+        );
       default:
         return <ComingSoonSettings />;
         break;
@@ -93,7 +109,10 @@ function SettingsModal({
                 </h2>
               </div>
               <button
-                onClick={onClose}
+                onClick={() => {
+                  setCurrentRoute({ route: "members", current: "members" });
+                  onClose();
+                }}
                 className="hover:bg-neutral-200 p-1 rounded"
               >
                 <GrClose size={18} />

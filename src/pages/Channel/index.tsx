@@ -26,12 +26,13 @@ import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { Channel, Thread, User } from "types";
+import { Channel, Member, Thread, User } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
+import ProfileImage from "components/ProfileImage";
 
 moment.locale("id");
 
@@ -57,7 +58,7 @@ function ChannelPage() {
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [leaveChannelModal, setLeaveChannelModal] = useState<boolean>();
-  const [memberList, setMemberList] = useState<User[]>([]);
+  const [memberList, setMemberList] = useState<Member[]>([]);
 
   const createThreadDraft = () => {
     const threadsDraft = localStorage.getItem("threadsDraft");
@@ -150,6 +151,7 @@ function ChannelPage() {
     try {
       const memberList = await kontenbase.service("Users").find({
         where: { workspaces: params.workspaceId, channels: params.channelId },
+        lookup: ["avatar"],
       });
       if (memberList.data) {
         setMemberList(memberList.data);
@@ -185,11 +187,22 @@ function ChannelPage() {
             {memberList.map(
               (member, idx) =>
                 idx <= 3 && (
-                  <NameInitial
-                    key={member._id}
-                    name={getNameInitial(member.firstName)}
-                    className="border-2 border-white -mr-2 bg-red-400"
-                  />
+                  <>
+                    {!member.avatar && (
+                      <NameInitial
+                        key={member._id}
+                        name={getNameInitial(member.firstName)}
+                        className="border-2 border-white -mr-2 bg-red-400"
+                      />
+                    )}
+                    {member.avatar && (
+                      <ProfileImage
+                        key={member._id}
+                        className="border-2 border-white -mr-2 bg-red-400"
+                        source={member.avatar[0].url}
+                      />
+                    )}
+                  </>
                 )
             )}
           </div>

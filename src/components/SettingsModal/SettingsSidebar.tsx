@@ -44,7 +44,17 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
           <ul>
             <SidebarButton
               icon={
-                <RiAccountCircleFill size={20} className="text-neutral-200" />
+                auth.user.avatar ? (
+                  <div className="h-[20px] w-[20px] rounded-full overflow-hidden">
+                    <img
+                      src={auth.user.avatar}
+                      alt="avatar"
+                      className="h-full w-full object-cover"
+                    />
+                  </div>
+                ) : (
+                  <RiAccountCircleFill size={20} className="text-neutral-200" />
+                )
               }
               type="account"
               onClick={() => {

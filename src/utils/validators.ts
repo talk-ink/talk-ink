@@ -39,3 +39,16 @@ export const createChannelValidation = yup.object().shape({
 export const updateWorkspaceGeneral = yup.object().shape({
   name: yup.string().max(40).required().label("Workspace name"),
 });
+export const updateAccount = yup.object().shape({
+  firstName: yup.string().max(40).required(),
+});
+
+export const changePasswordValidation = yup.object().shape({
+  newPassword: yup.string().min(8).max(24).required(),
+  confirmPassword: yup.string().min(8).max(24).required(),
+});
+
+export const profileSettingsValidation = yup.object().shape({
+  about: yup.string().max(100),
+  contact: yup.string().max(100),
+});
