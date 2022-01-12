@@ -11,7 +11,7 @@ function LandingPage() {
   return (
     <div className="min-h-screen text-slightGray overflow-hidden">
       <LandingHeader />
-      <main className="grid grid-cols-1 items-center justify-center max-w-[1400px] m-auto px-20 2xl:px-0">
+      <main className="grid grid-cols-1 items-center justify-center max-w-[1400px] m-auto px-5 md:px-20 2xl:px-0">
         <LandingHero />
         <SectionHeader />
         <SectionContent

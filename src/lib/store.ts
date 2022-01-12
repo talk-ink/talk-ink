@@ -14,7 +14,7 @@ import { inboxReducer } from "features/inbox";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["thread", "toast"],
+  whitelist: ["thread", "toast", "auth"],
 };
 
 const appReducer = combineReducers({

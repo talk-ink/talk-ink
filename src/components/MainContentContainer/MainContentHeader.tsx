@@ -30,7 +30,7 @@ function MainContentHeader({
   };
 
   return (
-    <div className="w-full py-4 px-3 sticky top-0 grid grid-cols-3 border-b border-b-neutral-100 bg-white z-1">
+    <div className="w-full py-4 md:px-3 sticky top-0 grid grid-cols-3 border-b border-b-neutral-100 bg-white z-1">
       <div className="grid-cols-1">
         <Button
           className=" hover:bg-neutral-200 flex items-center"

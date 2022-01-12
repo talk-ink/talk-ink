@@ -76,7 +76,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
         const resized = await resizeFile(file, 500);
         const uploadImage = await kontenbase.storage.upload(resized);
 
-        const submitUpdate = await kontenbase.auth.updateProfile({
+        const submitUpdate = await kontenbase.auth.update({
           avatar: [uploadImage.data],
         });
       } catch (error) {
@@ -89,7 +89,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
   const removePhotoHandler = async () => {
     try {
       dispatch(updateUser({ avatar: null }));
-      const removeAvatar = await kontenbase.auth.updateProfile({
+      const removeAvatar = await kontenbase.auth.update({
         avatar: null,
       });
     } catch (error) {
@@ -100,7 +100,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const onSubmit = async (values: { firstName: string }) => {
     try {
-      const submitUpdate = await kontenbase.auth.updateProfile({
+      const submitUpdate = await kontenbase.auth.update({
         firstName: values.firstName,
       });
       dispatch(updateUser({ firstName: values.firstName }));
