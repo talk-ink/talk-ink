@@ -91,7 +91,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const loading = member.loading;
 
   return (
-    <div className="min-h-[50vh]">
+    <div className="h-full">
       {!showInvitePeople && (
         <>
           <div className="w-full border-b border-neutral-100 pb-3 pt-0">
@@ -159,7 +159,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               </Button>
             </div>
           </div>
-          <div className="h-[35vh] overflow-auto">
+          <div>
             {loading ? (
               <ContentSkeleton count={2} />
             ) : (
@@ -180,6 +180,13 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
                   </>
                 )}
 
+                {memberData.map((data, idx) => (
+                  <MemberList
+                    key={idx}
+                    data={data}
+                    hideEmail={workspaceData?.hideEmail?.includes(data._id)}
+                  />
+                ))}
                 {memberData.map((data, idx) => (
                   <MemberList
                     key={idx}
