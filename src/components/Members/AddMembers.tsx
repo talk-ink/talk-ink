@@ -187,13 +187,6 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
                     hideEmail={workspaceData?.hideEmail?.includes(data._id)}
                   />
                 ))}
-                {memberData.map((data, idx) => (
-                  <MemberList
-                    key={idx}
-                    data={data}
-                    hideEmail={workspaceData?.hideEmail?.includes(data._id)}
-                  />
-                ))}
               </>
             )}
           </div>
