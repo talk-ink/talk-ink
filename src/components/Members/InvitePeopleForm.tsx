@@ -13,6 +13,9 @@ import {
 import ClosableBadge from "components/Badge/ClosableBadge";
 import { BiErrorCircle } from "react-icons/bi";
 import { useAppSelector } from "hooks/useAppSelector";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { updateWorkspace } from "features/workspaces";
+import { kontenbase } from "lib/client";
 
 type TProps = {
   workspaceData: Workspace;
@@ -21,7 +24,9 @@ type TProps = {
 
 function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
   const [showToast] = useToast();
+
   const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
   const [emailStr, setEmailStr] = useState("");
   const [emailArr, setEmailArr] = useState([]);
@@ -47,6 +52,24 @@ function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
       if (sendBulkEmail.data) {
         showToast({ message: "User invited!" });
       }
+
+      let invitedEmails = [];
+      if (!workspaceData.invitedEmails) {
+        invitedEmails = emailArr;
+      } else {
+        const filterEmails = workspaceData.invitedEmails.filter(
+          (email) => !emailArr.includes(email)
+        );
+        invitedEmails = [...filterEmails, ...emailArr];
+      }
+
+      const update = await kontenbase
+        .service("Workspaces")
+        .updateById(workspaceData._id, {
+          invitedEmails: JSON.stringify(invitedEmails),
+        });
+      if (update.data)
+        dispatch(updateWorkspace({ _id: workspaceData._id, invitedEmails }));
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error)}` });

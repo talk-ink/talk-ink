@@ -54,6 +54,7 @@ export interface Workspace {
   inviteId?: string;
   logo?: string;
   createdBy?: User;
+  invitedEmails?: string[];
 }
 
 export interface User {
@@ -91,4 +92,8 @@ export interface SendEmail {
 export interface SettingsModalRouteState {
   route: string;
   current: string;
+}
+
+export interface WorkspaceResponse extends Omit<Workspace, "invitedEmails"> {
+  invitedEmails: string;
 }
