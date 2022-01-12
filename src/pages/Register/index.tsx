@@ -33,10 +33,12 @@ function RegisterPage() {
   const onSubmit = async (values: Register) => {
     setApiLoading(true);
     try {
-      const { data } = await kontenbase.auth.register(values);
-      const { data: userData } = await kontenbase.auth.profile();
+      const { user: userRegister, token } = await kontenbase.auth.register(
+        values
+      );
+      const { user: userData } = await kontenbase.auth.user();
 
-      if (!data) throw new Error("Invalid register");
+      if (!userRegister) throw new Error("Invalid register");
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
@@ -55,7 +57,7 @@ function RegisterPage() {
           }
         }
 
-        dispatch(setAuthToken({ token: data?.token }));
+        dispatch(setAuthToken({ token }));
         dispatch(setAuthUser(user));
 
         navigate(`/a/${toWorkspaceId}`);
