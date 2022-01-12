@@ -31,6 +31,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const params = useParams();
   const [showToast] = useToast();
 
+  const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
@@ -163,17 +164,22 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               <ContentSkeleton count={2} />
             ) : (
               <>
-                {invitedEmails.map((data, idx) => (
-                  <MemberList
-                    key={idx}
-                    data={{
-                      firstName: data,
-                      email: data,
-                    }}
-                    hideEmail
-                    invited
-                  />
-                ))}
+                {auth.user.id === workspaceData?.createdBy?._id && (
+                  <>
+                    {invitedEmails.map((data, idx) => (
+                      <MemberList
+                        key={idx}
+                        data={{
+                          firstName: data,
+                          email: data,
+                        }}
+                        hideEmail
+                        invited
+                      />
+                    ))}
+                  </>
+                )}
+
                 {memberData.map((data, idx) => (
                   <MemberList
                     key={idx}
