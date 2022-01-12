@@ -31,6 +31,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const params = useParams();
   const [showToast] = useToast();
 
+  const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
@@ -48,6 +49,13 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const memberData = useMemo(() => {
     return member.members;
   }, [params.workspaceId, member.members]);
+
+  const invitedEmails = useMemo(() => {
+    const memberEmails = member.members.map((data) => data.email);
+    return workspaceData.invitedEmails.filter(
+      (data) => !memberEmails.includes(data)
+    );
+  }, [params.workspaceId, member.members, workspaceData]);
 
   const workspaceInviteIdHandler = async () => {
     setApiLoading(true);
@@ -83,7 +91,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   const loading = member.loading;
 
   return (
-    <div className="min-h-[50vh]">
+    <div className="h-full">
       {!showInvitePeople && (
         <>
           <div className="w-full border-b border-neutral-100 pb-3 pt-0">
@@ -120,7 +128,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
                       copy(
                         `${process.env.REACT_APP_FRONTEND_URL}/j/${
                           workspaceData?.inviteId ?? ""
-                        }/login`
+                        }`
                       );
                       showToast({ message: "Link copied!" });
                     }
@@ -151,11 +159,34 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               </Button>
             </div>
           </div>
-          <div className="h-[35vh] overflow-auto">
+          <div>
             {loading ? (
               <ContentSkeleton count={2} />
             ) : (
               <>
+                {auth.user.id === workspaceData?.createdBy?._id && (
+                  <>
+                    {invitedEmails.map((data, idx) => (
+                      <MemberList
+                        key={idx}
+                        data={{
+                          firstName: data,
+                          email: data,
+                        }}
+                        hideEmail
+                        invited
+                      />
+                    ))}
+                  </>
+                )}
+
+                {memberData.map((data, idx) => (
+                  <MemberList
+                    key={idx}
+                    data={data}
+                    hideEmail={workspaceData?.hideEmail?.includes(data._id)}
+                  />
+                ))}
                 {memberData.map((data, idx) => (
                   <MemberList
                     key={idx}

@@ -96,7 +96,7 @@ function JoinChannelPage() {
       const joinBulkChannel = await joinBulkChannelHandler();
 
       if (joinWorkspace.data && updateUser.data && joinBulkChannel) {
-        navigate(`/a/${params.workspaceId}`);
+        navigate(`/a/${params.workspaceId}/inbox`);
       }
     } catch (error) {
       console.log("err", error);

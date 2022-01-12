@@ -54,6 +54,7 @@ export interface Workspace {
   inviteId?: string;
   logo?: string;
   createdBy?: User;
+  invitedEmails?: string[];
   hideEmail?: string[];
 }
 
@@ -102,6 +103,11 @@ export interface SettingsModalRouteState {
   current: string;
 }
 
+export interface WorkspaceResponse
+  extends Omit<Workspace, "invitedEmails" | "peoples"> {
+  invitedEmails: string;
+  peoples: string[];
+}
 export interface Attachment {
   _id?: string;
   id?: string;
