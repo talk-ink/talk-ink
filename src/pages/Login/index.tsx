@@ -16,6 +16,8 @@ import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Login, User, Workspace } from "types";
 import { useToast } from "hooks/useToast";
+import Logo from "../../assets/image/logo512.png";
+import Hero from "../../assets/image/landing/thread.svg";
 
 const initialValues: Login = {
   email: "",
@@ -105,56 +107,96 @@ function LoginPage() {
     apiLoading;
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center text-slightGray px-5 md:px-0">
-      <div className="w-full md:w-4/12 bg-slate-100 border border-neutral-200 rounded-md px-5 md:px-20 py-16 flex flex-col justify-center">
-        <h1 className="text-3xl font-semibold">Login</h1>
-        {apiError && (
-          <div className="mt-3 -mb-5 px-3 py-2 text-sm rounded-md bg-red-200 text-center text-red-500">
-            {apiError}
-          </div>
-        )}
-        <form onSubmit={formik.handleSubmit} className="mt-8">
-          <FormControl>
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <TextInput
-              name="email"
-              type="email"
-              onChange={formik.handleChange("email")}
-              onBlur={formik.handleBlur("email")}
-              value={formik.values.email}
-            />
-            {formik.errors.email && <SubLabel>{formik.errors.email}</SubLabel>}
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <TextInput
-              name="password"
-              type="password"
-              onChange={formik.handleChange("password")}
-              onBlur={formik.handleBlur("password")}
-              value={formik.values.password}
-            />
-            {formik.errors.password && (
-              <SubLabel>{formik.errors.password}</SubLabel>
-            )}
-          </FormControl>
-
-          <FormControl>
-            <div className="flex items-center">
-              <Button
-                type="submit"
-                className="bg-cyan-500 hover:bg-cyan-600 text-center text-white font-medium text-sm mr-2"
-                disabled={isDisabled}
-              >
-                Login
-              </Button>
-              <Link to={handleLink()}>
-                <p className="text-sm text-cyan-500">Register</p>
+    <div className="lg:flex">
+      <div className="lg:w-1/2 xl:max-w-screen-sm">
+        <div className="py-12 bg-white lg:bg-white flex justify-center lg:justify-start lg:px-12">
+          <div className="cursor-pointer flex items-center">
+            <div>
+              <Link to="/">
+                <img src={Logo} alt="Logo" className="w-3/12" />
               </Link>
             </div>
-          </FormControl>
-        </form>
+          </div>
+        </div>
+        <div className="mt-10 px-12 sm:px-24 md:px-48 lg:px-12 lg:mt-16 xl:px-24 xl:max-w-2xl">
+          <h2
+            className="text-center text-4xl text-indigo-900 font-display font-semibold lg:text-left xl:text-5xl
+                xl:text-bold"
+          >
+            Log in
+          </h2>
+          <div className="mt-12">
+            <form onSubmit={formik.handleSubmit}>
+              <div>
+                <div className="text-sm font-bold text-gray-700 tracking-wide">
+                  Email Address
+                </div>
+                <input
+                  className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                  placeholder="Enter Your Email"
+                  name="email"
+                  type="email"
+                  onChange={formik.handleChange("email")}
+                  onBlur={formik.handleBlur("email")}
+                  value={formik.values.email}
+                />
+                {formik.errors.email && (
+                  <SubLabel>{formik.errors.email}</SubLabel>
+                )}
+              </div>
+              <div className="mt-8">
+                <div className="flex justify-between items-center">
+                  <div className="text-sm font-bold text-gray-700 tracking-wide">
+                    Password
+                  </div>
+                  <div>
+                    <span
+                      className="text-xs font-display font-semibold text-indigo-600 hover:text-indigo-800
+                                    cursor-pointer"
+                    >
+                      Forgot Password?
+                    </span>
+                  </div>
+                </div>
+                <input
+                  className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+                  placeholder="Enter your password"
+                  type="password"
+                  onChange={formik.handleChange("password")}
+                  onBlur={formik.handleBlur("password")}
+                  value={formik.values.password}
+                />
+                {formik.errors.password && (
+                  <SubLabel>{formik.errors.password}</SubLabel>
+                )}
+              </div>
+              <div className="mt-10">
+                <button
+                  type="submit"
+                  className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
+                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600
+                            shadow-lg"
+                  disabled={isDisabled}
+                >
+                  Log In
+                </button>
+              </div>
+            </form>
+            <div className="mt-12 text-sm font-display font-semibold text-gray-700 text-center">
+              Don't have an account ?{" "}
+              <Link to={handleLink()}>
+                <span className="cursor-pointer text-indigo-600 hover:text-indigo-800">
+                  Sign up
+                </span>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="hidden lg:flex items-center justify-center bg-indigo-100 flex-1 h-screen">
+        <div className="max-w-md transform duration-200 hover:scale-110 cursor-pointer">
+          <img src={Hero} alt="hero" />
+        </div>
       </div>
     </div>
   );
