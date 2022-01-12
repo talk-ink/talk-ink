@@ -57,10 +57,12 @@ function RegisterPage() {
           }
         }
 
-        dispatch(setAuthToken({ token }));
         dispatch(setAuthUser(user));
+        dispatch(setAuthToken({ token }));
 
-        navigate(`/a/${toWorkspaceId}`);
+        setTimeout(() => {
+          navigate(`/a/${toWorkspaceId}`);
+        }, 200);
       }
     } catch (error: any) {
       console.log("error");
