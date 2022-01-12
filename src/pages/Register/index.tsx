@@ -7,7 +7,13 @@ import SubLabel from "components/Form/SubLabel";
 import Hero from "../../assets/image/landing/email.svg";
 import Layout from "components/Layout/LoginRegister";
 
-import { Register, TUserProfile, User, Workspace } from "types";
+import {
+  Register,
+  TUserProfile,
+  User,
+  Workspace,
+  WorkspaceResponse,
+} from "types";
 import { registerValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -45,22 +51,27 @@ function RegisterPage() {
         let toWorkspaceId = "create_workspace";
 
         if (params.inviteId) {
-          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+          const { data: workspaceData }: KontenbaseResponse<WorkspaceResponse> =
             await kontenbase
               .service("Workspaces")
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
-            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            let invitedEmails: string[] = [];
+
+            if (workspaceData[0].invitedEmails) {
+              invitedEmails = JSON.parse(workspaceData[0].invitedEmails);
+            }
+
+            if (invitedEmails.includes(user.email))
+              toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
           }
         }
 
-        dispatch(setAuthUser(user));
         dispatch(setAuthToken({ token }));
+        dispatch(setAuthUser(user));
 
-        setTimeout(() => {
-          navigate(`/a/${toWorkspaceId}`);
-        }, 200);
+        navigate(`/a/${toWorkspaceId}`);
       }
     } catch (error: any) {
       console.log("error");

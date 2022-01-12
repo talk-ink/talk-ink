@@ -11,7 +11,7 @@ import { kontenbase } from "lib/client";
 import { setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Login, TUserProfile, User, Workspace } from "types";
+import { Login, TUserProfile, User, Workspace, WorkspaceResponse } from "types";
 import { useToast } from "hooks/useToast";
 import Hero from "../../assets/image/landing/thread.svg";
 
@@ -45,13 +45,28 @@ function LoginPage() {
         let toWorkspaceId: string = "";
 
         if (params.inviteId) {
-          const { data: workspaceData }: KontenbaseResponse<Workspace> =
+          const { data: workspaceData }: KontenbaseResponse<WorkspaceResponse> =
             await kontenbase
               .service("Workspaces")
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
-            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            let invitedEmails: string[] = [];
+
+            if (workspaceData[0].invitedEmails) {
+              invitedEmails = JSON.parse(workspaceData[0].invitedEmails);
+            }
+
+            if (
+              user.id === workspaceData[0]?.createdBy?._id ||
+              workspaceData[0]?.peoples.includes(user.id)
+            ) {
+              toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+            } else if (!invitedEmails.includes(user.email)) {
+              return showToast({ message: "Invite link not valid!" });
+            } else {
+              toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            }
           } else {
             return showToast({ message: "Invite link not valid!" });
           }
@@ -68,12 +83,10 @@ function LoginPage() {
           }
         }
 
-        dispatch(setAuthUser(user));
         dispatch(setAuthToken({ token }));
+        dispatch(setAuthUser(user));
 
-        setTimeout(() => {
-          navigate(`/a/${toWorkspaceId}`);
-        }, 200);
+        navigate(`/a/${toWorkspaceId}`);
       }
     } catch (error: any) {
       console.log("err", error);

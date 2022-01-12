@@ -78,7 +78,7 @@ function SettingsModal({
   return visible ? (
     <div className="w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]">
       <div className="w-7/12 h-[75vh] bg-white rounded-lg mt-20 overflow-hidden">
-        <div className="grid grid-cols-[250px_1fr] h-full">
+        <div className="grid grid-cols-[250px_1fr] h-full max-h-full overflow-auto">
           <SettingsSidebar
             currentActive={currentRoute.route}
             setCurrentActive={(value) => {
@@ -88,7 +88,7 @@ function SettingsModal({
               });
             }}
           />
-          <div>
+          <div className="overflow-auto">
             <header className="flex items-center justify-between p-3 border-b border-neutral-100">
               <div className="flex gap-2 items-center">
                 {currentRoute.route !== currentRoute.current && (
@@ -118,7 +118,11 @@ function SettingsModal({
                 <GrClose size={18} />
               </button>
             </header>
-            <div className="p-3">{settingsRender(currentRoute.route)}</div>
+            <div className="h-[92.5%] overflow-auto">
+              <div className="p-3 h-full">
+                {settingsRender(currentRoute.route)}
+              </div>
+            </div>
           </div>
         </div>
       </div>
