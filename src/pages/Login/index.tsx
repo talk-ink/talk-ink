@@ -34,11 +34,11 @@ function LoginPage() {
   const onSubmit = async (values: Login) => {
     setApiLoading(true);
     try {
-      const { data } = await kontenbase.auth.login(values);
+      const { user: userLogin, token } = await kontenbase.auth.login(values);
 
-      const { data: userData } = await kontenbase.auth.profile();
+      const { user: userData } = await kontenbase.auth.user();
 
-      if (!data) throw new Error("Invalid login");
+      if (!userLogin) throw new Error("Invalid login");
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
@@ -71,7 +71,7 @@ function LoginPage() {
         }
 
         dispatch(setAuthUser(user));
-        dispatch(setAuthToken({ token: data?.token }));
+        dispatch(setAuthToken({ token }));
 
         setTimeout(() => {
           navigate(`/a/${toWorkspaceId}`);

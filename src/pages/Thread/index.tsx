@@ -32,7 +32,7 @@ function ThreadPage() {
     let key: string;
 
     kontenbase.realtime
-      .subscribe("Comments", async (message) => {
+      .subscribe("Comments", { event: "*" }, async (message) => {
         const { payload, event } = message;
         const isCurrentThread =
           event === "UPDATE_RECORD"
