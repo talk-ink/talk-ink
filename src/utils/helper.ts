@@ -178,3 +178,38 @@ export const resizeFile = (file: File, maxSize: number): Promise<any> =>
       "file"
     );
   });
+
+export const beforeUploadImage = ({
+  file,
+  types,
+  maxSize,
+}: {
+  file: File;
+  types: string[];
+  maxSize: number;
+}): { error: boolean; message: string } => {
+  const isImage = types.includes(file.type);
+  if (!isImage) {
+    let fileTypes = "";
+    types.forEach((type) => {
+      const split = type.split("image/");
+      fileTypes += split[1] + " ";
+    });
+    return {
+      error: true,
+      message: `Only supported ${fileTypes.toUpperCase()}`,
+    };
+  }
+  const isOverSize = file.size / 1024 / 1024 < maxSize;
+  if (!isOverSize) {
+    return {
+      error: true,
+      message: `Can't upload beyond ${maxSize}MB`,
+    };
+  }
+
+  return {
+    error: false,
+    message: "",
+  };
+};

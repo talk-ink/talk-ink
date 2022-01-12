@@ -1,13 +1,13 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
-import { Thread, User } from "types";
+import { Member, Thread, User } from "types";
 
 type FetchMembersProps = {
   workspaceId: string;
 };
 
 type InitThreadState = {
-  members: User[];
+  members: Member[];
   loading: boolean;
 };
 
@@ -16,7 +16,7 @@ export const fetchMembers = createAsyncThunk(
   async ({ workspaceId }: FetchMembersProps) => {
     const response = await kontenbase
       .service("Users")
-      .find({ where: { workspaces: workspaceId } });
+      .find({ where: { workspaces: workspaceId }, lookup: ["avatar"] });
 
     return response.data;
   }
@@ -31,10 +31,10 @@ const memberSlice = createSlice({
   name: "member",
   initialState,
   reducers: {
-    addMember: (state, action: PayloadAction<User>) => {
+    addMember: (state, action: PayloadAction<Member>) => {
       state.members.push(action.payload);
     },
-    deleteMember: (state, action: PayloadAction<User>) => {
+    deleteMember: (state, action: PayloadAction<Member>) => {
       let deletedIndex = state.members.findIndex(
         (data) => data._id === action.payload._id
       );
@@ -49,7 +49,7 @@ const memberSlice = createSlice({
     });
     builder.addCase(
       fetchMembers.fulfilled,
-      (state, action: PayloadAction<User[]>) => {
+      (state, action: PayloadAction<Member[]>) => {
         state.members = action.payload;
         state.loading = false;
       }
