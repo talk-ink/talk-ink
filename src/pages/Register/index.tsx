@@ -70,12 +70,10 @@ function RegisterPage() {
           }
         }
 
-        dispatch(setAuthUser(user));
         dispatch(setAuthToken({ token }));
+        dispatch(setAuthUser(user));
 
-        setTimeout(() => {
-          navigate(`/a/${toWorkspaceId}`);
-        }, 200);
+        navigate(`/a/${toWorkspaceId}`);
       }
     } catch (error: any) {
       console.log("error");

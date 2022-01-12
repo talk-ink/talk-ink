@@ -128,7 +128,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
                       copy(
                         `${process.env.REACT_APP_FRONTEND_URL}/j/${
                           workspaceData?.inviteId ?? ""
-                        }/login`
+                        }`
                       );
                       showToast({ message: "Link copied!" });
                     }

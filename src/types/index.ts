@@ -103,8 +103,10 @@ export interface SettingsModalRouteState {
   current: string;
 }
 
-export interface WorkspaceResponse extends Omit<Workspace, "invitedEmails"> {
+export interface WorkspaceResponse
+  extends Omit<Workspace, "invitedEmails" | "peoples"> {
   invitedEmails: string;
+  peoples: string[];
 }
 export interface Attachment {
   _id?: string;

@@ -22,6 +22,7 @@ import ThreadPage from "pages/Thread";
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import { useToast } from "hooks/useToast";
 import JoinChannelPage from "pages/JoinChannel";
+import InvitedWorkspacePage from "pages/InvitedWorkspace";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -113,9 +114,14 @@ function App() {
         />
         <Route
           caseSensitive
+          path="/j/:inviteId"
+          element={<InvitedWorkspacePage />}
+        />
+        <Route
+          caseSensitive
           path="/j/:inviteId/login"
           element={
-            <RestrictedRoute type="public">
+            <RestrictedRoute type="public" from="inviteLogin">
               <LoginPage />
             </RestrictedRoute>
           }
@@ -124,7 +130,7 @@ function App() {
           caseSensitive
           path="/j/:inviteId/register"
           element={
-            <RestrictedRoute type="public">
+            <RestrictedRoute type="public" from="inviteRegister">
               <RegisterPage />
             </RestrictedRoute>
           }
