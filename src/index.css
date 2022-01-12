@@ -52,3 +52,78 @@
   top: auto !important;
   bottom: 25px !important;
 }
+
+.ck.ck-reset.ck-editor {
+  display: -webkit-box;
+  display: -moz-box;
+  display: -ms-flexbox;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-flex-direction: column-reverse;
+  -moz-flex-direction: column-reverse;
+  -ms-flex-direction: column-reverse;
+  flex-direction: column-reverse;
+}
+
+.ck.ck-editor__main > .ck-editor__editable {
+  height: 200px;
+}
+
+.ck.ck-editor .ck-editor__top .ck-sticky-panel .ck-toolbar,
+.ck-sticky-panel__content {
+  height: 54px;
+}
+
+.ck-focused,
+.ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused {
+  border: none;
+  border: none;
+  outline: none !important;
+  -moz-outline: none !important;
+  -webkit-outline: none !important;
+  -ms-outline: none !important;
+  -webkit-box-shadow: none;
+  -moz-box-shadow: none;
+  box-shadow: none;
+}
+
+.ck-editor__editable_inline {
+  min-height: 400px;
+}
+
+.markdown-overrides h1 {
+  font-size: 2em !important;
+}
+
+.markdown-overrides h2 {
+  font-size: 1.5em !important;
+}
+
+.markdown-overrides h3 {
+  font-size: 1.17em !important;
+}
+
+.markdown-overrides strong {
+  font-weight: bolder !important;
+}
+
+.markdown-overrides mark {
+  background-color: yellow !important;
+}
+
+.markdown-overrides ul {
+  list-style: initial !important;
+}
+
+.markdown-overrides ol {
+  list-style: decimal !important;
+}
+
+.markdown-overrides {
+  overflow: auto;
+  margin-bottom: 1em;
+}
+
+.markdown-overrides :nth-child(1) {
+  height: inherit !important;
+}

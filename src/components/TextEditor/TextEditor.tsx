@@ -5,6 +5,9 @@ import ReactMarkdown from "react-markdown";
 import Button from "components/Button/Button";
 import { Thread } from "types";
 import { useNavigate, useParams } from "react-router";
+import Editor from "rich-markdown-editor";
+
+import { kontenbase } from "lib/client";
 
 type Props = React.PropsWithChildren<{
   formik: FormikProps<Thread>;
@@ -35,23 +38,23 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
           onBlur={formik.handleBlur("name")}
           value={formik.values.name}
         />
-        <div className={`h-full ${preview && "overflow-auto"}`}>
-          <textarea
-            className={`resize-none w-full h-full outline-none text-sm ${
-              preview && "hidden"
-            }`}
-            placeholder="Thread description here..."
-            onChange={formik.handleChange("content")}
-            onBlur={formik.handleBlur("content")}
-            value={formik.values.content}
-          />
 
-          {preview && (
-            <ReactMarkdown className="w-full prose">
-              {formik.values.content}
-            </ReactMarkdown>
-          )}
-        </div>
+        {!preview && (
+          <Editor
+            onChange={(getContent) =>
+              formik.setFieldValue("content", getContent())
+            }
+            onBlur={() => formik.handleBlur("content")}
+            defaultValue={formik.values.content}
+            uploadImage={async (file: File) => {
+              const { data } = await kontenbase.storage.upload(file);
+              return data.url;
+            }}
+            className="markdown-overrides"
+          />
+        )}
+
+        {preview && <Editor value={formik.values.content} readOnly />}
       </div>
       <div className="w-full flex justify-between items-center">
         <div></div>

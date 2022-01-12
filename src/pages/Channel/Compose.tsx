@@ -129,7 +129,7 @@ function Compose() {
         />
       }
     >
-      <div className="w-[50vw] h-[80vh] border border-neutral-300 rounded-lg p-5 mx-auto">
+      <div className="w-[50vw] h-[80vh] border border-neutral-300 rounded-lg p-7 mx-auto ">
         <TextEditor
           formik={formik}
           loading={loading}
