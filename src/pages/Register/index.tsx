@@ -3,11 +3,9 @@ import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useFormik } from "formik";
 
-import Button from "components/Button/Button";
-import FormControl from "components/Form/FormControl";
-import FormLabel from "components/Form/FormLabel";
-import TextInput from "components/Form/TextInput";
 import SubLabel from "components/Form/SubLabel";
+import Hero from "../../assets/image/landing/email.svg";
+import Layout from "components/Layout/LoginRegister";
 
 import { Register, User, Workspace } from "types";
 import { registerValidation } from "utils/validators";
@@ -95,68 +93,84 @@ function RegisterPage() {
     apiLoading;
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center text-slightGray px-5 md:px-0">
-      <div className="w-full md:w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-5 md:px-20 py-16 flex flex-col justify-center">
-        <h1 className="text-3xl font-semibold">Register</h1>
-        {apiError && (
-          <div className="mt-3 -mb-5 px-3 py-2 text-sm rounded-md bg-red-200 text-center text-red-500">
-            {apiError}
+    <Layout hero={Hero} title="Register">
+      {apiError && (
+        <div className="mt-3 mb-5 px-3 py-2 text-sm rounded-md bg-red-200 text-center text-red-500">
+          {apiError}
+        </div>
+      )}
+      <form onSubmit={formik.handleSubmit}>
+        <div>
+          <div className="text-sm font-bold text-gray-700 tracking-wide">
+            Full Name
           </div>
-        )}
-        <form onSubmit={formik.handleSubmit} className="mt-8">
-          <FormControl>
-            <FormLabel htmlFor="fullName">Fullname</FormLabel>
-            <TextInput
-              name="fullName"
-              type="text"
-              onChange={formik.handleChange("firstName")}
-              onBlur={formik.handleBlur("firstName")}
-            />
-            {formik.errors.firstName && (
-              <SubLabel>{formik.errors.firstName}</SubLabel>
-            )}
-          </FormControl>
-          <FormControl>
-            <FormLabel htmlFor="email">Email</FormLabel>
-            <TextInput
-              name="email"
-              type="email"
-              onChange={formik.handleChange("email")}
-              onBlur={formik.handleBlur("email")}
-            />{" "}
-            {formik.errors.email && <SubLabel>{formik.errors.email}</SubLabel>}
-          </FormControl>
-
-          <FormControl>
-            <FormLabel htmlFor="password">Password</FormLabel>
-            <TextInput
-              name="password"
-              type="password"
-              onChange={formik.handleChange("password")}
-              onBlur={formik.handleBlur("password")}
-            />{" "}
-            {formik.errors.password && (
-              <SubLabel>{formik.errors.password}</SubLabel>
-            )}
-          </FormControl>
-
-          <FormControl>
-            <div className="flex items-center">
-              <Button
-                type="submit"
-                className="bg-cyan-500 hover:bg-cyan-600 text-center text-white font-medium text-sm mr-2"
-                disabled={isDisabled}
-              >
-                Register
-              </Button>
-              <Link to={handleLink()}>
-                <p className="text-sm text-cyan-500">Sign In</p>
-              </Link>
+          <input
+            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+            placeholder="Enter Your Full Name"
+            name="firstName"
+            type="text"
+            onChange={formik.handleChange("firstName")}
+            onBlur={formik.handleBlur("firstName")}
+            value={formik.values.firstName}
+          />
+          {formik.errors.firstName && (
+            <SubLabel>{formik.errors.firstName}</SubLabel>
+          )}
+        </div>
+        <div className="mt-8">
+          <div className="text-sm font-bold text-gray-700 tracking-wide">
+            Email Address
+          </div>
+          <input
+            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+            placeholder="Enter Your Email"
+            name="email"
+            type="email"
+            onChange={formik.handleChange("email")}
+            onBlur={formik.handleBlur("email")}
+            value={formik.values.email}
+          />
+          {formik.errors.email && <SubLabel>{formik.errors.email}</SubLabel>}
+        </div>
+        <div className="mt-8">
+          <div className="flex justify-between items-center">
+            <div className="text-sm font-bold text-gray-700 tracking-wide">
+              Password
             </div>
-          </FormControl>
-        </form>
+          </div>
+          <input
+            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+            placeholder="Enter your password"
+            type="password"
+            onChange={formik.handleChange("password")}
+            onBlur={formik.handleBlur("password")}
+            value={formik.values.password}
+          />
+          {formik.errors.password && (
+            <SubLabel>{formik.errors.password}</SubLabel>
+          )}
+        </div>
+        <div className="mt-10">
+          <button
+            type="submit"
+            className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
+                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600
+                            shadow-lg"
+            disabled={isDisabled}
+          >
+            Sign up
+          </button>
+        </div>
+      </form>
+      <div className="mt-12 text-sm font-display font-semibold text-gray-700 text-center">
+        Already have account ?{" "}
+        <Link to={handleLink()}>
+          <span className="cursor-pointer text-indigo-600 hover:text-indigo-800">
+            Login
+          </span>
+        </Link>
       </div>
-    </div>
+    </Layout>
   );
 }
 
