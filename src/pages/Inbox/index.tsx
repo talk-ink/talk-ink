@@ -29,7 +29,7 @@ function InboxPage() {
           </p>
         </div>
         <div className="flex justify-between">
-          <nav className="flex gap-2 items-center">
+          <nav className="flex gap-1 md:gap-2 items-center">
             <Badge active title="Active" />
             <Badge title="Done" />
           </nav>

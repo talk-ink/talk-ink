@@ -56,7 +56,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const onSubmit = async (values: TypeInitialValues) => {
     try {
-      await kontenbase.auth.updateProfile({ ...values });
+      await kontenbase.auth.update({ ...values });
       let hideEmail: string[] = [];
 
       if (workspaceData.hideEmail) {

@@ -39,7 +39,10 @@ function ContentItem({
     "
     >
       <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800 group">
-        <button className="flex items-center w-full py-5 " onClick={onClick}>
+        <button
+          className="flex items-start md:items-center w-full py-5 "
+          onClick={onClick}
+        >
           {/* <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
             <img
               src="https://picsum.photos/100"
@@ -47,12 +50,14 @@ function ContentItem({
               alt="img"
             />
           </div> */}
-          <NameInitial
-            name={getNameInitial(dataSource.createdBy?.firstName)}
-            className="mr-4"
-          />
           <div>
-            <div className="flex items-center">
+            <NameInitial
+              name={getNameInitial(dataSource.createdBy?.firstName)}
+              className="mr-4"
+            />
+          </div>
+          <div>
+            <div className="flex flex-col items-start md:flex-row md:items-center">
               <p
                 className={`font-body text-sm mr-2 ${
                   dataSource?.draft && "text-blue-500"
@@ -70,8 +75,8 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="overflow-hidden whitespace-nowrap text-ellipsis max-w-3xl text-xs text-neutral-500 pr-2">
-              <small className="text-xs text-neutral-500">
+            <div className="text-left w-64 md:w-full truncate md:text-clip md:whitespace-nowrap max-w-3xl text-xs text-neutral-500 pr-2">
+              <small className=" text-xs text-neutral-500">
                 {dataSource?.draft ? "Me: " : ""}
                 {dataSource.content}
               </small>

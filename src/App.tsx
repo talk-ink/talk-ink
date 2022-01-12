@@ -31,12 +31,12 @@ function App() {
       const cookiesToken = cookies.get("token");
       if (!cookiesToken) return;
 
-      const { data } = await kontenbase.auth.profile();
+      const { user: userData } = await kontenbase.auth.user();
 
-      if (!data) throw new Error("Invalid user");
+      if (!userData) throw new Error("Invalid user");
 
       const token: Token = { token: cookiesToken };
-      const user: TUserProfile = data;
+      const user: TUserProfile = userData;
 
       dispatch(setAuthToken(token));
       dispatch(setAuthUser(user));

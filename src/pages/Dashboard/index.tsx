@@ -7,12 +7,22 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { Workspace } from "types";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchWorkspaces } from "features/workspaces/slice";
+import { useMediaQuery } from "react-responsive";
+import { FcMenu } from "react-icons/fc";
 
 function DashboardPage() {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, []);
 
   const userId: string = auth.user.id;
 
@@ -33,8 +43,17 @@ function DashboardPage() {
   return loading ? (
     <FullscreenLoading />
   ) : (
-    <div className="w-full min-h-screen grid grid-cols-[280px_1fr] overflow-hidden text-slightGray">
-      <SidebarComponent />
+    <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-auto md:overflow-hidden text-slightGray">
+      <FcMenu
+        className="fixed top-2 left-2"
+        size={"2rem"}
+        onClick={() => setIsSidebarOpen((prev) => !prev)}
+      />
+      <SidebarComponent
+        isMobile={isMobile}
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
+      />
       <Outlet />
     </div>
   );

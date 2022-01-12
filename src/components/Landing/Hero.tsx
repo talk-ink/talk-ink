@@ -10,22 +10,22 @@ import GithubButton from "./GithubButton";
 
 function LandingHero() {
   return (
-    <section className="w-full pt-20 grid grid-cols-2 justify-center items-start">
-      <div>
-        <h1 className="font-montserrat text-5xl 2xl:text-6xl font-extrabold mb-2">
+    <section className="w-full pt-10 md:pt-20 grid md:grid-cols-2 justify-center items-start ">
+      <div className="text-center md:text-left">
+        <h1 className="font-montserrat text-2xl md:text-5xl 2xl:text-6xl font-extrabold mb-2">
           <span className="text-accent">Simple</span> as Email
         </h1>
-        <h1 className="font-montserrat text-5xl 2xl:text-6xl  font-extrabold mb-2">
+        <h1 className="font-montserrat text-2xl md:text-5xl 2xl:text-6xl  font-extrabold mb-2">
           <span className="text-accent">Readable</span> as Thread
         </h1>
-        <h1 className="font-montserrat text-5xl 2xl:text-6xl  font-extrabold mb-2">
+        <h1 className="font-montserrat text-2xl md:text-5xl 2xl:text-6xl  font-extrabold mb-2">
           <span className="text-accent">Realtime</span> as Chat
         </h1>
 
-        <p className="font-montserrat text-neutral-600 text-xl 2xl:text-2xl mt-4 mb-10">
+        <p className="font-montserrat text-neutral-600 text-md md:text-xl 2xl:text-2xl mt-4 mb-10">
           an Open Source Team Communication Tools, Finally!
         </p>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 justify-center md:justify-start mb-10 md:mb-0">
           <GetStartedButton />
           <GithubButton />
         </div>

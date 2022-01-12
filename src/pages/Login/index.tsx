@@ -34,11 +34,11 @@ function LoginPage() {
   const onSubmit = async (values: Login) => {
     setApiLoading(true);
     try {
-      const { data } = await kontenbase.auth.login(values);
+      const { user: userLogin, token } = await kontenbase.auth.login(values);
 
-      const { data: userData } = await kontenbase.auth.profile();
+      const { user: userData } = await kontenbase.auth.user();
 
-      if (!data) throw new Error("Invalid login");
+      if (!userLogin) throw new Error("Invalid login");
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
@@ -70,7 +70,7 @@ function LoginPage() {
           }
         }
 
-        dispatch(setAuthToken({ token: data?.token }));
+        dispatch(setAuthToken({ token }));
         dispatch(setAuthUser(user));
 
         navigate(`/a/${toWorkspaceId}`);
@@ -105,8 +105,8 @@ function LoginPage() {
     apiLoading;
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center text-slightGray">
-      <div className="w-4/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
+    <div className="w-screen h-screen flex items-center justify-center text-slightGray px-5 md:px-0">
+      <div className="w-full md:w-4/12 bg-slate-100 border border-neutral-200 rounded-md px-5 md:px-20 py-16 flex flex-col justify-center">
         <h1 className="text-3xl font-semibold">Login</h1>
         {apiError && (
           <div className="mt-3 -mb-5 px-3 py-2 text-sm rounded-md bg-red-200 text-center text-red-500">

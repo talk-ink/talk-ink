@@ -27,7 +27,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
   return (
     <div className="flex flex-col h-full ">
       <div></div>
-      <div className="flex flex-col h-full">
+      <div className="flex flex-col h-full min-h-0">
         <input
           className="w-full h-auto outline-none text-3xl font-bold mb-4"
           placeholder="Thread title"
@@ -35,7 +35,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
           onBlur={formik.handleBlur("name")}
           value={formik.values.name}
         />
-        <div className={`h-72 ${preview && "overflow-auto"}`}>
+        <div className={`h-full ${preview && "overflow-auto"}`}>
           <textarea
             className={`resize-none w-full h-full outline-none text-sm ${
               preview && "hidden"

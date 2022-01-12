@@ -2,7 +2,7 @@ import IconButton from "components/Button/IconButton";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Popup from "components/Popup/Popup";
-import React, { useMemo } from "react";
+import React, { Dispatch, SetStateAction, useMemo } from "react";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
 import { BiDotsHorizontalRounded, BiEditAlt, BiLogOut } from "react-icons/bi";
@@ -26,6 +26,7 @@ type Props = React.PropsWithChildren<{
   leaveModalHandler?: (channel: Channel) => void;
   editModalHandler?: (channel: Channel) => void;
   data?: Channel;
+  setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }>;
 
 function SidebarList({
@@ -37,6 +38,7 @@ function SidebarList({
   leaveModalHandler,
   editModalHandler,
   data,
+  setIsSidebarOpen,
 }: Props) {
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
@@ -85,6 +87,7 @@ function SidebarList({
         className={({ isActive }) =>
           `w-full flex items-center text-sm pl-3 h-8`
         }
+        onClick={() => setIsSidebarOpen(false)}
       >
         <Icon
           size={20}

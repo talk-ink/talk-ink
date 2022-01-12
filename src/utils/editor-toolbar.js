@@ -1,3 +1,19 @@
+const uploadCallback = (file, callback) => {
+  console.log(file);
+  // return new Promise((resolve, reject) => {
+  //   const reader = new window.FileReader();
+  //   console.log(reader);
+  //   reader.onloadend = async () => {
+  //     const form_data = new FormData();
+  //     form_data.append("file", file);
+  //     const res = await uploadFile(form_data);
+  //     setValue("thumbnail", res.data);
+  //     resolve({ data: { link: process.env.REACT_APP_API + res.data } });
+  //   };
+  //   reader.readAsDataURL(file);
+  // });
+};
+
 export const toolbar = {
   options: [
     "inline",
@@ -10,7 +26,7 @@ export const toolbar = {
     // "link",
     // "embedded",
     "emoji",
-    // "image",
+    "image",
     // "remove",
     "history",
   ],
@@ -297,23 +313,7 @@ export const toolbar = {
       width: "auto",
     },
   },
-  image: {
-    icon: undefined,
-    className: undefined,
-    component: undefined,
-    popupClassName: undefined,
-    urlEnabled: true,
-    uploadEnabled: true,
-    alignmentEnabled: true,
-    uploadCallback: undefined,
-    previewImage: false,
-    inputAccept: "image/gif,image/jpeg,image/jpg,image/png,image/svg",
-    alt: { present: false, mandatory: false },
-    defaultSize: {
-      height: "auto",
-      width: "auto",
-    },
-  },
+
   remove: { icon: undefined, className: undefined, component: undefined },
   history: {
     inDropdown: false,

@@ -33,10 +33,12 @@ function RegisterPage() {
   const onSubmit = async (values: Register) => {
     setApiLoading(true);
     try {
-      const { data } = await kontenbase.auth.register(values);
-      const { data: userData } = await kontenbase.auth.profile();
+      const { user: userRegister, token } = await kontenbase.auth.register(
+        values
+      );
+      const { user: userData } = await kontenbase.auth.user();
 
-      if (!data) throw new Error("Invalid register");
+      if (!userRegister) throw new Error("Invalid register");
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
@@ -55,7 +57,7 @@ function RegisterPage() {
           }
         }
 
-        dispatch(setAuthToken({ token: data?.token }));
+        dispatch(setAuthToken({ token }));
         dispatch(setAuthUser(user));
 
         navigate(`/a/${toWorkspaceId}`);
@@ -91,8 +93,8 @@ function RegisterPage() {
     apiLoading;
 
   return (
-    <div className="w-screen h-screen flex items-center justify-center text-slightGray">
-      <div className="w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-20 py-16 flex flex-col justify-center">
+    <div className="w-screen h-screen flex items-center justify-center text-slightGray px-5 md:px-0">
+      <div className="w-full md:w-5/12 bg-slate-100 border border-neutral-200 rounded-md px-5 md:px-20 py-16 flex flex-col justify-center">
         <h1 className="text-3xl font-semibold">Register</h1>
         {apiError && (
           <div className="mt-3 -mb-5 px-3 py-2 text-sm rounded-md bg-red-200 text-center text-red-500">

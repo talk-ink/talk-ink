@@ -20,15 +20,15 @@ function SectionContent({ header, subHeader, reverse, type }: Props) {
   };
 
   return (
-    <div className="grid grid-cols-2 gap-20 items-start mb-20">
+    <div className="grid grid-cols-2 gap-5 md:gap-20 items-start mb-20">
       <div className={`${reverse && "order-2"}`}>
         <img src={image[type]} className="w-full" />
       </div>
       <div className={`${reverse && "order-1"}`}>
-        <h2 className="font-montserrat font-extrabold text-4xl mb-2">
+        <h2 className="font-montserrat font-extrabold text-2xl md:text-4xl mb-2">
           {header}
         </h2>
-        <p className="font-montserrat font-medium text-2xl 2xl:text-3xl">
+        <p className="font-montserrat font-medium text-md md:text-2xl 2xl:text-3xl">
           {subHeader}
         </p>
       </div>

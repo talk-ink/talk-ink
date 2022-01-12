@@ -55,9 +55,11 @@ const Comment: React.FC<IProps> = ({ comment }) => {
   };
 
   return (
-    <div className="group  flex items-start mb-8 relative ">
-      <Avatar src="https://picsum.photos/100" />
-      <div className="prose  flex-grow-0 ml-4">
+    <div className="group flex items-start mb-8 relative ">
+      <div className=" w-8">
+        <Avatar src="https://picsum.photos/100" />
+      </div>
+      <div className="ml-4 w-full">
         <div className="-mt-1.5 flex items-center justify-start">
           <p className=" font-semibold mb-0 mt-0 mr-2">
             {comment.createdBy?.firstName}
@@ -68,15 +70,16 @@ const Comment: React.FC<IProps> = ({ comment }) => {
             </ReactMoment>
           </p>
         </div>
-
-        <Preview
-          content={comment.content}
-          isEdit={isEdit}
-          editorState={editorState}
-          setEditorState={setEditorState}
-          discardComment={discardComment}
-          handleUpdateComment={handleUpdateComment}
-        />
+        <div className="w-full ">
+          <Preview
+            content={comment.content}
+            isEdit={isEdit}
+            editorState={editorState}
+            setEditorState={setEditorState}
+            discardComment={discardComment}
+            handleUpdateComment={handleUpdateComment}
+          />
+        </div>
         {auth.user.id === comment.createdBy?._id && (
           <div className="absolute top-0 right-0 z-50 hidden group-hover:block  ">
             <Popup

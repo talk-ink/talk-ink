@@ -28,10 +28,10 @@ function ChangePassword({ onCancel }: TProps) {
     try {
       //   if (values.newPassword !== values.confirmPassword)
       //     throw new Error("The passwords you entered do not match.");
-      //   const updateProfile = await kontenbase.auth.updateProfile({
+      //   const update = await kontenbase.auth.update({
       //     password: values.newPassword,
       //   });
-      //   if (updateProfile.data) {
+      //   if (update.data) {
       //     showToast({ message: "Password changed!" });
       //     onCancel();
       //   }
