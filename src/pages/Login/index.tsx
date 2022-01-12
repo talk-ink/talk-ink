@@ -53,7 +53,11 @@ function LoginPage() {
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
-            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            if (user.id === workspaceData[0]?.createdBy?._id) {
+              toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+            } else {
+              toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            }
           } else {
             return showToast({ message: "Invite link not valid!" });
           }

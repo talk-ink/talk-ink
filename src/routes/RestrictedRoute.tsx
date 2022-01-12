@@ -44,7 +44,10 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
             />
           );
         }
-        return <Navigate to="/404" state={{ from: location }} />;
+
+        if (!auth.user) {
+          return <Navigate to="/404" state={{ from: location }} />;
+        }
       }
       break;
 
