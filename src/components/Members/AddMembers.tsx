@@ -49,6 +49,13 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
     return member.members;
   }, [params.workspaceId, member.members]);
 
+  const invitedEmails = useMemo(() => {
+    const memberEmails = member.members.map((data) => data.email);
+    return workspaceData.invitedEmails.filter(
+      (data) => !memberEmails.includes(data)
+    );
+  }, [params.workspaceId, member.members, workspaceData]);
+
   const workspaceInviteIdHandler = async () => {
     setApiLoading(true);
     try {
@@ -156,6 +163,17 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               <ContentSkeleton count={2} />
             ) : (
               <>
+                {invitedEmails.map((data, idx) => (
+                  <MemberList
+                    key={idx}
+                    data={{
+                      firstName: data,
+                      email: data,
+                    }}
+                    hideEmail
+                    invited
+                  />
+                ))}
                 {memberData.map((data, idx) => (
                   <MemberList
                     key={idx}
