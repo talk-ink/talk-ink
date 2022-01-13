@@ -192,7 +192,7 @@ function ChannelPage() {
             {memberList.map(
               (member, idx) =>
                 idx <= 3 && (
-                  <>
+                  <div key={idx}>
                     {!member.avatar && (
                       <NameInitial
                         key={member._id}
@@ -207,7 +207,7 @@ function ChannelPage() {
                         source={member.avatar[0].url}
                       />
                     )}
-                  </>
+                  </div>
                 )
             )}
           </div>
