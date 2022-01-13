@@ -19,6 +19,7 @@ import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthToken, setAuthUser } from "features/auth";
 import { KontenbaseResponse } from "@kontenbase/sdk";
+import OneSignal from "react-onesignal";
 
 const initialValues: Register = {
   email: "",
@@ -46,6 +47,9 @@ function RegisterPage() {
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
+        OneSignal.setExternalUserId(userData.id).then(() =>
+          OneSignal.setSubscription(true)
+        );
         const user: TUserProfile = userData;
 
         let toWorkspaceId = "create_workspace";

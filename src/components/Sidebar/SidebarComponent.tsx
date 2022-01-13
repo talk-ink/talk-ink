@@ -11,6 +11,7 @@ import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
+import OneSignal from "react-onesignal";
 
 import ChannelButton from "components/Button/ChannelButton";
 import IconButton from "components/Button/IconButton";
@@ -82,6 +83,7 @@ function SidebarComponent({
       await kontenbase.auth.logout();
 
       cookies.remove("token");
+      OneSignal.removeExternalUserId();
       dispatch(logout());
       navigate("/login");
     } catch (error) {

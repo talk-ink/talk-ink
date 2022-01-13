@@ -132,3 +132,7 @@
   overflow: auto;
   padding-right: 0.5em;
 }
+
+.onesignal-bell-launcher-button {
+  display: none !important;
+}

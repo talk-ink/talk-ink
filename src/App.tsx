@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { Route, Routes } from "react-router";
 import cookies from "js-cookie";
+import OneSignal from "react-onesignal";
 
 import ChannelPage from "pages/Channel";
 import DashboardPage from "pages/Dashboard";
@@ -36,6 +37,17 @@ function App() {
       const { user: userData } = await kontenbase.auth.user();
 
       if (!userData) throw new Error("Invalid user");
+
+      OneSignal.init({
+        appId: process.env.REACT_APP_ONE_SIGNAL_ID,
+        notifyButton: {
+          enable: true,
+        },
+        allowLocalhostAsSecureOrigin: true,
+        autoResubscribe: true,
+      }).then(() => {
+        OneSignal.showSlidedownPrompt();
+      });
 
       const token: Token = { token: cookiesToken };
       const user: TUserProfile = userData;

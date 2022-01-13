@@ -14,6 +14,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { Login, TUserProfile, User, Workspace, WorkspaceResponse } from "types";
 import { useToast } from "hooks/useToast";
 import Hero from "../../assets/image/landing/thread.svg";
+import OneSignal from "react-onesignal";
 
 const initialValues: Login = {
   email: "",
@@ -40,6 +41,10 @@ function LoginPage() {
       if (!userData) throw new Error("Invalid user");
 
       if (userData) {
+        OneSignal.setExternalUserId(userData.id).then(() =>
+          OneSignal.setSubscription(true)
+        );
+
         const user: TUserProfile = userData;
 
         let toWorkspaceId: string = "";
