@@ -59,7 +59,14 @@ function InboxPage() {
       const threadIds = threadData.map((thread) => thread._id);
       const uniqueId = new Set([...threadIds, ...userReaded]);
 
-      await kontenbase.auth.update({ readedThreads: [...uniqueId] });
+      [...uniqueId].forEach((id, idx) => {
+        setTimeout(async () => {
+          await kontenbase.service("Users").link(auth.user.id, {
+            readedThreads: id,
+          });
+        }, idx * 100);
+      });
+
       dispatch(updateUser({ readedThreads: [...uniqueId] }));
     } catch (error: any) {
       console.log("err", error);
@@ -75,7 +82,13 @@ function InboxPage() {
       const threadIds = threadData.map((thread) => thread._id);
       const uniqueId = new Set([...threadIds, ...userDoneThreads]);
 
-      await kontenbase.auth.update({ doneThreads: [...uniqueId] });
+      [...uniqueId].forEach((id, idx) => {
+        setTimeout(async () => {
+          await kontenbase.service("Users").link(auth.user.id, {
+            doneThreads: id,
+          });
+        }, idx * 100);
+      });
       dispatch(updateUser({ doneThreads: [...uniqueId] }));
     } catch (error: any) {
       console.log("err", error);
