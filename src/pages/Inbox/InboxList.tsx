@@ -15,6 +15,7 @@ import { addDoneThread, deleteDoneThread } from "features/auth";
 import Modal from "components/Modal/Modal";
 import { kontenbase } from "lib/client";
 import { deleteInbox } from "features/inbox";
+import { deleteThread } from "features/threads";
 
 type TProps = {
   type?: "active" | "done";
@@ -27,7 +28,7 @@ function InboxList({ type = "active" }: TProps) {
   const navigate = useNavigate();
 
   const auth = useAppSelector((state) => state.auth);
-  const inbox = useAppSelector((state) => state.inbox);
+  const thread = useAppSelector((state) => state.thread);
   const dispatch = useAppDispatch();
 
   const userId: string = auth.user.id;
@@ -39,21 +40,27 @@ function InboxList({ type = "active" }: TProps) {
     return type === "done";
   }, [type]);
 
-  const inboxData = useMemo(() => {
-    return inbox.inbox.filter((data) => {
+  const threadData = useMemo(() => {
+    return thread.threads.filter((data) => {
       if (!auth.user.doneThreads && isDoneThread) return false;
       if (!auth.user.doneThreads && !isDoneThread) return true;
       if (isDoneThread) return auth.user.doneThreads.includes(data._id);
       return !auth.user.doneThreads.includes(data._id);
     });
-  }, [inbox.inbox, auth.user, params]);
+  }, [thread.threads, auth.user, params]);
 
-  const markHandler = async (inboxId: string) => {
+  const markHandler = async (threadId: string) => {
     try {
       if (isDoneThread) {
-        dispatch(deleteDoneThread(inboxId));
+        const update = await kontenbase
+          .service("Users")
+          .unlink(auth.user.id, { doneThreads: threadId });
+        dispatch(deleteDoneThread(threadId));
       } else {
-        dispatch(addDoneThread(inboxId));
+        const update = await kontenbase
+          .service("Users")
+          .link(auth.user.id, { doneThreads: threadId });
+        dispatch(addDoneThread(threadId));
       }
     } catch (error) {
       console.log("err", error);
@@ -71,7 +78,7 @@ function InboxList({ type = "active" }: TProps) {
       if (deletedThread?.data) {
         setSelectedThread(null);
       }
-      dispatch(deleteInbox(deletedThread.data));
+      dispatch(deleteThread(deletedThread.data));
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${error}` });
@@ -80,16 +87,16 @@ function InboxList({ type = "active" }: TProps) {
     }
   };
 
-  const loading = inbox.loading;
+  const loading = thread.loading;
   return (
     <div>
       {loading ? (
         <ContentSkeleton />
       ) : (
         <>
-          {inboxData?.length > 0 ? (
+          {threadData?.length > 0 ? (
             <ul>
-              {inboxData.map((inbox, idx) => (
+              {threadData.map((inbox, idx) => (
                 <ContentItem
                   key={idx}
                   dataSource={inbox}
