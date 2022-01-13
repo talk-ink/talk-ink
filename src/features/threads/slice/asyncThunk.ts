@@ -1,34 +1,59 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
+import { Thread } from "types";
 
 type FetchThreadsProps = {
-  channelId: string;
+  type: "inbox" | "threads";
+  channelId?: string;
+  workspaceId?: string;
+  userId?: string;
 };
 
 export const fetchThreads = createAsyncThunk(
   "channel/fetchThreads",
-  async ({ channelId }: FetchThreadsProps) => {
-    const response = await kontenbase
-      .service("Threads")
-      .find({ where: { channel: channelId } });
+  async ({
+    type = "threads",
+    channelId,
+    workspaceId,
+    userId,
+  }: FetchThreadsProps) => {
+    switch (type) {
+      case "threads":
+        const threadResponse = await kontenbase
+          .service("Threads")
+          .find({ where: { channel: channelId } });
 
-    const parsedThreadsDraft: object = JSON.parse(
-      localStorage.getItem("threadsDraft")
-    );
+        const parsedThreadsDraft: object = JSON.parse(
+          localStorage.getItem("threadsDraft")
+        );
 
-    let draft = [];
+        let draft = [];
 
-    if (parsedThreadsDraft) {
-      draft = Object.entries(parsedThreadsDraft)
-        .map(([key, value]) => ({
-          id: key,
-          draft: true,
-          ...value,
-        }))
-        .filter((data) => data.channelId === channelId);
+        if (parsedThreadsDraft) {
+          draft = Object.entries(parsedThreadsDraft)
+            .map(([key, value]) => ({
+              id: key,
+              draft: true,
+              ...value,
+            }))
+            .filter((data) => data.channelId === channelId);
+        }
+
+        return [...draft, ...threadResponse.data];
+      case "inbox":
+        const inboxResponse = await kontenbase.service("Threads").find({
+          where: {
+            workspace: workspaceId,
+          },
+        });
+
+        const threadData: Thread[] = inboxResponse.data;
+
+        return threadData.filter((thread) => thread.createdBy._id !== userId);
+
+      default:
+        break;
     }
-
-    return [...draft, ...response.data];
   }
 );
 

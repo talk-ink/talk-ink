@@ -22,6 +22,7 @@ import ThreadPage from "pages/Thread";
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import { useToast } from "hooks/useToast";
 import JoinChannelPage from "pages/JoinChannel";
+import InboxList from "pages/Inbox/InboxList";
 import InvitedWorkspacePage from "pages/InvitedWorkspace";
 
 function App() {
@@ -76,7 +77,11 @@ function App() {
           }
         >
           <Route path="search" element={<>search</>} />
-          <Route path="inbox" element={<InboxPage />} />
+          <Route path="inbox/" element={<InboxPage />}>
+            <Route path="" element={<InboxList />} />
+            <Route path="done" element={<InboxList type="done" />} />
+          </Route>
+
           <Route path="saved" element={<>saved</>} />
           <Route path="messages" element={<>messages</>} />
           <Route path="ch/:channelId" element={<ChannelPage />} />
