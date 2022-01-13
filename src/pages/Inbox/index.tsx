@@ -24,6 +24,7 @@ import MenuItem from "components/Menu/MenuItem";
 import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import { kontenbase } from "lib/client";
+import Modal from "components/Modal/Modal";
 
 function InboxPage() {
   const [showToast] = useToast();
@@ -35,6 +36,10 @@ function InboxPage() {
   const auth = useAppSelector((state) => state.auth);
   const thread = useAppSelector((state) => state.thread);
   const dispatch = useAppDispatch();
+
+  const [inboxModal, setInboxModal] = useState<
+    "done" | "read" | null | undefined
+  >(null);
 
   const userId: string = auth.user.id;
 
@@ -150,13 +155,17 @@ function InboxPage() {
                       icon={
                         <BiCheckCircle size={20} className="text-neutral-400" />
                       }
-                      onClick={doneAllHandler}
+                      onClick={() => {
+                        setInboxModal("done");
+                      }}
                       title="Mark all done"
                       disabled={isDoneThread}
                     />
                     <MenuItem
                       icon={<BiCheck size={20} className="text-neutral-400" />}
-                      onClick={readAllHandler}
+                      onClick={() => {
+                        setInboxModal("read");
+                      }}
                       title="Mark all read"
                       disabled={isDoneThread}
                     />
@@ -175,6 +184,28 @@ function InboxPage() {
           )}
         </div>
       </header>
+      <Modal
+        visible={!!inboxModal}
+        header={`Are you sure you want to mark all Inbox threads as ${inboxModal}?`}
+        onCancel={() => {
+          setInboxModal(null);
+        }}
+        onClose={() => {
+          setInboxModal(null);
+        }}
+        okButtonText={`Mark all ${inboxModal}`}
+        onConfirm={() => {
+          if (inboxModal === "done") {
+            doneAllHandler();
+          }
+          if (inboxModal === "read") {
+            readAllHandler();
+          }
+          setInboxModal(null);
+        }}
+      >
+        <p className="text-sm">This action cannot be undone</p>
+      </Modal>
       <Outlet />
     </MainContentContainer>
   );
