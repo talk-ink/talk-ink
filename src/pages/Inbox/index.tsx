@@ -83,9 +83,11 @@ function InboxPage() {
               link={`/a/${params.workspaceId}/inbox/done`}
             />
           </nav>
-          <IconButton>
-            <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
-          </IconButton>
+          {threadData.length > 0 && (
+            <IconButton>
+              <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
+            </IconButton>
+          )}
         </div>
       </header>
       <Outlet />
