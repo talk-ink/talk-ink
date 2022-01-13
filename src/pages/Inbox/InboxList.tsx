@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
@@ -30,6 +30,7 @@ function InboxList({ type = "active" }: TProps) {
 
   const auth = useAppSelector((state) => state.auth);
   const thread = useAppSelector((state) => state.thread);
+  const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
   const userId: string = auth.user.id;
@@ -41,14 +42,21 @@ function InboxList({ type = "active" }: TProps) {
     return type === "done";
   }, [type]);
 
-  const threadData: Thread[] = useMemo(() => {
-    return thread.threads.filter((data) => {
-      if (!auth.user.doneThreads && isDoneThread) return false;
-      if (!auth.user.doneThreads && !isDoneThread) return true;
-      if (isDoneThread) return auth.user.doneThreads.includes(data._id);
-      return !auth.user.doneThreads.includes(data._id);
-    });
-  }, [thread.threads, auth.user, params]);
+  const channelData: string[] = useMemo(
+    () => channel.channels.map((data) => data._id),
+    [channel.channels]
+  );
+
+  const threadData = useMemo(
+    () =>
+      thread.threads.filter((data) => {
+        if (!channelData.includes(data.channel[0])) return false;
+        if (!auth.user.doneThreads) return true;
+        if (isDoneThread) return auth.user.doneThreads.includes(data._id);
+        return !auth.user.doneThreads.includes(data._id);
+      }),
+    [thread.threads, auth.user, params, channelData]
+  );
 
   const readedThreads: string[] = useMemo(() => {
     if (!auth.user.readedThreads) return [];
