@@ -80,11 +80,12 @@ function ContentItem({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800 group">
+      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-transparent relative z-0 group">
         <button
           className="flex items-start md:items-center w-full py-5 "
           onClick={onClick}
         >
+          <div className="h-full w-1 absolute top-0 left-0 rounded-l-xl group-hover:bg-cyan-700"></div>
           <div className="flex items-center">
             <div
               className={`h-3 w-3 ${
