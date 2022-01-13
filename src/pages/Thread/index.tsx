@@ -18,13 +18,18 @@ import { addComment, deleteComment, updateComment } from "features/threads";
 import { fetchComments } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { kontenbase } from "lib/client";
+import { useToast } from "hooks/useToast";
+import { updateUser } from "features/auth";
 
 function ThreadPage() {
+  const [showToast] = useToast();
   const { threadId, workspaceId, channelId } = useParams();
   const listRef = useRef<HTMLDivElement>(null);
-  const dispatch = useAppDispatch();
+
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
+  const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
 
@@ -99,9 +104,31 @@ function ThreadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const updateReadedThreads = async () => {
+    try {
+      let readedThreads: string[] = [];
+      if (auth.user?.readedThreads) {
+        readedThreads = auth.user?.readedThreads;
+      }
+      if (!readedThreads.includes(threadId)) {
+        const update = await kontenbase
+          .service("Users")
+          .link(auth.user.id, { readedThreads: threadId });
+        dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error.message)}` });
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchComments({ threadId: threadId }));
   }, [dispatch, threadId]);
+
+  useEffect(() => {
+    updateReadedThreads();
+  }, [threadId]);
 
   const threadData: Thread = useMemo(() => {
     return thread.threads.find((data) => data._id === threadId);

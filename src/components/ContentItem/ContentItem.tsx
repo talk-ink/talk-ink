@@ -1,6 +1,12 @@
 import React, { Dispatch, SetStateAction } from "react";
 
-import { BiDotsHorizontalRounded, BiEdit, BiTrash } from "react-icons/bi";
+import {
+  BiCheck,
+  BiCircle,
+  BiDotsHorizontalRounded,
+  BiEdit,
+  BiTrash,
+} from "react-icons/bi";
 import ReactMoment from "react-moment";
 
 import IconButton from "components/Button/IconButton";
@@ -10,18 +16,54 @@ import MenuItem from "components/Menu/MenuItem";
 import Menu from "components/Menu/Menu";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
+import Divider from "components/Divider/Divider";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { addReadThread, deleteReadThread } from "features/auth";
+import { kontenbase } from "lib/client";
+import { useAppSelector } from "hooks/useAppSelector";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
-  setSelectedThread: Dispatch<SetStateAction<Thread | null | undefined>>;
+  setSelectedThread?: Dispatch<SetStateAction<Thread | null | undefined>>;
+  otherButton?: React.ReactNode;
+  isRead?: boolean;
 }>;
 
 function ContentItem({
   onClick = () => {},
   dataSource,
   setSelectedThread,
+  otherButton,
+  isRead,
 }: Props) {
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
+
+  const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
+    try {
+      console.log(type);
+      switch (type) {
+        case "read":
+          await kontenbase
+            .service("Users")
+            .link(auth.user.id, { readedThreads: dataSource._id });
+          dispatch(addReadThread(dataSource._id));
+          break;
+        case "unread":
+          await kontenbase
+            .service("Users")
+            .unlink(auth.user.id, { readedThreads: dataSource._id });
+          dispatch(deleteReadThread(dataSource._id));
+          break;
+
+        default:
+          break;
+      }
+    } catch (error: any) {
+      console.log("err", error);
+    }
+  };
   return (
     <div
       className="
@@ -38,19 +80,18 @@ function ContentItem({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-l-2 border-transparent hover:border-cyan-800 group">
+      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-transparent group">
         <button
-          className="flex items-start md:items-center w-full py-5 "
+          className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
         >
-          {/* <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
-            <img
-              src="https://picsum.photos/100"
-              className="h-full w-full"
-              alt="img"
-            />
-          </div> */}
-          <div>
+          <div className="h-full w-1 absolute top-0 -left-3 rounded-l-xl group-hover:bg-cyan-700"></div>
+          <div className="flex items-center">
+            <div
+              className={`h-3 w-3 ${
+                !isRead ? "bg-cyan-600" : "bg-transparent"
+              } rounded-full mr-2`}
+            ></div>
             <NameInitial
               name={getNameInitial(dataSource.createdBy?.firstName)}
               className="mr-4"
@@ -61,7 +102,7 @@ function ContentItem({
               <p
                 className={`font-body text-sm mr-2 ${
                   dataSource?.draft && "text-blue-500"
-                }`}
+                } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >
                 {dataSource?.draft ? "Draft" : dataSource.name}
               </p>
@@ -83,11 +124,31 @@ function ContentItem({
             </div>
           </div>
         </button>
-        <div className="hidden active:block group-hover:block">
+        <div className="flex active:flex group-hover:flex gap-2">
+          {otherButton}
           <Popup
             content={
               <div>
                 <Menu>
+                  {isRead && (
+                    <MenuItem
+                      icon={<BiCircle size={20} className="text-neutral-400" />}
+                      title="Mark unread"
+                      onClick={() => {
+                        handleReadUnread({ type: "unread" });
+                      }}
+                    />
+                  )}
+                  {!isRead && (
+                    <MenuItem
+                      icon={<BiCheck size={20} className="text-neutral-400" />}
+                      title="Mark read"
+                      onClick={() => {
+                        handleReadUnread({ type: "read" });
+                      }}
+                    />
+                  )}
+                  <Divider />
                   <MenuItem
                     icon={<BiTrash size={20} className="text-neutral-400" />}
                     title="Delete thread..."

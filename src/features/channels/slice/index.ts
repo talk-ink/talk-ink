@@ -18,6 +18,7 @@ export const fetchChannels = createAsyncThunk(
     const response = await kontenbase
       .service("Channels")
       .find({ where: { members: userId, workspace: workspaceId } });
+
     return response.data;
   }
 );

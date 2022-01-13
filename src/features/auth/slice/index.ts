@@ -54,6 +54,42 @@ const authSlice = createSlice({
         ...action.payload,
       };
     },
+    addDoneThread: (state, action: PayloadAction<string>) => {
+      let doneThreads = [];
+      if (!state.user.doneThreads) {
+        doneThreads.push(action.payload);
+      } else {
+        doneThreads = [...state.user.doneThreads, action.payload];
+      }
+      state.user = {
+        ...state.user,
+        doneThreads,
+      };
+    },
+    deleteDoneThread: (state, action: PayloadAction<string>) => {
+      let deletedIndex = state.user.doneThreads.findIndex(
+        (data) => data === action.payload
+      );
+      state.user.doneThreads.splice(deletedIndex, 1);
+    },
+    addReadThread: (state, action: PayloadAction<string>) => {
+      let readedThreads = [];
+      if (!state.user.readedThreads) {
+        readedThreads.push(action.payload);
+      } else {
+        readedThreads = [...state.user.readedThreads, action.payload];
+      }
+      state.user = {
+        ...state.user,
+        readedThreads,
+      };
+    },
+    deleteReadThread: (state, action: PayloadAction<string>) => {
+      let deletedIndex = state.user.readedThreads.findIndex(
+        (data) => data === action.payload
+      );
+      state.user.readedThreads.splice(deletedIndex, 1);
+    },
   },
 });
 
@@ -64,5 +100,9 @@ export const {
   logout,
   login,
   updateUser,
+  addDoneThread,
+  deleteDoneThread,
+  addReadThread,
+  deleteReadThread,
 } = authSlice.actions;
 export const authReducer = authSlice.reducer;

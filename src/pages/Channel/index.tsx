@@ -98,6 +98,11 @@ function ChannelPage() {
     return thread.threads;
   }, [thread.threads]);
 
+  const readedThreads: string[] = useMemo(() => {
+    if (!auth.user.readedThreads) return [];
+    return auth.user.readedThreads;
+  }, [auth.user]);
+
   const deleteDraft = (id: string) => {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
     delete parsedThreadDraft[+id];
@@ -163,7 +168,7 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    dispatch(fetchThreads({ channelId: params.channelId }));
+    dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
     getMemberHandler();
   }, [params.channelId]);
 
@@ -187,7 +192,7 @@ function ChannelPage() {
             {memberList.map(
               (member, idx) =>
                 idx <= 3 && (
-                  <>
+                  <div key={idx}>
                     {!member.avatar && (
                       <NameInitial
                         key={member._id}
@@ -202,7 +207,7 @@ function ChannelPage() {
                         source={member.avatar[0].url}
                       />
                     )}
-                  </>
+                  </div>
                 )
             )}
           </div>
@@ -238,7 +243,7 @@ function ChannelPage() {
                 </Menu>
               </div>
             }
-            position="bottom"
+            position="left"
           >
             <IconButton size="medium">
               <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
@@ -264,6 +269,11 @@ function ChannelPage() {
                     }
                   }}
                   setSelectedThread={setSelectedThread}
+                  isRead={
+                    readedThreads.includes(thread._id) ||
+                    (readedThreads.includes(thread._id) &&
+                      thread.createdBy?._id === auth.user.id)
+                  }
                 />
               ))}
             </>
