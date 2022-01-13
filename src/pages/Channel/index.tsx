@@ -243,7 +243,7 @@ function ChannelPage() {
                 </Menu>
               </div>
             }
-            position="bottom"
+            position="left"
           >
             <IconButton size="medium">
               <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
