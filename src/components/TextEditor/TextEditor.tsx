@@ -35,12 +35,8 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
   const navigate = useNavigate();
   const params = useParams();
 
-  const isDisabled =
-    !formik.values.name ||
-    !formik.values.content ||
-    !!formik.errors.name ||
-    !!formik.errors.content ||
-    loading;
+
+  const isDisabled = !formik.values.name || !formik.values.content || loading;
 
   return (
     <div className="flex flex-col h-full ">

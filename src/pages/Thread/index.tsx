@@ -39,8 +39,6 @@ function ThreadPage() {
             ? payload.before.threads?.[0] === threadId
             : payload.threads?.[0] === threadId;
 
-        console.log(payload);
-
         let _createdBy;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
           const { data } = await kontenbase.service("Users").find({
@@ -130,46 +128,47 @@ function ThreadPage() {
       }
       listRef={listRef}
     >
-      <div className="w-full md:px-60 pb-10 ">
-        <div className="mb-8">
-          <h1 className="font-bold text-3xl">{threadData?.name}</h1>
-          <p className="text-neutral-500 text-sm font-body">
-            {channelData?.members?.length} Participants{" "}
-            <Link
-              to={`/a/${workspaceId}/ch/${channelId}`}
-              className="text-cyan-600"
-            >
-              #{channelData?.name}
-            </Link>
-          </p>
-        </div>
-        <div className="flex items-start ">
-          <div className="mr-4">
-            <Avatar src="https://picsum.photos/100" />
+      <div className="max-w-4xl ml-auto mr-auto">
+        <div className=" pb-10 relative">
+          <div className="mb-8">
+            <h1 className="font-bold text-3xl">{threadData?.name}</h1>
+            <p className="text-neutral-500 text-sm font-body">
+              {channelData?.members?.length} Participants{" "}
+              <Link
+                to={`/a/${workspaceId}/ch/${channelId}`}
+                className="text-cyan-600"
+              >
+                #{channelData?.name}
+              </Link>
+            </p>
           </div>
-          <div className="flex-grow">
-            <Editor
-              value={threadData?.content}
-              readOnly
-              className="markdown-overrides w-[70vw] md:w-full"
-            />
+          <div className="flex items-start">
+            <div className="mr-4">
+              <Avatar src="https://picsum.photos/100" />
+            </div>
+            <div className="flex-grow">
+              <Editor
+                value={threadData?.content}
+                readOnly
+                className="markdown-overrides w-[70vw] sm:w-full"
+              />
+            </div>
           </div>
+          <div className="border-t-2 border-gray-200 mb-8 mt-8" />
+          <div className="mb-10 ">
+            {thread.commentLoading ? (
+              <LoadingSkeleton />
+            ) : (
+              <CommentList dataSource={threadData.comments} />
+            )}
+          </div>
+          <CommentForm
+            isShowEditor={isShowEditor}
+            setIsShowEditor={setIsShowEditor}
+            threadId={threadId}
+            scrollToBottom={scrollToBottom}
+          />
         </div>
-        <div className="border-t-2 border-gray-200 mb-8 mt-8" />
-        <div className="mb-10 ">
-          {thread.commentLoading ? (
-            <LoadingSkeleton />
-          ) : (
-            <CommentList dataSource={threadData.comments} />
-          )}
-        </div>
-
-        <CommentForm
-          isShowEditor={isShowEditor}
-          setIsShowEditor={setIsShowEditor}
-          threadId={threadId}
-          scrollToBottom={scrollToBottom}
-        />
       </div>
     </MainContentContainer>
   );
