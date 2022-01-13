@@ -3,6 +3,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
+import axios from "axios";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 
@@ -23,6 +24,8 @@ const initialValues: Thread = {
 };
 
 moment.locale("id");
+
+const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
 
 function Compose() {
   const params = useParams();
@@ -93,6 +96,18 @@ function Compose() {
         channel: params.channelId,
         workspace: params.workspaceId,
       });
+
+      const filteredMemberWithoutOwner = channelData.members.filter(
+        (item) => item !== auth.user.id
+      );
+
+      if (filteredMemberWithoutOwner.length > 0) {
+        await axios.post(NOTIFICATION_API, {
+          title: `New Thread - ${channelData?.name}`,
+          description: values.name,
+          externalUserIds: filteredMemberWithoutOwner,
+        });
+      }
 
       deleteDraft();
 
