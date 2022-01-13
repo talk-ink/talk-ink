@@ -1,6 +1,10 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-import { BiDotsHorizontalRounded } from "react-icons/bi";
+import {
+  BiCheck,
+  BiCheckCircle,
+  BiDotsHorizontalRounded,
+} from "react-icons/bi";
 
 import Badge from "components/Badge/Badge";
 import InboxEmpty from "components/EmptyContent/InboxEmpty";
@@ -14,8 +18,16 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchInbox } from "features/inbox";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
+import Popup from "components/Popup/Popup";
+import Menu from "components/Menu/Menu";
+import MenuItem from "components/Menu/MenuItem";
+import { useToast } from "hooks/useToast";
+import { updateUser } from "features/auth";
+import { kontenbase } from "lib/client";
 
 function InboxPage() {
+  const [showToast] = useToast();
+
   const { pathname } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
@@ -37,6 +49,39 @@ function InboxPage() {
       return !auth.user.doneThreads.includes(data._id);
     });
   }, [thread.threads, auth.user, params]);
+
+  const readAllHandler = async () => {
+    try {
+      let userReaded: string[] = [];
+      if (auth.user?.readedThreads) {
+        userReaded = auth.user.readedThreads;
+      }
+      const threadIds = threadData.map((thread) => thread._id);
+      const uniqueId = new Set([...threadIds, ...userReaded]);
+
+      await kontenbase.auth.update({ readedThreads: [...uniqueId] });
+      dispatch(updateUser({ readedThreads: [...uniqueId] }));
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error.message)}` });
+    }
+  };
+  const doneAllHandler = async () => {
+    try {
+      let userDoneThreads: string[] = [];
+      if (auth.user?.doneThreads) {
+        userDoneThreads = auth.user.readedThreads;
+      }
+      const threadIds = threadData.map((thread) => thread._id);
+      const uniqueId = new Set([...threadIds, ...userDoneThreads]);
+
+      await kontenbase.auth.update({ doneThreads: [...uniqueId] });
+      dispatch(updateUser({ doneThreads: [...uniqueId] }));
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error.message)}` });
+    }
+  };
 
   useEffect(() => {
     dispatch(
@@ -84,9 +129,36 @@ function InboxPage() {
             />
           </nav>
           {threadData.length > 0 && (
-            <IconButton>
-              <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
-            </IconButton>
+            <Popup
+              content={
+                <div>
+                  <Menu>
+                    <MenuItem
+                      icon={
+                        <BiCheckCircle size={20} className="text-neutral-400" />
+                      }
+                      onClick={doneAllHandler}
+                      title="Mark all done"
+                      disabled={isDoneThread}
+                    />
+                    <MenuItem
+                      icon={<BiCheck size={20} className="text-neutral-400" />}
+                      onClick={readAllHandler}
+                      title="Mark all read"
+                      disabled={isDoneThread}
+                    />
+                  </Menu>
+                </div>
+              }
+              position="left"
+            >
+              <IconButton>
+                <BiDotsHorizontalRounded
+                  size={24}
+                  className="text-neutral-400"
+                />
+              </IconButton>
+            </Popup>
           )}
         </div>
       </header>
