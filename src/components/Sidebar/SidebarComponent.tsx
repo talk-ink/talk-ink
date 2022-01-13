@@ -227,7 +227,7 @@ function SidebarComponent({
                 link={`/a/${workspaceData?._id}/inbox`}
                 setIsSidebarOpen={setIsSidebarOpen}
               />
-              <SidebarList
+              {/* <SidebarList
                 type="saved"
                 name="Saved"
                 link={`/a/${workspaceData?._id}/saved`}
@@ -238,7 +238,7 @@ function SidebarComponent({
                 name="Messages"
                 link={`/a/${workspaceData?._id}/messages`}
                 setIsSidebarOpen={setIsSidebarOpen}
-              />
+              /> */}
             </ul>
             <ChannelButton setCreateChannelModal={setCreateChannelModal} />
             <div className="relative z-0">

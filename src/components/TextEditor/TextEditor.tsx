@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { FormikProps } from "formik";
-import ReactMarkdown from "react-markdown";
 import Button from "components/Button/Button";
 import { Thread } from "types";
 import { useNavigate, useParams } from "react-router";
+import Editor from "rich-markdown-editor";
+
+import { kontenbase } from "lib/client";
 
 type Props = React.PropsWithChildren<{
   formik: FormikProps<Thread>;
@@ -12,17 +14,29 @@ type Props = React.PropsWithChildren<{
   deleteDraft: () => void;
 }>;
 
+type PropsDelay = React.PropsWithChildren<{
+  waitBeforeShow?: number;
+}>;
+
+const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
+  const [isShown, setIsShown] = useState(false);
+
+  useEffect(() => {
+    setTimeout(() => {
+      setIsShown(true);
+    }, waitBeforeShow);
+  }, [waitBeforeShow]);
+
+  return isShown ? children : null;
+};
+
 function TextEditor({ formik, loading, deleteDraft }: Props) {
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
 
-  const isDisabled =
-    !formik.values.name ||
-    !formik.values.content ||
-    !!formik.errors.name ||
-    !!formik.errors.content ||
-    loading;
+
+  const isDisabled = !formik.values.name || !formik.values.content || loading;
 
   return (
     <div className="flex flex-col h-full ">
@@ -35,23 +49,34 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
           onBlur={formik.handleBlur("name")}
           value={formik.values.name}
         />
-        <div className={`h-full ${preview && "overflow-auto"}`}>
-          <textarea
-            className={`resize-none w-full h-full outline-none text-sm ${
-              preview && "hidden"
-            }`}
-            placeholder="Thread description here..."
-            onChange={formik.handleChange("content")}
-            onBlur={formik.handleBlur("content")}
-            value={formik.values.content}
-          />
 
-          {preview && (
-            <ReactMarkdown className="w-full prose">
-              {formik.values.content}
-            </ReactMarkdown>
-          )}
-        </div>
+        {!preview && (
+          //@ts-ignore
+          <Delayed>
+            <Editor
+              key="editor"
+              onChange={(getContent) =>
+                formik.setFieldValue("content", getContent())
+              }
+              onBlur={() => formik.handleBlur("content")}
+              defaultValue={formik.values.content}
+              uploadImage={async (file: File) => {
+                const { data } = await kontenbase.storage.upload(file);
+                return data.url;
+              }}
+              className="markdown-overrides"
+            />
+          </Delayed>
+        )}
+
+        {preview && (
+          <Editor
+            key="preview"
+            value={formik.values.content}
+            readOnly
+            className="markdown-overrides"
+          />
+        )}
       </div>
       <div className="w-full flex justify-between items-center">
         <div></div>
