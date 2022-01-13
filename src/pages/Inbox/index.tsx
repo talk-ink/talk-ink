@@ -5,26 +5,23 @@ import {
   BiCheckCircle,
   BiDotsHorizontalRounded,
 } from "react-icons/bi";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 
 import Badge from "components/Badge/Badge";
-import InboxEmpty from "components/EmptyContent/InboxEmpty";
 import IconButton from "components/Button/IconButton";
-import ContentItem from "components/ContentItem/ContentItem";
-import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-import { Thread } from "types";
-import { useAppSelector } from "hooks/useAppSelector";
-import { useAppDispatch } from "hooks/useAppDispatch";
-import { fetchInbox } from "features/inbox";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
-import { fetchThreads } from "features/threads/slice/asyncThunk";
 import Popup from "components/Popup/Popup";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
-import { useToast } from "hooks/useToast";
-import { updateUser } from "features/auth";
-import { kontenbase } from "lib/client";
 import Modal from "components/Modal/Modal";
+
+import { useAppSelector } from "hooks/useAppSelector";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { useToast } from "hooks/useToast";
+
+import { kontenbase } from "lib/client";
+import { updateUser } from "features/auth";
+import { fetchThreads } from "features/threads/slice/asyncThunk";
 import { addThread, deleteThread } from "features/threads";
 
 type SubscriptionKey = {
@@ -41,6 +38,7 @@ function InboxPage() {
 
   const auth = useAppSelector((state) => state.auth);
   const thread = useAppSelector((state) => state.thread);
+  const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
   const [inboxModal, setInboxModal] = useState<
@@ -53,13 +51,21 @@ function InboxPage() {
     return pathname.includes("inbox/done");
   }, [pathname]);
 
-  const threadData = useMemo(() => {
-    return thread.threads.filter((data) => {
-      if (!auth.user.doneThreads) return true;
-      if (isDoneThread) return auth.user.doneThreads.includes(data._id);
-      return !auth.user.doneThreads.includes(data._id);
-    });
-  }, [thread.threads, auth.user, params]);
+  const channelData: string[] = useMemo(
+    () => channel.channels.map((data) => data._id),
+    [channel.channels]
+  );
+
+  const threadData = useMemo(
+    () =>
+      thread.threads.filter((data) => {
+        if (!channelData.includes(data.channel[0])) return false;
+        if (!auth.user.doneThreads) return true;
+        if (isDoneThread) return auth.user.doneThreads.includes(data._id);
+        return !auth.user.doneThreads.includes(data._id);
+      }),
+    [thread.threads, auth.user, params, channelData]
+  );
 
   const readAllHandler = async () => {
     try {
@@ -127,7 +133,16 @@ function InboxPage() {
           params.workspaceId
         );
 
-        if (isCurrentWorkspace && payload?.createdBy !== auth.user.id) {
+        const isNotCreatedByThisUser = payload?.createdBy !== auth.user.id;
+        const isThreadInJoinedChannel = channelData.includes(
+          payload?.channel[0]
+        );
+
+        if (
+          isCurrentWorkspace &&
+          isThreadInJoinedChannel &&
+          isNotCreatedByThisUser
+        ) {
           dispatch(addThread(payload));
         }
       })
@@ -140,14 +155,24 @@ function InboxPage() {
           params.workspaceId
         );
 
-        if (isCurrentWorkspace && payload?.createdBy !== auth.user.id) {
+        const isNotCreatedByThisUser = payload?.createdBy !== auth.user.id;
+        const isThreadInJoinedChannel = channelData.includes(
+          payload?.channel[0]
+        );
+
+        if (
+          isCurrentWorkspace &&
+          isThreadInJoinedChannel &&
+          isNotCreatedByThisUser
+        ) {
           dispatch(deleteThread(payload));
         }
       })
-      .then((result) => (key.create = result));
+      .then((result) => (key.delete = result));
 
     return () => {
       kontenbase.realtime.unsubscribe(key.create);
+      kontenbase.realtime.unsubscribe(key.delete);
     };
   }, []);
 
