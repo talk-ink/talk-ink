@@ -25,6 +25,12 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import Modal from "components/Modal/Modal";
+import { addThread } from "features/threads";
+
+type SubscriptionKey = {
+  update: string | undefined | null;
+  create: string | undefined | null;
+};
 
 function InboxPage() {
   const [showToast] = useToast();
@@ -106,6 +112,33 @@ function InboxPage() {
       fetchThreads({ type: "inbox", workspaceId: params.workspaceId, userId })
     );
   }, [params.workspaceId]);
+
+  useEffect(() => {
+    let key: SubscriptionKey = {
+      update: undefined,
+      create: undefined,
+    };
+
+    kontenbase.realtime
+      .subscribe("Threads", { event: "CREATE_RECORD" }, (message) => {
+        const { payload } = message;
+
+        const isCurrentWorkspace = payload?.workspace?.includes(
+          params.workspaceId
+        );
+
+        console.log(payload);
+
+        if (isCurrentWorkspace && payload?.createdBy !== auth.user.id) {
+          dispatch(addThread(payload));
+        }
+      })
+      .then((result) => (key.create = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key.create);
+    };
+  }, []);
 
   const loading = thread.loading;
 
