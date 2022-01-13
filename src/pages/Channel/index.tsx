@@ -271,7 +271,8 @@ function ChannelPage() {
                   setSelectedThread={setSelectedThread}
                   isRead={
                     readedThreads.includes(thread._id) ||
-                    thread.createdBy?._id === auth.user.id
+                    (readedThreads.includes(thread._id) &&
+                      thread.createdBy?._id === auth.user.id)
                   }
                 />
               ))}

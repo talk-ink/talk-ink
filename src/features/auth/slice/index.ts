@@ -72,6 +72,24 @@ const authSlice = createSlice({
       );
       state.user.doneThreads.splice(deletedIndex, 1);
     },
+    addReadThread: (state, action: PayloadAction<string>) => {
+      let readedThreads = [];
+      if (!state.user.readedThreads) {
+        readedThreads.push(action.payload);
+      } else {
+        readedThreads = [...state.user.readedThreads, action.payload];
+      }
+      state.user = {
+        ...state.user,
+        readedThreads,
+      };
+    },
+    deleteReadThread: (state, action: PayloadAction<string>) => {
+      let deletedIndex = state.user.readedThreads.findIndex(
+        (data) => data === action.payload
+      );
+      state.user.readedThreads.splice(deletedIndex, 1);
+    },
   },
 });
 
@@ -84,5 +102,7 @@ export const {
   updateUser,
   addDoneThread,
   deleteDoneThread,
+  addReadThread,
+  deleteReadThread,
 } = authSlice.actions;
 export const authReducer = authSlice.reducer;

@@ -1,6 +1,12 @@
 import React, { Dispatch, SetStateAction } from "react";
 
-import { BiDotsHorizontalRounded, BiEdit, BiTrash } from "react-icons/bi";
+import {
+  BiCheck,
+  BiCircle,
+  BiDotsHorizontalRounded,
+  BiEdit,
+  BiTrash,
+} from "react-icons/bi";
 import ReactMoment from "react-moment";
 
 import IconButton from "components/Button/IconButton";
@@ -10,6 +16,11 @@ import MenuItem from "components/Menu/MenuItem";
 import Menu from "components/Menu/Menu";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
+import Divider from "components/Divider/Divider";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { addReadThread, deleteReadThread } from "features/auth";
+import { kontenbase } from "lib/client";
+import { useAppSelector } from "hooks/useAppSelector";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -26,6 +37,33 @@ function ContentItem({
   otherButton,
   isRead,
 }: Props) {
+  const dispatch = useAppDispatch();
+  const auth = useAppSelector((state) => state.auth);
+
+  const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
+    try {
+      console.log(type);
+      switch (type) {
+        case "read":
+          await kontenbase
+            .service("Users")
+            .link(auth.user.id, { readedThreads: dataSource._id });
+          dispatch(addReadThread(dataSource._id));
+          break;
+        case "unread":
+          await kontenbase
+            .service("Users")
+            .unlink(auth.user.id, { readedThreads: dataSource._id });
+          dispatch(deleteReadThread(dataSource._id));
+          break;
+
+        default:
+          break;
+      }
+    } catch (error: any) {
+      console.log("err", error);
+    }
+  };
   return (
     <div
       className="
@@ -63,7 +101,7 @@ function ContentItem({
               <p
                 className={`font-body text-sm mr-2 ${
                   dataSource?.draft && "text-blue-500"
-                }`}
+                } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >
                 {dataSource?.draft ? "Draft" : dataSource.name}
               </p>
@@ -91,6 +129,25 @@ function ContentItem({
             content={
               <div>
                 <Menu>
+                  {isRead && (
+                    <MenuItem
+                      icon={<BiCircle size={20} className="text-neutral-400" />}
+                      title="Mark unread"
+                      onClick={() => {
+                        handleReadUnread({ type: "unread" });
+                      }}
+                    />
+                  )}
+                  {!isRead && (
+                    <MenuItem
+                      icon={<BiCheck size={20} className="text-neutral-400" />}
+                      title="Mark read"
+                      onClick={() => {
+                        handleReadUnread({ type: "read" });
+                      }}
+                    />
+                  )}
+                  <Divider />
                   <MenuItem
                     icon={<BiTrash size={20} className="text-neutral-400" />}
                     title="Delete thread..."
