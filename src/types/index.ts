@@ -26,7 +26,7 @@ export interface Thread {
   createdAt?: Date;
   updatedAt?: Date;
   draft?: boolean;
-  createdBy?: User;
+  createdBy?: Member;
   workspace?: string;
 }
 export interface Channel {
@@ -75,6 +75,7 @@ export interface User {
   about?: string;
   contact?: string;
   doneThreads?: string[];
+  readedThreads?: string[];
 }
 
 export interface Login {

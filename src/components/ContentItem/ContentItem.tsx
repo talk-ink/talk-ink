@@ -16,6 +16,7 @@ type Props = React.PropsWithChildren<{
   dataSource: Thread | null | undefined;
   setSelectedThread?: Dispatch<SetStateAction<Thread | null | undefined>>;
   otherButton?: React.ReactNode;
+  isRead?: boolean;
 }>;
 
 function ContentItem({
@@ -23,6 +24,7 @@ function ContentItem({
   dataSource,
   setSelectedThread,
   otherButton,
+  isRead,
 }: Props) {
   return (
     <div
@@ -45,14 +47,12 @@ function ContentItem({
           className="flex items-start md:items-center w-full py-5 "
           onClick={onClick}
         >
-          {/* <div className="h-8 w-8 rounded-full overflow-hidden mr-4">
-            <img
-              src="https://picsum.photos/100"
-              className="h-full w-full"
-              alt="img"
-            />
-          </div> */}
-          <div>
+          <div className="flex items-center">
+            <div
+              className={`h-3 w-3 ${
+                !isRead ? "bg-cyan-600" : "bg-transparent"
+              } rounded-full mr-2`}
+            ></div>
             <NameInitial
               name={getNameInitial(dataSource.createdBy?.firstName)}
               className="mr-4"

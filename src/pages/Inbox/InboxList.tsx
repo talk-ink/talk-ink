@@ -16,6 +16,7 @@ import Modal from "components/Modal/Modal";
 import { kontenbase } from "lib/client";
 import { deleteInbox } from "features/inbox";
 import { deleteThread } from "features/threads";
+import { Thread } from "types";
 
 type TProps = {
   type?: "active" | "done";
@@ -40,7 +41,7 @@ function InboxList({ type = "active" }: TProps) {
     return type === "done";
   }, [type]);
 
-  const threadData = useMemo(() => {
+  const threadData: Thread[] = useMemo(() => {
     return thread.threads.filter((data) => {
       if (!auth.user.doneThreads && isDoneThread) return false;
       if (!auth.user.doneThreads && !isDoneThread) return true;
@@ -48,6 +49,11 @@ function InboxList({ type = "active" }: TProps) {
       return !auth.user.doneThreads.includes(data._id);
     });
   }, [thread.threads, auth.user, params]);
+
+  const readedThreads: string[] = useMemo(() => {
+    if (!auth.user.readedThreads) return [];
+    return auth.user.readedThreads;
+  }, [auth.user]);
 
   const markHandler = async (threadId: string) => {
     try {
@@ -120,6 +126,7 @@ function InboxList({ type = "active" }: TProps) {
                     </IconButton>
                   }
                   setSelectedThread={setSelectedThread}
+                  isRead={readedThreads.includes(inbox._id)}
                 />
               ))}
             </ul>

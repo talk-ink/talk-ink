@@ -98,6 +98,11 @@ function ChannelPage() {
     return thread.threads;
   }, [thread.threads]);
 
+  const readedThreads: string[] = useMemo(() => {
+    if (!auth.user.readedThreads) return [];
+    return auth.user.readedThreads;
+  }, [auth.user]);
+
   const deleteDraft = (id: string) => {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
     delete parsedThreadDraft[+id];
@@ -264,6 +269,10 @@ function ChannelPage() {
                     }
                   }}
                   setSelectedThread={setSelectedThread}
+                  isRead={
+                    readedThreads.includes(thread._id) ||
+                    thread.createdBy?._id === auth.user.id
+                  }
                 />
               ))}
             </>
