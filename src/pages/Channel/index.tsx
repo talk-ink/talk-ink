@@ -163,7 +163,7 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    dispatch(fetchThreads({ channelId: params.channelId }));
+    dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
     getMemberHandler();
   }, [params.channelId]);
 

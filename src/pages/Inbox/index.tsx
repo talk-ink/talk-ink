@@ -13,6 +13,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchInbox } from "features/inbox";
 import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { fetchThreads } from "features/threads/slice/asyncThunk";
 
 function InboxPage() {
   const { pathname } = useLocation();
@@ -20,7 +21,7 @@ function InboxPage() {
   const navigate = useNavigate();
 
   const auth = useAppSelector((state) => state.auth);
-  const inbox = useAppSelector((state) => state.inbox);
+  const thread = useAppSelector((state) => state.thread);
   const dispatch = useAppDispatch();
 
   const userId: string = auth.user.id;
@@ -29,19 +30,21 @@ function InboxPage() {
     return pathname.includes("inbox/done");
   }, [pathname]);
 
-  const inboxData = useMemo(() => {
-    return inbox.inbox.filter((data) => {
+  const threadData = useMemo(() => {
+    return thread.threads.filter((data) => {
       if (!auth.user.doneThreads) return true;
       if (isDoneThread) return auth.user.doneThreads.includes(data._id);
       return !auth.user.doneThreads.includes(data._id);
     });
-  }, [inbox.inbox, auth.user, params]);
+  }, [thread.threads, auth.user, params]);
 
   useEffect(() => {
-    dispatch(fetchInbox({ workspaceId: params.workspaceId, userId }));
+    dispatch(
+      fetchThreads({ type: "inbox", workspaceId: params.workspaceId, userId })
+    );
   }, [params.workspaceId]);
 
-  const loading = inbox.loading;
+  const loading = thread.loading;
 
   return (
     <MainContentContainer>
@@ -50,9 +53,9 @@ function InboxPage() {
           <h1 className="font-bold text-3xl">Inbox</h1>
           {!isDoneThread && (
             <>
-              {inboxData.length > 0 ? (
+              {threadData.length > 0 ? (
                 <p className="text-neutral-500 font-body">
-                  {inboxData.length} thread to Inbox Zero
+                  {threadData.length} thread to Inbox Zero
                 </p>
               ) : (
                 <p className="text-neutral-500 font-body">
