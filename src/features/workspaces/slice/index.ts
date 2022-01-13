@@ -15,6 +15,7 @@ export const fetchWorkspaces = createAsyncThunk(
 
     const remap = response.data.map((workspace) => {
       let logo = null;
+      let invitedEmails = [];
 
       if (workspace.logo) {
         logo =
@@ -23,9 +24,14 @@ export const fetchWorkspaces = createAsyncThunk(
             : null;
       }
 
+      if (workspace.invitedEmails) {
+        invitedEmails = JSON.parse(workspace.invitedEmails);
+      }
+
       return {
         ...workspace,
         logo,
+        invitedEmails,
       };
     });
 
