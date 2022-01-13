@@ -25,11 +25,11 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import Modal from "components/Modal/Modal";
-import { addThread } from "features/threads";
+import { addThread, deleteThread } from "features/threads";
 
 type SubscriptionKey = {
-  update: string | undefined | null;
   create: string | undefined | null;
+  delete: string | undefined | null;
 };
 
 function InboxPage() {
@@ -115,8 +115,8 @@ function InboxPage() {
 
   useEffect(() => {
     let key: SubscriptionKey = {
-      update: undefined,
       create: undefined,
+      delete: undefined,
     };
 
     kontenbase.realtime
@@ -127,10 +127,21 @@ function InboxPage() {
           params.workspaceId
         );
 
-        console.log(payload);
-
         if (isCurrentWorkspace && payload?.createdBy !== auth.user.id) {
           dispatch(addThread(payload));
+        }
+      })
+      .then((result) => (key.create = result));
+    kontenbase.realtime
+      .subscribe("Threads", { event: "DELETE_RECORD" }, (message) => {
+        const { payload } = message;
+
+        const isCurrentWorkspace = payload?.workspace?.includes(
+          params.workspaceId
+        );
+
+        if (isCurrentWorkspace && payload?.createdBy !== auth.user.id) {
+          dispatch(deleteThread(payload));
         }
       })
       .then((result) => (key.create = result));
