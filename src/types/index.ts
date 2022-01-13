@@ -21,7 +21,7 @@ export interface Thread {
   _id?: string;
   name: string;
   content: string;
-  channel?: Channel[];
+  channel?: string[];
   comments?: IComment[];
   createdAt?: Date;
   updatedAt?: Date;
