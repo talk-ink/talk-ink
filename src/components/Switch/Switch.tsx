@@ -9,7 +9,7 @@ function Switch({ value = false, onChange = () => {} }: TProps) {
   return (
     <div
       className={`w-12 h-6 ${
-        value ? "bg-cyan-500" : "bg-neutral-300"
+        value ? "bg-indigo-500" : "bg-neutral-300"
       } relative rounded-full cursor-pointer`}
       onClick={() => {
         onChange(!value);

@@ -22,9 +22,10 @@ import { useAppSelector } from "hooks/useAppSelector";
 
 interface IProps {
   comment: IComment;
+  listRef?: React.LegacyRef<HTMLDivElement>;
 }
 
-const Comment: React.FC<IProps> = ({ comment }) => {
+const Comment: React.FC<IProps> = ({ comment, listRef }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
@@ -55,7 +56,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
   };
 
   return (
-    <div className="group flex items-start mb-8 relative ">
+    <div className="group flex items-start mb-8 relative " ref={listRef}>
       <div className=" w-8">
         <Avatar src="https://picsum.photos/100" />
       </div>

@@ -20,7 +20,7 @@ const SidebarButton = ({
   return (
     <button
       className={`cursor-pointer w-full rounded ${
-        active === type && "bg-cyan-100"
+        active === type && "bg-indigo-100"
       } hover:bg-neutral-100 flex items-center justify-between group ${className} outline-none`}
       onClick={onClick}
     >

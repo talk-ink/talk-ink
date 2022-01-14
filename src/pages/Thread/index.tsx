@@ -109,7 +109,7 @@ function ThreadPage() {
         readedThreads = auth.user?.readedThreads;
       }
       if (!readedThreads.includes(threadId)) {
-        const update = await kontenbase
+        await kontenbase
           .service("Users")
           .link(auth.user.id, { readedThreads: threadId });
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
@@ -133,7 +133,9 @@ function ThreadPage() {
   }, [thread.threads, threadId]);
 
   const scrollToBottom = () => {
-    listRef.current.scrollIntoView({ behavior: "smooth" });
+    setTimeout(() => {
+      listRef.current.scrollIntoView({ behavior: "smooth" });
+    }, 500);
   };
 
   useEffect(() => {
@@ -153,9 +155,8 @@ function ThreadPage() {
           thread
         />
       }
-      listRef={listRef}
     >
-      <div className="max-w-4xl ml-auto mr-auto">
+      <div className="max-w-3xl ml-auto mr-auto">
         <div className=" pb-10 relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl">{threadData?.name}</h1>
@@ -163,7 +164,7 @@ function ThreadPage() {
               {channelData?.members?.length} Participants{" "}
               <Link
                 to={`/a/${workspaceId}/ch/${channelId}`}
-                className="text-cyan-600"
+                className="text-indigo-800"
               >
                 #{channelData?.name}
               </Link>
@@ -186,7 +187,7 @@ function ThreadPage() {
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
-              <CommentList dataSource={threadData.comments} />
+              <CommentList dataSource={threadData.comments} listRef={listRef} />
             )}
           </div>
           <CommentForm

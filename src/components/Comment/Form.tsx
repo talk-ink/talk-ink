@@ -5,6 +5,8 @@ import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
 import Editor from "rich-markdown-editor";
 import { kontenbase } from "lib/client";
+import Select from "react-select";
+import makeAnimated from "react-select/animated";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -21,6 +23,30 @@ interface IProps {
 }
 
 const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
+const animatedComponents = makeAnimated();
+
+const colourOptions = [
+  {
+    value: "all-1",
+    label: "Everyone who interacted",
+    color: "#00B8D9",
+    isFixed: true,
+  },
+  {
+    value: "all-2",
+    label: "Everyone in Channel",
+    color: "#0052CC",
+    isFixed: true,
+  },
+  { value: "purple", label: "Purple", color: "#5243AA" },
+  { value: "red", label: "Red", color: "#FF5630", isFixed: true },
+  { value: "orange", label: "Orange", color: "#FF8B00" },
+  { value: "yellow", label: "Yellow", color: "#FFC400" },
+  { value: "green", label: "Green", color: "#36B37E" },
+  { value: "forest", label: "Forest", color: "#00875A" },
+  { value: "slate", label: "Slate", color: "#253858" },
+  { value: "silver", label: "Silver", color: "#666666" },
+];
 
 const Form: React.FC<IProps> = ({
   isShowEditor,
@@ -78,7 +104,7 @@ const Form: React.FC<IProps> = ({
             <Avatar src={auth.user.avatar} />
           </div>
           <input
-            className="ml-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
+            className="ml-4  appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
             placeholder="Input Your Message"
             readOnly
@@ -90,7 +116,23 @@ const Form: React.FC<IProps> = ({
       )}
 
       {isShowEditor && (
-        <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-5	">
+        <div className="px-2 border-solid border-[1px] border-light-blue-500 rounded-xl mb-5	">
+          <div className="mt-1 flex w-fit items-center">
+            <div className="mr-2">
+              <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
+                Tag:
+              </div>
+            </div>
+            <Select
+              isClearable={false}
+              className="text-sm custom-select "
+              closeMenuOnSelect={false}
+              components={animatedComponents}
+              defaultValue={[colourOptions[0]]}
+              isMulti
+              options={colourOptions}
+            />
+          </div>
           <Editor
             key="editor"
             defaultValue={editorState}
@@ -110,14 +152,14 @@ const Form: React.FC<IProps> = ({
             <div className="flex items-center py-2">
               <Button
                 type="submit"
-                className="mr-3 text-sm flex items-center justify-center bg-cyan-100 min-w-[5rem] text-black"
+                className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
                 onClick={discardComment}
               >
                 Discard
               </Button>
               <Button
                 type="submit"
-                className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+                className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
                 onClick={handleCreateComment}
               >
                 Post

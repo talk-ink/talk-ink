@@ -147,7 +147,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
             </div>
             <div>
               <Button
-                className="text-sm text-white bg-cyan-600"
+                className="text-sm text-white bg-indigo-500"
                 onClick={() => {
                   setCurrentRoute((prev) => ({
                     ...prev,

@@ -85,11 +85,11 @@ function ContentItem({
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
         >
-          <div className="h-full w-1 absolute top-0 -left-3 rounded-l-xl group-hover:bg-cyan-700"></div>
+          <div className="h-full w-1 absolute top-0 -left-3 rounded-l-xl group-hover:bg-indigo-500"></div>
           <div className="flex items-center">
             <div
               className={`h-3 w-3 ${
-                !isRead ? "bg-cyan-600" : "bg-transparent"
+                !isRead ? "bg-indigo-500" : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
             <NameInitial

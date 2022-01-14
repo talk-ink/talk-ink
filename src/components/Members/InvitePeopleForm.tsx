@@ -145,7 +145,7 @@ function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
         </Button>
         <Button
           type="submit"
-          className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+          className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
           disabled={emailArr.length === 0 || apiLoading}
           onClick={sendInviteHandler}
         >

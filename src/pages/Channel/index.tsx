@@ -26,7 +26,7 @@ import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { Channel, Member, Thread, User } from "types";
+import { Channel, Member, Thread } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
@@ -212,7 +212,7 @@ function ChannelPage() {
             )}
           </div>
           <Button
-            className="bg-cyan-600 hover:bg-cyan-700 flex items-center"
+            className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
             onClick={() => {
               createThreadDraft();
             }}

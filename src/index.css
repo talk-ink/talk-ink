@@ -143,3 +143,12 @@
 .comment-editor {
   height: 17rem !important;
 }
+
+.custom-select > div {
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  margin-left: -5px !important;
+  min-width: 15rem;
+}

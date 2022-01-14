@@ -169,7 +169,7 @@ function RegisterPage() {
           <button
             type="submit"
             className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
-                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600
+                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-500
                             shadow-lg"
             disabled={isDisabled}
           >

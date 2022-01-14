@@ -30,7 +30,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
   }, [workspace.workspaces, params.workspaceId]);
 
   return (
-    <div className="bg-[#F7FAFB]">
+    <div className="bg-indigo-100">
       <header className="flex items-center p-3">
         <h2 className="text-lg font-bold -mb-1">Settings</h2>
       </header>

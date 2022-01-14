@@ -68,14 +68,14 @@ const Preview: React.FC<IProps> = ({
         <div className="flex items-center py-2">
           <Button
             type="submit"
-            className="mr-3 text-sm flex items-center justify-center bg-cyan-100 min-w-[5rem] text-black"
+            className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
             onClick={discardComment}
           >
             Cancel
           </Button>
           <Button
             type="submit"
-            className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+            className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
             onClick={handleUpdateComment}
             disabled={imageLoading}
           >
