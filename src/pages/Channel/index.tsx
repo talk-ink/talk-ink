@@ -193,23 +193,41 @@ function ChannelPage() {
               (member, idx) =>
                 idx <= 3 && (
                   <div key={idx}>
-                    {!member.avatar && (
-                      <NameInitial
-                        key={member._id}
-                        name={getNameInitial(member.firstName)}
-                        className="border-2 border-white -mr-2 bg-red-400"
-                      />
+                    {member._id === auth.user.id && (
+                      <>
+                        {!auth.user.avatar && (
+                          <NameInitial
+                            key={member._id}
+                            name={getNameInitial(auth.user.firstName)}
+                            className="border-2 border-white -mr-2 bg-red-400"
+                          />
+                        )}
+                        {auth.user.avatar && (
+                          <ProfileImage
+                            key={member._id}
+                            className="border-2 border-white -mr-2 bg-red-400"
+                            source={auth.user.avatar}
+                          />
+                        )}
+                      </>
                     )}
-                    {member.avatar && (
-                      <ProfileImage
-                        key={member._id}
-                        className="border-2 border-white -mr-2 bg-red-400"
-                        source={
-                          member._id === auth.user.id
-                            ? auth.user.avatar
-                            : member.avatar[0].url
-                        }
-                      />
+                    {member._id !== auth.user.id && (
+                      <>
+                        {!member.avatar && (
+                          <NameInitial
+                            key={member._id}
+                            name={getNameInitial(member.firstName)}
+                            className="border-2 border-white -mr-2 bg-red-400"
+                          />
+                        )}
+                        {member.avatar && (
+                          <ProfileImage
+                            key={member._id}
+                            className="border-2 border-white -mr-2 bg-red-400"
+                            source={member.avatar[0].url}
+                          />
+                        )}
+                      </>
                     )}
                   </div>
                 )
