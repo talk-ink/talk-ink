@@ -1,6 +1,8 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 
 import { convertToRaw, EditorState } from "draft-js";
+import axios from "axios";
+import draftToHtml from "draftjs-to-html";
 
 import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
@@ -8,24 +10,38 @@ import CommentEditor from "components/Editor/Editor";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
+import { Channel } from "types";
+import { useAppSelector } from "hooks/useAppSelector";
+import { useParams } from "react-router";
 
 interface IProps {
   isShowEditor: boolean;
   setIsShowEditor: React.Dispatch<React.SetStateAction<boolean>>;
   threadId: string;
+  threadName: string;
   scrollToBottom: () => void;
 }
+
+const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
 
 const Form: React.FC<IProps> = ({
   isShowEditor,
   setIsShowEditor,
   threadId,
+  threadName,
   scrollToBottom,
 }) => {
+  const params = useParams();
   const dispatch = useAppDispatch();
   const [editorState, setEditorState] = useState<EditorState>(
     EditorState.createEmpty()
   );
+  const auth = useAppSelector((state) => state.auth);
+  const channel = useAppSelector((state) => state.channel);
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === params.channelId);
+  }, [params.channelId, channel.channels]);
 
   const discardComment = () => {
     setIsShowEditor(false);
@@ -39,6 +55,21 @@ const Form: React.FC<IProps> = ({
         threadId,
       })
     );
+
+    const filteredMemberWithoutOwner = channelData.members.filter(
+      (item) => item !== auth.user.id
+    );
+
+    if (filteredMemberWithoutOwner.length > 0) {
+      axios.post(NOTIFICATION_API, {
+        title: `${auth?.user.firstName} comment on ${threadName}`,
+        description: draftToHtml(
+          convertToRaw(editorState.getCurrentContent())
+        ).replace(/(<([^>]+)>)/gi, ""),
+        externalUserIds: filteredMemberWithoutOwner,
+      });
+    }
+
     discardComment();
     setTimeout(() => {
       scrollToBottom();
@@ -50,7 +81,7 @@ const Form: React.FC<IProps> = ({
       {!isShowEditor && (
         <div className="flex items-center py-5 ">
           <div>
-            <Avatar src="https://picsum.photos/100" />
+            <Avatar src={auth.user.avatar} />
           </div>
           <input
             className="ml-4 shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"

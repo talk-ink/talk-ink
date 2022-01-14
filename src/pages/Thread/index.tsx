@@ -193,6 +193,7 @@ function ThreadPage() {
             isShowEditor={isShowEditor}
             setIsShowEditor={setIsShowEditor}
             threadId={threadId}
+            threadName={threadData.name}
             scrollToBottom={scrollToBottom}
           />
         </div>
