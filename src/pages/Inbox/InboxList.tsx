@@ -50,14 +50,14 @@ function InboxList({ type = "active" }: TProps) {
 
   const threadData = useMemo(
     () =>
-      thread.threads.filter((data) => {
+      thread.threads.filter((data) =>
         inboxFilter({
           thread: data,
           channelIds: channelData,
           userData: auth.user,
           isDoneThread,
-        });
-      }),
+        })
+      ),
     [thread.threads, auth.user, params, channelData]
   );
 
