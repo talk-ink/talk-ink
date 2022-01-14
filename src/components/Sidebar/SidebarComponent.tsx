@@ -210,7 +210,8 @@ function SidebarComponent({
                 onClick={() => setIsSidebarOpen(false)}
               />
             ) : (
-              <BiMoon size={18} className="text-neutral-400" />
+              // <BiMoon size={18} className="text-neutral-400" />
+              <></>
             )}
           </IconButton>
         </div>
