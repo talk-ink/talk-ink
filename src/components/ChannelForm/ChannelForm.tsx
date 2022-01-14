@@ -50,7 +50,9 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
   return (
     <form onSubmit={formik.handleSubmit}>
       <FormControl>
-        <FormLabel htmlFor="name">Name</FormLabel>
+        <FormLabel htmlFor="name" required>
+          Name
+        </FormLabel>
         <TextInput
           name="name"
           onChange={formik.handleChange("name")}
@@ -72,7 +74,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
         )}
       </FormControl>
       <FormControl>
-        <FormLabel>Privacy</FormLabel>
+        <FormLabel required>Privacy</FormLabel>
         <select
           value={formik.values.privacy}
           onChange={formik.handleChange("privacy")}
