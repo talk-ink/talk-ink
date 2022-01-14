@@ -204,7 +204,11 @@ function ChannelPage() {
                       <ProfileImage
                         key={member._id}
                         className="border-2 border-white -mr-2 bg-red-400"
-                        source={member.avatar[0].url}
+                        source={
+                          member._id === auth.user.id
+                            ? auth.user.avatar
+                            : member.avatar[0].url
+                        }
                       />
                     )}
                   </div>
