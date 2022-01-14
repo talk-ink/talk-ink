@@ -17,6 +17,7 @@ import { kontenbase } from "lib/client";
 import { deleteInbox } from "features/inbox";
 import { deleteThread } from "features/threads";
 import { Thread } from "types";
+import { inboxFilter } from "utils/helper";
 
 type TProps = {
   type?: "active" | "done";
@@ -50,10 +51,12 @@ function InboxList({ type = "active" }: TProps) {
   const threadData = useMemo(
     () =>
       thread.threads.filter((data) => {
-        if (!channelData.includes(data.channel[0])) return false;
-        if (!auth.user.doneThreads) return true;
-        if (isDoneThread) return auth.user.doneThreads.includes(data._id);
-        return !auth.user.doneThreads.includes(data._id);
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        });
       }),
     [thread.threads, auth.user, params, channelData]
   );

@@ -1,4 +1,4 @@
-import { SendEmail } from "types";
+import { SendEmail, Thread, User } from "types";
 import axios, { AxiosResponse } from "axios";
 import FileResizer from "react-image-file-resizer";
 
@@ -212,4 +212,23 @@ export const beforeUploadImage = ({
     error: false,
     message: "",
   };
+};
+
+export const inboxFilter = ({
+  thread,
+  channelIds,
+  userData,
+  isDoneThread,
+}: {
+  thread: Thread;
+  channelIds: string[];
+  userData: User;
+  isDoneThread: boolean;
+}) => {
+  if (thread.draft) return false;
+  if (!channelIds.includes(thread.channel[0])) return false;
+
+  if (!userData.doneThreads) return true;
+  if (isDoneThread) return userData.doneThreads.includes(thread._id);
+  return !userData.doneThreads.includes(thread._id);
 };
