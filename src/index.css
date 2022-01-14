@@ -130,9 +130,16 @@
 .markdown-overrides > div {
   height: inherit !important;
   overflow: auto;
+}
+
+.fix-editor {
   padding-right: 0.5em;
 }
 
 .onesignal-bell-launcher-button {
   display: none !important;
+}
+
+.comment-editor {
+  height: 17rem !important;
 }

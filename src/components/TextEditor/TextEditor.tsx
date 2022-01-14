@@ -27,14 +27,13 @@ const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
     }, waitBeforeShow);
   }, [waitBeforeShow]);
 
-  return isShown ? children : null;
+  return isShown ? <>{children}</> : null;
 };
 
 function TextEditor({ formik, loading, deleteDraft }: Props) {
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
-
 
   const isDisabled = !formik.values.name || !formik.values.content || loading;
 
@@ -51,9 +50,9 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
         />
 
         {!preview && (
-          //@ts-ignore
           <Delayed>
             <Editor
+              autoFocus
               key="editor"
               onChange={(getContent) =>
                 formik.setFieldValue("content", getContent())
@@ -64,7 +63,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
                 const { data } = await kontenbase.storage.upload(file);
                 return data.url;
               }}
-              className="markdown-overrides"
+              className="markdown-overrides fix-editor"
             />
           </Delayed>
         )}

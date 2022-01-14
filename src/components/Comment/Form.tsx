@@ -1,12 +1,10 @@
 import React, { useState, useMemo } from "react";
 
-import { convertToRaw, EditorState } from "draft-js";
 import axios from "axios";
-import draftToHtml from "draftjs-to-html";
-
 import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
-import CommentEditor from "components/Editor/Editor";
+import Editor from "rich-markdown-editor";
+import { kontenbase } from "lib/client";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -33,9 +31,7 @@ const Form: React.FC<IProps> = ({
 }) => {
   const params = useParams();
   const dispatch = useAppDispatch();
-  const [editorState, setEditorState] = useState<EditorState>(
-    EditorState.createEmpty()
-  );
+  const [editorState, setEditorState] = useState<string>("");
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
 
@@ -45,13 +41,13 @@ const Form: React.FC<IProps> = ({
 
   const discardComment = () => {
     setIsShowEditor(false);
-    setEditorState(EditorState.createEmpty());
+    setEditorState("");
   };
 
   const handleCreateComment = () => {
     dispatch(
       createComment({
-        content: JSON.stringify(convertToRaw(editorState.getCurrentContent())),
+        content: editorState,
         threadId,
       })
     );
@@ -63,9 +59,7 @@ const Form: React.FC<IProps> = ({
     if (filteredMemberWithoutOwner.length > 0) {
       axios.post(NOTIFICATION_API, {
         title: `${auth?.user.firstName} comment on ${threadName}`,
-        description: draftToHtml(
-          convertToRaw(editorState.getCurrentContent())
-        ).replace(/(<([^>]+)>)/gi, ""),
+        description: editorState.replace(/(<([^>]+)>)/gi, ""),
         externalUserIds: filteredMemberWithoutOwner,
       });
     }
@@ -97,10 +91,20 @@ const Form: React.FC<IProps> = ({
 
       {isShowEditor && (
         <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-5	">
-          <CommentEditor
-            editorState={editorState}
-            setEditorState={setEditorState}
+          <Editor
+            key="editor"
+            defaultValue={editorState}
+            onChange={(getContent: () => string) =>
+              setEditorState(getContent())
+            }
+            autoFocus
+            uploadImage={async (file: File) => {
+              const { data } = await kontenbase.storage.upload(file);
+              return data.url;
+            }}
+            className="markdown-overrides comment-editor"
           />
+
           <div className="flex justify-between">
             icon
             <div className="flex items-center py-2">

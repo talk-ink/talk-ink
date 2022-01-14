@@ -30,7 +30,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
   const auth = useAppSelector((state) => state.auth);
 
   const [isEdit, setIsEdit] = useState(false);
-  const [editorState, setEditorState] = useState<any>();
+  const [editorState, setEditorState] = useState<string>("");
 
   const handleDeleteComment = () => {
     dispatch(deleteComment({ commentId: comment._id }));
@@ -41,7 +41,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
     dispatch(
       updateComment({
         commentId: comment._id,
-        content: JSON.stringify(convertToRaw(editorState.getCurrentContent())),
+        content: editorState,
       })
     );
 
@@ -51,7 +51,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
 
   const discardComment = () => {
     setIsEdit(false);
-    setEditorState(EditorState.createEmpty());
+    setEditorState("");
   };
 
   return (
@@ -74,13 +74,12 @@ const Comment: React.FC<IProps> = ({ comment }) => {
           <Preview
             content={comment.content}
             isEdit={isEdit}
-            editorState={editorState}
             setEditorState={setEditorState}
             discardComment={discardComment}
             handleUpdateComment={handleUpdateComment}
           />
         </div>
-        {auth.user.id === comment.createdBy?._id && (
+        {auth.user.id === comment.createdBy?._id && !isEdit && (
           <div className="absolute top-0 right-0 z-50 hidden group-hover:block  ">
             <Popup
               content={
@@ -89,11 +88,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
                     icon={<BiEditAlt size={20} className="text-neutral-400" />}
                     onClick={() => {
                       setIsEdit(true);
-                      setEditorState(
-                        EditorState.createWithContent(
-                          convertFromRaw(JSON.parse(comment.content))
-                        )
-                      );
+                      setEditorState(comment.content);
                     }}
                     title="Edit Comment"
                   />
