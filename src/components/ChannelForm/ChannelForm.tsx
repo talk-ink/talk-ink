@@ -41,7 +41,6 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
 
   const isDisabled: boolean =
     !formik.values.name ||
-    !formik.values.description ||
     !formik.values.privacy ||
     !!formik.errors.name ||
     !!formik.errors.description ||
