@@ -236,14 +236,6 @@ export const inboxFilter = ({
 export const isDevelopmet =
   !process.env.NODE_ENV || process.env.NODE_ENV === "development";
 
-export const frontendUrl = isDevelopmet
-  ? process.env.REACT_APP_FRONTEND_URL
-  : process.env.REACT_APP_FRONTEND_URL_PROD;
-
-export const notificationUrl = isDevelopmet
-  ? process.env.REACT_APP_NOTIFICATION_API
-  : process.env.REACT_APP_NOTIFICATION_API_PROD;
-
-export const oneSignalId = isDevelopmet
-  ? process.env.REACT_APP_ONE_SIGNAL_ID
-  : process.env.REACT_APP_ONE_SIGNAL_ID_PROD;
+export const frontendUrl = process.env.REACT_APP_FRONTEND_URL;
+export const notificationUrl = process.env.REACT_APP_NOTIFICATION_API;
+export const oneSignalId = process.env.REACT_APP_ONE_SIGNAL_ID;
