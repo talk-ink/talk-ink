@@ -95,6 +95,7 @@ function Compose() {
         content: values.content,
         channel: params.channelId,
         workspace: params.workspaceId,
+        interactedUsers: [auth.user.id],
       });
 
       const filteredMemberWithoutOwner = channelData.members.filter(
@@ -102,7 +103,7 @@ function Compose() {
       );
 
       if (filteredMemberWithoutOwner.length > 0) {
-        await axios.post(NOTIFICATION_API, {
+        axios.post(NOTIFICATION_API, {
           title: `New Thread - ${channelData?.name}`,
           description: values.name,
           externalUserIds: filteredMemberWithoutOwner,

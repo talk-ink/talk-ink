@@ -5,12 +5,12 @@ import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
 import Editor from "rich-markdown-editor";
 import { kontenbase } from "lib/client";
-import Select from "react-select";
+import Select, { OnChangeValue } from "react-select";
 import makeAnimated from "react-select/animated";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Channel } from "types";
+import { Channel, Member } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
 
@@ -21,6 +21,15 @@ interface IProps {
   threadName: string;
   scrollToBottom: () => void;
   interactedUsersCount: number;
+  memberList: Member[];
+}
+
+interface INotifiedOption {
+  value: string;
+  label: string;
+  color?: string;
+  isFixed?: boolean;
+  flag: number;
 }
 
 const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
@@ -33,35 +42,42 @@ const Form: React.FC<IProps> = ({
   threadName,
   scrollToBottom,
   interactedUsersCount,
+  memberList,
 }) => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const [editorState, setEditorState] = useState<string>("");
+  const [notifiedOptions, setNotifiedOptions] = useState<INotifiedOption[]>();
+  const [selectedNotifiedOptions, setSelectedNotifiedOptions] = useState<
+    INotifiedOption[]
+  >([]);
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
 
-  const colourOptions = [
-    {
-      value: "all-1",
-      label: `Everyone who interacted (${interactedUsersCount || 1})`,
-      color: "#00B8D9",
-      isFixed: true,
-    },
-    {
-      value: "all-2",
-      label: "Everyone in Channel",
-      color: "#0052CC",
-      isFixed: true,
-    },
-    { value: "purple", label: "Purple", color: "#5243AA" },
-    { value: "red", label: "Red", color: "#FF5630", isFixed: true },
-    { value: "orange", label: "Orange", color: "#FF8B00" },
-    { value: "yellow", label: "Yellow", color: "#FFC400" },
-    { value: "green", label: "Green", color: "#36B37E" },
-    { value: "forest", label: "Forest", color: "#00875A" },
-    { value: "slate", label: "Slate", color: "#253858" },
-    { value: "silver", label: "Silver", color: "#666666" },
-  ];
+  useEffect(() => {
+    const options: INotifiedOption[] = [
+      {
+        value: "INTERACTEDUSERS",
+        label: `Everyone who interacted (${interactedUsersCount || 1})`,
+        flag: 1,
+      },
+      {
+        value: "ALLUSERSINCHANNEL",
+        label: `Everyone in Channel (${memberList.length || 1})`,
+        flag: 2,
+      },
+      ...memberList
+        .map((item) => ({
+          value: item._id,
+          label: item.firstName,
+          flag: 3,
+        }))
+        .filter((item) => item.value !== auth.user.id),
+    ];
+
+    setNotifiedOptions(options);
+    setSelectedNotifiedOptions([options[0]]);
+  }, [interactedUsersCount, memberList, auth]);
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === params.channelId);
@@ -126,13 +142,37 @@ const Form: React.FC<IProps> = ({
               </div>
             </div>
             <Select
+              value={selectedNotifiedOptions}
+              onChange={(e: any) => {
+                const isInteractedUsersSelected =
+                  !!selectedNotifiedOptions.find(
+                    (item) => item.value === "INTERACTEDUSERS"
+                  );
+                const isAllChannelSelected = !!selectedNotifiedOptions.find(
+                  (item) => item.value === "ALLUSERSINCHANNEL"
+                );
+
+                const currSelectedOptions = e.filter((item: any) => {
+                  if (isAllChannelSelected) {
+                    return item.flag === 1;
+                  }
+
+                  if (isInteractedUsersSelected) {
+                    return item.flag === 2;
+                  }
+
+                  return item;
+                });
+
+                setSelectedNotifiedOptions(currSelectedOptions);
+              }}
               isClearable={false}
               className="text-sm custom-select "
               closeMenuOnSelect={false}
               components={animatedComponents}
-              defaultValue={[colourOptions[0]]}
+              defaultValue={[notifiedOptions[0]]}
               isMulti
-              options={colourOptions}
+              options={notifiedOptions}
             />
           </div>
           <Editor

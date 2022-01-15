@@ -11,7 +11,7 @@ import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
-import { Channel, Thread } from "types";
+import { Channel, Thread, Member } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import {
   addComment,
@@ -30,6 +30,7 @@ function ThreadPage() {
   const [showToast] = useToast();
   const { threadId, workspaceId, channelId } = useParams();
   const listRef = useRef<HTMLDivElement>(null);
+  const [memberList, setMemberList] = useState<Member[]>([]);
 
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
@@ -152,24 +153,48 @@ function ThreadPage() {
   }, [channelId, channel.channels]);
 
   useEffect(() => {
-    if (!auth.user.id || threadData?.interactedUsers?.includes(auth.user.id))
-      return;
-
     const setInteractedUser = async () => {
-      await kontenbase.service("Threads").link(threadData._id, {
-        interactedUsers: auth.user.id,
-      });
+      try {
+        const { data } = await kontenbase.service("Threads").getById(threadId);
 
-      dispatch(
-        addInteractedUser({
-          threadId: threadData._id,
-          userId: auth.user.id,
-        })
-      );
+        if (!data.interactedUsers.find((item: any) => item === auth.user.id)) {
+          await kontenbase.service("Threads").link(threadId, {
+            interactedUsers: auth.user.id,
+          });
+
+          dispatch(
+            addInteractedUser({
+              threadId: threadId,
+              userId: auth.user.id,
+            })
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
     };
 
     setInteractedUser();
-  }, [dispatch, auth.user, threadData]);
+  }, []);
+
+  const getMemberHandler = async () => {
+    try {
+      const memberList = await kontenbase.service("Users").find({
+        where: { workspaces: workspaceId, channels: channelId },
+        lookup: ["avatar"],
+      });
+      if (memberList.data) {
+        setMemberList(memberList.data);
+      }
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error)}` });
+    }
+  };
+
+  useEffect(() => {
+    getMemberHandler();
+  }, []);
 
   return (
     <MainContentContainer
@@ -222,8 +247,11 @@ function ThreadPage() {
             setIsShowEditor={setIsShowEditor}
             threadId={threadId}
             threadName={threadData.name}
-            interactedUsersCount={threadData?.interactedUsers?.length}
+            interactedUsersCount={
+              [...new Set(threadData?.interactedUsers)]?.length
+            }
             scrollToBottom={scrollToBottom}
+            memberList={memberList}
           />
         </div>
       </div>

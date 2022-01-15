@@ -177,9 +177,6 @@ function ChannelPage() {
   return (
     <MainContentContainer>
       <header
-        // className={`mb-2 flex items-end justify-between ${
-        //   !false && "border-b-2 border-neutral-100 pb-8"
-        // }`}
         className={`mb-8 flex items-end justify-between "border-b-2 border-neutral-100 pb-8"
         `}
       >
