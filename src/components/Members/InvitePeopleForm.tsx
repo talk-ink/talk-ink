@@ -6,6 +6,7 @@ import Button from "components/Button/Button";
 import { Workspace } from "types";
 import { useToast } from "hooks/useToast";
 import {
+  frontendUrl,
   inviteWorkspaceTemplate,
   sendEmail,
   validateEmail,
@@ -41,9 +42,7 @@ function InvitePeopleForm({ onCancel, workspaceData }: TProps) {
         emails: emailArr,
         subject: "Workspace Invitation",
         message: inviteWorkspaceTemplate({
-          inviteLink: `${process.env.REACT_APP_FRONTEND_URL}/j/${
-            workspaceData?.inviteId ?? ""
-          }/login`,
+          inviteLink: `${frontendUrl}/j/${workspaceData?.inviteId ?? ""}/login`,
           workspaceName: workspaceData.name,
           invitee: auth.user.firstName,
         }),

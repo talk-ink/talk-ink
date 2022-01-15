@@ -20,6 +20,7 @@ import { addThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import { fetchChannels } from "features/channels/slice";
+import { notificationUrl } from "utils/helper";
 
 const initialValues: Thread = {
   name: "",
@@ -38,7 +39,7 @@ const animatedComponents = makeAnimated();
 
 moment.locale("id");
 
-const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
+const NOTIFICATION_API = notificationUrl;
 
 function Compose() {
   const params = useParams();
@@ -48,7 +49,7 @@ function Compose() {
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
-  const [notifiedOptions, setNotifiedOptions] = useState<INotifiedOption[]>();
+  const [notifiedOptions, setNotifiedOptions] = useState<INotifiedOption[]>([]);
   const [selectedNotifiedOptions, setSelectedNotifiedOptions] = useState<
     INotifiedOption[]
   >([]);
@@ -232,6 +233,7 @@ function Compose() {
               Tag:
             </div>
           </div>
+
           <Select
             value={selectedNotifiedOptions}
             onChange={(e: any) => {
@@ -270,8 +272,8 @@ function Compose() {
             isClearable={false}
             className="text-sm custom-select "
             closeMenuOnSelect={false}
-            components={animatedComponents}
-            defaultValue={[notifiedOptions?.[0]]}
+            // components={animatedComponents}
+            defaultValue={[notifiedOptions[0]]}
             isMulti
             options={notifiedOptions}
             placeholder="Select Tags"

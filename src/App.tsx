@@ -25,6 +25,7 @@ import { useToast } from "hooks/useToast";
 import JoinChannelPage from "pages/JoinChannel";
 import InboxList from "pages/Inbox/InboxList";
 import InvitedWorkspacePage from "pages/InvitedWorkspace";
+import { oneSignalId } from "utils/helper";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -39,7 +40,7 @@ function App() {
       if (!userData) throw new Error("Invalid user");
 
       OneSignal.init({
-        appId: process.env.REACT_APP_ONE_SIGNAL_ID,
+        appId: oneSignalId,
         notifyButton: {
           enable: true,
         },

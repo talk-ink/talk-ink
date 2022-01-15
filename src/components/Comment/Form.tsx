@@ -13,6 +13,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { Channel, Member } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
+import { notificationUrl } from "utils/helper";
 
 interface IProps {
   isShowEditor: boolean;
@@ -32,7 +33,7 @@ interface INotifiedOption {
   flag: number;
 }
 
-const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
+const NOTIFICATION_API = notificationUrl;
 const animatedComponents = makeAnimated();
 
 const Form: React.FC<IProps> = ({
@@ -246,7 +247,7 @@ const Form: React.FC<IProps> = ({
           />
 
           <div className="flex justify-between">
-            icon
+            <div />
             <div className="flex items-center py-2">
               <Button
                 type="submit"

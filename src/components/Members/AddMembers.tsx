@@ -18,7 +18,7 @@ import MemberList from "./MemberList";
 import InvitePeopleForm from "./InvitePeopleForm";
 import { useToast } from "hooks/useToast";
 import { updateWorkspace } from "features/workspaces";
-import { randomString } from "utils/helper";
+import { frontendUrl, randomString } from "utils/helper";
 import { kontenbase } from "lib/client";
 import { SettingsModalRouteState } from "types";
 
@@ -115,9 +115,9 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               }`}
             >
               <div className="overflow-hidden whitespace-nowrap text-ellipsis flex-grow-0">
-                <p className="text-sm">{`${
-                  process.env.REACT_APP_FRONTEND_URL
-                }/j/${workspaceData?.inviteId ?? ""}/login`}</p>
+                <p className="text-sm">{`${frontendUrl}/j/${
+                  workspaceData?.inviteId ?? ""
+                }/login`}</p>
               </div>
 
               <div className="h-full px-2 flex-shrink-0">
@@ -125,11 +125,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
                   className="text-cyan-600 text-sm cursor-pointer hover:underline"
                   onClick={() => {
                     if (workspaceData.inviteId && !apiLoading) {
-                      copy(
-                        `${process.env.REACT_APP_FRONTEND_URL}/j/${
-                          workspaceData?.inviteId ?? ""
-                        }`
-                      );
+                      copy(`${frontendUrl}/j/${workspaceData?.inviteId ?? ""}`);
                       showToast({ message: "Link copied!" });
                     }
                   }}

@@ -42,11 +42,10 @@ const threadSlice = createSlice({
       state.threads.push(action.payload);
     },
     deleteThread: (state, action: PayloadAction<Thread>) => {
-      const newThread = state.threads.filter(
-        (item) => item._id !== action.payload._id
+      let deletedIndex = state.threads.findIndex(
+        (data) => data._id === action.payload._id
       );
-
-      state.threads = newThread;
+      state.threads.splice(deletedIndex, 1);
     },
     addComment: (state, action: PayloadAction<TCommentPayload>) => {
       const newThread = state.threads.map((item) =>
