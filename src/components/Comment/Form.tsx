@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 
 import axios from "axios";
 import Avatar from "components/Avatar/Avatar";
@@ -20,33 +20,11 @@ interface IProps {
   threadId: string;
   threadName: string;
   scrollToBottom: () => void;
+  interactedUsersCount: number;
 }
 
 const NOTIFICATION_API = process.env.REACT_APP_NOTIFICATION_API;
 const animatedComponents = makeAnimated();
-
-const colourOptions = [
-  {
-    value: "all-1",
-    label: "Everyone who interacted",
-    color: "#00B8D9",
-    isFixed: true,
-  },
-  {
-    value: "all-2",
-    label: "Everyone in Channel",
-    color: "#0052CC",
-    isFixed: true,
-  },
-  { value: "purple", label: "Purple", color: "#5243AA" },
-  { value: "red", label: "Red", color: "#FF5630", isFixed: true },
-  { value: "orange", label: "Orange", color: "#FF8B00" },
-  { value: "yellow", label: "Yellow", color: "#FFC400" },
-  { value: "green", label: "Green", color: "#36B37E" },
-  { value: "forest", label: "Forest", color: "#00875A" },
-  { value: "slate", label: "Slate", color: "#253858" },
-  { value: "silver", label: "Silver", color: "#666666" },
-];
 
 const Form: React.FC<IProps> = ({
   isShowEditor,
@@ -54,12 +32,36 @@ const Form: React.FC<IProps> = ({
   threadId,
   threadName,
   scrollToBottom,
+  interactedUsersCount,
 }) => {
   const params = useParams();
   const dispatch = useAppDispatch();
   const [editorState, setEditorState] = useState<string>("");
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
+
+  const colourOptions = [
+    {
+      value: "all-1",
+      label: `Everyone who interacted (${interactedUsersCount || 1})`,
+      color: "#00B8D9",
+      isFixed: true,
+    },
+    {
+      value: "all-2",
+      label: "Everyone in Channel",
+      color: "#0052CC",
+      isFixed: true,
+    },
+    { value: "purple", label: "Purple", color: "#5243AA" },
+    { value: "red", label: "Red", color: "#FF5630", isFixed: true },
+    { value: "orange", label: "Orange", color: "#FF8B00" },
+    { value: "yellow", label: "Yellow", color: "#FFC400" },
+    { value: "green", label: "Green", color: "#36B37E" },
+    { value: "forest", label: "Forest", color: "#00875A" },
+    { value: "slate", label: "Slate", color: "#253858" },
+    { value: "silver", label: "Silver", color: "#666666" },
+  ];
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === params.channelId);
@@ -99,7 +101,7 @@ const Form: React.FC<IProps> = ({
   return (
     <div className="sticky bottom-0 left-0 z-30  bg-white">
       {!isShowEditor && (
-        <div className="flex items-center py-5 ">
+        <div className="flex items-center py-3 ">
           <div>
             <Avatar src={auth.user.avatar} />
           </div>

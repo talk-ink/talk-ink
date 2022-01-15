@@ -27,6 +27,8 @@ export const fetchThreads = createAsyncThunk(
           localStorage.getItem("threadsDraft")
         );
 
+        console.log(threadResponse);
+
         let draft = [];
 
         if (parsedThreadsDraft) {

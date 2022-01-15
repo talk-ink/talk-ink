@@ -132,6 +132,10 @@
   overflow: auto;
 }
 
+.markdown-overrides span {
+  z-index: 30 !important;
+}
+
 .fix-editor {
   padding-right: 0.5em;
 }
@@ -141,7 +145,7 @@
 }
 
 .comment-editor {
-  height: 17rem !important;
+  height: 12rem !important;
 }
 
 .custom-select > div {

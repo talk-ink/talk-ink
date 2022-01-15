@@ -13,7 +13,12 @@ import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
 import { Channel, Thread } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
-import { addComment, deleteComment, updateComment } from "features/threads";
+import {
+  addComment,
+  deleteComment,
+  updateComment,
+  addInteractedUser,
+} from "features/threads";
 
 import { fetchComments } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -134,7 +139,7 @@ function ThreadPage() {
 
   const scrollToBottom = () => {
     setTimeout(() => {
-      listRef.current.scrollIntoView({ behavior: "smooth" });
+      listRef?.current?.scrollIntoView({ behavior: "smooth" });
     }, 500);
   };
 
@@ -146,6 +151,26 @@ function ThreadPage() {
     return channel.channels.find((data) => data._id === channelId);
   }, [channelId, channel.channels]);
 
+  useEffect(() => {
+    if (!auth.user.id || threadData?.interactedUsers?.includes(auth.user.id))
+      return;
+
+    const setInteractedUser = async () => {
+      await kontenbase.service("Threads").link(threadData._id, {
+        interactedUsers: auth.user.id,
+      });
+
+      dispatch(
+        addInteractedUser({
+          threadId: threadData._id,
+          userId: auth.user.id,
+        })
+      );
+    };
+
+    setInteractedUser();
+  }, [dispatch, auth.user, threadData]);
+
   return (
     <MainContentContainer
       header={
@@ -156,8 +181,8 @@ function ThreadPage() {
         />
       }
     >
-      <div className="max-w-3xl ml-auto mr-auto">
-        <div className=" pb-10 relative">
+      <div className="max-w-3xl ml-auto mr-auto -mt-4">
+        <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl">{threadData?.name}</h1>
             <p className="text-neutral-500 text-sm font-body">
@@ -195,6 +220,7 @@ function ThreadPage() {
             setIsShowEditor={setIsShowEditor}
             threadId={threadId}
             threadName={threadData.name}
+            interactedUsersCount={threadData?.interactedUsers?.length}
             scrollToBottom={scrollToBottom}
           />
         </div>
