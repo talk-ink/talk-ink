@@ -247,9 +247,7 @@ function ThreadPage() {
             setIsShowEditor={setIsShowEditor}
             threadId={threadId}
             threadName={threadData.name}
-            interactedUsersCount={
-              [...new Set(threadData?.interactedUsers)]?.length
-            }
+            interactedUsers={[...new Set(threadData?.interactedUsers)]}
             scrollToBottom={scrollToBottom}
             memberList={memberList}
           />

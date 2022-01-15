@@ -30,6 +30,7 @@ export interface Thread {
   workspace?: string;
   interactedUsers?: string[];
   channelId?: string;
+  tagedUsers?: string[];
 }
 export interface Channel {
   id?: string;

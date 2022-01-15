@@ -27,8 +27,6 @@ export const fetchThreads = createAsyncThunk(
           localStorage.getItem("threadsDraft")
         );
 
-        console.log(threadResponse);
-
         let draft = [];
 
         if (parsedThreadsDraft) {
@@ -51,7 +49,8 @@ export const fetchThreads = createAsyncThunk(
 
         const threadData: Thread[] = inboxResponse.data;
 
-        return threadData.filter((thread) => thread.createdBy._id !== userId);
+        // return threadData.filter((thread) => thread.createdBy._id !== userId);
+        return threadData;
 
       default:
         break;
@@ -75,10 +74,22 @@ export const fetchComments = createAsyncThunk(
 
 export const createComment = createAsyncThunk(
   "channel/thread/createComment",
-  async ({ content, threadId }: { content: any; threadId: string }) => {
+  async ({
+    content,
+    threadId,
+    tagedUsers,
+  }: {
+    content: any;
+    threadId: string;
+    tagedUsers: string[];
+  }) => {
     const { data } = await kontenbase.service("Comments").create({
       content,
       threads: [threadId],
+    });
+
+    await kontenbase.service("Threads").updateById(threadId, {
+      tagedUsers,
     });
 
     return data;

@@ -5,7 +5,7 @@ import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
 import Editor from "rich-markdown-editor";
 import { kontenbase } from "lib/client";
-import Select, { OnChangeValue } from "react-select";
+import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
 import { createComment } from "features/threads/slice/asyncThunk";
@@ -20,7 +20,7 @@ interface IProps {
   threadId: string;
   threadName: string;
   scrollToBottom: () => void;
-  interactedUsersCount: number;
+  interactedUsers: string[];
   memberList: Member[];
 }
 
@@ -41,7 +41,7 @@ const Form: React.FC<IProps> = ({
   threadId,
   threadName,
   scrollToBottom,
-  interactedUsersCount,
+  interactedUsers,
   memberList,
 }) => {
   const params = useParams();
@@ -58,7 +58,7 @@ const Form: React.FC<IProps> = ({
     const options: INotifiedOption[] = [
       {
         value: "INTERACTEDUSERS",
-        label: `Everyone who interacted (${interactedUsersCount || 1})`,
+        label: `Everyone who interacted (${interactedUsers.length || 1})`,
         flag: 1,
       },
       {
@@ -77,7 +77,7 @@ const Form: React.FC<IProps> = ({
 
     setNotifiedOptions(options);
     setSelectedNotifiedOptions([options[0]]);
-  }, [interactedUsersCount, memberList, auth]);
+  }, [interactedUsers, memberList, auth]);
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === params.channelId);
@@ -89,22 +89,47 @@ const Form: React.FC<IProps> = ({
   };
 
   const handleCreateComment = () => {
+    let _invitedUsers: string[] = [];
+
+    const isInteractedUsersSelected = !!selectedNotifiedOptions.find(
+      (item) => item.value === "INTERACTEDUSERS"
+    );
+
+    const isAllChannelSelected = !!selectedNotifiedOptions.find(
+      (item) => item.value === "ALLUSERSINCHANNEL"
+    );
+
+    const isMemberSelected = !!selectedNotifiedOptions.find(
+      (item) => item.flag === 3
+    );
+
+    if (isInteractedUsersSelected) {
+      _invitedUsers = interactedUsers.filter((item) => item !== auth.user.id);
+    }
+
+    if (isAllChannelSelected) {
+      _invitedUsers = channelData.members.filter(
+        (item) => item !== auth.user.id
+      );
+    }
+
+    if (isMemberSelected) {
+      _invitedUsers = selectedNotifiedOptions.map((item) => item.value);
+    }
+
     dispatch(
       createComment({
         content: editorState,
         threadId,
+        tagedUsers: _invitedUsers,
       })
     );
 
-    const filteredMemberWithoutOwner = channelData.members.filter(
-      (item) => item !== auth.user.id
-    );
-
-    if (filteredMemberWithoutOwner.length > 0) {
+    if (_invitedUsers.length > 0) {
       axios.post(NOTIFICATION_API, {
         title: `${auth?.user.firstName} comment on ${threadName}`,
         description: editorState.replace(/(<([^>]+)>)/gi, ""),
-        externalUserIds: filteredMemberWithoutOwner,
+        externalUserIds: _invitedUsers,
       });
     }
 
@@ -148,16 +173,46 @@ const Form: React.FC<IProps> = ({
                   !!selectedNotifiedOptions.find(
                     (item) => item.value === "INTERACTEDUSERS"
                   );
+                const isCurrInteractedUsersSelected = !!e.find(
+                  (item: any) => item.value === "INTERACTEDUSERS"
+                );
+
                 const isAllChannelSelected = !!selectedNotifiedOptions.find(
                   (item) => item.value === "ALLUSERSINCHANNEL"
+                );
+                const isCurrAllChannelSelected = !!e.find(
+                  (item: any) => item.value === "ALLUSERSINCHANNEL"
+                );
+
+                const isMemberSelected = !!selectedNotifiedOptions.find(
+                  (item) => item.flag === 3
+                );
+                const isCurrMemberSelected = !!e.find(
+                  (item: any) => item.flag === 3
                 );
 
                 const currSelectedOptions = e.filter((item: any) => {
                   if (isAllChannelSelected) {
-                    return item.flag === 1;
+                    if (isCurrMemberSelected) {
+                      return item.flag === 3;
+                    } else {
+                      return item.flag === 1;
+                    }
                   }
 
                   if (isInteractedUsersSelected) {
+                    if (isCurrMemberSelected) {
+                      return item.flag === 3;
+                    } else {
+                      return item.flag === 2;
+                    }
+                  }
+
+                  if (isMemberSelected && isCurrInteractedUsersSelected) {
+                    return item.flag === 1;
+                  }
+
+                  if (isMemberSelected && isCurrAllChannelSelected) {
                     return item.flag === 2;
                   }
 
@@ -173,6 +228,7 @@ const Form: React.FC<IProps> = ({
               defaultValue={[notifiedOptions[0]]}
               isMulti
               options={notifiedOptions}
+              placeholder="Select Tags"
             />
           </div>
           <Editor

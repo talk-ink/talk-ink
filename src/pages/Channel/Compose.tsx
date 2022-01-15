@@ -95,7 +95,6 @@ function Compose() {
         content: values.content,
         channel: params.channelId,
         workspace: params.workspaceId,
-        interactedUsers: [auth.user.id],
       });
 
       const filteredMemberWithoutOwner = channelData.members.filter(
