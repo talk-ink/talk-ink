@@ -148,14 +148,17 @@ function ContentItem({
                       }}
                     />
                   )}
-                  <Divider />
-                  <MenuItem
-                    icon={<BiTrash size={20} className="text-neutral-400" />}
-                    title="Delete thread..."
-                    onClick={() => {
-                      setSelectedThread(dataSource);
-                    }}
-                  />
+                  {dataSource.createdBy._id === auth.user.id && <Divider />}
+                  {dataSource.createdBy._id === auth.user.id && (
+                    <MenuItem
+                      icon={<BiTrash size={20} className="text-neutral-400" />}
+                      title="Delete thread..."
+                      onClick={() => {
+                        setSelectedThread(dataSource);
+                      }}
+                    />
+                  )}
+
                   {/* <MenuItem
                     icon={<BiEdit size={20} className="text-neutral-400" />}
                     title="Edit thread title..."
