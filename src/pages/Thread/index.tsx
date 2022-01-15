@@ -184,7 +184,9 @@ function ThreadPage() {
       <div className="max-w-3xl ml-auto mr-auto -mt-4">
         <div className="relative">
           <div className="mb-8">
-            <h1 className="font-bold text-3xl">{threadData?.name}</h1>
+            <h1 className="font-bold text-3xl max-w-3xl break-words">
+              {threadData?.name}
+            </h1>
             <p className="text-neutral-500 text-sm font-body">
               {channelData?.members?.length} Participants{" "}
               <Link

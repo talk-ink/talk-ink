@@ -100,7 +100,7 @@ function ContentItem({
           <div>
             <div className="flex flex-col items-start md:flex-row md:items-center">
               <p
-                className={`font-body text-sm mr-2 ${
+                className={`font-body text-sm mr-2 max-w-xs overflow-hidden text-ellipsis ${
                   dataSource?.draft && "text-blue-500"
                 } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >

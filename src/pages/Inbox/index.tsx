@@ -23,11 +23,7 @@ import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
 import { addThread, deleteThread } from "features/threads";
-
-type SubscriptionKey = {
-  create: string | undefined | null;
-  delete: string | undefined | null;
-};
+import { inboxFilter } from "utils/helper";
 
 function InboxPage() {
   const [showToast] = useToast();
@@ -58,12 +54,14 @@ function InboxPage() {
 
   const threadData = useMemo(
     () =>
-      thread.threads.filter((data) => {
-        if (!channelData.includes(data.channel[0])) return false;
-        if (!auth.user.doneThreads) return true;
-        if (isDoneThread) return auth.user.doneThreads.includes(data._id);
-        return !auth.user.doneThreads.includes(data._id);
-      }),
+      thread.threads.filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      ),
     [thread.threads, auth.user, params, channelData]
   );
 
@@ -120,14 +118,11 @@ function InboxPage() {
   }, [params.workspaceId]);
 
   useEffect(() => {
-    let key: SubscriptionKey = {
-      create: undefined,
-      delete: undefined,
-    };
+    let key: string | undefined;
 
     kontenbase.realtime
-      .subscribe("Threads", { event: "CREATE_RECORD" }, (message) => {
-        const { payload } = message;
+      .subscribe("Threads", { event: "*" }, (message) => {
+        const { event, payload } = message;
 
         const isCurrentWorkspace = payload?.workspace?.includes(
           params.workspaceId
@@ -143,38 +138,25 @@ function InboxPage() {
           isThreadInJoinedChannel &&
           isNotCreatedByThisUser
         ) {
-          dispatch(addThread(payload));
+          switch (event) {
+            case "CREATE_RECORD":
+              dispatch(addThread(payload));
+              break;
+            case "DELETE_RECORD":
+              dispatch(deleteThread(payload));
+              break;
+
+            default:
+              break;
+          }
         }
       })
-      .then((result) => (key.create = result));
-    kontenbase.realtime
-      .subscribe("Threads", { event: "DELETE_RECORD" }, (message) => {
-        const { payload } = message;
-
-        const isCurrentWorkspace = payload?.workspace?.includes(
-          params.workspaceId
-        );
-
-        const isNotCreatedByThisUser = payload?.createdBy !== auth.user.id;
-        const isThreadInJoinedChannel = channelData.includes(
-          payload?.channel[0]
-        );
-
-        if (
-          isCurrentWorkspace &&
-          isThreadInJoinedChannel &&
-          isNotCreatedByThisUser
-        ) {
-          dispatch(deleteThread(payload));
-        }
-      })
-      .then((result) => (key.delete = result));
+      .then((result) => (key = result));
 
     return () => {
-      kontenbase.realtime.unsubscribe(key.create);
-      kontenbase.realtime.unsubscribe(key.delete);
+      kontenbase.realtime.unsubscribe(key);
     };
-  }, []);
+  }, [channelData]);
 
   const loading = thread.loading;
 

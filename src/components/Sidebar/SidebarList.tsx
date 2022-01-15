@@ -5,7 +5,12 @@ import Popup from "components/Popup/Popup";
 import React, { Dispatch, SetStateAction, useMemo } from "react";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
-import { BiDotsHorizontalRounded, BiEditAlt, BiLogOut } from "react-icons/bi";
+import {
+  BiDotsHorizontalRounded,
+  BiEditAlt,
+  BiLock,
+  BiLogOut,
+} from "react-icons/bi";
 import {
   HiOutlineBookmark,
   HiOutlineChat,
@@ -95,7 +100,12 @@ function SidebarList({
             type === "channel" && isDefault && "text-cyan-500"
           }`}
         />
-        <p>{name}</p>
+        <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
+          {name}
+        </p>
+        {data?.privacy === "private" && (
+          <BiLock size={16} className={`ml-2 text-gray-400`} />
+        )}
       </NavLink>
       <div
         className={`h-7 w-8 flex items-center justify-center ${

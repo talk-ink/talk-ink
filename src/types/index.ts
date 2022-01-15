@@ -29,6 +29,7 @@ export interface Thread {
   createdBy?: Member;
   workspace?: string;
   interactedUsers?: string[];
+  channelId?: string;
 }
 export interface Channel {
   id?: string;
