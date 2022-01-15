@@ -21,6 +21,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { addReadThread, deleteReadThread } from "features/auth";
 import { kontenbase } from "lib/client";
 import { useAppSelector } from "hooks/useAppSelector";
+import Avatar from "components/Avatar/Avatar";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -91,10 +92,15 @@ function ContentItem({
                 !isRead ? "bg-indigo-500" : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
-            <NameInitial
-              name={getNameInitial(dataSource.createdBy?.firstName)}
-              className="mr-4"
-            />
+            <div className="mr-4">
+              {dataSource.createdBy?.avatar?.[0]?.url ? (
+                <Avatar src={dataSource.createdBy?.avatar?.[0]?.url} />
+              ) : (
+                <NameInitial
+                  name={getNameInitial(dataSource.createdBy?.firstName)}
+                />
+              )}
+            </div>
           </div>
           <div>
             <div className="flex flex-col items-start md:flex-row md:items-center">

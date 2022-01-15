@@ -45,7 +45,6 @@ export const fetchThreads = createAsyncThunk(
           where: {
             workspace: workspaceId,
           },
-          lookup: ["comments"],
         });
 
         const threadData: Thread[] = inboxResponse.data;
