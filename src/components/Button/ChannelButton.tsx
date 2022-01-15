@@ -1,5 +1,6 @@
 import React, { Dispatch, SetStateAction } from "react";
 import { BiDotsHorizontalRounded, BiPlus } from "react-icons/bi";
+import { FaPlus } from "react-icons/fa";
 
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
@@ -23,30 +24,19 @@ function ChannelButton({
         <p className="font-bold text-xs text-neutral-500">Channels</p>
       </button>
 
-      <Popup
-        content={
-          <div>
-            <Menu>
-              <MenuItem
-                icon={<BiPlus size={20} className="text-neutral-400" />}
-                onClick={() => {
-                  setCreateChannelModal(true);
-                }}
-                title="Create new channel"
-              />
-            </Menu>
-          </div>
-        }
-        position="bottom"
+      <IconButton
+        className="hidden group-hover:flex"
+        size="medium"
+        onClick={onOptionClick}
       >
-        <IconButton
-          className="hidden group-hover:flex"
-          size="medium"
-          onClick={onOptionClick}
-        >
-          <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
-        </IconButton>
-      </Popup>
+        <FaPlus
+          size={15}
+          className="text-neutral-500"
+          onClick={() => {
+            setCreateChannelModal(true);
+          }}
+        />
+      </IconButton>
     </div>
   );
 }

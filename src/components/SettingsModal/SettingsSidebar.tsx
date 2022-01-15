@@ -62,14 +62,14 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
               }}
               active={currentActive}
             />
-            <SidebarButton
+            {/* <SidebarButton
               icon={<BiSliderAlt size={20} className="text-neutral-400" />}
               type="preferences"
               onClick={() => {
                 setCurrentActive("preferences");
               }}
               active={currentActive}
-            />
+            /> */}
             <SidebarButton
               icon={<BiUser size={20} className="text-neutral-400" />}
               type="profile"
@@ -79,7 +79,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
               active={currentActive}
             />
 
-            <SidebarButton
+            {/* <SidebarButton
               icon={<BiBell size={20} className="text-neutral-400" />}
               type="notifications"
               onClick={() => {
@@ -94,7 +94,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
                 setCurrentActive("doNotDisturb");
               }}
               active={currentActive}
-            />
+            /> */}
           </ul>
         </div>
         <div>
@@ -136,7 +136,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
               }}
               active={currentActive}
             />
-            <SidebarButton
+            {/* <SidebarButton
               icon={
                 <BiCreditCardFront size={20} className="text-neutral-400" />
               }
@@ -153,15 +153,15 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
                 setCurrentActive("integrations");
               }}
               active={currentActive}
-            />
-            <SidebarButton
+            /> */}
+            {/* <SidebarButton
               icon={<BiImport size={20} className="text-neutral-400" />}
               type="import"
               onClick={() => {
                 setCurrentActive("import");
               }}
               active={currentActive}
-            />
+            /> */}
           </ul>
         </div>
       </div>
