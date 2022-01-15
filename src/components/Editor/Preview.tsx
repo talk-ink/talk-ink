@@ -22,9 +22,16 @@ const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
   const [isShown, setIsShown] = useState(false);
 
   useEffect(() => {
-    setTimeout(() => {
-      setIsShown(true);
-    }, waitBeforeShow);
+    const timer = () =>
+      setTimeout(() => {
+        setIsShown(true);
+      }, waitBeforeShow);
+
+    const timerId = timer();
+
+    return () => {
+      clearTimeout(timerId);
+    };
   }, [waitBeforeShow]);
 
   return isShown ? <>{children}</> : null;

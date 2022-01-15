@@ -132,7 +132,7 @@ function InboxPage() {
 
         const isNotCreatedByThisUser = payload?.createdBy !== auth.user.id;
         const isThreadInJoinedChannel = channelData.includes(
-          payload?.channel[0]
+          payload?.channel?.[0]
         );
 
         if (
@@ -160,7 +160,29 @@ function InboxPage() {
     };
   }, [channelData]);
 
-  const loading = thread.loading;
+  useEffect(() => {
+    let key: string | undefined;
+
+    kontenbase.realtime
+      .subscribe("Comments", { event: "*" }, async (message) => {
+        console.log(message);
+
+        switch (message.event) {
+          case "CREATE_RECORD":
+            const { user: userData } = await kontenbase.auth.user();
+            dispatch(updateUser(userData));
+            break;
+
+          default:
+            break;
+        }
+      })
+      .then((result) => (key = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key);
+    };
+  }, []);
 
   return (
     <MainContentContainer>

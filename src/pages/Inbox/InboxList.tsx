@@ -71,12 +71,12 @@ function InboxList({ type = "active" }: TProps) {
   const markHandler = async (threadId: string) => {
     try {
       if (isDoneThread) {
-        const update = await kontenbase
+        await kontenbase
           .service("Users")
           .unlink(auth.user.id, { doneThreads: threadId });
         dispatch(deleteDoneThread(threadId));
       } else {
-        const update = await kontenbase
+        await kontenbase
           .service("Users")
           .link(auth.user.id, { doneThreads: threadId });
         dispatch(addDoneThread(threadId));

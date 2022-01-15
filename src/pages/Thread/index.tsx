@@ -138,14 +138,19 @@ function ThreadPage() {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
 
-  const scrollToBottom = () => {
+  const scrollToBottom = () =>
     setTimeout(() => {
       listRef?.current?.scrollIntoView({ behavior: "smooth" });
     }, 500);
-  };
 
   useEffect(() => {
     scrollToBottom();
+
+    const timedId = scrollToBottom();
+
+    return () => {
+      clearTimeout(timedId);
+    };
   }, []);
 
   const channelData: Channel = useMemo(() => {

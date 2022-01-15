@@ -92,6 +92,14 @@ export const createComment = createAsyncThunk(
       tagedUsers,
     });
 
+    tagedUsers.forEach((item, index) => {
+      setTimeout(async () => {
+        await kontenbase
+          .service("Users")
+          .unlink(item, { readedThreads: threadId });
+      }, 100 * index);
+    });
+
     return data;
   }
 );
