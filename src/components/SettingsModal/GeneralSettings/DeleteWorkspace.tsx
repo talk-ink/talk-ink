@@ -23,7 +23,7 @@ function DeleteWorkspace() {
   const auth = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const [inputValue, setInputValue] = useState("");
   const [inputValueDebounce] = useDebounce(inputValue, 100);

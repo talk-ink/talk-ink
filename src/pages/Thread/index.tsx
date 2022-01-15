@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
-import { useParams } from "react-router";
+import { useParams, useLocation } from "react-router";
 import Editor from "rich-markdown-editor";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
@@ -11,20 +11,34 @@ import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
-import { Channel, Thread } from "types";
+import { Channel, Thread, Member } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
-import { addComment, deleteComment, updateComment } from "features/threads";
+import {
+  addComment,
+  deleteComment,
+  updateComment,
+  addInteractedUser,
+} from "features/threads";
 
+import { fetchChannels } from "features/channels/slice";
 import { fetchComments } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { kontenbase } from "lib/client";
 import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
 function ThreadPage() {
   const [showToast] = useToast();
   const { threadId, workspaceId, channelId } = useParams();
+  const query = useQuery();
   const listRef = useRef<HTMLDivElement>(null);
+  const [memberList, setMemberList] = useState<Member[]>([]);
 
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
@@ -109,9 +123,9 @@ function ThreadPage() {
         readedThreads = auth.user?.readedThreads;
       }
       if (!readedThreads.includes(threadId)) {
-        const update = await kontenbase
+        await kontenbase
           .service("Users")
-          .link(auth.user.id, { readedThreads: threadId });
+          .link(auth.user._id, { readedThreads: threadId });
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
     } catch (error: any) {
@@ -132,17 +146,72 @@ function ThreadPage() {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
 
-  const scrollToBottom = () => {
-    listRef.current.scrollIntoView({ behavior: "smooth" });
-  };
+  const scrollToBottom = () =>
+    setTimeout(() => {
+      listRef?.current?.scrollIntoView({ behavior: "smooth" });
+    }, 1000);
 
   useEffect(() => {
     scrollToBottom();
+
+    const timedId = scrollToBottom();
+
+    return () => {
+      clearTimeout(timedId);
+    };
   }, []);
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === channelId);
   }, [channelId, channel.channels]);
+
+  useEffect(() => {
+    const setInteractedUser = async () => {
+      try {
+        const { data } = await kontenbase.service("Threads").getById(threadId);
+
+        if (!data.interactedUsers.find((item: any) => item === auth.user._id)) {
+          await kontenbase.service("Threads").link(threadId, {
+            interactedUsers: auth.user._id,
+          });
+
+          dispatch(
+            addInteractedUser({
+              threadId: threadId,
+              userId: auth.user._id,
+            })
+          );
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    setInteractedUser();
+  }, []);
+
+  const getMemberHandler = async () => {
+    try {
+      const memberList = await kontenbase.service("Users").find({
+        where: { workspaces: workspaceId, channels: channelId },
+        lookup: ["avatar"],
+      });
+      if (memberList.data) {
+        setMemberList(memberList.data);
+      }
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error)}` });
+    }
+  };
+
+  useEffect(() => {
+    getMemberHandler();
+  }, []);
+
+  useEffect(() => {
+    dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
+  }, [workspaceId]);
 
   return (
     <MainContentContainer
@@ -151,12 +220,12 @@ function ThreadPage() {
           channel={channelData?.name}
           title={threadData?.name}
           thread
+          from={query.get("fromInbox") === "1" && "inbox"}
         />
       }
-      listRef={listRef}
     >
-      <div className="max-w-4xl ml-auto mr-auto">
-        <div className=" pb-10 relative">
+      <div className="max-w-3xl ml-auto mr-auto -mt-4">
+        <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl max-w-3xl break-words">
               {threadData?.name}
@@ -165,7 +234,7 @@ function ThreadPage() {
               {channelData?.members?.length} Participants{" "}
               <Link
                 to={`/a/${workspaceId}/ch/${channelId}`}
-                className="text-cyan-600"
+                className="text-indigo-800"
               >
                 #{channelData?.name}
               </Link>
@@ -188,7 +257,7 @@ function ThreadPage() {
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
-              <CommentList dataSource={threadData.comments} />
+              <CommentList dataSource={threadData.comments} listRef={listRef} />
             )}
           </div>
           <CommentForm
@@ -196,7 +265,9 @@ function ThreadPage() {
             setIsShowEditor={setIsShowEditor}
             threadId={threadId}
             threadName={threadData.name}
+            interactedUsers={[...new Set(threadData?.interactedUsers)]}
             scrollToBottom={scrollToBottom}
+            memberList={memberList}
           />
         </div>
       </div>

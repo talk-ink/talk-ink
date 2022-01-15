@@ -31,7 +31,7 @@ function ChannelList({ data, onClick = () => {}, selectedChannels }: TProps) {
       <div>
         <div
           className={`h-5 w-5 border border-cyan-500 ${
-            active && "bg-cyan-500"
+            active && "bg-indigo-500"
           } rounded-full`}
         ></div>
       </div>

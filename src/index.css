@@ -130,9 +130,29 @@
 .markdown-overrides > div {
   height: inherit !important;
   overflow: auto;
+}
+
+.markdown-overrides span {
+  z-index: 30 !important;
+}
+
+.fix-editor {
   padding-right: 0.5em;
 }
 
 .onesignal-bell-launcher-button {
   display: none !important;
+}
+
+.comment-editor {
+  height: 12rem !important;
+}
+
+.custom-select > div {
+  border: none !important;
+  border-width: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+  margin-left: -5px !important;
+  min-width: 15rem;
 }

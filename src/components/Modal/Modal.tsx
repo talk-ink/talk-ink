@@ -51,7 +51,7 @@ function Modal({
               {cancelButtonText}
             </Button>
             <Button
-              className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+              className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
               {...okButtonProps}
               onClick={onConfirm}
             >

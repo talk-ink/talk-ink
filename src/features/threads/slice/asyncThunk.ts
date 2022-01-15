@@ -21,7 +21,7 @@ export const fetchThreads = createAsyncThunk(
       case "threads":
         const threadResponse = await kontenbase
           .service("Threads")
-          .find({ where: { channel: channelId } });
+          .find({ where: { channel: channelId }, lookup: ["comments"] });
 
         const parsedThreadsDraft: object = JSON.parse(
           localStorage.getItem("threadsDraft")
@@ -45,11 +45,13 @@ export const fetchThreads = createAsyncThunk(
           where: {
             workspace: workspaceId,
           },
+          lookup: ["comments"],
         });
 
         const threadData: Thread[] = inboxResponse.data;
 
-        return threadData.filter((thread) => thread.createdBy._id !== userId);
+        // return threadData.filter((thread) => thread.createdBy._id !== userId);
+        return threadData;
 
       default:
         break;
@@ -73,11 +75,34 @@ export const fetchComments = createAsyncThunk(
 
 export const createComment = createAsyncThunk(
   "channel/thread/createComment",
-  async ({ content, threadId }: { content: any; threadId: string }) => {
+  async ({
+    content,
+    threadId,
+    tagedUsers,
+  }: {
+    content: any;
+    threadId: string;
+    tagedUsers: string[];
+  }) => {
     const { data } = await kontenbase.service("Comments").create({
       content,
       threads: [threadId],
     });
+
+    if (tagedUsers.length > 0) {
+      await kontenbase.service("Threads").updateById(threadId, {
+        tagedUsers,
+      });
+
+      const tagPromise = tagedUsers.map(
+        async (item) =>
+          await kontenbase
+            .service("Users")
+            .unlink(item, { readedThreads: threadId })
+      );
+
+      Promise.all(tagPromise);
+    }
 
     return data;
   }

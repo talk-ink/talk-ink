@@ -44,7 +44,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
   }, [workspace.workspaces, params.workspaceId]);
 
   const isHideEmail = useMemo(() => {
-    return workspaceData?.hideEmail?.includes(auth.user.id);
+    return workspaceData?.hideEmail?.includes(auth.user._id);
   }, [workspaceData]);
 
   const [displayEmail, setDisplayEmail] = useState(!isHideEmail);
@@ -65,20 +65,20 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
 
       if (!displayEmail) {
         if (!isHideEmail) {
-          hideEmail = [...hideEmail, auth.user.id];
+          hideEmail = [...hideEmail, auth.user._id];
         }
       } else {
-        hideEmail = hideEmail.filter((email) => email !== auth.user.id);
+        hideEmail = hideEmail.filter((email) => email !== auth.user._id);
       }
 
       if (!displayEmail) {
         await kontenbase
           .service("Workspaces")
-          .link(params.workspaceId, { hideEmail: auth.user.id });
+          .link(params.workspaceId, { hideEmail: auth.user._id });
       } else {
         await kontenbase
           .service("Workspaces")
-          .unlink(params.workspaceId, { hideEmail: auth.user.id });
+          .unlink(params.workspaceId, { hideEmail: auth.user._id });
       }
 
       dispatch(updateWorkspace({ _id: params.workspaceId, hideEmail }));
@@ -169,7 +169,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
               Cancel
             </Button>
             <Button
-              className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+              className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
               type="submit"
             >
               Update

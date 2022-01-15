@@ -26,9 +26,9 @@ import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { Channel, Member, Thread, User } from "types";
+import { Channel, Member, Thread } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
-import { deleteChannel } from "features/channels/slice";
+import { deleteChannel, updateChannelCount } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
@@ -47,7 +47,7 @@ function ChannelPage() {
   const channel = useAppSelector((state) => state.channel);
   const thread = useAppSelector((state) => state.thread);
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const dispatch = useAppDispatch();
 
@@ -122,6 +122,12 @@ function ChannelPage() {
           setSelectedThread(null);
         }
         dispatch(deleteThread(deletedThread.data));
+        dispatch(
+          updateChannelCount({
+            chanelId: deletedThread.data?.channel?.[0],
+            threadId: selectedThread?._id,
+          })
+        );
       } else {
         deleteDraft(selectedThread.id);
         dispatch(deleteThread(selectedThread));
@@ -177,9 +183,6 @@ function ChannelPage() {
   return (
     <MainContentContainer>
       <header
-        // className={`mb-2 flex items-end justify-between ${
-        //   !false && "border-b-2 border-neutral-100 pb-8"
-        // }`}
         className={`mb-8 flex items-end justify-between "border-b-2 border-neutral-100 pb-8"
         `}
       >
@@ -195,7 +198,7 @@ function ChannelPage() {
               (member, idx) =>
                 idx <= 3 && (
                   <div key={idx}>
-                    {member._id === auth.user.id && (
+                    {member._id === auth.user._id && (
                       <>
                         {!auth.user.avatar && (
                           <NameInitial
@@ -213,7 +216,7 @@ function ChannelPage() {
                         )}
                       </>
                     )}
-                    {member._id !== auth.user.id && (
+                    {member._id !== auth.user._id && (
                       <>
                         {!member.avatar && (
                           <NameInitial
@@ -236,7 +239,7 @@ function ChannelPage() {
             )}
           </div>
           <Button
-            className="bg-cyan-600 hover:bg-cyan-700 flex items-center"
+            className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
             onClick={() => {
               createThreadDraft();
             }}
@@ -296,7 +299,7 @@ function ChannelPage() {
                   isRead={
                     readedThreads.includes(thread._id) ||
                     (readedThreads.includes(thread._id) &&
-                      thread.createdBy?._id === auth.user.id)
+                      thread.createdBy?._id === auth.user._id)
                   }
                 />
               ))}

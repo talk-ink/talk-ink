@@ -42,18 +42,17 @@ function ContentItem({
 
   const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
     try {
-      console.log(type);
       switch (type) {
         case "read":
           await kontenbase
             .service("Users")
-            .link(auth.user.id, { readedThreads: dataSource._id });
+            .link(auth.user._id, { readedThreads: dataSource._id });
           dispatch(addReadThread(dataSource._id));
           break;
         case "unread":
           await kontenbase
             .service("Users")
-            .unlink(auth.user.id, { readedThreads: dataSource._id });
+            .unlink(auth.user._id, { readedThreads: dataSource._id });
           dispatch(deleteReadThread(dataSource._id));
           break;
 
@@ -85,11 +84,11 @@ function ContentItem({
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
         >
-          <div className="h-full w-1 absolute top-0 -left-3 rounded-l-xl group-hover:bg-cyan-700"></div>
+          <div className="h-full w-1 absolute top-0 -left-3 rounded-l-xl group-hover:bg-indigo-500"></div>
           <div className="flex items-center">
             <div
               className={`h-3 w-3 ${
-                !isRead && !dataSource.draft ? "bg-cyan-600" : "bg-transparent"
+                !isRead ? "bg-indigo-500" : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
             <NameInitial
@@ -119,7 +118,11 @@ function ContentItem({
             <div className="text-left w-52 md:w-full truncate  md:whitespace-nowrap 2xl:max-w-4xl xl:max-w-2xl md:max-w-xl text-xs text-neutral-500 pr-2">
               <small className=" text-xs text-neutral-500">
                 {dataSource?.draft ? "Me: " : ""}
-                {dataSource.content?.replace(/[^a-zA-Z ]/g, "")}
+                {dataSource.comments?.length > 0
+                  ? `Latest : ${dataSource.comments?.[
+                      dataSource.comments?.length - 1
+                    ]?.content?.replace(/[^a-zA-Z ]/g, "")}`
+                  : dataSource.content?.replace(/[^a-zA-Z ]/g, "")}
               </small>
             </div>
           </div>
@@ -148,14 +151,21 @@ function ContentItem({
                       }}
                     />
                   )}
-                  <Divider />
-                  <MenuItem
-                    icon={<BiTrash size={20} className="text-neutral-400" />}
-                    title="Delete thread..."
-                    onClick={() => {
-                      setSelectedThread(dataSource);
-                    }}
-                  />
+                  {dataSource.createdBy._id === auth.user._id ||
+                    (dataSource?.draft && <Divider />)}
+                  {dataSource.createdBy._id === auth.user._id ||
+                    (dataSource?.draft && (
+                      <MenuItem
+                        icon={
+                          <BiTrash size={20} className="text-neutral-400" />
+                        }
+                        title="Delete thread..."
+                        onClick={() => {
+                          setSelectedThread(dataSource);
+                        }}
+                      />
+                    ))}
+
                   {/* <MenuItem
                     icon={<BiEdit size={20} className="text-neutral-400" />}
                     title="Edit thread title..."

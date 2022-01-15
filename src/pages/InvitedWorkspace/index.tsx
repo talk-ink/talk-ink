@@ -27,7 +27,7 @@ function InvitedWorkspacePage() {
 
       let toWorkspaceId = "";
       if (workspaceData.length > 0) {
-        if (workspaceData[0].peoples.includes(auth.user.id)) {
+        if (workspaceData[0].peoples.includes(auth.user._id)) {
           toWorkspaceId = `${workspaceData[0]._id}/inbox`;
         } else {
           toWorkspaceId = `${workspaceData[0]._id}/join_channels`;

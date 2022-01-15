@@ -23,6 +23,11 @@ type TDeleteCommentPayload = {
   threadId: string;
 };
 
+type TInteractedUserPayload = {
+  userId: string;
+  threadId: string;
+};
+
 const initialState: InitThreadState = {
   threads: [],
   loading: true,
@@ -86,6 +91,23 @@ const threadSlice = createSlice({
 
       state.threads = filteredThread;
     },
+    addInteractedUser: (
+      state,
+      action: PayloadAction<TInteractedUserPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              interactedUsers: item.interactedUsers
+                ? [...item.interactedUsers, action.payload.userId]
+                : [action.payload.userId],
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
   },
   extraReducers: (builder) => {
     //fetch thread
@@ -135,5 +157,6 @@ export const {
   addComment,
   deleteComment,
   updateComment,
+  addInteractedUser,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

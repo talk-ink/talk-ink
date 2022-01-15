@@ -41,7 +41,7 @@ function InboxPage() {
     "done" | "read" | null | undefined
   >(null);
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const isDoneThread = useMemo(() => {
     return pathname.includes("inbox/done");
@@ -54,14 +54,16 @@ function InboxPage() {
 
   const threadData = useMemo(
     () =>
-      thread.threads.filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelData,
-          userData: auth.user,
-          isDoneThread,
-        })
-      ),
+      thread.threads
+        .filter((data) =>
+          inboxFilter({
+            thread: data,
+            channelIds: channelData,
+            userData: auth.user,
+            isDoneThread,
+          })
+        )
+        .filter((item) => item.tagedUsers?.includes(auth.user._id)),
     [thread.threads, auth.user, params, channelData]
   );
 
@@ -76,7 +78,7 @@ function InboxPage() {
 
       [...uniqueId].forEach((id, idx) => {
         setTimeout(async () => {
-          await kontenbase.service("Users").link(auth.user.id, {
+          await kontenbase.service("Users").link(auth.user._id, {
             readedThreads: id,
           });
         }, idx * 100);
@@ -99,7 +101,7 @@ function InboxPage() {
 
       [...uniqueId].forEach((id, idx) => {
         setTimeout(async () => {
-          await kontenbase.service("Users").link(auth.user.id, {
+          await kontenbase.service("Users").link(auth.user._id, {
             doneThreads: id,
           });
         }, idx * 100);
@@ -117,6 +119,10 @@ function InboxPage() {
     );
   }, [params.workspaceId]);
 
+  function timeout(delay: number) {
+    return new Promise((res) => setTimeout(res, delay));
+  }
+
   useEffect(() => {
     let key: string | undefined;
 
@@ -128,9 +134,9 @@ function InboxPage() {
           params.workspaceId
         );
 
-        const isNotCreatedByThisUser = payload?.createdBy !== auth.user.id;
+        const isNotCreatedByThisUser = payload?.createdBy !== auth.user._id;
         const isThreadInJoinedChannel = channelData.includes(
-          payload?.channel[0]
+          payload?.channel?.[0]
         );
 
         if (
@@ -158,7 +164,34 @@ function InboxPage() {
     };
   }, [channelData]);
 
-  const loading = thread.loading;
+  useEffect(() => {
+    let key: string | undefined;
+
+    kontenbase.realtime
+      .subscribe("Comments", { event: "CREATE_RECORD" }, async (message) => {
+        const { payload } = message;
+
+        if (threadData.find((item) => item._id === payload.threads[0])) {
+          await timeout(3000);
+
+          dispatch(
+            fetchThreads({
+              type: "inbox",
+              workspaceId: params.workspaceId,
+              userId,
+            })
+          );
+
+          const { user: userData } = await kontenbase.auth.user();
+          dispatch(updateUser(userData));
+        }
+      })
+      .then((result) => (key = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key);
+    };
+  }, []);
 
   return (
     <MainContentContainer>

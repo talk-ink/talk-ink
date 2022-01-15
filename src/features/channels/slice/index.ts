@@ -51,6 +51,20 @@ const channelSlice = createSlice({
         ...action.payload,
       };
     },
+    updateChannelCount: (state, action) => {
+      const newChanel = state.channels.map((item) =>
+        item._id === action.payload.chanelId
+          ? {
+              ...item,
+              threads: item.threads.filter(
+                (threadId) => threadId !== action.payload.threadId
+              ),
+            }
+          : item
+      );
+
+      state.channels = newChanel;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchChannels.pending, (state) => {
@@ -69,6 +83,6 @@ const channelSlice = createSlice({
   },
 });
 
-export const { addChannel, deleteChannel, updateChannel } =
+export const { addChannel, deleteChannel, updateChannel, updateChannelCount } =
   channelSlice.actions;
 export const channelReducer = channelSlice.reducer;

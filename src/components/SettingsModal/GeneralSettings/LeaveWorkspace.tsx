@@ -18,7 +18,7 @@ function LeaveWorkspace() {
   const auth = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const [isConfirmed, setIsConfirmed] = useState(false);
 

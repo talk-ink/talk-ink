@@ -28,7 +28,9 @@ export interface Thread {
   draft?: boolean;
   createdBy?: Member;
   workspace?: string;
+  interactedUsers?: string[];
   channelId?: string;
+  tagedUsers?: string[];
 }
 export interface Channel {
   id?: string;

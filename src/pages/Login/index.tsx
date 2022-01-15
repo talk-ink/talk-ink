@@ -6,6 +6,7 @@ import { KontenbaseResponse } from "@kontenbase/sdk";
 
 import SubLabel from "components/Form/SubLabel";
 import Layout from "components/Layout/LoginRegister";
+import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 
 import { kontenbase } from "lib/client";
 import { setAuthToken, setAuthUser } from "features/auth";
@@ -26,6 +27,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const params = useParams();
   const [showToast] = useToast();
+  const [isShowPass, setIsShowPass] = useState(false);
 
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -63,8 +65,8 @@ function LoginPage() {
             }
 
             if (
-              user.id === workspaceData[0]?.createdBy?._id ||
-              workspaceData[0]?.peoples.includes(user.id)
+              user._id === workspaceData[0]?.createdBy?._id ||
+              workspaceData[0]?.peoples.includes(user._id)
             ) {
               toWorkspaceId = `${workspaceData[0]._id}/inbox`;
             } else if (!invitedEmails.includes(user.email)) {
@@ -79,7 +81,7 @@ function LoginPage() {
           const { data: workspaceData }: KontenbaseResponse<Workspace> =
             await kontenbase
               .service("Workspaces")
-              .find({ where: { peoples: user.id } });
+              .find({ where: { peoples: user._id } });
 
           if (workspaceData?.length > 0) {
             toWorkspaceId = `${workspaceData[0]._id}/inbox`;
@@ -159,14 +161,29 @@ function LoginPage() {
               </span>
             </div>
           </div>
-          <input
-            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-            placeholder="Enter your password"
-            type="password"
-            onChange={formik.handleChange("password")}
-            onBlur={formik.handleBlur("password")}
-            value={formik.values.password}
-          />
+          <div className="relative">
+            <input
+              className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+              placeholder="Enter your password"
+              type={isShowPass ? "text" : "password"}
+              onChange={formik.handleChange("password")}
+              onBlur={formik.handleBlur("password")}
+              value={formik.values.password}
+            />
+            <div className="absolute right-0 top-3">
+              {isShowPass ? (
+                <FaRegEye
+                  onClick={() => setIsShowPass((prev) => !prev)}
+                  size={20}
+                />
+              ) : (
+                <FaRegEyeSlash
+                  onClick={() => setIsShowPass((prev) => !prev)}
+                  size={20}
+                />
+              )}
+            </div>
+          </div>
           {formik.errors.password && (
             <SubLabel>{formik.errors.password}</SubLabel>
           )}
@@ -175,7 +192,7 @@ function LoginPage() {
           <button
             type="submit"
             className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
-                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-600
+                            font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-500
                             shadow-lg"
             disabled={isDisabled}
           >

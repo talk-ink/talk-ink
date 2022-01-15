@@ -18,6 +18,7 @@ import { deleteInbox } from "features/inbox";
 import { deleteThread } from "features/threads";
 import { Thread } from "types";
 import { inboxFilter } from "utils/helper";
+import { updateChannelCount } from "features/channels/slice";
 
 type TProps = {
   type?: "active" | "done";
@@ -34,7 +35,7 @@ function InboxList({ type = "active" }: TProps) {
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const [selectedThread, setSelectedThread] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
@@ -50,14 +51,16 @@ function InboxList({ type = "active" }: TProps) {
 
   const threadData = useMemo(
     () =>
-      thread.threads.filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelData,
-          userData: auth.user,
-          isDoneThread,
-        })
-      ),
+      thread.threads
+        .filter((data) =>
+          inboxFilter({
+            thread: data,
+            channelIds: channelData,
+            userData: auth.user,
+            isDoneThread,
+          })
+        )
+        .filter((item) => item.tagedUsers?.includes(auth.user._id)),
     [thread.threads, auth.user, params, channelData]
   );
 
@@ -69,14 +72,14 @@ function InboxList({ type = "active" }: TProps) {
   const markHandler = async (threadId: string) => {
     try {
       if (isDoneThread) {
-        const update = await kontenbase
+        await kontenbase
           .service("Users")
-          .unlink(auth.user.id, { doneThreads: threadId });
+          .unlink(auth.user._id, { doneThreads: threadId });
         dispatch(deleteDoneThread(threadId));
       } else {
-        const update = await kontenbase
+        await kontenbase
           .service("Users")
-          .link(auth.user.id, { doneThreads: threadId });
+          .link(auth.user._id, { doneThreads: threadId });
         dispatch(addDoneThread(threadId));
       }
     } catch (error) {
@@ -96,6 +99,12 @@ function InboxList({ type = "active" }: TProps) {
         setSelectedThread(null);
       }
       dispatch(deleteThread(deletedThread.data));
+      dispatch(
+        updateChannelCount({
+          chanelId: deletedThread.data?.channel?.[0],
+          threadId: selectedThread?._id,
+        })
+      );
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${error}` });
@@ -119,7 +128,7 @@ function InboxList({ type = "active" }: TProps) {
                   dataSource={inbox}
                   onClick={() => {
                     navigate(
-                      `/a/${params.workspaceId}/ch/${inbox?.channel?.[0]}/t/${inbox?._id}`
+                      `/a/${params.workspaceId}/ch/${inbox?.channel?.[0]}/t/${inbox?._id}?fromInbox=1`
                     );
                   }}
                   otherButton={

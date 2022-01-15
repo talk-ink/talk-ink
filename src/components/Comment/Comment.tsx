@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { convertFromRaw, convertToRaw, EditorState } from "draft-js";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -22,15 +21,16 @@ import { useAppSelector } from "hooks/useAppSelector";
 
 interface IProps {
   comment: IComment;
+  listRef?: React.LegacyRef<HTMLDivElement>;
 }
 
-const Comment: React.FC<IProps> = ({ comment }) => {
+const Comment: React.FC<IProps> = ({ comment, listRef }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
 
   const [isEdit, setIsEdit] = useState(false);
-  const [editorState, setEditorState] = useState<any>();
+  const [editorState, setEditorState] = useState<string>("");
 
   const handleDeleteComment = () => {
     dispatch(deleteComment({ commentId: comment._id }));
@@ -41,7 +41,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
     dispatch(
       updateComment({
         commentId: comment._id,
-        content: JSON.stringify(convertToRaw(editorState.getCurrentContent())),
+        content: editorState,
       })
     );
 
@@ -51,11 +51,11 @@ const Comment: React.FC<IProps> = ({ comment }) => {
 
   const discardComment = () => {
     setIsEdit(false);
-    setEditorState(EditorState.createEmpty());
+    setEditorState("");
   };
 
   return (
-    <div className="group flex items-start mb-8 relative ">
+    <div className="group flex items-start mb-8 relative " ref={listRef}>
       <div className=" w-8">
         <Avatar src="https://picsum.photos/100" />
       </div>
@@ -70,17 +70,16 @@ const Comment: React.FC<IProps> = ({ comment }) => {
             </ReactMoment>
           </p>
         </div>
-        <div className="w-full ">
+        <div className=" w-[70vw] sm:w-full">
           <Preview
             content={comment.content}
             isEdit={isEdit}
-            editorState={editorState}
             setEditorState={setEditorState}
             discardComment={discardComment}
             handleUpdateComment={handleUpdateComment}
           />
         </div>
-        {auth.user.id === comment.createdBy?._id && (
+        {auth.user._id === comment.createdBy?._id && !isEdit && (
           <div className="absolute top-0 right-0 z-50 hidden group-hover:block  ">
             <Popup
               content={
@@ -89,11 +88,7 @@ const Comment: React.FC<IProps> = ({ comment }) => {
                     icon={<BiEditAlt size={20} className="text-neutral-400" />}
                     onClick={() => {
                       setIsEdit(true);
-                      setEditorState(
-                        EditorState.createWithContent(
-                          convertFromRaw(JSON.parse(comment.content))
-                        )
-                      );
+                      setEditorState(comment.content);
                     }}
                     title="Edit Comment"
                   />

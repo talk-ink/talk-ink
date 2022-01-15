@@ -14,7 +14,7 @@ function JoinChannelPage() {
   const [showToast] = useToast();
 
   const auth = useAppSelector((state) => state.auth);
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const [apiLoading, setApiLoading] = useState(false);
   const [channels, setChannels] = useState([]);
@@ -128,7 +128,7 @@ function JoinChannelPage() {
         </div>
         <div className="max-w-sm mt-5">
           <Button
-            className="w-full bg-cyan-600 text-white font-semibold text-xl p-5 flex items-center justify-center"
+            className="w-full bg-indigo-500 text-white font-semibold text-xl p-5 flex items-center justify-center"
             disabled={selectedChannels.length === 0 || apiLoading}
             onClick={joinChannelsHandler}
           >

@@ -101,7 +101,7 @@ function ChangePassword({ onCancel }: TProps) {
               Cancel
             </Button>
             <Button
-              className="text-sm flex items-center justify-center bg-cyan-500 min-w-[5rem] text-white"
+              className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
               type="submit"
             >
               Update

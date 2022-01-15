@@ -13,7 +13,6 @@ function MainContentContainer({ children, className, header, listRef }: Props) {
       <div className={`w-full md:w-11/12 px-5 md:px-10 pt-20 ${className} `}>
         {children}
       </div>
-      <div ref={listRef} />
     </div>
   );
 }

@@ -12,7 +12,7 @@ function Badge({ active, title, link }: Props) {
     <Link
       to={link}
       className={`text-sm py-1.5 px-3 ${
-        active ? "bg-cyan-100 hover:bg-slate-300" : "hover:bg-slate-100"
+        active ? "bg-indigo-100 hover:bg-slate-300" : "hover:bg-slate-100"
       }  rounded-full text-cyan-800 cursor-pointer`}
     >
       {title}

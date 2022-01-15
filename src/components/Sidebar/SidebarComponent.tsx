@@ -39,6 +39,7 @@ import AddMembers from "components/Members/AddMembers";
 import WorkspaceListButton from "components/Button/WorkspaceListButton";
 import Divider from "components/Divider/Divider";
 import SettingsModal from "components/SettingsModal/SettingsModal";
+import { FaPlus } from "react-icons/fa";
 
 type TProps = {
   isMobile: boolean;
@@ -76,7 +77,7 @@ function SidebarComponent({
   }, [workspace.workspaces, params.workspaceId]);
 
   const channelData: Channel[] = channel.channels;
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const handleLogout = async () => {
     try {
@@ -101,7 +102,7 @@ function SidebarComponent({
     try {
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
-        members: [...workspaceData.peoples, auth.user.id],
+        members: [...workspaceData.peoples, auth.user._id],
         workspace: params.workspaceId,
       });
 
@@ -265,6 +266,17 @@ function SidebarComponent({
                   }}
                 />
               ))}
+              <div
+                className="cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between group mt-1"
+                onClick={() => setCreateChannelModal(true)}
+              >
+                <div className=" `w-full flex items-center text-sm pl-3 h-8`">
+                  <FaPlus size={15} className="mr-3 text-gray-400" />
+                  <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
+                    New Channel
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
         )}

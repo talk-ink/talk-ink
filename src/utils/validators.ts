@@ -13,7 +13,7 @@ export const registerValidation = yup.object().shape({
 
 export const createWorkspaceValidation = yup.object().shape({
   name: yup.string().max(40).required().label("Workspace name"),
-  project: yup.string().max(40).required().label("Project name"),
+  // project: yup.string().max(40).required().label("Project name"),
 });
 
 export const createThreadValidation = yup.object().shape({

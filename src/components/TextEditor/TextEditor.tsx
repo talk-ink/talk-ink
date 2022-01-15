@@ -27,14 +27,13 @@ const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
     }, waitBeforeShow);
   }, [waitBeforeShow]);
 
-  return isShown ? children : null;
+  return isShown ? <>{children}</> : null;
 };
 
 function TextEditor({ formik, loading, deleteDraft }: Props) {
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
-
 
   const isDisabled = !formik.values.name || !formik.values.content || loading;
 
@@ -51,9 +50,9 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
         />
 
         {!preview && (
-          //@ts-ignore
           <Delayed>
             <Editor
+              autoFocus
               key="editor"
               onChange={(getContent) =>
                 formik.setFieldValue("content", getContent())
@@ -64,7 +63,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
                 const { data } = await kontenbase.storage.upload(file);
                 return data.url;
               }}
-              className="markdown-overrides"
+              className="markdown-overrides fix-editor"
             />
           </Delayed>
         )}
@@ -78,19 +77,19 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
           />
         )}
       </div>
-      <div className="w-full flex justify-between items-center">
+      <div className="absolute left-0 bottom-0 w-full flex justify-between items-center px-5 pb-5">
         <div></div>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             className={` hover:bg-neutral-200 rounded text-xs font-medium px-5 ${
-              !preview ? "text-cyan-500" : "text-white bg-cyan-500"
+              !preview ? "text-cyan-500" : "text-white bg-indigo-500"
             }`}
             onClick={() => {
               setPreview((prev) => !prev);
             }}
           >
             Preview
-          </Button>
+          </Button> */}
 
           <Button
             className=" hover:bg-neutral-200 rounded text-xs font-medium px-5"
@@ -103,7 +102,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
           </Button>
           <Button
             type="submit"
-            className=" bg-cyan-500 hover:bg-cyan-600 rounded text-xs font-medium px-5 text-white"
+            className=" bg-indigo-500 hover:bg-indigo-500 rounded text-xs font-medium px-5 text-white"
             disabled={isDisabled}
             onClick={formik.handleSubmit}
           >
