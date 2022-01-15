@@ -28,7 +28,7 @@ import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
 import { Channel, Member, Thread } from "types";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
-import { deleteChannel } from "features/channels/slice";
+import { deleteChannel, updateChannelCount } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
@@ -122,6 +122,12 @@ function ChannelPage() {
           setSelectedThread(null);
         }
         dispatch(deleteThread(deletedThread.data));
+        dispatch(
+          updateChannelCount({
+            chanelId: deletedThread.data?.channel?.[0],
+            threadId: selectedThread?._id,
+          })
+        );
       } else {
         deleteDraft(selectedThread.id);
         dispatch(deleteThread(selectedThread));

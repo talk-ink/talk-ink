@@ -18,6 +18,7 @@ import { deleteInbox } from "features/inbox";
 import { deleteThread } from "features/threads";
 import { Thread } from "types";
 import { inboxFilter } from "utils/helper";
+import { updateChannelCount } from "features/channels/slice";
 
 type TProps = {
   type?: "active" | "done";
@@ -98,6 +99,12 @@ function InboxList({ type = "active" }: TProps) {
         setSelectedThread(null);
       }
       dispatch(deleteThread(deletedThread.data));
+      dispatch(
+        updateChannelCount({
+          chanelId: deletedThread.data?.channel?.[0],
+          threadId: selectedThread?._id,
+        })
+      );
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${error}` });
