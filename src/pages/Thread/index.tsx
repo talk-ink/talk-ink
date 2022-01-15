@@ -26,6 +26,8 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { kontenbase } from "lib/client";
 import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
+import NameInitial from "components/Avatar/NameInitial";
+import { getNameInitial } from "utils/helper";
 
 function useQuery() {
   const { search } = useLocation();
@@ -244,8 +246,16 @@ function ThreadPage() {
           </div>
           <div className="flex items-start">
             <div className="mr-4">
-              <Avatar src="https://picsum.photos/100" />
+              {threadData.createdBy?.avatar?.[0]?.url ? (
+                <Avatar src={threadData.createdBy?.avatar?.[0]?.url} />
+              ) : (
+                <NameInitial
+                  name={getNameInitial(threadData.createdBy?.firstName)}
+                  className="mr-4"
+                />
+              )}
             </div>
+
             <div className="flex-grow">
               <Editor
                 value={threadData?.content}

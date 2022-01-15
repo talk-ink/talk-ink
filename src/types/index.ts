@@ -75,7 +75,7 @@ export interface User {
   email: string;
   workspaces?: Workspace[];
   channels?: Channel[];
-  avatar?: string;
+  avatar?: string | any;
   about?: string;
   contact?: string;
   doneThreads?: string[];

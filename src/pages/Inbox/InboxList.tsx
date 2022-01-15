@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BiCheckCircle, BiCircle } from "react-icons/bi";
@@ -14,9 +14,7 @@ import { useToast } from "hooks/useToast";
 import { addDoneThread, deleteDoneThread } from "features/auth";
 import Modal from "components/Modal/Modal";
 import { kontenbase } from "lib/client";
-import { deleteInbox } from "features/inbox";
 import { deleteThread } from "features/threads";
-import { Thread } from "types";
 import { inboxFilter } from "utils/helper";
 import { updateChannelCount } from "features/channels/slice";
 
@@ -34,8 +32,6 @@ function InboxList({ type = "active" }: TProps) {
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
-
-  const userId: string = auth.user._id;
 
   const [selectedThread, setSelectedThread] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);

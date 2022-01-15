@@ -18,6 +18,8 @@ import {
 } from "features/threads/slice/asyncThunk";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
+import NameInitial from "components/Avatar/NameInitial";
+import { getNameInitial } from "utils/helper";
 
 interface IProps {
   comment: IComment;
@@ -57,7 +59,14 @@ const Comment: React.FC<IProps> = ({ comment, listRef }) => {
   return (
     <div className="group flex items-start mb-8 relative " ref={listRef}>
       <div className=" w-8">
-        <Avatar src="https://picsum.photos/100" />
+        {comment.createdBy?.avatar?.[0]?.url ? (
+          <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
+        ) : (
+          <NameInitial
+            name={getNameInitial(comment.createdBy?.firstName)}
+            className="mr-4"
+          />
+        )}
       </div>
       <div className="ml-4 w-full">
         <div className="-mt-1.5 flex items-center justify-start">
