@@ -21,7 +21,7 @@ export const fetchThreads = createAsyncThunk(
       case "threads":
         const threadResponse = await kontenbase
           .service("Threads")
-          .find({ where: { channel: channelId } });
+          .find({ where: { channel: channelId }, lookup: ["comments"] });
 
         const parsedThreadsDraft: object = JSON.parse(
           localStorage.getItem("threadsDraft")
@@ -45,6 +45,7 @@ export const fetchThreads = createAsyncThunk(
           where: {
             workspace: workspaceId,
           },
+          lookup: ["comments"],
         });
 
         const threadData: Thread[] = inboxResponse.data;

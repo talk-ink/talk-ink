@@ -42,7 +42,6 @@ function ContentItem({
 
   const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
     try {
-      console.log(type);
       switch (type) {
         case "read":
           await kontenbase
@@ -119,7 +118,11 @@ function ContentItem({
             <div className="text-left w-52 md:w-full truncate  md:whitespace-nowrap 2xl:max-w-4xl xl:max-w-2xl md:max-w-xl text-xs text-neutral-500 pr-2">
               <small className=" text-xs text-neutral-500">
                 {dataSource?.draft ? "Me: " : ""}
-                {dataSource.content?.replace(/[^a-zA-Z ]/g, "")}
+                {dataSource.comments?.length > 0
+                  ? `Latest : ${dataSource.comments?.[
+                      dataSource.comments?.length - 1
+                    ]?.content?.replace(/[^a-zA-Z ]/g, "")}`
+                  : dataSource.content?.replace(/[^a-zA-Z ]/g, "")}
               </small>
             </div>
           </div>
