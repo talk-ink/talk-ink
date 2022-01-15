@@ -2,6 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 
 import Logo from "../../assets/image/logo512.png";
+import Brand from "assets/image/landing/brand.svg";
 
 type TProps = React.PropsWithChildren<{
   hero: string;
@@ -16,7 +17,7 @@ const LoginRegister: React.FC<TProps> = ({ hero, title, children }) => {
           <div className="cursor-pointer flex items-center">
             <div>
               <Link to="/">
-                <img src={Logo} alt="Logo" className="w-3/12" />
+                <img src={Brand} alt="Logo" className="w-10/12 px-12" />
               </Link>
             </div>
           </div>

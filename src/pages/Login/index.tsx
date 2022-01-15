@@ -6,6 +6,7 @@ import { KontenbaseResponse } from "@kontenbase/sdk";
 
 import SubLabel from "components/Form/SubLabel";
 import Layout from "components/Layout/LoginRegister";
+import { FaRegEyeSlash, FaRegEye } from "react-icons/fa";
 
 import { kontenbase } from "lib/client";
 import { setAuthToken, setAuthUser } from "features/auth";
@@ -26,6 +27,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const params = useParams();
   const [showToast] = useToast();
+  const [isShowPass, setIsShowPass] = useState(false);
 
   const [apiLoading, setApiLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
@@ -159,14 +161,29 @@ function LoginPage() {
               </span>
             </div>
           </div>
-          <input
-            className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
-            placeholder="Enter your password"
-            type="password"
-            onChange={formik.handleChange("password")}
-            onBlur={formik.handleBlur("password")}
-            value={formik.values.password}
-          />
+          <div className="relative">
+            <input
+              className="w-full text-lg py-2 border-b border-gray-300 focus:outline-none focus:border-indigo-500"
+              placeholder="Enter your password"
+              type={isShowPass ? "text" : "password"}
+              onChange={formik.handleChange("password")}
+              onBlur={formik.handleBlur("password")}
+              value={formik.values.password}
+            />
+            <div className="absolute right-0 top-3">
+              {isShowPass ? (
+                <FaRegEye
+                  onClick={() => setIsShowPass((prev) => !prev)}
+                  size={20}
+                />
+              ) : (
+                <FaRegEyeSlash
+                  onClick={() => setIsShowPass((prev) => !prev)}
+                  size={20}
+                />
+              )}
+            </div>
+          </div>
           {formik.errors.password && (
             <SubLabel>{formik.errors.password}</SubLabel>
           )}
