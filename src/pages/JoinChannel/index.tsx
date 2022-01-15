@@ -14,7 +14,7 @@ function JoinChannelPage() {
   const [showToast] = useToast();
 
   const auth = useAppSelector((state) => state.auth);
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const [apiLoading, setApiLoading] = useState(false);
   const [channels, setChannels] = useState([]);

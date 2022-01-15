@@ -160,7 +160,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               <ContentSkeleton count={2} />
             ) : (
               <>
-                {auth.user.id === workspaceData?.createdBy?._id && (
+                {auth.user._id === workspaceData?.createdBy?._id && (
                   <>
                     {invitedEmails.map((data, idx) => (
                       <MemberList

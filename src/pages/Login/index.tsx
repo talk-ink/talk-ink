@@ -65,8 +65,8 @@ function LoginPage() {
             }
 
             if (
-              user.id === workspaceData[0]?.createdBy?._id ||
-              workspaceData[0]?.peoples.includes(user.id)
+              user._id === workspaceData[0]?.createdBy?._id ||
+              workspaceData[0]?.peoples.includes(user._id)
             ) {
               toWorkspaceId = `${workspaceData[0]._id}/inbox`;
             } else if (!invitedEmails.includes(user.email)) {
@@ -81,7 +81,7 @@ function LoginPage() {
           const { data: workspaceData }: KontenbaseResponse<Workspace> =
             await kontenbase
               .service("Workspaces")
-              .find({ where: { peoples: user.id } });
+              .find({ where: { peoples: user._id } });
 
           if (workspaceData?.length > 0) {
             toWorkspaceId = `${workspaceData[0]._id}/inbox`;

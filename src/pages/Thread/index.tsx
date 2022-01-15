@@ -125,7 +125,7 @@ function ThreadPage() {
       if (!readedThreads.includes(threadId)) {
         await kontenbase
           .service("Users")
-          .link(auth.user.id, { readedThreads: threadId });
+          .link(auth.user._id, { readedThreads: threadId });
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
     } catch (error: any) {
@@ -170,15 +170,15 @@ function ThreadPage() {
       try {
         const { data } = await kontenbase.service("Threads").getById(threadId);
 
-        if (!data.interactedUsers.find((item: any) => item === auth.user.id)) {
+        if (!data.interactedUsers.find((item: any) => item === auth.user._id)) {
           await kontenbase.service("Threads").link(threadId, {
-            interactedUsers: auth.user.id,
+            interactedUsers: auth.user._id,
           });
 
           dispatch(
             addInteractedUser({
               threadId: threadId,
-              userId: auth.user.id,
+              userId: auth.user._id,
             })
           );
         }
@@ -210,7 +210,7 @@ function ThreadPage() {
   }, []);
 
   useEffect(() => {
-    dispatch(fetchChannels({ userId: auth.user.id, workspaceId }));
+    dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
   }, [workspaceId]);
 
   return (

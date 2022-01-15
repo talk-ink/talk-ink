@@ -41,7 +41,7 @@ function InboxPage() {
     "done" | "read" | null | undefined
   >(null);
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const isDoneThread = useMemo(() => {
     return pathname.includes("inbox/done");
@@ -63,7 +63,7 @@ function InboxPage() {
             isDoneThread,
           })
         )
-        .filter((item) => item.tagedUsers?.includes(auth.user.id)),
+        .filter((item) => item.tagedUsers?.includes(auth.user._id)),
     [thread.threads, auth.user, params, channelData]
   );
 
@@ -78,7 +78,7 @@ function InboxPage() {
 
       [...uniqueId].forEach((id, idx) => {
         setTimeout(async () => {
-          await kontenbase.service("Users").link(auth.user.id, {
+          await kontenbase.service("Users").link(auth.user._id, {
             readedThreads: id,
           });
         }, idx * 100);
@@ -101,7 +101,7 @@ function InboxPage() {
 
       [...uniqueId].forEach((id, idx) => {
         setTimeout(async () => {
-          await kontenbase.service("Users").link(auth.user.id, {
+          await kontenbase.service("Users").link(auth.user._id, {
             doneThreads: id,
           });
         }, idx * 100);
@@ -134,7 +134,7 @@ function InboxPage() {
           params.workspaceId
         );
 
-        const isNotCreatedByThisUser = payload?.createdBy !== auth.user.id;
+        const isNotCreatedByThisUser = payload?.createdBy !== auth.user._id;
         const isThreadInJoinedChannel = channelData.includes(
           payload?.channel?.[0]
         );

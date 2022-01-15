@@ -120,7 +120,7 @@ function Compose() {
 
     if (isAllChannelSelected) {
       _invitedUsers = channelData.members.filter(
-        (item) => item !== auth.user.id
+        (item) => item !== auth.user._id
       );
     }
 
@@ -198,7 +198,7 @@ function Compose() {
           label: item.firstName,
           flag: 3,
         }))
-        .filter((item) => item.value !== auth.user.id),
+        .filter((item) => item.value !== auth.user._id),
     ];
 
     setNotifiedOptions(options);
@@ -207,7 +207,7 @@ function Compose() {
 
   useEffect(() => {
     dispatch(
-      fetchChannels({ userId: auth.user.id, workspaceId: params.workspaceId })
+      fetchChannels({ userId: auth.user._id, workspaceId: params.workspaceId })
     );
   }, [params.workspaceId]);
 

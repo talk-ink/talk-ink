@@ -77,7 +77,7 @@ function SidebarComponent({
   }, [workspace.workspaces, params.workspaceId]);
 
   const channelData: Channel[] = channel.channels;
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const handleLogout = async () => {
     try {
@@ -102,7 +102,7 @@ function SidebarComponent({
     try {
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
-        members: [...workspaceData.peoples, auth.user.id],
+        members: [...workspaceData.peoples, auth.user._id],
         workspace: params.workspaceId,
       });
 

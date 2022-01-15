@@ -46,13 +46,13 @@ function ContentItem({
         case "read":
           await kontenbase
             .service("Users")
-            .link(auth.user.id, { readedThreads: dataSource._id });
+            .link(auth.user._id, { readedThreads: dataSource._id });
           dispatch(addReadThread(dataSource._id));
           break;
         case "unread":
           await kontenbase
             .service("Users")
-            .unlink(auth.user.id, { readedThreads: dataSource._id });
+            .unlink(auth.user._id, { readedThreads: dataSource._id });
           dispatch(deleteReadThread(dataSource._id));
           break;
 
@@ -151,9 +151,9 @@ function ContentItem({
                       }}
                     />
                   )}
-                  {dataSource.createdBy._id === auth.user.id ||
+                  {dataSource.createdBy._id === auth.user._id ||
                     (dataSource?.draft && <Divider />)}
-                  {dataSource.createdBy._id === auth.user.id ||
+                  {dataSource.createdBy._id === auth.user._id ||
                     (dataSource?.draft && (
                       <MenuItem
                         icon={

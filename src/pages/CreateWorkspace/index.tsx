@@ -43,7 +43,7 @@ function CreateWorkspacePage() {
     try {
       const { data } = await kontenbase
         .service("Workspaces")
-        .create({ name: values.name, peoples: auth.user.id });
+        .create({ name: values.name, peoples: auth.user._id });
 
       dispatch(addWorkspace(data));
 
@@ -51,20 +51,20 @@ function CreateWorkspacePage() {
         const generalChannel = await kontenbase.service("Channels").create({
           name: "General",
           workspace: data?._id,
-          members: auth.user.id,
+          members: auth.user._id,
           privacy: "public",
         });
 
         await kontenbase.service("Channels").create({
           name: "Random",
           workspace: data?._id,
-          members: auth.user.id,
+          members: auth.user._id,
           privacy: "public",
         });
         // const projectChannel = await kontenbase.service("Channels").create({
         //   name: values.project,
         //   workspace: data?._id,
-        //   members: auth.user.id,
+        //   members: auth.user._id,
         //   privacy: "public",
         // });
 

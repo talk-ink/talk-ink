@@ -47,7 +47,7 @@ function ChannelPage() {
   const channel = useAppSelector((state) => state.channel);
   const thread = useAppSelector((state) => state.thread);
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   const dispatch = useAppDispatch();
 
@@ -198,7 +198,7 @@ function ChannelPage() {
               (member, idx) =>
                 idx <= 3 && (
                   <div key={idx}>
-                    {member._id === auth.user.id && (
+                    {member._id === auth.user._id && (
                       <>
                         {!auth.user.avatar && (
                           <NameInitial
@@ -216,7 +216,7 @@ function ChannelPage() {
                         )}
                       </>
                     )}
-                    {member._id !== auth.user.id && (
+                    {member._id !== auth.user._id && (
                       <>
                         {!member.avatar && (
                           <NameInitial
@@ -299,7 +299,7 @@ function ChannelPage() {
                   isRead={
                     readedThreads.includes(thread._id) ||
                     (readedThreads.includes(thread._id) &&
-                      thread.createdBy?._id === auth.user.id)
+                      thread.createdBy?._id === auth.user._id)
                   }
                 />
               ))}

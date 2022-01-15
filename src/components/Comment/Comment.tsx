@@ -79,7 +79,7 @@ const Comment: React.FC<IProps> = ({ comment, listRef }) => {
             handleUpdateComment={handleUpdateComment}
           />
         </div>
-        {auth.user.id === comment.createdBy?._id && !isEdit && (
+        {auth.user._id === comment.createdBy?._id && !isEdit && (
           <div className="absolute top-0 right-0 z-50 hidden group-hover:block  ">
             <Popup
               content={

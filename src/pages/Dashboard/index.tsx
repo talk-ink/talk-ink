@@ -24,7 +24,7 @@ function DashboardPage() {
     setIsSidebarOpen(false);
   }, []);
 
-  const userId: string = auth.user.id;
+  const userId: string = auth.user._id;
 
   useEffect(() => {
     dispatch(fetchWorkspaces({ userId }));

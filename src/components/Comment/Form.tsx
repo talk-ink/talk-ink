@@ -73,7 +73,7 @@ const Form: React.FC<IProps> = ({
           label: item.firstName,
           flag: 3,
         }))
-        .filter((item) => item.value !== auth.user.id),
+        .filter((item) => item.value !== auth.user._id),
     ];
 
     setNotifiedOptions(options);
@@ -105,12 +105,12 @@ const Form: React.FC<IProps> = ({
     );
 
     if (isInteractedUsersSelected) {
-      _invitedUsers = interactedUsers.filter((item) => item !== auth.user.id);
+      _invitedUsers = interactedUsers.filter((item) => item !== auth.user._id);
     }
 
     if (isAllChannelSelected) {
       _invitedUsers = channelData.members.filter(
-        (item) => item !== auth.user.id
+        (item) => item !== auth.user._id
       );
     }
 
