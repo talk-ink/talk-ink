@@ -170,7 +170,9 @@ function ThreadPage() {
       try {
         const { data } = await kontenbase.service("Threads").getById(threadId);
 
-        if (!data.interactedUsers.find((item: any) => item === auth.user._id)) {
+        if (
+          !data.interactedUsers?.find((item: any) => item === auth.user._id)
+        ) {
           await kontenbase.service("Threads").link(threadId, {
             interactedUsers: auth.user._id,
           });
