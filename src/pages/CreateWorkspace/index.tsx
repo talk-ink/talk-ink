@@ -17,7 +17,7 @@ import Hero from "../../assets/image/landing/chat.svg";
 
 const initialValues: Workspace = {
   name: "",
-  project: "",
+  // project: "",
 };
 
 function CreateWorkspacePage() {
@@ -54,14 +54,25 @@ function CreateWorkspacePage() {
           members: auth.user.id,
           privacy: "public",
         });
-        const projectChannel = await kontenbase.service("Channels").create({
-          name: values.project,
+
+        await kontenbase.service("Channels").create({
+          name: "Random",
           workspace: data?._id,
           members: auth.user.id,
           privacy: "public",
         });
+        // const projectChannel = await kontenbase.service("Channels").create({
+        //   name: values.project,
+        //   workspace: data?._id,
+        //   members: auth.user.id,
+        //   privacy: "public",
+        // });
 
-        if (generalChannel && projectChannel) {
+        // if (generalChannel && projectChannel) {
+        //   navigate(`/a/${data?._id}/inbox`);
+        // }
+
+        if (generalChannel) {
           navigate(`/a/${data?._id}/inbox`);
         }
       }
@@ -72,12 +83,14 @@ function CreateWorkspacePage() {
       setApiLoading(false);
     }
   };
-  const isDisabled =
-    !formik.values.name ||
-    !formik.values.project ||
-    !!formik.errors.name ||
-    !!formik.errors.project ||
-    apiLoading;
+  // const isDisabled =
+  //   !formik.values.name ||
+  //   !formik.values.project ||
+  //   !!formik.errors.name ||
+  //   !!formik.errors.project ||
+  //   apiLoading;
+
+  const isDisabled = !formik.values.name || !!formik.errors.name || apiLoading;
 
   return (
     <Layout hero={Hero} title="Workspace">
@@ -96,7 +109,7 @@ function CreateWorkspacePage() {
           {formik.errors.name && <SubLabel>{formik.errors.name}</SubLabel>}
         </div>
 
-        <div className="mt-8">
+        {/* <div className="mt-8">
           <div className="flex justify-between items-center">
             <div className="text-sm font-bold text-gray-700 tracking-wide">
               Project Name
@@ -113,7 +126,7 @@ function CreateWorkspacePage() {
           {formik.errors.project && (
             <SubLabel>{formik.errors.project}</SubLabel>
           )}
-        </div>
+        </div> */}
         <div className="mt-10">
           <button
             type="submit"

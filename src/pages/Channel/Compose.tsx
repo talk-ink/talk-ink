@@ -19,6 +19,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { addThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
+import { fetchChannels } from "features/channels/slice";
 
 const initialValues: Thread = {
   name: "",
@@ -202,6 +203,12 @@ function Compose() {
     setNotifiedOptions(options);
     setSelectedNotifiedOptions([options[0]]);
   }, [memberList, auth]);
+
+  useEffect(() => {
+    dispatch(
+      fetchChannels({ userId: auth.user.id, workspaceId: params.workspaceId })
+    );
+  }, [params.workspaceId]);
 
   const loading = apiLoading;
 

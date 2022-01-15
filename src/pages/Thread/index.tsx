@@ -20,6 +20,7 @@ import {
   addInteractedUser,
 } from "features/threads";
 
+import { fetchChannels } from "features/channels/slice";
 import { fetchComments } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { kontenbase } from "lib/client";
@@ -207,6 +208,10 @@ function ThreadPage() {
   useEffect(() => {
     getMemberHandler();
   }, []);
+
+  useEffect(() => {
+    dispatch(fetchChannels({ userId: auth.user.id, workspaceId }));
+  }, [workspaceId]);
 
   return (
     <MainContentContainer
