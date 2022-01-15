@@ -135,15 +135,11 @@ function Compose() {
         tagedUsers: _invitedUsers,
       });
 
-      const filteredMemberWithoutOwner = channelData.members.filter(
-        (item) => item !== auth.user.id
-      );
-
-      if (filteredMemberWithoutOwner.length > 0) {
+      if (_invitedUsers.length > 0) {
         axios.post(NOTIFICATION_API, {
           title: `New Thread - ${channelData?.name}`,
           description: values.name,
-          externalUserIds: filteredMemberWithoutOwner,
+          externalUserIds: _invitedUsers,
         });
       }
 
@@ -222,7 +218,7 @@ function Compose() {
         />
       }
     >
-      <div className="w-[50vw] h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-7 mx-auto ">
+      <div className="w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-7 mx-auto relative ">
         <div className="mb-2 flex w-fit items-center">
           <div className="mr-2">
             <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">

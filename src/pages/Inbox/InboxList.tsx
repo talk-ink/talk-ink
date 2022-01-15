@@ -121,7 +121,7 @@ function InboxList({ type = "active" }: TProps) {
                   dataSource={inbox}
                   onClick={() => {
                     navigate(
-                      `/a/${params.workspaceId}/ch/${inbox?.channel?.[0]}/t/${inbox?._id}`
+                      `/a/${params.workspaceId}/ch/${inbox?.channel?.[0]}/t/${inbox?._id}?fromInbox=1`
                     );
                   }}
                   otherButton={

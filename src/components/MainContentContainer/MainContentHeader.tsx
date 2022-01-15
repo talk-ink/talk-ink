@@ -9,7 +9,7 @@ type Props = React.PropsWithChildren<{
   title: string;
   thread?: boolean;
   onBackClick?: () => void;
-  from?: "inbox";
+  from?: string;
 }>;
 
 function MainContentHeader({
@@ -40,7 +40,9 @@ function MainContentHeader({
           }}
         >
           <HiChevronLeft size={18} className="text-neutral-500 mr-2 " />
-          <p className="text-xs text-neutral-500 font-medium">{channel}</p>
+          <p className="text-xs text-neutral-500 font-medium">
+            {from === "inbox" ? "Inbox" : channel}
+          </p>
         </Button>
       </div>
       <div className="flex items-center justify-center grid-cols-1">

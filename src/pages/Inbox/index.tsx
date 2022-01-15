@@ -174,6 +174,14 @@ function InboxPage() {
         if (threadData.find((item) => item._id === payload.threads[0])) {
           await timeout(3000);
 
+          dispatch(
+            fetchThreads({
+              type: "inbox",
+              workspaceId: params.workspaceId,
+              userId,
+            })
+          );
+
           const { user: userData } = await kontenbase.auth.user();
           dispatch(updateUser(userData));
         }

@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
-import { useParams } from "react-router";
+import { useParams, useLocation } from "react-router";
 import Editor from "rich-markdown-editor";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
@@ -26,9 +26,16 @@ import { kontenbase } from "lib/client";
 import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 
+function useQuery() {
+  const { search } = useLocation();
+
+  return React.useMemo(() => new URLSearchParams(search), [search]);
+}
+
 function ThreadPage() {
   const [showToast] = useToast();
   const { threadId, workspaceId, channelId } = useParams();
+  const query = useQuery();
   const listRef = useRef<HTMLDivElement>(null);
   const [memberList, setMemberList] = useState<Member[]>([]);
 
@@ -208,6 +215,7 @@ function ThreadPage() {
           channel={channelData?.name}
           title={threadData?.name}
           thread
+          from={query.get("fromInbox") === "1" && "inbox"}
         />
       }
     >

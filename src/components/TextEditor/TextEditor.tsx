@@ -77,10 +77,10 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
           />
         )}
       </div>
-      <div className="w-full flex justify-between items-center">
+      <div className="absolute left-0 bottom-0 w-full flex justify-between items-center px-5 pb-5">
         <div></div>
         <div className="flex gap-2">
-          <Button
+          {/* <Button
             className={` hover:bg-neutral-200 rounded text-xs font-medium px-5 ${
               !preview ? "text-cyan-500" : "text-white bg-indigo-500"
             }`}
@@ -89,7 +89,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
             }}
           >
             Preview
-          </Button>
+          </Button> */}
 
           <Button
             className=" hover:bg-neutral-200 rounded text-xs font-medium px-5"
