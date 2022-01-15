@@ -119,6 +119,10 @@ function InboxPage() {
     );
   }, [params.workspaceId]);
 
+  function timeout(delay: number) {
+    return new Promise((res) => setTimeout(res, delay));
+  }
+
   useEffect(() => {
     let key: string | undefined;
 
@@ -164,17 +168,14 @@ function InboxPage() {
     let key: string | undefined;
 
     kontenbase.realtime
-      .subscribe("Comments", { event: "*" }, async (message) => {
-        console.log(message);
+      .subscribe("Comments", { event: "CREATE_RECORD" }, async (message) => {
+        const { payload } = message;
 
-        switch (message.event) {
-          case "CREATE_RECORD":
-            const { user: userData } = await kontenbase.auth.user();
-            dispatch(updateUser(userData));
-            break;
+        if (threadData.find((item) => item._id === payload.threads[0])) {
+          await timeout(3000);
 
-          default:
-            break;
+          const { user: userData } = await kontenbase.auth.user();
+          dispatch(updateUser(userData));
         }
       })
       .then((result) => (key = result));

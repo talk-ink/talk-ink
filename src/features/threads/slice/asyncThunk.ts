@@ -88,17 +88,20 @@ export const createComment = createAsyncThunk(
       threads: [threadId],
     });
 
-    await kontenbase.service("Threads").updateById(threadId, {
-      tagedUsers,
-    });
+    if (tagedUsers.length > 0) {
+      await kontenbase.service("Threads").updateById(threadId, {
+        tagedUsers,
+      });
 
-    tagedUsers.forEach((item, index) => {
-      setTimeout(async () => {
-        await kontenbase
-          .service("Users")
-          .unlink(item, { readedThreads: threadId });
-      }, 100 * index);
-    });
+      const tagPromise = tagedUsers.map(
+        async (item) =>
+          await kontenbase
+            .service("Users")
+            .unlink(item, { readedThreads: threadId })
+      );
+
+      Promise.all(tagPromise);
+    }
 
     return data;
   }

@@ -141,7 +141,7 @@ function ThreadPage() {
   const scrollToBottom = () =>
     setTimeout(() => {
       listRef?.current?.scrollIntoView({ behavior: "smooth" });
-    }, 500);
+    }, 1000);
 
   useEffect(() => {
     scrollToBottom();

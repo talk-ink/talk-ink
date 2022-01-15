@@ -3,7 +3,6 @@ import React, { useState } from "react";
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { convertFromRaw, convertToRaw, EditorState } from "draft-js";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
