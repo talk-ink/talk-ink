@@ -23,6 +23,7 @@ import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
 import { addThread, deleteThread } from "features/threads";
+import { inboxFilter } from "utils/helper";
 
 function InboxPage() {
   const [showToast] = useToast();
@@ -53,12 +54,14 @@ function InboxPage() {
 
   const threadData = useMemo(
     () =>
-      thread.threads.filter((data) => {
-        if (!channelData.includes(data.channel[0])) return false;
-        if (!auth.user.doneThreads) return true;
-        if (isDoneThread) return auth.user.doneThreads.includes(data._id);
-        return !auth.user.doneThreads.includes(data._id);
-      }),
+      thread.threads.filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      ),
     [thread.threads, auth.user, params, channelData]
   );
 

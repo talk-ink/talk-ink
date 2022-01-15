@@ -89,7 +89,7 @@ function ContentItem({
           <div className="flex items-center">
             <div
               className={`h-3 w-3 ${
-                !isRead ? "bg-cyan-600" : "bg-transparent"
+                !isRead && !dataSource.draft ? "bg-cyan-600" : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
             <NameInitial
@@ -100,7 +100,7 @@ function ContentItem({
           <div>
             <div className="flex flex-col items-start md:flex-row md:items-center">
               <p
-                className={`font-body text-sm mr-2 ${
+                className={`font-body text-sm mr-2 max-w-xs overflow-hidden text-ellipsis ${
                   dataSource?.draft && "text-blue-500"
                 } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >

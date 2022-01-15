@@ -23,12 +23,7 @@ export const createThreadValidation = yup.object().shape({
 
 export const createChannelValidation = yup.object().shape({
   name: yup.string().max(40).required().label("Channel name"),
-  description: yup
-    .string()
-    .max(300)
-    .required()
-    .typeError("Description is required")
-    .label("Description"),
+  description: yup.string().max(300).typeError("").label("Description"),
   privacy: yup
     .string()
     .oneOf(["public", "private"])

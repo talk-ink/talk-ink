@@ -44,7 +44,9 @@ function MainContentHeader({
         </Button>
       </div>
       <div className="flex items-center justify-center grid-cols-1">
-        <h1 className="text-md font-bold">{title}</h1>
+        <h1 className="text-md font-bold max-w-md overflow-hidden text-ellipsis">
+          {title}
+        </h1>
       </div>
       {thread && (
         <div className="grid-cols-1 flex items-center justify-end"></div>

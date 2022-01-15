@@ -28,6 +28,7 @@ export interface Thread {
   draft?: boolean;
   createdBy?: Member;
   workspace?: string;
+  channelId?: string;
 }
 export interface Channel {
   id?: string;

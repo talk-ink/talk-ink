@@ -5,7 +5,7 @@ import { setToast } from "features/toast";
 export const useToast = () => {
   const dispatch = useAppDispatch();
 
-  const showToast = ({ message, duration = 1000 }: Toast) => {
+  const showToast = ({ message, duration = 3000 }: Toast) => {
     dispatch(setToast({ message, duration }));
   };
 

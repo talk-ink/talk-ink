@@ -152,10 +152,10 @@ function SidebarComponent({
                   ? "translate-x-0 w-[80vw] "
                   : "-translate-x-full w-full"
               } md:block`
-            : `bg-[#F7FAFB] h-screen hidden md:block`
+            : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51] `
         }
       >
-        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-10">
+        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-[51]">
           <Popup
             content={
               <div>
@@ -210,7 +210,8 @@ function SidebarComponent({
                 onClick={() => setIsSidebarOpen(false)}
               />
             ) : (
-              <BiMoon size={18} className="text-neutral-400" />
+              // <BiMoon size={18} className="text-neutral-400" />
+              <></>
             )}
           </IconButton>
         </div>
