@@ -7,3 +7,9 @@
 - Simple as email
 - Realtime as chat
 - Readable as thread
+
+## Screenshots
+
+![Homepage](./public/images/talkink-homepage.png)
+
+![Demo](./public/images/talkink-demo.png)
