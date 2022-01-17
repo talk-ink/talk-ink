@@ -76,7 +76,11 @@ function SidebarComponent({
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
 
-  const channelData: Channel[] = channel.channels;
+  const channelData: Channel[] = useMemo(() => {
+    return channel.channels.filter((data) =>
+      data.members.includes(auth.user._id)
+    );
+  }, [channel.channels, params.channelId]);
   const userId: string = auth.user._id;
 
   const handleLogout = async () => {

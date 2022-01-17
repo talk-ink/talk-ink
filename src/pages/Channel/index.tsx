@@ -33,6 +33,7 @@ import { useToast } from "hooks/useToast";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import ProfileImage from "components/ProfileImage";
+import { setAuthLoading } from "features/auth";
 
 moment.locale("id");
 
@@ -46,6 +47,7 @@ function ChannelPage() {
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
   const thread = useAppSelector((state) => state.thread);
+  const workspace = useAppSelector((state) => state.workspace);
 
   const userId: string = auth.user._id;
 
@@ -97,6 +99,10 @@ function ChannelPage() {
   const threadData = useMemo(() => {
     return thread.threads;
   }, [thread.threads]);
+
+  const workspaceData = useMemo(() => {
+    return workspace.workspaces.find((data) => data._id === params.workspaceId);
+  }, [workspace.workspaces, params.workspaceId]);
 
   const readedThreads: string[] = useMemo(() => {
     if (!auth.user.readedThreads) return [];
@@ -174,9 +180,17 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
-    getMemberHandler();
+    if (channel.channels.length > 0) {
+      dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
+      getMemberHandler();
+    }
   }, [params.channelId]);
+
+  useEffect(() => {
+    if (workspaceData && !workspaceData.channels.includes(params.channelId)) {
+      navigate("/404", { state: { params: { message: "Channel error" } } });
+    }
+  }, [workspaceData, params.channelId]);
 
   const loading = channel.loading || thread.loading;
 
