@@ -35,6 +35,7 @@ import { deleteChannel, updateChannelCount } from "features/channels/slice";
 import { kontenbase } from "lib/client";
 import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
+import ChannelBadge from "components/ChannelBadge";
 
 moment.locale("id");
 
@@ -98,13 +99,16 @@ function ChannelPage() {
     return channel.channels.find((data) => data._id === params.channelId);
   }, [params.channelId, channel.channels]);
 
+  const isChannelMember: boolean = useMemo(() => {
+    if (channelData) {
+      return channelData.members.includes(userId);
+    }
+    return false;
+  }, [channelData]);
+
   const threadData = useMemo(() => {
     return thread.threads;
   }, [thread.threads]);
-
-  const workspaceData = useMemo(() => {
-    return workspace.workspaces.find((data) => data._id === params.workspaceId);
-  }, [workspace.workspaces, params.workspaceId]);
 
   const readedThreads: string[] = useMemo(() => {
     if (!auth.user.readedThreads) return [];
@@ -151,11 +155,9 @@ function ChannelPage() {
 
   const leaveChannelHandler = async () => {
     try {
-      let members = channelData.members.filter((data) => data !== userId);
-
-      await kontenbase.service("Channels").updateById(channelData?._id, {
-        members,
-      });
+      await kontenbase
+        .service("Channels")
+        .unlink(channelData?._id, { members: userId });
 
       dispatch(deleteChannel(channelData));
       setLeaveChannelModal(false);
@@ -248,17 +250,19 @@ function ChannelPage() {
                 )
             )}
           </div>
-          <Button
-            className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
-            onClick={() => {
-              createThreadDraft();
-            }}
-          >
-            <BiEdit size={18} className="text-white md:mr-2" />
-            <p className="hidden md:block text-sm text-white font-medium -mb-1">
-              New Thread
-            </p>
-          </Button>
+          {isChannelMember && (
+            <Button
+              className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
+              onClick={() => {
+                createThreadDraft();
+              }}
+            >
+              <BiEdit size={18} className="text-white md:mr-2" />
+              <p className="hidden md:block text-sm text-white font-medium -mb-1">
+                New Thread
+              </p>
+            </Button>
+          )}
           <Popup
             content={
               <div>
@@ -378,6 +382,9 @@ function ChannelPage() {
           again later.
         </p>
       </Modal>
+      {!isChannelMember && !loading && (
+        <ChannelBadge type="channel" data={channelData} userId={userId} />
+      )}
     </MainContentContainer>
   );
 }

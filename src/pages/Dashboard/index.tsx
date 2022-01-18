@@ -85,8 +85,7 @@ function DashboardPage() {
           return dispatch(addChannel(channelData[0]));
         }
       }
-
-      return dispatch(setPageStatus(null));
+      return setPageStatus(null);
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error)}` });
@@ -97,12 +96,7 @@ function DashboardPage() {
     if (workspace.workspaces.length > 0) {
       pageStatusHandler();
     }
-  }, [
-    params.workspaceId,
-    params.channelId,
-    channel.channels,
-    workspace.workspaces,
-  ]);
+  }, [params.workspaceId, params.channelId, workspace.workspaces]);
 
   const loading =
     workspace.loading ||
