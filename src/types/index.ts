@@ -129,3 +129,9 @@ export interface Member extends Omit<User, "avatar"> {
 export interface TUserProfile extends Omit<User, "avatar"> {
   avatar?: Avatar[];
 }
+
+export type PageStatus =
+  | "channel-restricted"
+  | "channel-notFound"
+  | null
+  | undefined;

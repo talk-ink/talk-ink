@@ -116,7 +116,7 @@ function ContentItem({
                   dataSource.draft && "hidden"
                 } text-xs text-neutral-500`}
               >
-                <ReactMoment fromNow>
+                <ReactMoment fromNow locale="en">
                   {dataSource?.updatedAt || dataSource?.createdAt}
                 </ReactMoment>
               </span>

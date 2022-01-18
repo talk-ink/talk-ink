@@ -15,9 +15,9 @@ type InitChannelState = {
 export const fetchChannels = createAsyncThunk(
   "channel/fetchChannels",
   async ({ userId, workspaceId }: FetchChannelsProps) => {
-    const response = await kontenbase
-      .service("Channels")
-      .find({ where: { workspace: workspaceId } });
+    const response = await kontenbase.service("Channels").find({
+      where: { members: userId, workspace: workspaceId },
+    });
 
     return response.data;
   }

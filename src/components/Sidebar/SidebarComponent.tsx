@@ -40,6 +40,7 @@ import WorkspaceListButton from "components/Button/WorkspaceListButton";
 import Divider from "components/Divider/Divider";
 import SettingsModal from "components/SettingsModal/SettingsModal";
 import { FaPlus } from "react-icons/fa";
+import { updateWorkspace } from "features/workspaces";
 
 type TProps = {
   isMobile: boolean;
@@ -112,6 +113,12 @@ function SidebarComponent({
 
       if (createChannel) {
         dispatch(addChannel(createChannel.data));
+        dispatch(
+          updateWorkspace({
+            _id: params.workspaceId,
+            channels: [...workspaceData.channels, createChannel?.data?._id],
+          })
+        );
         setCreateChannelModal(false);
         navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
       }
@@ -259,7 +266,7 @@ function SidebarComponent({
                   data={channel}
                   link={`/a/${workspaceData?._id}/ch/${channel._id}`}
                   isDefault
-                  count={channel.threads.length}
+                  count={channel.threads.length ?? 0}
                   leaveModalHandler={(channel) => {
                     setLeaveChannelModal(true);
                     setSelectedChannel(channel);

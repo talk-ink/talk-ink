@@ -38,24 +38,24 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
             />
           );
         }
-        if (params.channelId && channel.channels.length > 0) {
-          const findChannel = channel.channels.find(
-            (data) => data._id === params.channelId
-          );
+        // if (params.channelId && channel.channels.length > 0) {
+        //   const findChannel = channel.channels.find(
+        //     (data) => data._id === params.channelId
+        //   );
 
-          if (
-            !findChannel ||
-            (findChannel?.privacy === "private" &&
-              !findChannel?.members?.includes(auth.user._id))
-          ) {
-            return (
-              <Navigate
-                to="/404"
-                state={{ params: { message: "Channel error - privacy" } }}
-              />
-            );
-          }
-        }
+        //   if (
+        //     !findChannel ||
+        //     (findChannel?.privacy === "private" &&
+        //       !findChannel?.members?.includes(auth.user._id))
+        //   ) {
+        //     return (
+        //       <Navigate
+        //         to="/404"
+        //         state={{ params: { message: "Channel error - privacy" } }}
+        //       />
+        //     );
+        //   }
+        // }
       }
       break;
     case "public":

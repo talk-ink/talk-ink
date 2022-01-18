@@ -20,20 +20,21 @@ import Popup from "components/Popup/Popup";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Modal from "components/Modal/Modal";
+import ProfileImage from "components/ProfileImage";
+import EditChannelForm from "components/ChannelForm/EditChannelForm";
+import NameInitial from "components/Avatar/NameInitial";
 
 import { useAppSelector } from "hooks/useAppSelector";
-import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
+import { useToast } from "hooks/useToast";
+
 import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { Channel, Member, Thread } from "types";
-import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel, updateChannelCount } from "features/channels/slice";
-import { useToast } from "hooks/useToast";
-import NameInitial from "components/Avatar/NameInitial";
+
+import { kontenbase } from "lib/client";
+import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
-import ProfileImage from "components/ProfileImage";
-import { setAuthLoading } from "features/auth";
 
 moment.locale("id");
 
@@ -56,6 +57,7 @@ function ChannelPage() {
   const [selectedThread, setSelectedThread] = useState<
     Thread | null | undefined
   >();
+
   const [apiLoading, setApiLoading] = useState<boolean>();
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
@@ -186,19 +188,13 @@ function ChannelPage() {
     }
   }, [params.channelId]);
 
-  useEffect(() => {
-    if (workspaceData && !workspaceData.channels.includes(params.channelId)) {
-      navigate("/404", { state: { params: { message: "Channel error" } } });
-    }
-  }, [workspaceData, params.channelId]);
-
   const loading = channel.loading || thread.loading;
 
   return (
     <MainContentContainer>
       <header
         className={`mb-8 flex items-end justify-between "border-b-2 border-neutral-100 pb-8"
-        `}
+            `}
       >
         <div>
           <h1 className="font-bold text-3xl">{channelData?.name}</h1>
