@@ -41,6 +41,7 @@ import Divider from "components/Divider/Divider";
 import SettingsModal from "components/SettingsModal/SettingsModal";
 import { FaPlus } from "react-icons/fa";
 import { updateWorkspace } from "features/workspaces";
+import ChannelInfo from "components/ChannelForm/ChannelInfo";
 
 type TProps = {
   isMobile: boolean;
@@ -66,6 +67,7 @@ function SidebarComponent({
 
   const [createChannelModal, setCreateChannelModal] = useState(false);
   const [editChannelModal, setEditChannelModal] = useState(false);
+  const [channelInfoModal, setChannelInfoModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
 
@@ -275,6 +277,10 @@ function SidebarComponent({
                     setEditChannelModal(true);
                     setSelectedChannel(channel);
                   }}
+                  channelInfoHandler={(channel) => {
+                    setChannelInfoModal(true);
+                    setSelectedChannel(channel);
+                  }}
                 />
               ))}
               <div
@@ -325,6 +331,27 @@ function SidebarComponent({
           data={selectedChannel}
           onClose={() => {
             setEditChannelModal(false);
+            setSelectedChannel(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        header="Channel information"
+        visible={channelInfoModal}
+        onClose={() => {
+          setChannelInfoModal(false);
+          setSelectedChannel(null);
+        }}
+        onCancel={() => {
+          setChannelInfoModal(false);
+          setSelectedChannel(null);
+        }}
+        footer={null}
+      >
+        <ChannelInfo
+          data={selectedChannel}
+          onClose={() => {
+            setChannelInfoModal(false);
             setSelectedChannel(null);
           }}
         />

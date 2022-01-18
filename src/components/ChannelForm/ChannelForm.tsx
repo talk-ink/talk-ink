@@ -34,6 +34,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
       : initialValues,
     validationSchema: createChannelValidation,
     onSubmit: (values) => {
+      console.log("awe");
       onSubmit(values);
     },
     enableReinitialize: true,
