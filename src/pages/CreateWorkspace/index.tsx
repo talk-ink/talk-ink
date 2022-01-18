@@ -14,6 +14,7 @@ import { useToast } from "hooks/useToast";
 
 import Layout from "components/Layout/LoginRegister";
 import Hero from "../../assets/image/landing/chat.svg";
+import { updateUser } from "features/auth";
 
 const initialValues: Workspace = {
   name: "",
@@ -46,6 +47,9 @@ function CreateWorkspacePage() {
         .create({ name: values.name, peoples: auth.user._id });
 
       dispatch(addWorkspace(data));
+      dispatch(
+        updateUser({ workspaces: [...auth.user.workspaces, data?._id] })
+      );
 
       if (data) {
         const generalChannel = await kontenbase.service("Channels").create({
