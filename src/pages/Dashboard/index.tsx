@@ -85,7 +85,7 @@ function DashboardPage() {
           return dispatch(addChannel(channelData[0]));
         }
       }
-      return setPageStatus(null);
+      return dispatch(setPageStatus(null));
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error)}` });
