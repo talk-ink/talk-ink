@@ -1,4 +1,5 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
 import { kontenbase } from "lib/client";
 import { Thread } from "types";
 
@@ -89,18 +90,20 @@ export const createComment = createAsyncThunk(
     });
 
     if (tagedUsers.length > 0) {
-      await kontenbase.service("Threads").updateById(threadId, {
-        tagedUsers,
-      });
+      const commentHooksUrl: string =
+        process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
+      const basicAuth: { username: string; password: string } = {
+        username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
+        password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
+      };
 
-      const tagPromise = tagedUsers.map(
-        async (item) =>
-          await kontenbase
-            .service("Users")
-            .unlink(item, { readedThreads: threadId })
+      const updateTagged = await axios.post(
+        commentHooksUrl,
+        { taggedUsers: tagedUsers, threadId },
+        {
+          auth: basicAuth,
+        }
       );
-
-      Promise.all(tagPromise);
     }
 
     return data;
