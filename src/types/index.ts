@@ -47,6 +47,7 @@ export interface CreateChannel {
   name: string;
   description?: string;
   privacy?: "private" | "public";
+  members?: string[];
 }
 
 export interface Workspace {

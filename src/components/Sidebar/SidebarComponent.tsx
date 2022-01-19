@@ -111,7 +111,7 @@ function SidebarComponent({
     try {
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
-        members: [...workspaceData.peoples, auth.user._id],
+        members: values?.members,
         workspace: params.workspaceId,
       });
 
