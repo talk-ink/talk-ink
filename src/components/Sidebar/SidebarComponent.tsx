@@ -154,6 +154,11 @@ function SidebarComponent({
     }
   };
 
+  const showManageMemberModal = (channel: Channel) => {
+    setAddMemberModal(true);
+    setSelectedChannel(channel);
+  };
+
   useEffect(() => {
     getChannels();
   }, [params.workspaceId]);
@@ -286,8 +291,7 @@ function SidebarComponent({
                     setSelectedChannel(channel);
                   }}
                   addMemberHandler={(channel) => {
-                    setAddMemberModal(true);
-                    setSelectedChannel(channel);
+                    showManageMemberModal(channel);
                   }}
                   isAdmin={
                     workspaceData.createdBy._id === auth.user._id ||
@@ -369,6 +373,7 @@ function SidebarComponent({
             setChannelInfoModal(false);
             setSelectedChannel(null);
           }}
+          showManageMemberModal={showManageMemberModal}
         />
       </Modal>
       <Modal

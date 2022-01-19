@@ -425,6 +425,9 @@ function ChannelPage() {
           onClose={() => {
             setChannelInfoModal(false);
           }}
+          showManageMemberModal={() => {
+            setAddMemberModal(true);
+          }}
         />
       </Modal>
       <Modal

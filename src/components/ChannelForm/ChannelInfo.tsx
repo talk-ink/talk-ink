@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import Button from "components/Button/Button";
 import ChannelForm from "./ChannelForm";
@@ -8,17 +8,53 @@ import { useToast } from "hooks/useToast";
 
 import { updateChannel } from "features/channels/slice";
 import { kontenbase } from "lib/client";
-import { Channel, CreateChannel } from "types";
+import { Channel, CreateChannel, Member } from "types";
+import { useAppSelector } from "hooks/useAppSelector";
+import { fetchMembers } from "features/members";
+import { useParams } from "react-router-dom";
+import NameInitial from "components/Avatar/NameInitial";
+import ProfileImage from "components/ProfileImage";
+import { getNameInitial } from "utils/helper";
 
 type TProps = {
   data: Channel;
   onClose: () => void;
+  showManageMemberModal?: (channel?: Channel) => void;
 };
 
-function ChannelInfo({ data, onClose }: TProps) {
-  const [edit, setEdit] = useState(false);
-  const dispatch = useAppDispatch();
+function ChannelInfo({ data, onClose, showManageMemberModal }: TProps) {
   const [showToast] = useToast();
+  const params = useParams();
+
+  const auth = useAppSelector((state) => state.auth);
+  const member = useAppSelector((state) => state.member);
+  const workspace = useAppSelector((state) => state.workspace);
+  const channel = useAppSelector((state) => state.channel);
+  const dispatch = useAppDispatch();
+
+  const [edit, setEdit] = useState(false);
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((item) => item._id === data._id);
+  }, [channel.channels, data]);
+
+  const memberList: Member[] = useMemo(() => {
+    const notJoined = member.members.filter((item) =>
+      channelData?.members.includes(item._id)
+    );
+    return notJoined;
+  }, [params.workspaceId, member.members, channelData]);
+
+  const workspaceData = useMemo(() => {
+    return workspace.workspaces.find((data) => data._id === params.workspaceId);
+  }, [workspace.workspaces, params.workspaceId]);
+
+  const isAdmin = useMemo(() => {
+    return (
+      workspaceData.createdBy._id === auth.user._id ||
+      channelData?.createdBy?._id === auth.user._id
+    );
+  }, [workspaceData, channelData]);
 
   const onSubmit = async (value: CreateChannel) => {
     try {
@@ -35,6 +71,10 @@ function ChannelInfo({ data, onClose }: TProps) {
     public: "Public",
     private: "Private",
   };
+
+  useEffect(() => {
+    dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+  }, [params.workspaceId, channelData]);
 
   return (
     <div className="pt-2 pb-3">
@@ -61,6 +101,67 @@ function ChannelInfo({ data, onClose }: TProps) {
           <div>
             <p className="text-sm font-semibold">Description</p>
             <p className="text-xs">{data.description || "-"}</p>
+          </div>
+          <div>
+            <p className="text-sm font-semibold mb-2">Manage members</p>
+            <div className="flex items-center">
+              <div className="flex justify-start">
+                {memberList.map(
+                  (member, idx) =>
+                    idx <= 3 && (
+                      <div key={idx}>
+                        {member._id === auth.user._id && (
+                          <>
+                            {!auth.user.avatar && (
+                              <NameInitial
+                                key={member._id}
+                                name={getNameInitial(auth.user.firstName)}
+                                className="border-2 border-white -mr-2 bg-red-400"
+                              />
+                            )}
+                            {auth.user.avatar && (
+                              <ProfileImage
+                                key={member._id}
+                                className="border-2 border-white -mr-2 bg-red-400"
+                                source={auth.user.avatar}
+                              />
+                            )}
+                          </>
+                        )}
+                        {member._id !== auth.user._id && (
+                          <>
+                            {!member.avatar && (
+                              <NameInitial
+                                key={member._id}
+                                name={getNameInitial(member.firstName)}
+                                className="border-2 border-white -mr-2 bg-red-400"
+                              />
+                            )}
+                            {member.avatar && (
+                              <ProfileImage
+                                key={member._id}
+                                className="border-2 border-white -mr-2 bg-red-400"
+                                source={member.avatar[0].url}
+                              />
+                            )}
+                          </>
+                        )}
+                      </div>
+                    )
+                )}
+              </div>
+              {isAdmin && (
+                <span
+                  className="text-indigo-500 hover:underline cursor-pointer ml-6"
+                  onClick={() => {
+                    onClose();
+                    showManageMemberModal(channelData);
+                  }}
+                >
+                  Edit
+                </span>
+              )}
+            </div>
           </div>
         </>
       )}
