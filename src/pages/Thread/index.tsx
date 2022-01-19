@@ -269,11 +269,11 @@ function ThreadPage() {
           </div>
           <div className="flex items-start">
             <div className="mr-4">
-              {threadData.createdBy?.avatar?.[0]?.url ? (
-                <Avatar src={threadData.createdBy?.avatar?.[0]?.url} />
+              {threadData?.createdBy?.avatar?.[0]?.url ? (
+                <Avatar src={threadData?.createdBy?.avatar?.[0]?.url} />
               ) : (
                 <NameInitial
-                  name={getNameInitial(threadData.createdBy?.firstName)}
+                  name={getNameInitial(threadData?.createdBy?.firstName)}
                   className="mr-4"
                 />
               )}
@@ -293,9 +293,10 @@ function ThreadPage() {
               <LoadingSkeleton />
             ) : (
               <CommentList
-                dataSource={threadData.comments}
+                dataSource={threadData?.comments}
                 listRef={listRef}
                 memberList={memberList}
+                threadId={threadId}
               />
             )}
           </div>
@@ -303,7 +304,7 @@ function ThreadPage() {
             isShowEditor={isShowEditor}
             setIsShowEditor={setIsShowEditor}
             threadId={threadId}
-            threadName={threadData.name}
+            threadName={threadData?.name}
             interactedUsers={[...new Set(threadData?.interactedUsers)]}
             scrollToBottom={scrollToBottom}
             memberList={memberList}

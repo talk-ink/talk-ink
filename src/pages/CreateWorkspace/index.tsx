@@ -14,6 +14,8 @@ import { useToast } from "hooks/useToast";
 
 import Layout from "components/Layout/LoginRegister";
 import Hero from "../../assets/image/landing/chat.svg";
+import { GreetingThread } from "utils/text-constants";
+import { updateUser } from "features/auth";
 
 const initialValues: Workspace = {
   name: "",
@@ -46,13 +48,21 @@ function CreateWorkspacePage() {
         .create({ name: values.name, peoples: auth.user._id });
 
       dispatch(addWorkspace(data));
-
+      dispatch(updateUser({ workspaces: [...auth.user.workspaces, data._id] }));
       if (data) {
         const generalChannel = await kontenbase.service("Channels").create({
           name: "General",
           workspace: data?._id,
           members: auth.user._id,
           privacy: "public",
+        });
+
+        await kontenbase.service("Threads").create({
+          name: "Welcome to Talk.ink",
+          content: GreetingThread,
+          channel: generalChannel.data._id,
+          workspace: data?._id,
+          tagedUsers: [auth.user._id],
         });
 
         await kontenbase.service("Channels").create({

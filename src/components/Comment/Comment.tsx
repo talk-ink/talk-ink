@@ -4,7 +4,7 @@ import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import Editor from "rich-markdown-editor";
-import { useParams } from "react-router";
+import { BsFillChatRightDotsFill } from "react-icons/bs";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -31,18 +31,25 @@ interface IProps {
   comment: IComment;
   listRef?: React.LegacyRef<HTMLDivElement>;
   memberList: Member[];
+  threadId: string;
 }
 
-const Comment: React.FC<IProps> = ({ comment, listRef, memberList }) => {
+const Comment: React.FC<IProps> = ({
+  comment,
+  listRef,
+  memberList,
+  threadId,
+}) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
   const [isReplyEditorVisible, setIsShowReplyEditorVisible] = useState(false);
-  const { threadId } = useParams();
 
-  const [isEdit, setIsEdit] = useState(false);
+  const [isEdit, setIsEdit] = useState<boolean>(false);
   const [editorState, setEditorState] = useState<string>("");
   const [subEditorState, setSubEditorState] = useState<string>("");
+  const [isShowMoreSubComment, setIsShowMoreSubComment] =
+    useState<boolean>(false);
 
   const handleDeleteComment = () => {
     dispatch(deleteComment({ commentId: comment._id }));
@@ -88,6 +95,7 @@ const Comment: React.FC<IProps> = ({ comment, listRef, memberList }) => {
         );
 
         discardSubComment();
+        setIsShowMoreSubComment(true);
       }
     } catch (error) {
       console.log(error);
@@ -119,7 +127,9 @@ const Comment: React.FC<IProps> = ({ comment, listRef, memberList }) => {
         </div>
         <div className=" w-[70vw] sm:w-full ">
           <div
-            className={`relative ${isReplyEditorVisible ? "mb-0" : "mb-10"}`}
+            className={`relative ${
+              isReplyEditorVisible ? "mb-0" : "mb-10"
+            } min-h-[2.5rem]`}
           >
             <Preview
               content={comment.content}
@@ -130,30 +140,66 @@ const Comment: React.FC<IProps> = ({ comment, listRef, memberList }) => {
             />
             {!isReplyEditorVisible && (
               <div
-                className="text-sm absolute -bottom-7 left-0 z-20 flex items-center hover:cursor-pointer hover:opacity-80 "
+                className="text-sm absolute -bottom-7 left-0 z-20 flex items-center hover:cursor-pointer hover:opacity-80 text-gray-500"
                 onClick={() => setIsShowReplyEditorVisible(true)}
               >
+                <BsFillChatRightDotsFill className="mr-1" />
                 Reply
               </div>
             )}
           </div>
-          {comment.subComments?.map((subComment) => {
-            const newSubComment = {
-              ...subComment,
-              createdBy: memberList.find(
-                //@ts-ignore
-                (item) => item._id === subComment.createdBy
-              ),
-            };
 
-            return (
-              <SubComment
-                comment={newSubComment}
-                key={subComment._id}
-                parentId={comment._id}
-              />
-            );
-          })}
+          <div>
+            {comment.subComments?.length > 0 && (
+              <>
+                <div className="border-t-[1px] border-gray-200 mb-6" />
+                {!isShowMoreSubComment && (
+                  <div className="text-sm -mt-3">
+                    {comment.subComments?.length > 1 && (
+                      <p
+                        className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
+                        onClick={() => setIsShowMoreSubComment(true)}
+                      >
+                        View More {comment.subComments?.length - 1} Comment
+                      </p>
+                    )}
+                    <SubComment
+                      comment={{
+                        ...comment.subComments?.[0],
+                        createdBy: memberList.find(
+                          (item) =>
+                            //@ts-ignore
+                            item._id === comment.subComments?.[0].createdBy
+                        ),
+                      }}
+                      key={comment.subComments?.[0]?._id}
+                      parentId={comment._id}
+                      threadId={threadId}
+                    />
+                  </div>
+                )}
+                {isShowMoreSubComment &&
+                  comment.subComments?.map((subComment) => {
+                    const newSubComment = {
+                      ...subComment,
+                      createdBy: memberList.find(
+                        //@ts-ignore
+                        (item) => item._id === subComment.createdBy
+                      ),
+                    };
+
+                    return (
+                      <SubComment
+                        comment={newSubComment}
+                        key={subComment._id}
+                        parentId={comment._id}
+                        threadId={threadId}
+                      />
+                    );
+                  })}
+              </>
+            )}
+          </div>
 
           {isReplyEditorVisible && (
             <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[8rem] mb-2">

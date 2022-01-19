@@ -86,7 +86,7 @@ export interface User {
   firstName: string;
   lastName?: string;
   email: string;
-  workspaces?: Workspace[];
+  workspaces?: string[];
   channels?: Channel[];
   avatar?: string | any;
   about?: string;
@@ -142,3 +142,9 @@ export interface Member extends Omit<User, "avatar"> {
 export interface TUserProfile extends Omit<User, "avatar"> {
   avatar?: Avatar[];
 }
+
+export type PageStatus =
+  | "channel-restricted"
+  | "channel-notFound"
+  | null
+  | undefined;

@@ -1,5 +1,5 @@
 import React from "react";
-import { Navigate, useLocation } from "react-router";
+import { Navigate, useLocation, useParams } from "react-router";
 import { useAppSelector } from "hooks/useAppSelector";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
 
@@ -10,8 +10,11 @@ type Props = React.PropsWithChildren<{
 }>;
 
 function RestrictedRoute({ children, type = "private", from }: Props) {
-  let auth = useAppSelector((state) => state.auth);
+  let params = useParams();
   let location = useLocation();
+
+  let auth = useAppSelector((state) => state.auth);
+  let channel = useAppSelector((state) => state.channel);
 
   if (auth.loading) {
     return <FullscreenLoading />;
@@ -21,6 +24,38 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
     case "private":
       if (!auth.token) {
         return <Navigate to="/login" state={{ from: location }} />;
+      }
+      if (auth.token && auth.user) {
+        if (
+          auth.user.workspaces &&
+          params.workspaceId &&
+          !auth?.user?.workspaces?.includes(params.workspaceId)
+        ) {
+          return (
+            <Navigate
+              to="/404"
+              state={{ params: { message: "Workspace error" } }}
+            />
+          );
+        }
+        // if (params.channelId && channel.channels.length > 0) {
+        //   const findChannel = channel.channels.find(
+        //     (data) => data._id === params.channelId
+        //   );
+
+        //   if (
+        //     !findChannel ||
+        //     (findChannel?.privacy === "private" &&
+        //       !findChannel?.members?.includes(auth.user._id))
+        //   ) {
+        //     return (
+        //       <Navigate
+        //         to="/404"
+        //         state={{ params: { message: "Channel error - privacy" } }}
+        //       />
+        //     );
+        //   }
+        // }
       }
       break;
     case "public":

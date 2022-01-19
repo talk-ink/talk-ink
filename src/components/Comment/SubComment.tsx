@@ -11,13 +11,9 @@ import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import IconButton from "components/Button/IconButton";
 import { kontenbase } from "lib/client";
-import { useParams } from "react-router";
 
 import { IComment, ISubComment } from "types";
-import {
-  deleteComment,
-  updateComment,
-} from "features/threads/slice/asyncThunk";
+
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
@@ -31,13 +27,18 @@ interface IProps {
   comment: IComment | ISubComment;
   listRef?: React.LegacyRef<HTMLDivElement>;
   parentId: string;
+  threadId: string;
 }
 
-const Comment: React.FC<IProps> = ({ comment, listRef, parentId }) => {
+const Comment: React.FC<IProps> = ({
+  comment,
+  listRef,
+  parentId,
+  threadId,
+}) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
-  const { threadId } = useParams();
 
   const [isEdit, setIsEdit] = useState(false);
   const [editorState, setEditorState] = useState<string>("");
