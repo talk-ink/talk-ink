@@ -4,6 +4,7 @@ import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import Editor from "rich-markdown-editor";
+import { useParams } from "react-router";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -14,11 +15,12 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment } from "types";
+import { IComment, Member } from "types";
 import {
   deleteComment,
   updateComment,
 } from "features/threads/slice/asyncThunk";
+import { addSubCommentToComment } from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
@@ -28,13 +30,15 @@ import { kontenbase } from "lib/client";
 interface IProps {
   comment: IComment;
   listRef?: React.LegacyRef<HTMLDivElement>;
+  memberList: Member[];
 }
 
-const Comment: React.FC<IProps> = ({ comment, listRef }) => {
+const Comment: React.FC<IProps> = ({ comment, listRef, memberList }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
   const [isReplyEditorVisible, setIsShowReplyEditorVisible] = useState(false);
+  const { threadId } = useParams();
 
   const [isEdit, setIsEdit] = useState(false);
   const [editorState, setEditorState] = useState<string>("");
@@ -68,12 +72,26 @@ const Comment: React.FC<IProps> = ({ comment, listRef }) => {
   };
 
   const handleCreateSubComment = async () => {
-    await kontenbase.service("SubComments").create({
-      content: subEditorState,
-      parent: comment._id,
-    });
+    try {
+      const { data, error } = await kontenbase.service("SubComments").create({
+        content: subEditorState,
+        parent: comment._id,
+      });
 
-    discardSubComment();
+      if (!error) {
+        dispatch(
+          addSubCommentToComment({
+            subComment: data,
+            threadId,
+            commentId: comment._id,
+          })
+        );
+
+        discardSubComment();
+      }
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
@@ -100,7 +118,9 @@ const Comment: React.FC<IProps> = ({ comment, listRef }) => {
           </p>
         </div>
         <div className=" w-[70vw] sm:w-full ">
-          <div className="relative mb-10">
+          <div
+            className={`relative ${isReplyEditorVisible ? "mb-0" : "mb-10"}`}
+          >
             <Preview
               content={comment.content}
               isEdit={isEdit}
@@ -116,42 +136,57 @@ const Comment: React.FC<IProps> = ({ comment, listRef }) => {
                 Reply
               </div>
             )}
-            {isReplyEditorVisible && (
-              <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[8rem]">
-                <Editor
-                  key="edited"
-                  defaultValue={subEditorState}
-                  className="markdown-overrides"
-                  onChange={(getContent: () => string) =>
-                    setSubEditorState(getContent())
-                  }
-                  placeholder={`Reply to ${comment.createdBy?.firstName}`}
-                  autoFocus
-                />
-                <div className="flex justify-end ">
-                  <div className="flex items-center py-2">
-                    <Button
-                      type="submit"
-                      className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
-                      onClick={discardSubComment}
-                    >
-                      Discard
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-                      onClick={handleCreateSubComment}
-                    >
-                      Post
-                    </Button>
-                  </div>
+          </div>
+          {comment.subComments?.map((subComment) => {
+            const newSubComment = {
+              ...subComment,
+              createdBy: memberList.find(
+                //@ts-ignore
+                (item) => item._id === subComment.createdBy
+              ),
+            };
+
+            return (
+              <SubComment
+                comment={newSubComment}
+                key={subComment._id}
+                parentId={comment._id}
+              />
+            );
+          })}
+
+          {isReplyEditorVisible && (
+            <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[8rem] mb-2">
+              <Editor
+                key="edited"
+                defaultValue={subEditorState}
+                className="markdown-overrides"
+                onChange={(getContent: () => string) =>
+                  setSubEditorState(getContent())
+                }
+                placeholder={`Reply to ${comment.createdBy?.firstName}`}
+                autoFocus
+              />
+              <div className="flex justify-end ">
+                <div className="flex items-center py-2">
+                  <Button
+                    type="submit"
+                    className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
+                    onClick={discardSubComment}
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    type="submit"
+                    className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
+                    onClick={handleCreateSubComment}
+                  >
+                    Post
+                  </Button>
                 </div>
               </div>
-            )}
-          </div>
-          {comment.subComments?.map((subComment) => (
-            <SubComment comment={subComment} key={subComment._id} />
-          ))}
+            </div>
+          )}
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (
           <div className="absolute top-0 right-0 z-50 hidden group-hover:block  ">

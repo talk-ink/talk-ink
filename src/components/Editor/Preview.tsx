@@ -56,7 +56,7 @@ const Preview: React.FC<IProps> = ({
       />
     </Delayed>
   ) : (
-    <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md ">
+    <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-4 mt-2 ">
       <Editor
         key="edited"
         defaultValue={content}
@@ -70,7 +70,7 @@ const Preview: React.FC<IProps> = ({
           return data.url;
         }}
       />
-      <div className="flex justify-between">
+      <div className="flex justify-between ">
         <div />
         <div className="flex items-center py-2">
           <Button

@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Thread, IComment } from "types";
+import { Thread, IComment, ISubComment } from "types";
 import { fetchComments, fetchThreads } from "./asyncThunk";
 
 type InitThreadState = {
@@ -25,6 +25,18 @@ type TDeleteCommentPayload = {
 
 type TInteractedUserPayload = {
   userId: string;
+  threadId: string;
+};
+
+type TSubCommentsPayload = {
+  subComment: ISubComment;
+  commentId: string;
+  threadId: string;
+};
+
+type TSubCommentsDeletePayload = {
+  subCommentId: string;
+  commentId: string;
   threadId: string;
 };
 
@@ -108,6 +120,94 @@ const threadSlice = createSlice({
 
       state.threads = newThread;
     },
+    refetchComment: (state, action: PayloadAction<TCommentsPayload>) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: action.payload.comments,
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    addSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: [
+                        ...comment.subComments,
+                        action.payload.subComment,
+                      ],
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    updateSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: comment.subComments.map((subComment) =>
+                        subComment._id === action.payload.subComment._id
+                          ? action.payload.subComment
+                          : subComment
+                      ),
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    deleteSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsDeletePayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: comment.subComments.filter(
+                        (subComment) =>
+                          subComment._id !== action.payload.subCommentId
+                      ),
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
   },
   extraReducers: (builder) => {
     //fetch thread
@@ -158,5 +258,9 @@ export const {
   deleteComment,
   updateComment,
   addInteractedUser,
+  refetchComment,
+  addSubCommentToComment,
+  updateSubCommentToComment,
+  deleteSubCommentToComment,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

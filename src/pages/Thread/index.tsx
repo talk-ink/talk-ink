@@ -11,7 +11,7 @@ import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
-import { Channel, Thread, Member } from "types";
+import { Channel, Thread, Member, ISubComment } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import {
   addComment,
@@ -28,7 +28,7 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
-import { KontenbaseSingleResponse } from "@kontenbase/sdk";
+import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 
 function useQuery() {
   const { search } = useLocation();
@@ -62,6 +62,7 @@ function ThreadPage() {
             : payload.threads?.[0] === threadId;
 
         let _createdBy;
+        let _subComments;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
           const { data } = await kontenbase.service("Users").find({
             where: {
@@ -72,6 +73,24 @@ function ThreadPage() {
             },
           });
           _createdBy = data?.[0];
+
+          if (
+            event === "UPDATE_RECORD" &&
+            payload.after.subComments.length > 0
+          ) {
+            const { data }: KontenbaseResponse<ISubComment> = await kontenbase
+              .service("SubComments")
+              .find({
+                where: {
+                  parent: payload.after._id,
+                },
+              });
+
+            _subComments = data.map((item) => ({
+              ...item,
+              createdBy: item.createdBy._id,
+            }));
+          }
         }
 
         if (isCurrentThread) {
@@ -93,6 +112,7 @@ function ThreadPage() {
                     ...payload.before,
                     ...payload.after,
                     createdBy: _createdBy,
+                    subComments: _subComments,
                   },
                 })
               );
@@ -272,7 +292,11 @@ function ThreadPage() {
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
-              <CommentList dataSource={threadData.comments} listRef={listRef} />
+              <CommentList
+                dataSource={threadData.comments}
+                listRef={listRef}
+                memberList={memberList}
+              />
             )}
           </div>
           <CommentForm
