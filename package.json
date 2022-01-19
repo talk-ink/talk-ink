@@ -27,7 +27,7 @@
     ]
   },
   "dependencies": {
-    "@kontenbase/sdk": "^0.6.0",
+    "@kontenbase/sdk": "^0.6.1",
     "@reduxjs/toolkit": "^1.7.1",
     "@testing-library/jest-dom": "^5.16.1",
     "@testing-library/react": "^12.1.2",
