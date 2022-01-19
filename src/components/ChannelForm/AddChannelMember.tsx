@@ -34,7 +34,7 @@ function AddChannelMember({ data }: TProps) {
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((item) => item._id === data._id);
-  }, [channel.channels, params.channelId, data]);
+  }, [channel.channels, data]);
 
   const notJoinedMemberData: Member[] = useMemo(() => {
     const notJoined = member.members.filter(
@@ -83,7 +83,7 @@ function AddChannelMember({ data }: TProps) {
       if (removeData) {
         dispatch(
           removeChannelMember({
-            _id: params.channelId,
+            _id: data._id,
             memberId,
           })
         );
