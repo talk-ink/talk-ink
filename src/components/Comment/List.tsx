@@ -1,4 +1,4 @@
-import React, { Fragment } from "react";
+import React from "react";
 
 import Comment from "components/Comment/Comment";
 import { IComment, Member } from "types";
@@ -18,14 +18,15 @@ const List: React.FC<IProps> = ({
 }) => {
   return (
     <div>
-      {dataSource.map((item, index) => (
-        <Comment
-          comment={item}
-          key={index}
-          memberList={memberList}
-          threadId={threadId}
-        />
-      ))}
+      {dataSource.length > 0 &&
+        dataSource.map((item, index) => (
+          <Comment
+            comment={item}
+            key={index}
+            memberList={memberList}
+            threadId={threadId}
+          />
+        ))}
       <div ref={listRef} />
     </div>
   );

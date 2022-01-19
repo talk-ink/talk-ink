@@ -159,18 +159,16 @@ function ContentItem({
                   )}
                   {dataSource.createdBy._id === auth.user._id ||
                     (dataSource?.draft && <Divider />)}
-                  {dataSource.createdBy._id === auth.user._id ||
-                    (dataSource?.draft && (
-                      <MenuItem
-                        icon={
-                          <BiTrash size={20} className="text-neutral-400" />
-                        }
-                        title="Delete thread..."
-                        onClick={() => {
-                          setSelectedThread(dataSource);
-                        }}
-                      />
-                    ))}
+                  {(dataSource.createdBy._id === auth.user._id ||
+                    dataSource?.draft) && (
+                    <MenuItem
+                      icon={<BiTrash size={20} className="text-neutral-400" />}
+                      title="Delete thread..."
+                      onClick={() => {
+                        setSelectedThread(dataSource);
+                      }}
+                    />
+                  )}
 
                   {/* <MenuItem
                     icon={<BiEdit size={20} className="text-neutral-400" />}

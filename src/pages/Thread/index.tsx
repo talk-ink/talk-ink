@@ -117,17 +117,18 @@ function ThreadPage() {
                 })
               );
               break;
-            case "DELETE_RECORD":
-              dispatch(
-                deleteComment({
-                  threadId,
-                  deletedId: payload._id,
-                })
-              );
-              break;
             default:
               break;
           }
+        }
+
+        if (event === "DELETE_RECORD") {
+          dispatch(
+            deleteComment({
+              threadId,
+              deletedId: payload._id,
+            })
+          );
         }
       })
       .then((result) => (key = result));
@@ -147,8 +148,9 @@ function ThreadPage() {
       }
       if (!readedThreads.includes(threadId)) {
         await kontenbase
-          .service("Users")
-          .link(auth.user._id, { readedThreads: threadId });
+          .service("Threads")
+          .link(threadId, { doneUsers: auth.user._id });
+
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
     } catch (error: any) {
@@ -251,7 +253,7 @@ function ThreadPage() {
         />
       }
     >
-      <div className="max-w-3xl ml-auto mr-auto -mt-4">
+      <div className="max-w-4xl ml-auto mr-auto -mt-4">
         <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl max-w-3xl break-words">

@@ -1,6 +1,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { kontenbase } from "lib/client";
+import moment from "moment-timezone";
 import { Thread } from "types";
 
 type FetchThreadsProps = {
@@ -62,12 +63,20 @@ export const fetchThreads = createAsyncThunk(
 export const fetchComments = createAsyncThunk(
   "channel/thread/fetchComments",
   async ({ threadId }: { threadId: string }) => {
-    const { data } = await kontenbase
-      .service("Comments")
-      .find({ where: { threads: threadId }, lookup: ["subComments"] });
+    const { data } = await kontenbase.service("Comments").find({
+      where: { threads: threadId },
+      lookup: ["subComments"],
+      skip: 0,
+      limit: 10,
+      sort: {
+        createdAt: -1,
+      },
+    });
 
     return {
-      comments: data,
+      comments: data.sort(
+        (a, b) => moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf()
+      ),
       threadId,
     };
   }
@@ -97,7 +106,7 @@ export const createComment = createAsyncThunk(
         password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
       };
 
-      const updateTagged = await axios.post(
+      await axios.post(
         commentHooksUrl,
         { taggedUsers: tagedUsers, threadId },
         {

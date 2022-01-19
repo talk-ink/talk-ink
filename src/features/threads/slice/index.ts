@@ -144,10 +144,10 @@ const threadSlice = createSlice({
                 comment._id === action.payload.commentId
                   ? {
                       ...comment,
-                      subComments: [
-                        ...comment.subComments,
-                        action.payload.subComment,
-                      ],
+                      subComments:
+                        comment.subComments.length > 0
+                          ? [...comment.subComments, action.payload.subComment]
+                          : [action.payload.subComment],
                     }
                   : comment
               ),

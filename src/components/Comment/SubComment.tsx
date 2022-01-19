@@ -117,7 +117,7 @@ const Comment: React.FC<IProps> = ({
             </ReactMoment>
           </p>
         </div>
-        <div className=" w-[70vw] sm:w-full">
+        <div className=" w-[70vw] sm:w-full min-h-[3rem]">
           <Preview
             content={comment.content}
             isEdit={isEdit}

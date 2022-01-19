@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import Editor from "rich-markdown-editor";
 import { BsFillChatRightDotsFill } from "react-icons/bs";
+import Select from "react-select";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -34,6 +35,14 @@ interface IProps {
   threadId: string;
 }
 
+interface INotifiedOption {
+  value: string;
+  label: string;
+  color?: string;
+  isFixed?: boolean;
+  flag: number;
+}
+
 const Comment: React.FC<IProps> = ({
   comment,
   listRef,
@@ -50,6 +59,32 @@ const Comment: React.FC<IProps> = ({
   const [subEditorState, setSubEditorState] = useState<string>("");
   const [isShowMoreSubComment, setIsShowMoreSubComment] =
     useState<boolean>(false);
+  const [notifiedOptions, setNotifiedOptions] = useState<INotifiedOption[]>();
+  const [selectedNotifiedOptions, setSelectedNotifiedOptions] = useState<
+    INotifiedOption[]
+  >([]);
+
+  useEffect(() => {
+    if (memberList.length <= 0 || !auth || !comment) return;
+
+    const options: INotifiedOption[] = memberList.map((item) => ({
+      value: item._id,
+      label: item._id === auth.user._id ? "Your Self" : item.firstName,
+      flag: 3,
+    }));
+
+    setNotifiedOptions(options);
+  }, [memberList, auth, comment]);
+
+  useEffect(() => {
+    if (notifiedOptions?.length <= 0 || !comment) return;
+
+    const selectedOption = notifiedOptions?.find((item) => {
+      return comment.createdBy?._id === item.value;
+    });
+
+    setSelectedNotifiedOptions([selectedOption]);
+  }, [notifiedOptions, isReplyEditorVisible, comment]);
 
   const handleDeleteComment = () => {
     dispatch(deleteComment({ commentId: comment._id }));
@@ -202,17 +237,44 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           {isReplyEditorVisible && (
-            <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[8rem] mb-2">
-              <Editor
-                key="edited"
-                defaultValue={subEditorState}
-                className="markdown-overrides"
-                onChange={(getContent: () => string) =>
-                  setSubEditorState(getContent())
-                }
-                placeholder={`Reply to ${comment.createdBy?.firstName}`}
-                autoFocus
-              />
+            <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
+              <div>
+                <div className="mt-1 flex w-fit items-center">
+                  <div className="mr-2">
+                    <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
+                      Tag:
+                    </div>
+                  </div>
+                  <Select
+                    value={selectedNotifiedOptions}
+                    onChange={(e: any) => {
+                      setSelectedNotifiedOptions(e);
+                    }}
+                    isClearable={false}
+                    className="text-sm custom-select "
+                    closeMenuOnSelect={false}
+                    defaultValue={[notifiedOptions[0]]}
+                    isMulti
+                    options={notifiedOptions}
+                    placeholder="Select Tags"
+                    //@ts-ignore
+                    components={{
+                      DropdownIndicator: () => null,
+                      IndicatorSeparator: () => null,
+                    }}
+                  />
+                </div>
+                <Editor
+                  key="edited"
+                  defaultValue={subEditorState}
+                  className="markdown-overrides"
+                  onChange={(getContent: () => string) =>
+                    setSubEditorState(getContent())
+                  }
+                  placeholder={`Reply to ${comment.createdBy?.firstName}`}
+                  autoFocus
+                />
+              </div>
               <div className="flex justify-end ">
                 <div className="flex items-center py-2">
                   <Button
