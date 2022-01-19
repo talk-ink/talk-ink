@@ -30,7 +30,7 @@ function MemberSuggestion({ onChange, children }: TProps) {
 
       {showSuggestion && (
         <div
-          className="w-full max-h-64 mt-1 absolute left-0 origin-bottom rounded-sm bg-white py-1 border border-gray-200 overflow-auto shadow outline-none"
+          className="w-full max-h-64 mt-1 absolute left-0 origin-bottom rounded-sm bg-white py-1 border border-gray-200 overflow-auto shadow outline-none z-10"
           onClick={() => setShowSuggestion(false)}
         >
           {children}
