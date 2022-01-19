@@ -40,6 +40,7 @@ export interface Channel {
   members: string[];
   description?: string;
   privacy?: "private" | "public";
+  createdBy?: User;
 }
 
 export interface CreateChannel {

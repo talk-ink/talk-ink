@@ -118,6 +118,10 @@ function ChannelPage() {
     return auth.user.readedThreads;
   }, [auth.user]);
 
+  const workspaceData = useMemo(() => {
+    return workspace.workspaces.find((data) => data._id === params.workspaceId);
+  }, [workspace.workspaces, params.workspaceId]);
+
   const deleteDraft = (id: string) => {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
     delete parsedThreadDraft[+id];
@@ -189,9 +193,13 @@ function ChannelPage() {
   useEffect(() => {
     if (channel.channels.length > 0) {
       dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
-      getMemberHandler();
     }
   }, [params.channelId]);
+  useEffect(() => {
+    if (channelData) {
+      getMemberHandler();
+    }
+  }, [channelData]);
 
   const loading = channel.loading || thread.loading;
 

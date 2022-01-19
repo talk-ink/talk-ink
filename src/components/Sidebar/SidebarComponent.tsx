@@ -42,6 +42,7 @@ import SettingsModal from "components/SettingsModal/SettingsModal";
 import { FaPlus } from "react-icons/fa";
 import { updateWorkspace } from "features/workspaces";
 import ChannelInfo from "components/ChannelForm/ChannelInfo";
+import AddChannelMember from "components/ChannelForm/AddChannelMember";
 
 type TProps = {
   isMobile: boolean;
@@ -70,6 +71,7 @@ function SidebarComponent({
   const [channelInfoModal, setChannelInfoModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
+  const [addMemberModal, setAddMemberModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -281,6 +283,14 @@ function SidebarComponent({
                     setChannelInfoModal(true);
                     setSelectedChannel(channel);
                   }}
+                  addMemberHandler={(channel) => {
+                    setAddMemberModal(true);
+                    setSelectedChannel(channel);
+                  }}
+                  isAdmin={
+                    workspaceData.createdBy._id === auth.user._id ||
+                    channel?.createdBy?._id === auth.user._id
+                  }
                 />
               ))}
               <div
@@ -358,6 +368,22 @@ function SidebarComponent({
             setSelectedChannel(null);
           }}
         />
+      </Modal>
+      <Modal
+        header="Manage members"
+        visible={addMemberModal}
+        onClose={() => {
+          setAddMemberModal(false);
+          setSelectedChannel(null);
+        }}
+        onCancel={() => {
+          setAddMemberModal(false);
+          setSelectedChannel(null);
+        }}
+        footer={null}
+        size="small"
+      >
+        <AddChannelMember data={selectedChannel} />
       </Modal>
       <Modal
         header={`Leave ${

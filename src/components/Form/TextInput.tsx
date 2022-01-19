@@ -1,6 +1,6 @@
 import React from "react";
 
-type Props = React.PropsWithChildren<{
+interface Props extends React.HTMLProps<HTMLInputElement> {
   name?: string;
   type?: string;
   className?: string;
@@ -9,7 +9,8 @@ type Props = React.PropsWithChildren<{
   value?: string | number;
   placeholder?: string;
   defaultValue?: string | number;
-}>;
+  onClick?: React.MouseEventHandler<HTMLInputElement>;
+}
 
 function TextInput({
   name,
@@ -20,6 +21,7 @@ function TextInput({
   value,
   placeholder,
   defaultValue,
+  onClick,
 }: Props) {
   return (
     <input
@@ -32,6 +34,7 @@ function TextInput({
       value={value}
       placeholder={placeholder}
       defaultValue={defaultValue}
+      onClick={onClick}
     />
   );
 }
