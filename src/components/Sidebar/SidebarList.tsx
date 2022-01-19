@@ -97,7 +97,7 @@ function SidebarList({
         <Icon
           size={20}
           className={`mr-2 text-gray-400 ${
-            type === "channel" && isDefault && "text-cyan-500"
+            type === "channel" && isDefault && "text-gray-400"
           }`}
         />
         <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">

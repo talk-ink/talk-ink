@@ -28,6 +28,7 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
+import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 
 function useQuery() {
   const { search } = useLocation();
@@ -170,7 +171,9 @@ function ThreadPage() {
   useEffect(() => {
     const setInteractedUser = async () => {
       try {
-        const { data } = await kontenbase.service("Threads").getById(threadId);
+        const { data }: KontenbaseSingleResponse<Thread> = await kontenbase
+          .service("Threads")
+          .getById(threadId);
 
         if (
           !data.interactedUsers?.find((item: any) => item === auth.user._id)
