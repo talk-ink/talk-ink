@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import { Popover } from "@headlessui/react";
 
@@ -20,10 +20,12 @@ import Button from "components/Button/Button";
 
 type TProps = {
   data: Channel;
+  onClose: () => void;
 };
 
-function AddChannelMember({ data }: TProps) {
+function AddChannelMember({ data, onClose }: TProps) {
   const [showToast] = useToast();
+  const navigate = useNavigate();
   const params = useParams();
 
   const auth = useAppSelector((state) => state.auth);
@@ -89,6 +91,11 @@ function AddChannelMember({ data }: TProps) {
             memberId,
           })
         );
+
+        if (type === "leave") {
+          onClose();
+          navigate(`/a/${params.workspaceId}/inbox`);
+        }
       }
     } catch (error: any) {
       console.log("err", error);

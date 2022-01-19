@@ -6,6 +6,7 @@ import {
   BiEditAlt,
   BiInfoCircle,
   BiLogOut,
+  BiUserPlus,
 } from "react-icons/bi";
 import { useLocation, useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
@@ -38,6 +39,7 @@ import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
 import ChannelBadge from "components/ChannelBadge";
 import ChannelInfo from "components/ChannelForm/ChannelInfo";
+import AddChannelMember from "components/ChannelForm/AddChannelMember";
 
 moment.locale("id");
 
@@ -66,6 +68,8 @@ function ChannelPage() {
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [channelInfoModal, setChannelInfoModal] = useState<boolean>(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState<boolean>();
+  const [addMemberModal, setAddMemberModal] = useState<boolean>(false);
+
   const [memberList, setMemberList] = useState<Member[]>([]);
 
   const createThreadDraft = () => {
@@ -121,6 +125,13 @@ function ChannelPage() {
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
+
+  const isAdmin = useMemo(() => {
+    return (
+      workspaceData.createdBy._id === auth.user._id ||
+      channelData?.createdBy?._id === auth.user._id
+    );
+  }, [workspaceData, channelData]);
 
   const deleteDraft = (id: string) => {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
@@ -278,6 +289,17 @@ function ChannelPage() {
             content={
               <div>
                 <Menu>
+                  {isAdmin && (
+                    <MenuItem
+                      icon={
+                        <BiUserPlus size={20} className="text-neutral-400" />
+                      }
+                      onClick={() => {
+                        setAddMemberModal(true);
+                      }}
+                      title="Add members"
+                    />
+                  )}
                   <MenuItem
                     icon={
                       <BiInfoCircle size={20} className="text-neutral-400" />
@@ -287,13 +309,17 @@ function ChannelPage() {
                     }}
                     title="Channel information"
                   />
-                  <MenuItem
-                    icon={<BiEditAlt size={20} className="text-neutral-400" />}
-                    onClick={() => {
-                      setEditChannelModal(true);
-                    }}
-                    title="Edit channel"
-                  />
+                  {isAdmin && (
+                    <MenuItem
+                      icon={
+                        <BiEditAlt size={20} className="text-neutral-400" />
+                      }
+                      onClick={() => {
+                        setEditChannelModal(true);
+                      }}
+                      title="Edit channel"
+                    />
+                  )}
                   <MenuItem
                     icon={<BiLogOut size={20} className="text-neutral-400" />}
                     onClick={() => {
@@ -401,7 +427,25 @@ function ChannelPage() {
           }}
         />
       </Modal>
-
+      <Modal
+        header="Manage members"
+        visible={addMemberModal}
+        onClose={() => {
+          setAddMemberModal(false);
+        }}
+        onCancel={() => {
+          setAddMemberModal(false);
+        }}
+        footer={null}
+        size="small"
+      >
+        <AddChannelMember
+          data={channelData}
+          onClose={() => {
+            setAddMemberModal(false);
+          }}
+        />
+      </Modal>
       <Modal
         header={`Leave ${
           channelData?.privacy === "private" ? "private" : "public"

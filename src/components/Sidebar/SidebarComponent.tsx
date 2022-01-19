@@ -383,7 +383,13 @@ function SidebarComponent({
         footer={null}
         size="small"
       >
-        <AddChannelMember data={selectedChannel} />
+        <AddChannelMember
+          data={selectedChannel}
+          onClose={() => {
+            setAddMemberModal(false);
+            setSelectedChannel(null);
+          }}
+        />
       </Modal>
       <Modal
         header={`Leave ${
