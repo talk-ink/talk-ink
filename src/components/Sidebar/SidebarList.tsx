@@ -8,6 +8,7 @@ import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
 import {
   BiDotsHorizontalRounded,
   BiEditAlt,
+  BiInfoCircle,
   BiLock,
   BiLogOut,
 } from "react-icons/bi";
@@ -30,6 +31,7 @@ type Props = React.PropsWithChildren<{
   count?: number | string;
   leaveModalHandler?: (channel: Channel) => void;
   editModalHandler?: (channel: Channel) => void;
+  channelInfoHandler?: (channel: Channel) => void;
   data?: Channel;
   setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
 }>;
@@ -44,6 +46,7 @@ function SidebarList({
   editModalHandler,
   data,
   setIsSidebarOpen,
+  channelInfoHandler,
 }: Props) {
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
@@ -119,6 +122,13 @@ function SidebarList({
           content={
             <div>
               <Menu>
+                <MenuItem
+                  icon={<BiInfoCircle size={20} className="text-neutral-400" />}
+                  onClick={() => {
+                    channelInfoHandler(data);
+                  }}
+                  title="Channel information"
+                />
                 <MenuItem
                   icon={<BiEditAlt size={20} className="text-neutral-400" />}
                   onClick={() => {

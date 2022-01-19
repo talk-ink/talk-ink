@@ -48,7 +48,10 @@ function CreateWorkspacePage() {
         .create({ name: values.name, peoples: auth.user._id });
 
       dispatch(addWorkspace(data));
-      dispatch(updateUser({ workspaces: [...auth.user.workspaces, data._id] }));
+      dispatch(
+        updateUser({ workspaces: [...auth.user.workspaces, data?._id] })
+      );
+
       if (data) {
         const generalChannel = await kontenbase.service("Channels").create({
           name: "General",

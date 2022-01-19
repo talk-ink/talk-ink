@@ -9,6 +9,7 @@ import { Channel, CreateChannel } from "types";
 import { createChannelValidation } from "utils/validators";
 import Button from "components/Button/Button";
 import SubLabel from "components/Form/SubLabel";
+import Switch from "components/Switch/Switch";
 
 const initialValues: CreateChannel = {
   name: "",
@@ -34,10 +35,16 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
       : initialValues,
     validationSchema: createChannelValidation,
     onSubmit: (values) => {
+      console.log("awe");
       onSubmit(values);
     },
     enableReinitialize: true,
   });
+
+  const privacyStr = {
+    public: "Public",
+    private: "Private",
+  };
 
   const isDisabled: boolean =
     !formik.values.name ||
@@ -75,15 +82,20 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
       </FormControl>
       <FormControl>
         <FormLabel required>Privacy</FormLabel>
-        <select
-          value={formik.values.privacy}
-          onChange={formik.handleChange("privacy")}
-          onBlur={formik.handleBlur("privacy")}
-          className="w-full text-sm p-2 rounded-md outline-0 border bg-white border-neutral-200 focus:border-neutral-300"
-        >
-          <option value="public">Public</option>
-          <option value="private">Private</option>
-        </select>
+        <div className="flex items-center gap-3">
+          <Switch
+            value={formik.values.privacy == "public" ?? true}
+            onChange={(values) => {
+              if (values) {
+                formik.setFieldValue("privacy", "public");
+              } else {
+                formik.setFieldValue("privacy", "private");
+              }
+            }}
+          />
+          <p className="text-sm">{privacyStr[formik.values.privacy]}</p>
+        </div>
+
         {formik.errors.privacy && <SubLabel>{formik.errors.privacy}</SubLabel>}
       </FormControl>
       <div className="pt-2 flex items-center justify-end gap-2">

@@ -35,6 +35,7 @@ import Divider from "components/Divider/Divider";
 import SettingsModal from "components/SettingsModal/SettingsModal";
 import { FaPlus } from "react-icons/fa";
 import { updateWorkspace } from "features/workspaces";
+import ChannelInfo from "components/ChannelForm/ChannelInfo";
 
 type TProps = {
   isMobile: boolean;
@@ -60,6 +61,7 @@ function SidebarComponent({
 
   const [createChannelModal, setCreateChannelModal] = useState(false);
   const [editChannelModal, setEditChannelModal] = useState(false);
+  const [channelInfoModal, setChannelInfoModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
 
@@ -249,7 +251,7 @@ function SidebarComponent({
                 setIsSidebarOpen={setIsSidebarOpen}
               /> */}
             </ul>
-            <ChannelButton setCreateChannelModal={setCreateChannelModal} />
+            <ChannelButton onOptionClick={() => setCreateChannelModal(true)} />
             <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
@@ -267,6 +269,10 @@ function SidebarComponent({
                   }}
                   editModalHandler={(channel) => {
                     setEditChannelModal(true);
+                    setSelectedChannel(channel);
+                  }}
+                  channelInfoHandler={(channel) => {
+                    setChannelInfoModal(true);
                     setSelectedChannel(channel);
                   }}
                 />
@@ -293,6 +299,7 @@ function SidebarComponent({
         }}
         visible={createChannelModal}
         footer={null}
+        size="small"
       >
         <ChannelForm
           onSubmit={createChannelHandler}
@@ -314,11 +321,34 @@ function SidebarComponent({
           setSelectedChannel(null);
         }}
         footer={null}
+        size="small"
       >
         <EditChannelForm
           data={selectedChannel}
           onClose={() => {
             setEditChannelModal(false);
+            setSelectedChannel(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        header="Channel information"
+        visible={channelInfoModal}
+        onClose={() => {
+          setChannelInfoModal(false);
+          setSelectedChannel(null);
+        }}
+        onCancel={() => {
+          setChannelInfoModal(false);
+          setSelectedChannel(null);
+        }}
+        footer={null}
+        size="small"
+      >
+        <ChannelInfo
+          data={selectedChannel}
+          onClose={() => {
+            setChannelInfoModal(false);
             setSelectedChannel(null);
           }}
         />
@@ -340,6 +370,7 @@ function SidebarComponent({
         onConfirm={() => {
           leaveChannelHandler();
         }}
+        size="xs"
       >
         <p className="text-sm">
           Are you sure you want to leave this channel? You can always join it

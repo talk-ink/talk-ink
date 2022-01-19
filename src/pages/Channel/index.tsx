@@ -4,6 +4,7 @@ import {
   BiDotsHorizontalRounded,
   BiEdit,
   BiEditAlt,
+  BiInfoCircle,
   BiLogOut,
 } from "react-icons/bi";
 import { useLocation, useNavigate, useParams } from "react-router";
@@ -36,6 +37,7 @@ import { kontenbase } from "lib/client";
 import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
 import ChannelBadge from "components/ChannelBadge";
+import ChannelInfo from "components/ChannelForm/ChannelInfo";
 
 moment.locale("id");
 
@@ -62,6 +64,7 @@ function ChannelPage() {
   const [apiLoading, setApiLoading] = useState<boolean>();
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
+  const [channelInfoModal, setChannelInfoModal] = useState<boolean>(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState<boolean>();
   const [memberList, setMemberList] = useState<Member[]>([]);
 
@@ -268,6 +271,15 @@ function ChannelPage() {
               <div>
                 <Menu>
                   <MenuItem
+                    icon={
+                      <BiInfoCircle size={20} className="text-neutral-400" />
+                    }
+                    onClick={() => {
+                      setChannelInfoModal(true);
+                    }}
+                    title="Channel information"
+                  />
+                  <MenuItem
                     icon={<BiEditAlt size={20} className="text-neutral-400" />}
                     onClick={() => {
                       setEditChannelModal(true);
@@ -339,6 +351,7 @@ function ChannelPage() {
           threadDeleteHandler();
         }}
         okButtonText="Confirm"
+        size="xs"
       >
         Are you sure you want to delete this thread?
       </Modal>
@@ -352,11 +365,31 @@ function ChannelPage() {
           setEditChannelModal(false);
         }}
         footer={null}
+        size="small"
       >
         <EditChannelForm
           data={channelData}
           onClose={() => {
             setEditChannelModal(false);
+          }}
+        />
+      </Modal>
+      <Modal
+        header="Channel information"
+        visible={channelInfoModal}
+        onClose={() => {
+          setChannelInfoModal(false);
+        }}
+        onCancel={() => {
+          setChannelInfoModal(false);
+        }}
+        footer={null}
+        size="small"
+      >
+        <ChannelInfo
+          data={channelData}
+          onClose={() => {
+            setChannelInfoModal(false);
           }}
         />
       </Modal>
@@ -376,6 +409,7 @@ function ChannelPage() {
         onConfirm={() => {
           leaveChannelHandler();
         }}
+        size="xs"
       >
         <p className="text-sm">
           Are you sure you want to leave this channel? You can always join it
