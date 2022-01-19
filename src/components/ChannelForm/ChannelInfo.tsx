@@ -60,7 +60,7 @@ function ChannelInfo({ data, onClose }: TProps) {
           </div>
           <div>
             <p className="text-sm font-semibold">Description</p>
-            <p className="text-xs">{data.description}</p>
+            <p className="text-xs">{data.description || "-"}</p>
           </div>
         </>
       )}
