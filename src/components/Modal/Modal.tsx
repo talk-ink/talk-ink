@@ -15,6 +15,7 @@ type TProps = React.PropsWithChildren<{
   okButtonProps?: object;
   cancelButtonProps?: object;
   footer?: React.ReactNode | null;
+  size?: "xs" | "small" | "medium" | "large";
 }>;
 
 function Modal({
@@ -29,10 +30,19 @@ function Modal({
   okButtonProps = {},
   cancelButtonProps = {},
   footer,
+  size = "medium",
 }: TProps) {
+  const modalContentSize = {
+    xs: "w-4/12 2xl:w-3/12",
+    small: "w-5/12 2xl:w-4/12",
+    medium: "w-6/12 2xl:w-5/12",
+    large: "w-7/12 2xl:w-6/12",
+  };
   return visible ? (
     <div className="w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]">
-      <div className="w-5/12 h-auto bg-white rounded-lg mt-20">
+      <div
+        className={`${modalContentSize[size]} h-auto bg-white rounded-lg mt-20`}
+      >
         <header className="flex items-center justify-between p-3">
           <h2 className="text-lg font-bold -mb-1">{header}</h2>
           <button onClick={onClose}>

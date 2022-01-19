@@ -351,6 +351,7 @@ function ChannelPage() {
           threadDeleteHandler();
         }}
         okButtonText="Confirm"
+        size="xs"
       >
         Are you sure you want to delete this thread?
       </Modal>
@@ -364,6 +365,7 @@ function ChannelPage() {
           setEditChannelModal(false);
         }}
         footer={null}
+        size="small"
       >
         <EditChannelForm
           data={channelData}
@@ -382,6 +384,7 @@ function ChannelPage() {
           setChannelInfoModal(false);
         }}
         footer={null}
+        size="small"
       >
         <ChannelInfo
           data={channelData}
@@ -406,6 +409,7 @@ function ChannelPage() {
         onConfirm={() => {
           leaveChannelHandler();
         }}
+        size="xs"
       >
         <p className="text-sm">
           Are you sure you want to leave this channel? You can always join it

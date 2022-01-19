@@ -305,6 +305,7 @@ function SidebarComponent({
         }}
         visible={createChannelModal}
         footer={null}
+        size="small"
       >
         <ChannelForm
           onSubmit={createChannelHandler}
@@ -326,6 +327,7 @@ function SidebarComponent({
           setSelectedChannel(null);
         }}
         footer={null}
+        size="small"
       >
         <EditChannelForm
           data={selectedChannel}
@@ -347,6 +349,7 @@ function SidebarComponent({
           setSelectedChannel(null);
         }}
         footer={null}
+        size="small"
       >
         <ChannelInfo
           data={selectedChannel}
@@ -373,6 +376,7 @@ function SidebarComponent({
         onConfirm={() => {
           leaveChannelHandler();
         }}
+        size="xs"
       >
         <p className="text-sm">
           Are you sure you want to leave this channel? You can always join it
