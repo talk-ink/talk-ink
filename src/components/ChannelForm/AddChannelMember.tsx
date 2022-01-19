@@ -33,8 +33,8 @@ function AddChannelMember({ data }: TProps) {
   const [searchDebounce] = useDebounce(search, 100);
 
   const channelData: Channel = useMemo(() => {
-    return channel.channels.find((data) => data._id === params.channelId);
-  }, [channel.channels, params.channelId]);
+    return channel.channels.find((item) => item._id === data._id);
+  }, [channel.channels, params.channelId, data]);
 
   const notJoinedMemberData: Member[] = useMemo(() => {
     const notJoined = member.members.filter(
