@@ -20,19 +20,22 @@ import Popup from "components/Popup/Popup";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import Modal from "components/Modal/Modal";
+import ProfileImage from "components/ProfileImage";
+import EditChannelForm from "components/ChannelForm/EditChannelForm";
+import NameInitial from "components/Avatar/NameInitial";
 
 import { useAppSelector } from "hooks/useAppSelector";
-import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";
+import { useToast } from "hooks/useToast";
+
 import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { Channel, Member, Thread } from "types";
-import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import { deleteChannel, updateChannelCount } from "features/channels/slice";
-import { useToast } from "hooks/useToast";
-import NameInitial from "components/Avatar/NameInitial";
+
+import { kontenbase } from "lib/client";
+import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
-import ProfileImage from "components/ProfileImage";
+import ChannelBadge from "components/ChannelBadge";
 
 moment.locale("id");
 
@@ -46,6 +49,7 @@ function ChannelPage() {
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
   const thread = useAppSelector((state) => state.thread);
+  const workspace = useAppSelector((state) => state.workspace);
 
   const userId: string = auth.user._id;
 
@@ -54,6 +58,7 @@ function ChannelPage() {
   const [selectedThread, setSelectedThread] = useState<
     Thread | null | undefined
   >();
+
   const [apiLoading, setApiLoading] = useState<boolean>();
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
@@ -93,6 +98,13 @@ function ChannelPage() {
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === params.channelId);
   }, [params.channelId, channel.channels]);
+
+  const isChannelMember: boolean = useMemo(() => {
+    if (channelData) {
+      return channelData.members.includes(userId);
+    }
+    return false;
+  }, [channelData]);
 
   const threadData = useMemo(() => {
     return thread.threads;
@@ -143,11 +155,9 @@ function ChannelPage() {
 
   const leaveChannelHandler = async () => {
     try {
-      let members = channelData.members.filter((data) => data !== userId);
-
-      await kontenbase.service("Channels").updateById(channelData?._id, {
-        members,
-      });
+      await kontenbase
+        .service("Channels")
+        .unlink(channelData?._id, { members: userId });
 
       dispatch(deleteChannel(channelData));
       setLeaveChannelModal(false);
@@ -174,8 +184,10 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
-    getMemberHandler();
+    if (channel.channels.length > 0) {
+      dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
+      getMemberHandler();
+    }
   }, [params.channelId]);
 
   const loading = channel.loading || thread.loading;
@@ -184,7 +196,7 @@ function ChannelPage() {
     <MainContentContainer>
       <header
         className={`mb-8 flex items-end justify-between "border-b-2 border-neutral-100 pb-8"
-        `}
+            `}
       >
         <div>
           <h1 className="font-bold text-3xl">{channelData?.name}</h1>
@@ -238,17 +250,19 @@ function ChannelPage() {
                 )
             )}
           </div>
-          <Button
-            className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
-            onClick={() => {
-              createThreadDraft();
-            }}
-          >
-            <BiEdit size={18} className="text-white md:mr-2" />
-            <p className="hidden md:block text-sm text-white font-medium -mb-1">
-              New Thread
-            </p>
-          </Button>
+          {isChannelMember && (
+            <Button
+              className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
+              onClick={() => {
+                createThreadDraft();
+              }}
+            >
+              <BiEdit size={18} className="text-white md:mr-2" />
+              <p className="hidden md:block text-sm text-white font-medium -mb-1">
+                New Thread
+              </p>
+            </Button>
+          )}
           <Popup
             content={
               <div>
@@ -368,6 +382,9 @@ function ChannelPage() {
           again later.
         </p>
       </Modal>
+      {!isChannelMember && !loading && (
+        <ChannelBadge type="channel" data={channelData} userId={userId} />
+      )}
     </MainContentContainer>
   );
 }

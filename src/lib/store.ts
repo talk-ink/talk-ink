@@ -10,11 +10,12 @@ import { threadReducer } from "features/threads";
 import { toastReducer } from "features/toast/slice";
 import { memberReducer } from "features/members/slice";
 import { inboxReducer } from "features/inbox";
+import { pageStatusReducer } from "features/pageStatus";
 
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["thread", "toast", "auth"],
+  whitelist: ["thread", "toast", "auth", "pageStatus"],
 };
 
 const appReducer = combineReducers({
@@ -25,6 +26,7 @@ const appReducer = combineReducers({
   toast: toastReducer,
   member: memberReducer,
   inbox: inboxReducer,
+  pageStatus: pageStatusReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appReducer);
