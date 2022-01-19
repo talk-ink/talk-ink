@@ -86,6 +86,8 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
   useEffect(() => {
     if (joinedMemberIds.length === 0) {
       setIsMemberEmpty(true);
+    } else {
+      setIsMemberEmpty(false);
     }
     formik.setFieldValue("members", joinedMemberIds);
   }, [joinedMemberIds]);

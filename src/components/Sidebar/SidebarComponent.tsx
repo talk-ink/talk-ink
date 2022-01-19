@@ -124,7 +124,9 @@ function SidebarComponent({
           })
         );
         setCreateChannelModal(false);
-        navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
+        if (values?.members?.includes(auth.user._id)) {
+          navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
+        }
       }
     } catch (error) {
       console.log("err", error);
