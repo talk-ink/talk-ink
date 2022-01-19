@@ -69,13 +69,13 @@ function InboxList({ type = "active" }: TProps) {
     try {
       if (isDoneThread) {
         await kontenbase
-          .service("Users")
-          .unlink(auth.user._id, { doneThreads: threadId });
+          .service("Threads")
+          .unlink(threadId, { doneUsers: auth.user._id });
         dispatch(deleteDoneThread(threadId));
       } else {
         await kontenbase
-          .service("Users")
-          .link(auth.user._id, { doneThreads: threadId });
+          .service("Threads")
+          .link(threadId, { doneUsers: auth.user._id });
         dispatch(addDoneThread(threadId));
       }
     } catch (error) {
