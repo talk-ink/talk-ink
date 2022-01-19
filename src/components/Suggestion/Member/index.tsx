@@ -10,7 +10,12 @@ type TProps = {
 function MemberSuggestion({ onChange, children }: TProps) {
   const [showSuggestion, setShowSuggestion] = useState(false);
   return (
-    <div className="relative">
+    <div
+      className="relative"
+      onBlur={(e) => {
+        if (!e.relatedTarget) setShowSuggestion(false);
+      }}
+    >
       <TextInput
         className="w-full"
         placeholder="Search by name"

@@ -108,6 +108,7 @@ function AddChannelMember({ data }: TProps) {
             data={data}
             onClick={() => {
               inviteMemberHandler(data._id);
+              setSearch("");
             }}
           />
         ))}
