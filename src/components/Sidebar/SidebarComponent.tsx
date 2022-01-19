@@ -257,7 +257,7 @@ function SidebarComponent({
                 setIsSidebarOpen={setIsSidebarOpen}
               /> */}
             </ul>
-            <ChannelButton setCreateChannelModal={setCreateChannelModal} />
+            <ChannelButton onOptionClick={() => setCreateChannelModal(true)} />
             <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
