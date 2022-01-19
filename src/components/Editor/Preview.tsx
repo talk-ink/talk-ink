@@ -71,7 +71,7 @@ const Preview: React.FC<IProps> = ({
         }}
       />
       <div className="flex justify-between">
-        icon
+        <div />
         <div className="flex items-center py-2">
           <Button
             type="submit"

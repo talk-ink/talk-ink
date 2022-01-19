@@ -7,6 +7,17 @@ export interface AuthState extends Token {
   loading: boolean;
 }
 
+export interface ISubComment {
+  id?: string;
+  _id?: string;
+  content: string;
+  createdAt: string;
+  createdBy: User;
+  tagedUsers?: string[];
+  updatedAt?: string | null;
+  parent: string[];
+}
+
 export interface IComment {
   id?: string;
   _id?: string;
@@ -15,6 +26,8 @@ export interface IComment {
   createdBy: User;
   threads: string[];
   updatedAt?: string | null;
+  tagedUsers?: string[];
+  subComments?: ISubComment[];
 }
 export interface Thread {
   id?: string;

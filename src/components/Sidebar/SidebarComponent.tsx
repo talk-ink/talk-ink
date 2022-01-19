@@ -1,12 +1,6 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
-import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
+import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
@@ -156,7 +150,7 @@ function SidebarComponent({
             : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51] `
         }
       >
-        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-[51]">
+        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 fixed: md:sticky top-0 z-[51]">
           <Popup
             content={
               <div>

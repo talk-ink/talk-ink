@@ -43,9 +43,9 @@ function DashboardPage() {
   return loading ? (
     <FullscreenLoading />
   ) : (
-    <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-auto md:overflow-hidden text-slightGray">
+    <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-auto md:overflow-hidden text-slightGray relative">
       <FcMenu
-        className="fixed top-2 left-2"
+        className="absolute top-2 left-2"
         size={"2rem"}
         onClick={() => setIsSidebarOpen((prev) => !prev)}
       />

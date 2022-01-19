@@ -28,7 +28,7 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
-import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
+import { KontenbaseSingleResponse } from "@kontenbase/sdk";
 
 function useQuery() {
   const { search } = useLocation();

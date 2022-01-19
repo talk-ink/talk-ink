@@ -63,7 +63,7 @@ export const fetchComments = createAsyncThunk(
   async ({ threadId }: { threadId: string }) => {
     const { data } = await kontenbase
       .service("Comments")
-      .find({ where: { threads: threadId } });
+      .find({ where: { threads: threadId }, lookup: ["subComments"] });
 
     return {
       comments: data,
