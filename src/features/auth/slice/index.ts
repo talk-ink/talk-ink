@@ -1,8 +1,7 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cookies from "js-cookie";
-import { kontenbase } from "lib/client";
 
-import { AuthState, Avatar, Token, TUserProfile, User } from "types";
+import { AuthState, Token, TUserProfile } from "types";
 
 const initialState: AuthState = {
   token: null,

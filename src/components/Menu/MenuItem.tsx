@@ -1,5 +1,4 @@
 import React from "react";
-import { BiTrash } from "react-icons/bi";
 
 type TProps = React.PropsWithChildren<{
   title?: string;
@@ -12,7 +11,7 @@ function MenuItem({ title, onClick = () => {}, icon, disabled }: TProps) {
   return (
     <button
       className={`rounded-md ${
-        !disabled ? "hover:bg-cyan-50" : "opacity-50"
+        !disabled ? "hover:bg-indigo-50" : "opacity-50"
       } flex justify-between p-2`}
       onClick={onClick}
       disabled={disabled}

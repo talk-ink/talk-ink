@@ -12,7 +12,7 @@ import { kontenbase } from "lib/client";
 import { setAuthToken, setAuthUser } from "features/auth";
 import { loginValidation } from "utils/validators";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Login, TUserProfile, User, Workspace, WorkspaceResponse } from "types";
+import { Login, TUserProfile, Workspace, WorkspaceResponse } from "types";
 import { useToast } from "hooks/useToast";
 import Hero from "../../assets/image/landing/thread.svg";
 import OneSignal from "react-onesignal";

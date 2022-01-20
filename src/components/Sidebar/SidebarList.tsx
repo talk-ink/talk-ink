@@ -1,8 +1,8 @@
-import IconButton from "components/Button/IconButton";
-import Menu from "components/Menu/Menu";
-import MenuItem from "components/Menu/MenuItem";
-import Popup from "components/Popup/Popup";
 import React, { Dispatch, SetStateAction, useMemo } from "react";
+
+import IconButton from "components/Button/IconButton";
+import { Menu } from "@headlessui/react";
+import MenuItem from "components/Menu/MenuItem2";
 
 import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
 import {
@@ -65,7 +65,7 @@ function SidebarList({
     } else {
       return params.channelId === data?._id;
     }
-  }, [params, pathname]);
+  }, [params, pathname, data, type]);
 
   switch (type) {
     case "search":
@@ -115,59 +115,78 @@ function SidebarList({
           <BiLock size={16} className={`ml-2 text-gray-400`} />
         )}
       </NavLink>
-      <div
-        className={`h-7 w-8 flex items-center justify-center ${
-          showOption && "group-hover:hidden"
-        }`}
-      >
-        <p className="text-neutral-400 text-xs">{count}</p>
-      </div>
+
       {showOption && (
-        <Popup
-          content={
-            <div>
-              <Menu>
-                {isAdmin && (
+        <Menu as="div" className="relative">
+          {({ open }) => (
+            <>
+              <div className="flex items-center">
+                <div
+                  className={`h-7 w-8 flex items-center justify-center ${
+                    showOption
+                      ? `${open ? "hidden" : ""} group-hover:hidden`
+                      : ""
+                  }`}
+                >
+                  <p className="text-neutral-400 text-xs">{count}</p>
+                </div>
+                <Menu.Button as={React.Fragment}>
+                  <IconButton
+                    className={`${open ? "flex" : "hidden"} group-hover:flex`}
+                    size="medium"
+                  >
+                    <BiDotsHorizontalRounded
+                      size={18}
+                      className="text-neutral-500"
+                    />
+                  </IconButton>
+                </Menu.Button>
+              </div>
+              {open && (
+                <Menu.Items static className="menu-container origin-top-right">
+                  {isAdmin && (
+                    <MenuItem
+                      icon={
+                        <BiUserPlus size={20} className="text-neutral-400" />
+                      }
+                      onClick={() => {
+                        addMemberHandler(data);
+                      }}
+                      title="Add members"
+                    />
+                  )}
                   <MenuItem
-                    icon={<BiUserPlus size={20} className="text-neutral-400" />}
+                    icon={
+                      <BiInfoCircle size={20} className="text-neutral-400" />
+                    }
                     onClick={() => {
-                      addMemberHandler(data);
+                      channelInfoHandler(data);
                     }}
-                    title="Add members"
+                    title="Channel information"
                   />
-                )}
-                <MenuItem
-                  icon={<BiInfoCircle size={20} className="text-neutral-400" />}
-                  onClick={() => {
-                    channelInfoHandler(data);
-                  }}
-                  title="Channel information"
-                />
-                {isAdmin && (
+                  {isAdmin && (
+                    <MenuItem
+                      icon={
+                        <BiEditAlt size={20} className="text-neutral-400" />
+                      }
+                      onClick={() => {
+                        editModalHandler(data);
+                      }}
+                      title="Edit channel"
+                    />
+                  )}
                   <MenuItem
-                    icon={<BiEditAlt size={20} className="text-neutral-400" />}
+                    icon={<BiLogOut size={20} className="text-neutral-400" />}
                     onClick={() => {
-                      editModalHandler(data);
+                      leaveModalHandler(data);
                     }}
-                    title="Edit channel"
+                    title="Leave channel"
                   />
-                )}
-                <MenuItem
-                  icon={<BiLogOut size={20} className="text-neutral-400" />}
-                  onClick={() => {
-                    leaveModalHandler(data);
-                  }}
-                  title="Leave channel"
-                />
-              </Menu>
-            </div>
-          }
-          position="bottom"
-        >
-          <IconButton className="hidden group-hover:flex" size="medium">
-            <BiDotsHorizontalRounded size={18} className="text-neutral-500" />
-          </IconButton>
-        </Popup>
+                </Menu.Items>
+              )}
+            </>
+          )}
+        </Menu>
       )}
     </div>
   );

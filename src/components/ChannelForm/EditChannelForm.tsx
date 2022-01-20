@@ -1,11 +1,11 @@
-import Button from "components/Button/Button";
-import { updateChannel } from "features/channels/slice";
+import ChannelForm from "./ChannelForm";
+
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
+
+import { updateChannel } from "features/channels/slice";
 import { kontenbase } from "lib/client";
-import React, { useState } from "react";
 import { Channel, CreateChannel } from "types";
-import ChannelForm from "./ChannelForm";
 
 type TProps = {
   data: Channel;

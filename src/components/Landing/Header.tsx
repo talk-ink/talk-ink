@@ -1,8 +1,5 @@
-import React from "react";
-import { GoMarkGithub } from "react-icons/go";
 import { Link } from "react-router-dom";
 
-import Button from "components/Button/Button";
 import Brand from "assets/image/landing/brand.svg";
 import GetStartedButton from "./GetStartedButton";
 import GithubButton from "./GithubButton";

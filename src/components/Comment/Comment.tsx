@@ -3,15 +3,14 @@ import React, { useEffect, useState } from "react";
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
+import { Menu } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
 import { BsFillChatRightDotsFill } from "react-icons/bs";
 import Select from "react-select";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
-import Popup from "components/Popup/Popup";
-import Menu from "components/Menu/Menu";
-import MenuItem from "components/Menu/MenuItem";
+import MenuItem from "components/Menu/MenuItem2";
 import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
@@ -297,34 +296,47 @@ const Comment: React.FC<IProps> = ({
           )}
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (
-          <div className="absolute top-0 right-0 z-50 hidden group-hover:block  group-focus:block">
-            <Popup
-              content={
-                <Menu>
-                  <MenuItem
-                    icon={<BiEditAlt size={20} className="text-neutral-400" />}
-                    onClick={() => {
-                      setIsEdit(true);
-                      setEditorState(comment.content);
-                    }}
-                    title="Edit Comment"
-                  />
-                  <MenuItem
-                    icon={<BiTrash size={20} className="text-neutral-400" />}
-                    onClick={handleDeleteComment}
-                    title="Delete Comment"
-                  />
-                </Menu>
-              }
-              position="bottom"
-            >
-              <IconButton size="medium">
-                <BiDotsHorizontalRounded
-                  size={25}
-                  className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
-                />
-              </IconButton>
-            </Popup>
+          <div className="absolute top-0 right-0 z-50">
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton
+                      size="medium"
+                      className={`${
+                        open ? "flex" : "hidden"
+                      } group-hover:flex items-center`}
+                    >
+                      <BiDotsHorizontalRounded
+                        size={25}
+                        className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      <MenuItem
+                        icon={
+                          <BiEditAlt size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setIsEdit(true);
+                          setEditorState(comment.content);
+                        }}
+                        title="Edit Comment"
+                      />
+                      <MenuItem
+                        icon={
+                          <BiTrash size={20} className="text-neutral-400" />
+                        }
+                        onClick={handleDeleteComment}
+                        title="Delete Comment"
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
           </div>
         )}
       </div>

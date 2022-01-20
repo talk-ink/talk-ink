@@ -1,7 +1,5 @@
 import React from "react";
 
-import { Menu } from "@headlessui/react";
-
 import NameInitial from "components/Avatar/NameInitial";
 import ProfileImage from "components/ProfileImage";
 

@@ -1,5 +1,3 @@
-import React, { useEffect, useState } from "react";
-
 type TProps = {
   value?: boolean;
   onChange?: (value?: boolean) => void;

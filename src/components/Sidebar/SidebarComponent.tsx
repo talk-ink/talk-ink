@@ -223,18 +223,21 @@ function SidebarComponent({
           >
             {!loading && <WorkspaceButton workspaceData={workspaceData} />}
           </Popup>
-          <IconButton>
-            {isMobile ? (
+          {isMobile ? (
+            <IconButton>
               <MdClose
                 size={18}
                 className="text-neutral-400"
                 onClick={() => setIsSidebarOpen(false)}
               />
-            ) : (
-              // <BiMoon size={18} className="text-neutral-400" />
-              <></>
-            )}
-          </IconButton>
+            </IconButton>
+          ) : (
+            <>
+              {/* <IconButton>
+                <BiMoon size={18} className="text-neutral-400" />
+              </IconButton> */}
+            </>
+          )}
         </div>
         {!loading && (
           <div className="p-2">

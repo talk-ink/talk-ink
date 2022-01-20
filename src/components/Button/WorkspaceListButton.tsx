@@ -1,6 +1,5 @@
 import React from "react";
 import { Workspace } from "types";
-import { getNameInitial } from "utils/helper";
 
 type TProps = {
   data: Workspace;
@@ -10,7 +9,7 @@ type TProps = {
 function WorkspaceListButton({ data, onClick = () => {} }: TProps) {
   return (
     <button
-      className="w-full outline-none rounded-md hover:bg-cyan-50 flex justify-between p-2"
+      className="w-full outline-none rounded-md hover:bg-indigo-50 flex justify-between p-2"
       onClick={onClick}
     >
       <div className="flex items-center">

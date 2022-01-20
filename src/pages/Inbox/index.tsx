@@ -5,7 +5,7 @@ import {
   BiCheckCircle,
   BiDotsHorizontalRounded,
 } from "react-icons/bi";
-import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
+import { Outlet, useLocation, useParams } from "react-router-dom";
 
 import Badge from "components/Badge/Badge";
 import IconButton from "components/Button/IconButton";
@@ -30,7 +30,6 @@ function InboxPage() {
 
   const { pathname } = useLocation();
   const params = useParams();
-  const navigate = useNavigate();
 
   const auth = useAppSelector((state) => state.auth);
   const thread = useAppSelector((state) => state.thread);
@@ -52,18 +51,17 @@ function InboxPage() {
     [channel.channels]
   );
 
-  const threadData = useMemo(
-    () =>
-      thread.threads.filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelData,
-          userData: auth.user,
-          isDoneThread,
-        })
-      ),
-    [thread.threads, auth.user, params, channelData]
-  );
+  const threadData = useMemo(() => {
+    return thread.threads.filter((data) =>
+      inboxFilter({
+        thread: data,
+        channelIds: channelData,
+        userData: auth.user,
+        isDoneThread,
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thread.threads, auth.user, params, channelData]);
 
   const readAllHandler = async () => {
     try {
@@ -115,6 +113,7 @@ function InboxPage() {
     dispatch(
       fetchThreads({ type: "inbox", workspaceId: params.workspaceId, userId })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
   function timeout(delay: number) {
@@ -160,6 +159,7 @@ function InboxPage() {
     return () => {
       kontenbase.realtime.unsubscribe(key);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelData]);
 
   useEffect(() => {
@@ -189,6 +189,7 @@ function InboxPage() {
     return () => {
       kontenbase.realtime.unsubscribe(key);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

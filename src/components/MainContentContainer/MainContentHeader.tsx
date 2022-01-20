@@ -1,6 +1,6 @@
-import Button from "components/Button/Button";
-import { createBrowserHistory } from "history";
 import React from "react";
+
+import Button from "components/Button/Button";
 import { HiChevronLeft } from "react-icons/hi";
 import { useNavigate, useParams } from "react-router";
 

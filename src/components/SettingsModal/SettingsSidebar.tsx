@@ -1,16 +1,7 @@
-import React, { SetStateAction, useMemo, useState, Dispatch } from "react";
+import React, { useMemo } from "react";
 import SidebarButton from "components/SettingsModal/SidebarButton";
 import { useAppSelector } from "hooks/useAppSelector";
-import {
-  BiBell,
-  BiCreditCardFront,
-  BiCustomize,
-  BiImport,
-  BiMoon,
-  BiSliderAlt,
-  BiUser,
-  BiUserPlus,
-} from "react-icons/bi";
+import { BiUser, BiUserPlus } from "react-icons/bi";
 import { RiAccountCircleFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 
