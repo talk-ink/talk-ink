@@ -63,6 +63,9 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
+  console.log(dataSource);
+
   return (
     <div
       className="
@@ -79,7 +82,7 @@ function ContentItem({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-transparent group">
+      <div className="flex items-center justify-between md:px-3 hover:bg-cyan-50 rounded-xl border-transparent group">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
@@ -120,8 +123,8 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="text-left w-52 md:w-full truncate  md:whitespace-nowrap 2xl:max-w-4xl xl:max-w-2xl md:max-w-xl text-xs text-neutral-500 pr-2">
-              <small className=" text-xs text-neutral-500">
+            <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
+              <small className=" text-xs text-neutral-500 table-cell truncate">
                 {dataSource?.draft ? "Me: " : ""}
                 {dataSource.comments?.length > 0
                   ? `Latest : ${dataSource.comments?.[
@@ -158,18 +161,16 @@ function ContentItem({
                   )}
                   {dataSource.createdBy._id === auth.user._id ||
                     (dataSource?.draft && <Divider />)}
-                  {dataSource.createdBy._id === auth.user._id ||
-                    (dataSource?.draft && (
-                      <MenuItem
-                        icon={
-                          <BiTrash size={20} className="text-neutral-400" />
-                        }
-                        title="Delete thread..."
-                        onClick={() => {
-                          setSelectedThread(dataSource);
-                        }}
-                      />
-                    ))}
+                  {(dataSource.createdBy._id === auth.user._id ||
+                    dataSource?.draft) && (
+                    <MenuItem
+                      icon={<BiTrash size={20} className="text-neutral-400" />}
+                      title="Delete thread..."
+                      onClick={() => {
+                        setSelectedThread(dataSource);
+                      }}
+                    />
+                  )}
 
                   {/* <MenuItem
                     icon={<BiEdit size={20} className="text-neutral-400" />}

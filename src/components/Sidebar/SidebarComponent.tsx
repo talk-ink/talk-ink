@@ -176,7 +176,7 @@ function SidebarComponent({
             : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51] `
         }
       >
-        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 sticky top-0 z-[51]">
+        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 fixed: md:sticky top-0 z-[51]">
           <Popup
             content={
               <div>
@@ -295,8 +295,8 @@ function SidebarComponent({
                     showManageMemberModal(channel);
                   }}
                   isAdmin={
-                    workspaceData.createdBy._id === auth.user._id ||
-                    channel?.createdBy?._id === auth.user._id
+                    workspaceData.createdBy?._id === auth.user?._id ||
+                    channel?.createdBy?._id === auth.user?._id
                   }
                 />
               ))}

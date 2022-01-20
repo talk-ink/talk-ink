@@ -8,7 +8,6 @@ import Select from "react-select";
 import makeAnimated from "react-select/animated";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-
 import TextEditor from "components/TextEditor/TextEditor";
 import { useFormik } from "formik";
 import { Channel, Thread, Member } from "types";
@@ -226,7 +225,7 @@ function Compose() {
         />
       }
     >
-      <div className="w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-7 mx-auto relative ">
+      <div className="w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-3 mx-auto relative ">
         <div className="mb-2 flex w-fit items-center">
           <div className="mr-2">
             <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
@@ -277,6 +276,11 @@ function Compose() {
             isMulti
             options={notifiedOptions}
             placeholder="Select Tags"
+            //@ts-ignore
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null,
+            }}
           />
         </div>
         <TextEditor

@@ -128,7 +128,7 @@ function ChannelPage() {
 
   const isAdmin = useMemo(() => {
     return (
-      workspaceData.createdBy._id === auth.user._id ||
+      workspaceData.createdBy?._id === auth.user?._id ||
       channelData?.createdBy?._id === auth.user._id
     );
   }, [workspaceData, channelData]);
@@ -202,15 +202,17 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    if (channel.channels.length > 0) {
-      dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
-    }
-  }, [params.channelId]);
-  useEffect(() => {
-    if (channelData) {
+    if (channel.channels.length > 0 && auth.user._id) {
+      dispatch(
+        fetchThreads({
+          type: "threads",
+          channelId: params.channelId,
+          userId: auth.user._id,
+        })
+      );
       getMemberHandler();
     }
-  }, [channelData]);
+  }, [params.channelId, auth.user._id]);
 
   const loading = channel.loading || thread.loading;
 

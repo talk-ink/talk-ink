@@ -11,7 +11,7 @@ import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
-import { Channel, Thread, Member } from "types";
+import { Channel, Thread, Member, ISubComment } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import {
   addComment,
@@ -28,6 +28,7 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
+import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 
 function useQuery() {
   const { search } = useLocation();
@@ -61,6 +62,7 @@ function ThreadPage() {
             : payload.threads?.[0] === threadId;
 
         let _createdBy;
+        let _subComments;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
           const { data } = await kontenbase.service("Users").find({
             where: {
@@ -71,6 +73,24 @@ function ThreadPage() {
             },
           });
           _createdBy = data?.[0];
+
+          if (
+            event === "UPDATE_RECORD" &&
+            payload.after.subComments.length > 0
+          ) {
+            const { data }: KontenbaseResponse<ISubComment> = await kontenbase
+              .service("SubComments")
+              .find({
+                where: {
+                  parent: payload.after._id,
+                },
+              });
+
+            _subComments = data.map((item) => ({
+              ...item,
+              createdBy: item.createdBy._id,
+            }));
+          }
         }
 
         if (isCurrentThread) {
@@ -92,21 +112,23 @@ function ThreadPage() {
                     ...payload.before,
                     ...payload.after,
                     createdBy: _createdBy,
+                    subComments: _subComments,
                   },
-                })
-              );
-              break;
-            case "DELETE_RECORD":
-              dispatch(
-                deleteComment({
-                  threadId,
-                  deletedId: payload._id,
                 })
               );
               break;
             default:
               break;
           }
+        }
+
+        if (event === "DELETE_RECORD") {
+          dispatch(
+            deleteComment({
+              threadId,
+              deletedId: payload._id,
+            })
+          );
         }
       })
       .then((result) => (key = result));
@@ -127,7 +149,8 @@ function ThreadPage() {
       if (!readedThreads.includes(threadId)) {
         await kontenbase
           .service("Threads")
-          .link(threadId, { readedUsers: auth.user._id });
+          .link(threadId, { doneUsers: auth.user._id });
+
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
     } catch (error: any) {
@@ -170,7 +193,9 @@ function ThreadPage() {
   useEffect(() => {
     const setInteractedUser = async () => {
       try {
-        const { data } = await kontenbase.service("Threads").getById(threadId);
+        const { data }: KontenbaseSingleResponse<Thread> = await kontenbase
+          .service("Threads")
+          .getById(threadId);
 
         if (
           !data.interactedUsers?.find((item: any) => item === auth.user._id)
@@ -228,7 +253,7 @@ function ThreadPage() {
         />
       }
     >
-      <div className="max-w-3xl ml-auto mr-auto -mt-4">
+      <div className="max-w-4xl ml-auto mr-auto -mt-4">
         <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl max-w-3xl break-words">
@@ -272,6 +297,8 @@ function ThreadPage() {
               <CommentList
                 dataSource={threadData?.comments}
                 listRef={listRef}
+                memberList={memberList}
+                threadId={threadId}
               />
             )}
           </div>

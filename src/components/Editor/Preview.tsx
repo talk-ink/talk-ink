@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import Editor from "rich-markdown-editor";
 
 import Button from "components/Button/Button";
+import Delayed from "components/Delay";
 
 import { kontenbase } from "lib/client";
 
@@ -13,29 +14,6 @@ interface IProps {
   discardComment: () => void;
   handleUpdateComment: () => void;
 }
-
-type PropsDelay = React.PropsWithChildren<{
-  waitBeforeShow?: number;
-}>;
-
-const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
-  const [isShown, setIsShown] = useState(false);
-
-  useEffect(() => {
-    const timer = () =>
-      setTimeout(() => {
-        setIsShown(true);
-      }, waitBeforeShow);
-
-    const timerId = timer();
-
-    return () => {
-      clearTimeout(timerId);
-    };
-  }, [waitBeforeShow]);
-
-  return isShown ? <>{children}</> : null;
-};
 
 const Preview: React.FC<IProps> = ({
   content,
@@ -56,7 +34,7 @@ const Preview: React.FC<IProps> = ({
       />
     </Delayed>
   ) : (
-    <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md ">
+    <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-4 mt-2 ">
       <Editor
         key="edited"
         defaultValue={content}
@@ -70,8 +48,8 @@ const Preview: React.FC<IProps> = ({
           return data.url;
         }}
       />
-      <div className="flex justify-between">
-        icon
+      <div className="flex justify-between ">
+        <div />
         <div className="flex items-center py-2">
           <Button
             type="submit"
