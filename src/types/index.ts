@@ -40,12 +40,14 @@ export interface Channel {
   members: string[];
   description?: string;
   privacy?: "private" | "public";
+  createdBy?: User;
 }
 
 export interface CreateChannel {
   name: string;
   description?: string;
   privacy?: "private" | "public";
+  members?: string[];
 }
 
 export interface Workspace {

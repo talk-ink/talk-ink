@@ -126,8 +126,8 @@ function ThreadPage() {
       }
       if (!readedThreads.includes(threadId)) {
         await kontenbase
-          .service("Users")
-          .link(auth.user._id, { readedThreads: threadId });
+          .service("Threads")
+          .link(threadId, { readedUsers: auth.user._id });
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
     } catch (error: any) {

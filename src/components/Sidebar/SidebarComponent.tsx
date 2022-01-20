@@ -42,6 +42,8 @@ import SettingsModal from "components/SettingsModal/SettingsModal";
 import { FaPlus } from "react-icons/fa";
 import { updateWorkspace } from "features/workspaces";
 import ChannelInfo from "components/ChannelForm/ChannelInfo";
+import AddChannelMember from "components/ChannelForm/AddChannelMember";
+import BrowseChannels from "components/BrowseChannels";
 
 type TProps = {
   isMobile: boolean;
@@ -70,6 +72,8 @@ function SidebarComponent({
   const [channelInfoModal, setChannelInfoModal] = useState(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
+  const [addMemberModal, setAddMemberModal] = useState(false);
+  const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -109,7 +113,7 @@ function SidebarComponent({
     try {
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
-        members: [...workspaceData.peoples, auth.user._id],
+        members: values?.members,
         workspace: params.workspaceId,
       });
 
@@ -122,7 +126,9 @@ function SidebarComponent({
           })
         );
         setCreateChannelModal(false);
-        navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
+        if (values?.members?.includes(auth.user._id)) {
+          navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
+        }
       }
     } catch (error) {
       console.log("err", error);
@@ -148,6 +154,11 @@ function SidebarComponent({
       console.log("err", error);
       showToast({ message: `${error}` });
     }
+  };
+
+  const showManageMemberModal = (channel: Channel) => {
+    setAddMemberModal(true);
+    setSelectedChannel(channel);
   };
 
   useEffect(() => {
@@ -257,7 +268,10 @@ function SidebarComponent({
                 setIsSidebarOpen={setIsSidebarOpen}
               /> */}
             </ul>
-            <ChannelButton onOptionClick={() => setCreateChannelModal(true)} />
+            <ChannelButton
+              onAddChannelClick={() => setCreateChannelModal(true)}
+              onBrowseChannels={() => setBrowseChannelsModal(true)}
+            />
             <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
@@ -281,6 +295,13 @@ function SidebarComponent({
                     setChannelInfoModal(true);
                     setSelectedChannel(channel);
                   }}
+                  addMemberHandler={(channel) => {
+                    showManageMemberModal(channel);
+                  }}
+                  isAdmin={
+                    workspaceData.createdBy._id === auth.user._id ||
+                    channel?.createdBy?._id === auth.user._id
+                  }
                 />
               ))}
               <div
@@ -356,6 +377,51 @@ function SidebarComponent({
           onClose={() => {
             setChannelInfoModal(false);
             setSelectedChannel(null);
+          }}
+          showManageMemberModal={showManageMemberModal}
+        />
+      </Modal>
+      <Modal
+        header="Manage members"
+        visible={addMemberModal}
+        onClose={() => {
+          setAddMemberModal(false);
+          setSelectedChannel(null);
+        }}
+        onCancel={() => {
+          setAddMemberModal(false);
+          setSelectedChannel(null);
+        }}
+        footer={null}
+        size="small"
+      >
+        <AddChannelMember
+          data={selectedChannel}
+          onClose={() => {
+            setAddMemberModal(false);
+            setSelectedChannel(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        header="Browse channels"
+        visible={browseChannelsModal}
+        onClose={() => {
+          setBrowseChannelsModal(false);
+        }}
+        onCancel={() => {
+          setBrowseChannelsModal(false);
+        }}
+        footer={null}
+        size="small"
+      >
+        <BrowseChannels
+          onAddNewChannel={() => {
+            setCreateChannelModal(true);
+            setBrowseChannelsModal(false);
+          }}
+          onClose={() => {
+            setBrowseChannelsModal(false);
           }}
         />
       </Modal>
