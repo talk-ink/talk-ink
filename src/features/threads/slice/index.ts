@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import moment from "moment-timezone";
 import { Thread, IComment, ISubComment } from "types";
 import { fetchComments, fetchThreads } from "./asyncThunk";
 
@@ -6,11 +7,13 @@ type InitThreadState = {
   threads: Thread[];
   loading: boolean;
   commentLoading: boolean;
+  commentCount: number;
 };
 
 type TCommentsPayload = {
   comments: IComment[];
   threadId: string;
+  count?: number;
 };
 
 type TCommentPayload = {
@@ -44,6 +47,7 @@ const initialState: InitThreadState = {
   threads: [],
   loading: true,
   commentLoading: true,
+  commentCount: 0,
 };
 
 const threadSlice = createSlice({
@@ -70,6 +74,7 @@ const threadSlice = createSlice({
       );
 
       state.threads = newThread;
+      state.commentCount = state.commentCount + 1;
     },
     updateComment: (state, action: PayloadAction<TCommentPayload>) => {
       console.log(action.payload);
@@ -102,6 +107,7 @@ const threadSlice = createSlice({
       );
 
       state.threads = filteredThread;
+      state.commentCount = state.commentCount - 1;
     },
     addInteractedUser: (
       state,
@@ -232,17 +238,40 @@ const threadSlice = createSlice({
     builder.addCase(
       fetchComments.fulfilled,
       (state, action: PayloadAction<TCommentsPayload>) => {
-        const newThread = state.threads.map((item) =>
-          item._id === action.payload.threadId
-            ? {
-                ...item,
-                comments: action.payload.comments,
+        const newThread = state.threads.map((item) => {
+          if (item._id === action.payload.threadId) {
+            const newComment =
+              item.comments?.length > 0
+                ? [...action.payload.comments, ...item.comments]
+                : action.payload.comments;
+
+            const result = [];
+            const map = new Map();
+            for (const comment of newComment) {
+              if (!map.has(comment._id)) {
+                map.set(comment._id, true); // set any value to Map
+                result.push(comment);
               }
-            : item
-        );
+            }
+
+            return {
+              ...item,
+              comments: result
+                .filter((item) => item.createdBy._id)
+                .sort(
+                  (a, b) =>
+                    moment(a.createdAt).valueOf() -
+                    moment(b.createdAt).valueOf()
+                ),
+            };
+          } else {
+            return item;
+          }
+        });
 
         state.threads = newThread;
         state.commentLoading = false;
+        state.commentCount = action.payload.count;
       }
     );
     builder.addCase(fetchComments.rejected, (state) => {

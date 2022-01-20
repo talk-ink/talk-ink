@@ -38,17 +38,25 @@ function useQuery() {
 
 function ThreadPage() {
   const [showToast] = useToast();
-  const { threadId, workspaceId, channelId } = useParams();
+  const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const query = useQuery();
-  const listRef = useRef<HTMLDivElement>(null);
-  const [memberList, setMemberList] = useState<Member[]>([]);
+  const { threadId, workspaceId, channelId } = useParams();
 
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
-  const auth = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const [memberList, setMemberList] = useState<Member[]>([]);
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === channelId);
+  }, [channelId, channel.channels]);
+
+  const threadData: Thread = useMemo(() => {
+    return thread.threads.find((data) => data._id === threadId);
+  }, [thread.threads, threadId]);
 
   useEffect(() => {
     let key: string;
@@ -149,7 +157,7 @@ function ThreadPage() {
       if (!readedThreads.includes(threadId)) {
         await kontenbase
           .service("Threads")
-          .link(threadId, { doneUsers: auth.user._id });
+          .link(threadId, { readedUsers: auth.user._id });
 
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
@@ -160,16 +168,18 @@ function ThreadPage() {
   };
 
   useEffect(() => {
-    dispatch(fetchComments({ threadId: threadId }));
+    dispatch(fetchComments({ threadId: threadId, skip: 0 }));
   }, [dispatch, threadId]);
 
-  useEffect(() => {
-    updateReadedThreads();
-  }, [threadId]);
+  const loadMoreComment = () => {
+    dispatch(
+      fetchComments({ threadId: threadId, skip: threadData.comments.length })
+    );
+  };
 
-  const threadData: Thread = useMemo(() => {
-    return thread.threads.find((data) => data._id === threadId);
-  }, [thread.threads, threadId]);
+  useEffect(() => {
+    updateReadedThreads(); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadId]);
 
   const scrollToBottom = () =>
     setTimeout(() => {
@@ -185,10 +195,6 @@ function ThreadPage() {
       clearTimeout(timedId);
     };
   }, []);
-
-  const channelData: Channel = useMemo(() => {
-    return channel.channels.find((data) => data._id === channelId);
-  }, [channelId, channel.channels]);
 
   useEffect(() => {
     const setInteractedUser = async () => {
@@ -216,7 +222,7 @@ function ThreadPage() {
       }
     };
 
-    setInteractedUser();
+    setInteractedUser(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMemberHandler = async () => {
@@ -235,12 +241,12 @@ function ThreadPage() {
   };
 
   useEffect(() => {
-    getMemberHandler();
+    getMemberHandler(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
-  }, [workspaceId]);
+  // useEffect(() => {
+  //   dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
+  // }, [workspaceId]);
 
   return (
     <MainContentContainer
@@ -281,7 +287,7 @@ function ThreadPage() {
               )}
             </div>
 
-            <div className="flex-grow">
+            <div className="flex-grow text-sm">
               <Editor
                 value={threadData?.content}
                 readOnly
@@ -289,7 +295,17 @@ function ThreadPage() {
               />
             </div>
           </div>
-          <div className="border-t-2 border-gray-200 mb-8 mt-8" />
+          <div className="border-t-[1px] border-gray-200 mb-8 mt-8" />
+          {thread?.commentCount - threadData?.comments?.length > 0 && (
+            <p
+              className="text-sm mb-8 -mt-4 hover:opacity-80 hover:cursor-pointer"
+              onClick={loadMoreComment}
+            >
+              View More {thread?.commentCount - threadData?.comments?.length}{" "}
+              Comments
+            </p>
+          )}
+
           <div className="mb-10 ">
             {thread.commentLoading ? (
               <LoadingSkeleton />

@@ -64,8 +64,6 @@ function ContentItem({
     }
   };
 
-  console.log(dataSource);
-
   return (
     <div
       className="
@@ -82,7 +80,7 @@ function ContentItem({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between md:px-3 hover:bg-cyan-50 rounded-xl border-transparent group">
+      <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
@@ -129,8 +127,8 @@ function ContentItem({
                 {dataSource.comments?.length > 0
                   ? `Latest : ${dataSource.comments?.[
                       dataSource.comments?.length - 1
-                    ]?.content?.replace(/[^a-zA-Z ]/g, "")}`
-                  : dataSource.content?.replace(/[^a-zA-Z ]/g, "")}
+                    ]?.content?.replace(/[^a-zA-Z0-9 ]/g, "")}`
+                  : dataSource.content?.replace(/[^a-zA-Z0-9 ]/g, "")}
               </small>
             </div>
           </div>
