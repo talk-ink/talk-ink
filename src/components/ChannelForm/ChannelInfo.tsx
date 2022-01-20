@@ -51,8 +51,8 @@ function ChannelInfo({ data, onClose, showManageMemberModal }: TProps) {
 
   const isAdmin = useMemo(() => {
     return (
-      workspaceData.createdBy._id === auth.user._id ||
-      channelData?.createdBy?._id === auth.user._id
+      workspaceData.createdBy?._id === auth.user?._id ||
+      channelData?.createdBy?._id === auth.user?._id
     );
   }, [workspaceData, channelData]);
 

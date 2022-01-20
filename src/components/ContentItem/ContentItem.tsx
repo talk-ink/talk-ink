@@ -123,8 +123,8 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="text-left w-52 md:w-full truncate  md:whitespace-nowrap 2xl:max-w-4xl xl:max-w-2xl md:max-w-xl text-xs text-neutral-500 pr-2">
-              <small className=" text-xs text-neutral-500">
+            <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
+              <small className=" text-xs text-neutral-500 table-cell truncate">
                 {dataSource?.draft ? "Me: " : ""}
                 {dataSource.comments?.length > 0
                   ? `Latest : ${dataSource.comments?.[
