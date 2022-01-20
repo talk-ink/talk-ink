@@ -10,7 +10,6 @@ import Select from "react-select";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
-import Popup from "components/Popup/Popup";
 import MenuItem from "components/Menu/MenuItem2";
 import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";

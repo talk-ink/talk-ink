@@ -2,7 +2,6 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import { useParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";
-import { Popover } from "@headlessui/react";
 import { FormikProps } from "formik";
 
 import MemberSuggestion from "components/Suggestion/Member";
@@ -46,6 +45,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
       (data) =>
         data.firstName.includes(trimValue) || data.email.includes(trimValue)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, searchDebounce, joinedMemberIds]);
 
   const joinedMemberData: Member[] = useMemo(() => {
@@ -53,6 +53,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
       joinedMemberIds.includes(item._id)
     );
     return notJoined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, joinedMemberIds]);
 
   const inviteMemberHandler = async (id: string) => {
@@ -81,6 +82,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
 
   useEffect(() => {
     dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
   useEffect(() => {
@@ -90,6 +92,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
       setIsMemberEmpty(false);
     }
     formik.setFieldValue("members", joinedMemberIds);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [joinedMemberIds]);
 
   return (

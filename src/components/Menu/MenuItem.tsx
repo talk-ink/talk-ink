@@ -1,5 +1,4 @@
 import React from "react";
-import { BiTrash } from "react-icons/bi";
 
 type TProps = React.PropsWithChildren<{
   title?: string;

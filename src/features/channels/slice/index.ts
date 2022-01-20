@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
-import { Channel, CreateChannel, Workspace } from "types";
+import { Channel } from "types";
 
 type FetchChannelsProps = {
   userId: string;

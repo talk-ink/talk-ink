@@ -1,6 +1,6 @@
-import { Menu } from "@headlessui/react";
 import React from "react";
-import { BiTrash } from "react-icons/bi";
+
+import { Menu } from "@headlessui/react";
 
 type TProps = React.PropsWithChildren<{
   title?: string;

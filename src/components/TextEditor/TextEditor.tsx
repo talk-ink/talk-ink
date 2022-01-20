@@ -31,6 +31,7 @@ const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
 };
 
 function TextEditor({ formik, loading, deleteDraft }: Props) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();

@@ -16,11 +16,7 @@ function ProfileImage({ className, source, size = "medium" }: TProps) {
     <div
       className={`${sizeStr[size]} rounded-full flex items-center justify-center overflow-hidden ${className}`}
     >
-      <img
-        src={source}
-        alt="profile image"
-        className="h-full w-full object-cover"
-      />
+      <img src={source} alt="profile" className="h-full w-full object-cover" />
     </div>
   );
 }

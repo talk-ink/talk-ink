@@ -5,7 +5,7 @@ import moment from "moment-timezone";
 import "moment/locale/id";
 import axios from "axios";
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
+// import makeAnimated from "react-select/animated";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import TextEditor from "components/TextEditor/TextEditor";
@@ -34,7 +34,7 @@ interface INotifiedOption {
   flag: number;
 }
 
-const animatedComponents = makeAnimated();
+// const animatedComponents = makeAnimated();
 
 moment.locale("id");
 
@@ -81,6 +81,7 @@ function Compose() {
 
   useEffect(() => {
     checkDraftAvailable();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.composeId]);
 
   const deleteDraft = () => {
@@ -182,6 +183,7 @@ function Compose() {
 
   useEffect(() => {
     getMemberHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -208,7 +210,8 @@ function Compose() {
     dispatch(
       fetchChannels({ userId: auth.user._id, workspaceId: params.workspaceId })
     );
-  }, [params.workspaceId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId, auth.user._id]);
 
   const loading = apiLoading;
 

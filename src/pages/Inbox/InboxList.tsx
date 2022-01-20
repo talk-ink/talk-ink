@@ -34,7 +34,6 @@ function InboxList({ type = "active" }: TProps) {
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] = useState(null);
-  const [apiLoading, setApiLoading] = useState(false);
 
   const isDoneThread = useMemo(() => {
     return type === "done";
@@ -45,20 +44,19 @@ function InboxList({ type = "active" }: TProps) {
     [channel.channels]
   );
 
-  const threadData = useMemo(
-    () =>
-      thread.threads
-        .filter((data) =>
-          inboxFilter({
-            thread: data,
-            channelIds: channelData,
-            userData: auth.user,
-            isDoneThread,
-          })
-        )
-        .filter((item) => item.tagedUsers?.includes(auth.user._id)),
-    [thread.threads, auth.user, params, channelData]
-  );
+  const threadData = useMemo(() => {
+    return thread.threads
+      .filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      )
+      .filter((item) => item.tagedUsers?.includes(auth.user._id));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thread.threads, auth.user, params, channelData]);
 
   const readedThreads: string[] = useMemo(() => {
     if (!auth.user.readedThreads) return [];
@@ -89,7 +87,6 @@ function InboxList({ type = "active" }: TProps) {
   };
 
   const threadDeleteHandler = async () => {
-    setApiLoading(true);
     try {
       const deletedThread = await kontenbase
         .service("Threads")
@@ -108,8 +105,6 @@ function InboxList({ type = "active" }: TProps) {
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${error}` });
-    } finally {
-      setApiLoading(false);
     }
   };
 

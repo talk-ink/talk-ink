@@ -62,8 +62,6 @@ function ChannelPage() {
     Thread | null | undefined
   >();
 
-  const [apiLoading, setApiLoading] = useState<boolean>();
-
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [channelInfoModal, setChannelInfoModal] = useState<boolean>(false);
   const [leaveChannelModal, setLeaveChannelModal] = useState<boolean>();
@@ -110,7 +108,7 @@ function ChannelPage() {
       return channelData.members.includes(userId);
     }
     return false;
-  }, [channelData]);
+  }, [channelData, userId]);
 
   const threadData = useMemo(() => {
     return thread.threads;
@@ -130,7 +128,7 @@ function ChannelPage() {
       workspaceData.createdBy?._id === auth.user?._id ||
       channelData?.createdBy?._id === auth.user._id
     );
-  }, [workspaceData, channelData]);
+  }, [workspaceData, channelData, auth.user._id]);
 
   const deleteDraft = (id: string) => {
     const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
@@ -140,7 +138,6 @@ function ChannelPage() {
   };
 
   const threadDeleteHandler = async () => {
-    setApiLoading(true);
     try {
       if (!selectedThread?.draft) {
         const deletedThread = await kontenbase
@@ -165,8 +162,6 @@ function ChannelPage() {
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${error}` });
-    } finally {
-      setApiLoading(false);
     }
   };
 
@@ -213,6 +208,7 @@ function ChannelPage() {
       );
       getMemberHandler();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.channelId, auth.user._id]);
 
   const loading = channel.loading || thread.loading;

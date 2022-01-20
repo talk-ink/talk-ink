@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
-import { Thread, User } from "types";
+import { Thread } from "types";
 
 type FetchInboxProps = {
   workspaceId: string;

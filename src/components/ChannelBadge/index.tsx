@@ -1,15 +1,13 @@
 import { KontenbaseResponse } from "@kontenbase/sdk";
-import Button from "components/Button/Button";
-import { updateUser } from "features/auth";
-import { addChannel, updateChannel } from "features/channels/slice";
-import { updateWorkspace } from "features/workspaces";
-import { useAppDispatch } from "hooks/useAppDispatch";
-import { useAppSelector } from "hooks/useAppSelector";
-import { useToast } from "hooks/useToast";
-import { kontenbase } from "lib/client";
-import React, { useMemo } from "react";
 import { BsEye } from "react-icons/bs";
-import { useParams } from "react-router-dom";
+import { kontenbase } from "lib/client";
+
+import Button from "components/Button/Button";
+
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { useToast } from "hooks/useToast";
+
+import { updateChannel } from "features/channels/slice";
 import { Channel } from "types";
 
 type Props = {

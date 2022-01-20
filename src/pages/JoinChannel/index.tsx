@@ -1,12 +1,13 @@
-import Button from "components/Button/Button";
-import { useAppSelector } from "hooks/useAppSelector";
-import { useToast } from "hooks/useToast";
-import { kontenbase } from "lib/client";
-import React, { useEffect, useState } from "react";
-import { HiOutlineHashtag } from "react-icons/hi";
+import { useEffect, useState } from "react";
+
 import { useNavigate, useParams } from "react-router-dom";
-import { Channel } from "types";
+import { kontenbase } from "lib/client";
+
+import Button from "components/Button/Button";
 import ChannelList from "./ChannelList";
+
+import { useToast } from "hooks/useToast";
+import { useAppSelector } from "hooks/useAppSelector";
 
 function JoinChannelPage() {
   const params = useParams();
@@ -108,6 +109,7 @@ function JoinChannelPage() {
 
   useEffect(() => {
     getChannels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
   return (

@@ -1,6 +1,5 @@
 import React from "react";
 import { Workspace } from "types";
-import { getNameInitial } from "utils/helper";
 
 type TProps = {
   data: Workspace;

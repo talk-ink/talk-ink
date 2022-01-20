@@ -8,13 +8,7 @@ import SubLabel from "components/Form/SubLabel";
 import Hero from "../../assets/image/landing/email.svg";
 import Layout from "components/Layout/LoginRegister";
 
-import {
-  Register,
-  TUserProfile,
-  User,
-  Workspace,
-  WorkspaceResponse,
-} from "types";
+import { Register, TUserProfile, WorkspaceResponse } from "types";
 import { registerValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import { useAppDispatch } from "hooks/useAppDispatch";

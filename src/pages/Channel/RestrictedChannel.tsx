@@ -10,7 +10,7 @@ function RestrictedChannelPage() {
   return (
     <div>
       <div className="w-full flex flex-col items-center justify-center h-full">
-        <img className="w-96" src={PrivateImage} />
+        <img className="w-96" src={PrivateImage} alt="restricted channel" />
 
         <p className="font-semibold text-slate-900 w-96 text-center">
           This channel is private

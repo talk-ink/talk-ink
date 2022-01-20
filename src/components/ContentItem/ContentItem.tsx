@@ -4,24 +4,24 @@ import {
   BiCheck,
   BiCircle,
   BiDotsHorizontalRounded,
-  BiEdit,
   BiTrash,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
+import { kontenbase } from "lib/client";
 
 import IconButton from "components/Button/IconButton";
-import { Thread } from "types";
-import Popup from "components/Popup/Popup";
 import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import Divider from "components/Divider/Divider";
-import { useAppDispatch } from "hooks/useAppDispatch";
-import { addReadThread, deleteReadThread } from "features/auth";
-import { kontenbase } from "lib/client";
-import { useAppSelector } from "hooks/useAppSelector";
 import Avatar from "components/Avatar/Avatar";
+
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { useAppSelector } from "hooks/useAppSelector";
+
+import { addReadThread, deleteReadThread } from "features/auth";
+import { Thread } from "types";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;

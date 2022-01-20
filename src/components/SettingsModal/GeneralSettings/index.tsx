@@ -50,11 +50,11 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const showLeaveWorkspace = useMemo(() => {
     return currentRoute.current === "leaveWorkspace";
-  }, [currentRoute.current]);
+  }, [currentRoute]);
 
   const showDeleteWorkspace = useMemo(() => {
     return currentRoute.current === "deleteWorkspace";
-  }, [currentRoute.current]);
+  }, [currentRoute]);
 
   const initialValues: TypeInitialValues = {
     name: workspaceData.name,
@@ -100,21 +100,24 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
           .replace("/s/g", "-")}-logo`;
 
         const resized = await resizeFile(file, 500);
-        const uploadImage = await kontenbase.storage.upload(resized);
+        const { data: uploadImage, error: uploadError } =
+          await kontenbase.storage.upload(resized);
+        if (uploadError) throw new Error(uploadError?.message);
 
         const createAttachment = await kontenbase
           .service("Attachments")
           .create({
             name,
-            ext: uploadImage.data.mimeType,
-            file: uploadImage.data.url,
+            ext: uploadImage.mimeType,
+            file: uploadImage.url,
           });
 
-        const submitUpdate = await kontenbase
+        const { error: createError } = await kontenbase
           .service("Workspaces")
           .link(params.workspaceId, {
             logo: createAttachment.data._id,
           });
+        if (createError) throw new Error(createError?.message);
       } catch (error) {
         console.log("err", error);
         showToast({ message: `${JSON.stringify(error)}` });
@@ -124,11 +127,13 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const onSubmit = async (values: { name: string; logo?: File }) => {
     try {
-      const submitUpdate = await kontenbase
+      const { error } = await kontenbase
         .service("Workspaces")
         .updateById(workspaceData._id, {
           name: values.name,
         });
+
+      if (error) throw new Error(error?.message);
 
       dispatch(updateWorkspace({ _id: workspaceData._id, name: values.name }));
     } catch (error) {

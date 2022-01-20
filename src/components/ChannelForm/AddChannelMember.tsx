@@ -7,6 +7,7 @@ import { Popover } from "@headlessui/react";
 import MemberSuggestion from "components/Suggestion/Member";
 import SuggestionMemberList from "components/Suggestion/Member/List";
 import MemberList from "components/Members/MemberList";
+import Button from "components/Button/Button";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -16,7 +17,6 @@ import { Channel, Member } from "types";
 import { fetchMembers } from "features/members";
 import { addChannelMember, removeChannelMember } from "features/channels/slice";
 import { kontenbase } from "lib/client";
-import Button from "components/Button/Button";
 
 type TProps = {
   data: Channel;
@@ -50,6 +50,7 @@ function AddChannelMember({ data, onClose }: TProps) {
       (data) =>
         data.firstName.includes(trimValue) || data.email.includes(trimValue)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, searchDebounce, channelData]);
 
   const joinedMemberData: Member[] = useMemo(() => {
@@ -57,6 +58,7 @@ function AddChannelMember({ data, onClose }: TProps) {
       channelData?.members.includes(item._id)
     );
     return notJoined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, channelData]);
 
   const inviteMemberHandler = async (id: string) => {
@@ -105,6 +107,7 @@ function AddChannelMember({ data, onClose }: TProps) {
 
   useEffect(() => {
     dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, channelData]);
 
   return (

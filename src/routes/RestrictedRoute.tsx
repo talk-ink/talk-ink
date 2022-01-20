@@ -1,5 +1,6 @@
 import React from "react";
 import { Navigate, useLocation, useParams } from "react-router";
+
 import { useAppSelector } from "hooks/useAppSelector";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
 
@@ -14,7 +15,6 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
   let location = useLocation();
 
   let auth = useAppSelector((state) => state.auth);
-  let channel = useAppSelector((state) => state.channel);
 
   if (auth.loading) {
     return <FullscreenLoading />;

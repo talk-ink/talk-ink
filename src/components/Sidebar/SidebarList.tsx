@@ -65,7 +65,7 @@ function SidebarList({
     } else {
       return params.channelId === data?._id;
     }
-  }, [params, pathname]);
+  }, [params, pathname, data, type]);
 
   switch (type) {
     case "search":

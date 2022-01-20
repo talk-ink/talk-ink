@@ -1,13 +1,7 @@
 import { setToast } from "features/toast";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { useEffect, useMemo } from "react";
 import { VscClose } from "react-icons/vsc";
 
 type TProps = {
@@ -28,7 +22,8 @@ function ToastProvider({ children }: TProps) {
         dispatch(setToast({ message: null }));
       }, toast.duration);
     }
-  }, [visible]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, toast.duration]);
 
   return (
     <div>

@@ -18,7 +18,7 @@ import NotFound from "components/NotFound/NotFound";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
-import { Token, TUserProfile, User } from "types";
+import { Token, TUserProfile } from "types";
 import ThreadPage from "pages/Thread";
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import { useToast } from "hooks/useToast";
@@ -65,6 +65,7 @@ function App() {
 
   useEffect(() => {
     checkUser();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

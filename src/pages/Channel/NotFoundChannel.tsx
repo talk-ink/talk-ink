@@ -10,7 +10,7 @@ function NotFoundChannelPage() {
   return (
     <div>
       <div className="w-full flex flex-col items-center justify-center h-full">
-        <img className="w-96" src={NotFoundImage} />
+        <img className="w-96" src={NotFoundImage} alt="not found channel" />
 
         <p className="font-semibold text-slate-900 w-96 text-center">
           Channel couldn't be found

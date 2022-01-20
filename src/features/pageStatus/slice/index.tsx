@@ -1,5 +1,4 @@
-import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { kontenbase } from "lib/client";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { PageStatus } from "types";
 
 type InitPageStatusState = {

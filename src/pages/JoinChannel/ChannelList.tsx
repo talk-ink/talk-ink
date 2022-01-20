@@ -12,7 +12,7 @@ type TProps = React.PropsWithChildren<{
 function ChannelList({ data, onClick = () => {}, selectedChannels }: TProps) {
   const active: boolean = useMemo(() => {
     return selectedChannels.includes(data._id);
-  }, [selectedChannels]);
+  }, [selectedChannels, data._id]);
 
   return (
     <button

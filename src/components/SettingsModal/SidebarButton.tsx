@@ -1,5 +1,4 @@
 import React from "react";
-import { BiUserPlus } from "react-icons/bi";
 import { SettingsModalHeader } from "utils/text-constants";
 
 type TProps = React.PropsWithChildren<{

@@ -1,11 +1,9 @@
-import React from "react";
-
 import BrainStorm from "assets/image/brainstorming.svg";
 
 function ChannelEmpty() {
   return (
     <div className="w-full flex flex-col items-center justify-center ">
-      <img className="w-96" src={BrainStorm} />
+      <img className="w-96" src={BrainStorm} alt="channel empty" />
       <h6 className="font-bold text-center mb-2">
         Every discussion is a thread
       </h6>
