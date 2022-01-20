@@ -234,8 +234,8 @@ function SidebarComponent({
           ) : (
             <>
               {/* <IconButton>
-               <BiMoon size={18} className="text-neutral-400" />
-               </IconButton> */}
+                <BiMoon size={18} className="text-neutral-400" />
+              </IconButton> */}
             </>
           )}
         </div>
