@@ -8,9 +8,10 @@ type TProps = {
   data: Member;
   hideEmail: boolean;
   invited?: boolean;
+  leftContent?: React.ReactNode;
 };
 
-function MemberList({ data, hideEmail, invited }: TProps) {
+function MemberList({ data, hideEmail, invited, leftContent }: TProps) {
   return (
     <div className="border-b border-neutral-100 py-3 first:border-t flex items-center justify-between">
       <div className="flex items-center">
@@ -34,7 +35,7 @@ function MemberList({ data, hideEmail, invited }: TProps) {
           )}
         </div>
       </div>
-      <div></div>
+      <div>{leftContent}</div>
     </div>
   );
 }

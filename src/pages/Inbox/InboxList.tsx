@@ -68,19 +68,23 @@ function InboxList({ type = "active" }: TProps) {
   const markHandler = async (threadId: string) => {
     try {
       if (isDoneThread) {
-        await kontenbase
-          .service("Users")
-          .unlink(auth.user._id, { doneThreads: threadId });
+        const { error } = await kontenbase
+          .service("Threads")
+          .unlink(threadId, { doneUsers: auth.user._id });
+
+        if (error) throw new Error(error.message);
         dispatch(deleteDoneThread(threadId));
       } else {
-        await kontenbase
-          .service("Users")
-          .link(auth.user._id, { doneThreads: threadId });
+        const { error } = await kontenbase
+          .service("Threads")
+          .link(threadId, { doneUsers: auth.user._id });
+
+        if (error) throw new Error(error.message);
         dispatch(addDoneThread(threadId));
       }
-    } catch (error) {
+    } catch (error: any) {
       console.log("err", error);
-      showToast({ message: `${JSON.stringify(error)}` });
+      showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
 

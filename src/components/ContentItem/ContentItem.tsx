@@ -46,17 +46,16 @@ function ContentItem({
       switch (type) {
         case "read":
           await kontenbase
-            .service("Users")
-            .link(auth.user._id, { readedThreads: dataSource._id });
+            .service("Threads")
+            .link(dataSource._id, { readedUsers: auth.user._id });
           dispatch(addReadThread(dataSource._id));
           break;
         case "unread":
           await kontenbase
-            .service("Users")
-            .unlink(auth.user._id, { readedThreads: dataSource._id });
+            .service("Threads")
+            .unlink(dataSource._id, { readedUsers: auth.user._id });
           dispatch(deleteReadThread(dataSource._id));
           break;
-
         default:
           break;
       }

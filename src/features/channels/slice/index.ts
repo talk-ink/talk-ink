@@ -65,6 +65,29 @@ const channelSlice = createSlice({
 
       state.channels = newChanel;
     },
+    removeChannelMember: (
+      state,
+      action: PayloadAction<{ _id: string; memberId: string }>
+    ) => {
+      const updatedIndex = state.channels.findIndex(
+        (channel) => channel._id === action.payload._id
+      );
+      const deletedMemberIndex = state.channels[updatedIndex].members.findIndex(
+        (data) => data === action.payload?.memberId
+      );
+
+      state.channels[updatedIndex].members.splice(deletedMemberIndex, 1);
+    },
+    addChannelMember: (
+      state,
+      action: PayloadAction<{ _id: string; memberId: string }>
+    ) => {
+      const updatedIndex = state.channels.findIndex(
+        (channel) => channel._id === action.payload._id
+      );
+
+      state.channels[updatedIndex].members.push(action.payload.memberId);
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchChannels.pending, (state) => {
@@ -83,6 +106,12 @@ const channelSlice = createSlice({
   },
 });
 
-export const { addChannel, deleteChannel, updateChannel, updateChannelCount } =
-  channelSlice.actions;
+export const {
+  addChannel,
+  deleteChannel,
+  updateChannel,
+  updateChannelCount,
+  removeChannelMember,
+  addChannelMember,
+} = channelSlice.actions;
 export const channelReducer = channelSlice.reducer;

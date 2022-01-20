@@ -11,6 +11,7 @@ import {
   BiInfoCircle,
   BiLock,
   BiLogOut,
+  BiUserPlus,
 } from "react-icons/bi";
 import {
   HiOutlineBookmark,
@@ -32,8 +33,10 @@ type Props = React.PropsWithChildren<{
   leaveModalHandler?: (channel: Channel) => void;
   editModalHandler?: (channel: Channel) => void;
   channelInfoHandler?: (channel: Channel) => void;
+  addMemberHandler?: (channel: Channel) => void;
   data?: Channel;
   setIsSidebarOpen: Dispatch<SetStateAction<boolean>>;
+  isAdmin?: boolean;
 }>;
 
 function SidebarList({
@@ -47,6 +50,8 @@ function SidebarList({
   data,
   setIsSidebarOpen,
   channelInfoHandler,
+  addMemberHandler,
+  isAdmin,
 }: Props) {
   let Icon = AiOutlineInbox;
   let showOption = type === "channel";
@@ -122,6 +127,15 @@ function SidebarList({
           content={
             <div>
               <Menu>
+                {isAdmin && (
+                  <MenuItem
+                    icon={<BiUserPlus size={20} className="text-neutral-400" />}
+                    onClick={() => {
+                      addMemberHandler(data);
+                    }}
+                    title="Add members"
+                  />
+                )}
                 <MenuItem
                   icon={<BiInfoCircle size={20} className="text-neutral-400" />}
                   onClick={() => {
@@ -129,13 +143,15 @@ function SidebarList({
                   }}
                   title="Channel information"
                 />
-                <MenuItem
-                  icon={<BiEditAlt size={20} className="text-neutral-400" />}
-                  onClick={() => {
-                    editModalHandler(data);
-                  }}
-                  title="Edit channel"
-                />
+                {isAdmin && (
+                  <MenuItem
+                    icon={<BiEditAlt size={20} className="text-neutral-400" />}
+                    onClick={() => {
+                      editModalHandler(data);
+                    }}
+                    title="Edit channel"
+                  />
+                )}
                 <MenuItem
                   icon={<BiLogOut size={20} className="text-neutral-400" />}
                   onClick={() => {
