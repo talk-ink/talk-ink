@@ -122,7 +122,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
 
               <div className="h-full px-2 flex-shrink-0">
                 <p
-                  className="text-cyan-600 text-sm cursor-pointer hover:underline"
+                  className="text-indigo-600 text-sm cursor-pointer hover:underline"
                   onClick={() => {
                     if (workspaceData.inviteId && !apiLoading) {
                       copy(`${frontendUrl}/j/${workspaceData?.inviteId ?? ""}`);

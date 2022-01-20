@@ -199,7 +199,7 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
                 By leaving, you'll immediately have no access to the{" "}
                 <span className="font-bold">{workspaceData.name}</span>. You wil
                 need to be re-invited to join again.{" "}
-                <span className="text-cyan-500 hover:underline cursor-pointer">
+                <span className="text-indigo-500 hover:underline cursor-pointer">
                   Learn more.
                 </span>
               </p>
@@ -223,7 +223,7 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
                   <span className="font-bold">{workspaceData.name}</span>{" "}
                   workspace and its data for everyone — including all channels,
                   threads, messages, and files. This cannot be undone.{" "}
-                  <span className="text-cyan-500 hover:underline cursor-pointer">
+                  <span className="text-indigo-500 hover:underline cursor-pointer">
                     Learn more.
                   </span>
                 </p>
