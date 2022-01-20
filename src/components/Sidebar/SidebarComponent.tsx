@@ -1,17 +1,13 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 
-import { BiLogOut, BiMoon, BiPlus, BiUserPlus } from "react-icons/bi";
+import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
 import { useNavigate, useParams } from "react-router";
 import OneSignal from "react-onesignal";
+import { kontenbase } from "lib/client";
+import { FaPlus } from "react-icons/fa";
 
 import ChannelButton from "components/Button/ChannelButton";
 import IconButton from "components/Button/IconButton";
@@ -23,27 +19,26 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import Modal from "components/Modal/Modal";
 import ChannelForm from "components/ChannelForm/ChannelForm";
 import SidebarList from "./SidebarList";
+import EditChannelForm from "components/ChannelForm/EditChannelForm";
+import WorkspaceListButton from "components/Button/WorkspaceListButton";
+import Divider from "components/Divider/Divider";
+import SettingsModal from "components/SettingsModal/SettingsModal";
+import { updateWorkspace } from "features/workspaces";
+import ChannelInfo from "components/ChannelForm/ChannelInfo";
+import AddChannelMember from "components/ChannelForm/AddChannelMember";
+import BrowseChannels from "components/BrowseChannels";
 
-import { kontenbase } from "lib/client";
-import { Channel, CreateChannel, Workspace } from "types";
-import { useAppSelector } from "hooks/useAppSelector";
 import { logout } from "features/auth";
 import {
   addChannel,
   deleteChannel,
   fetchChannels,
 } from "features/channels/slice";
-import EditChannelForm from "components/ChannelForm/EditChannelForm";
+
+import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import AddMembers from "components/Members/AddMembers";
-import WorkspaceListButton from "components/Button/WorkspaceListButton";
-import Divider from "components/Divider/Divider";
-import SettingsModal from "components/SettingsModal/SettingsModal";
-import { FaPlus } from "react-icons/fa";
-import { updateWorkspace } from "features/workspaces";
-import ChannelInfo from "components/ChannelForm/ChannelInfo";
-import AddChannelMember from "components/ChannelForm/AddChannelMember";
-import BrowseChannels from "components/BrowseChannels";
+
+import { Channel, CreateChannel } from "types";
 
 type TProps = {
   isMobile: boolean;
@@ -87,7 +82,7 @@ function SidebarComponent({
     return channel.channels.filter((data) =>
       data.members.includes(auth.user._id)
     );
-  }, [channel.channels, params.channelId]);
+  }, [channel.channels, auth.user._id]);
   const userId: string = auth.user._id;
 
   const handleLogout = async () => {
@@ -163,6 +158,7 @@ function SidebarComponent({
 
   useEffect(() => {
     getChannels();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
   const loading = workspace.loading || channel.loading;
