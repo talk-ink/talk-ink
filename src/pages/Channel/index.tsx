@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
 import {
   BiDotsHorizontalRounded,
@@ -11,6 +11,7 @@ import {
 import { useLocation, useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
+import { Menu } from "@headlessui/react";
 
 import Button from "components/Button/Button";
 import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
@@ -18,13 +19,14 @@ import IconButton from "components/Button/IconButton";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-import Popup from "components/Popup/Popup";
-import Menu from "components/Menu/Menu";
-import MenuItem from "components/Menu/MenuItem";
+import MenuItem from "components/Menu/MenuItem2";
 import Modal from "components/Modal/Modal";
 import ProfileImage from "components/ProfileImage";
 import EditChannelForm from "components/ChannelForm/EditChannelForm";
 import NameInitial from "components/Avatar/NameInitial";
+import ChannelBadge from "components/ChannelBadge";
+import ChannelInfo from "components/ChannelForm/ChannelInfo";
+import AddChannelMember from "components/ChannelForm/AddChannelMember";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -37,9 +39,6 @@ import { deleteChannel, updateChannelCount } from "features/channels/slice";
 import { kontenbase } from "lib/client";
 import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
-import ChannelBadge from "components/ChannelBadge";
-import ChannelInfo from "components/ChannelForm/ChannelInfo";
-import AddChannelMember from "components/ChannelForm/AddChannelMember";
 
 moment.locale("id");
 
@@ -285,57 +284,63 @@ function ChannelPage() {
               </p>
             </Button>
           )}
-          <Popup
-            content={
-              <div>
-                <Menu>
-                  {isAdmin && (
+          <Menu as="div" className="relative">
+            {({ open }) => (
+              <>
+                <Menu.Button as={React.Fragment}>
+                  <IconButton size="medium">
+                    <BiDotsHorizontalRounded
+                      size={24}
+                      className="text-neutral-400"
+                    />
+                  </IconButton>
+                </Menu.Button>
+
+                {open && (
+                  <Menu.Items static className="menu-container right-0">
+                    {isAdmin && (
+                      <MenuItem
+                        icon={
+                          <BiUserPlus size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setAddMemberModal(true);
+                        }}
+                        title="Add members"
+                      />
+                    )}
                     <MenuItem
                       icon={
-                        <BiUserPlus size={20} className="text-neutral-400" />
+                        <BiInfoCircle size={20} className="text-neutral-400" />
                       }
                       onClick={() => {
-                        setAddMemberModal(true);
+                        setChannelInfoModal(true);
                       }}
-                      title="Add members"
+                      title="Channel information"
                     />
-                  )}
-                  <MenuItem
-                    icon={
-                      <BiInfoCircle size={20} className="text-neutral-400" />
-                    }
-                    onClick={() => {
-                      setChannelInfoModal(true);
-                    }}
-                    title="Channel information"
-                  />
-                  {isAdmin && (
+                    {isAdmin && (
+                      <MenuItem
+                        icon={
+                          <BiEditAlt size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setEditChannelModal(true);
+                        }}
+                        title="Edit channel"
+                      />
+                    )}
                     <MenuItem
-                      icon={
-                        <BiEditAlt size={20} className="text-neutral-400" />
-                      }
+                      icon={<BiLogOut size={20} className="text-neutral-400" />}
                       onClick={() => {
-                        setEditChannelModal(true);
+                        setLeaveChannelModal(true);
                       }}
-                      title="Edit channel"
+                      title="Leave channel"
                     />
-                  )}
-                  <MenuItem
-                    icon={<BiLogOut size={20} className="text-neutral-400" />}
-                    onClick={() => {
-                      setLeaveChannelModal(true);
-                    }}
-                    title="Leave channel"
-                  />
-                </Menu>
-              </div>
-            }
-            position="left"
-          >
-            <IconButton size="medium">
-              <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
-            </IconButton>
-          </Popup>
+                  </Menu.Items>
+                )}
+              </>
+            )}
+          </Menu>
         </div>
       </header>
       {threadData?.length > 0 ? (
