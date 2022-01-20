@@ -64,6 +64,9 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
+  console.log(dataSource);
+
   return (
     <div
       className="
@@ -80,7 +83,7 @@ function ContentItem({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-cyan-50 rounded-xl border-transparent group">
+      <div className="flex items-center justify-between md:px-3 hover:bg-cyan-50 rounded-xl border-transparent group">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}

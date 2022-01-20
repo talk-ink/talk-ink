@@ -187,11 +187,17 @@ function ChannelPage() {
   };
 
   useEffect(() => {
-    if (channel.channels.length > 0) {
-      dispatch(fetchThreads({ type: "threads", channelId: params.channelId }));
+    if (channel.channels.length > 0 && auth.user._id) {
+      dispatch(
+        fetchThreads({
+          type: "threads",
+          channelId: params.channelId,
+          userId: auth.user._id,
+        })
+      );
       getMemberHandler();
     }
-  }, [params.channelId]);
+  }, [params.channelId, auth.user._id]);
 
   const loading = channel.loading || thread.loading;
 
