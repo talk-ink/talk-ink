@@ -1,20 +1,20 @@
-import {
-  KontenbaseError,
-  KontenbaseResponse,
-  KontenbaseResponseSuccess,
-} from "@kontenbase/sdk";
+import React, { useEffect, useMemo, useState } from "react";
+
+import { useNavigate, useParams } from "react-router-dom";
+import { BiSearch } from "react-icons/bi";
+import { useDebounce } from "use-debounce";
+
 import SolidBadge from "components/Badge/SolidBadge";
 import Button from "components/Button/Button";
-import { addChannel } from "features/channels/slice";
+import BrowseChannelList from "./List";
+
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
+
+import { addChannel } from "features/channels/slice";
 import { kontenbase } from "lib/client";
-import React, { useEffect, useState } from "react";
-import { BiSearch } from "react-icons/bi";
-import { useNavigate, useParams } from "react-router-dom";
 import { Channel } from "types";
-import BrowseChannelList from "./List";
 
 type TProps = {
   onAddNewChannel: () => void;
@@ -33,7 +33,21 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
   const dispatch = useAppDispatch();
 
   const [searchType, setSearchType] = useState<SearchType>("toJoin");
-  const [channelList, setChannelList] = useState([]);
+  const [channelList, setChannelList] = useState<Channel[]>([]);
+
+  const [search, setSearch] = useState("");
+  const [searchDebounce] = useDebounce(search, 100);
+
+  const channels = useMemo(() => {
+    const trimValue = searchDebounce.trim();
+    if (trimValue) {
+      return channelList.filter(
+        (data) =>
+          data.name.includes(trimValue) || data.description?.includes(trimValue)
+      );
+    }
+    return channelList;
+  }, [channelList, searchDebounce]);
 
   const getChannelsData = async () => {
     try {
@@ -53,6 +67,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
           channelData.filter((data) => data.members.includes(auth.user._id))
         );
       }
+      setSearch("");
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
@@ -71,6 +86,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
             type="text"
             className="w-full outline-none ml-2"
             placeholder="Search by channel name or description"
+            onChange={(e) => setSearch(e.target.value)}
           />
         </div>
         <Button
@@ -94,7 +110,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
       </div>
 
       <div className="max-h-[30vh] overflow-auto mt-5">
-        {channelList?.map((data, idx) => (
+        {channels?.map((data, idx) => (
           <BrowseChannelList
             key={idx}
             data={data}
