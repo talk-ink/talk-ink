@@ -103,7 +103,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
             <FormLabel required>Privacy</FormLabel>
             <div className="flex items-center gap-3">
               <Switch
-                value={formik.values.privacy == "public" ?? true}
+                value={formik.values.privacy === "public" ?? true}
                 onChange={(values) => {
                   if (values) {
                     formik.setFieldValue("privacy", "public");

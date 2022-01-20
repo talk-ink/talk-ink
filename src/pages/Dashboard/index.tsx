@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Outlet, Route, Routes, useParams, useNavigate } from "react-router";
+import { Outlet, useParams, useNavigate } from "react-router";
 
 import SidebarComponent from "components/Sidebar/SidebarComponent";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
 import { useAppSelector } from "hooks/useAppSelector";
-import { Channel, PageStatus, Workspace } from "types";
+import { Channel } from "types";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchWorkspaces } from "features/workspaces/slice";
 import { useMediaQuery } from "react-responsive";
@@ -28,7 +28,6 @@ function DashboardPage() {
 
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
-  const channel = useAppSelector((state) => state.channel);
   const pageStatus = useAppSelector((state) => state.pageStatus);
 
   const dispatch = useAppDispatch();
@@ -43,6 +42,7 @@ function DashboardPage() {
 
   useEffect(() => {
     dispatch(fetchWorkspaces({ userId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [userId]);
 
   useEffect(() => {
@@ -51,6 +51,7 @@ function DashboardPage() {
         navigate("/404");
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [workspace.workspaces]);
 
   const pageStatusHandler = async () => {
@@ -96,6 +97,7 @@ function DashboardPage() {
     if (workspace.workspaces.length > 0) {
       pageStatusHandler();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, params.channelId, workspace.workspaces]);
 
   const loading =

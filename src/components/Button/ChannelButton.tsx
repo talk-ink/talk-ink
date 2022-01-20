@@ -1,10 +1,11 @@
+import React from "react";
+
 import { Menu } from "@headlessui/react";
-import MenuItem from "components/Menu/MenuItem2";
-import React, { Dispatch, SetStateAction } from "react";
-import { BiDotsVerticalRounded } from "react-icons/bi";
 import { FaPlus } from "react-icons/fa";
+import { BiDotsVerticalRounded } from "react-icons/bi";
 import { HiOutlineHashtag } from "react-icons/hi";
 
+import MenuItem from "components/Menu/MenuItem2";
 import IconButton from "./IconButton";
 
 type Props = React.PropsWithChildren<{
@@ -51,10 +52,7 @@ function ChannelButton({
               </IconButton>
             </div>
             {open && (
-              <Menu.Items
-                static
-                className="absolute right-0 w-60 shadow rounded-xl bg-white p-3 z-10 outline-none mt-2"
-              >
+              <Menu.Items static className="menu-container right-0">
                 <MenuItem
                   icon={
                     <HiOutlineHashtag size={16} className="text-neutral-400" />

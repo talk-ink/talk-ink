@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
-import { Member, Thread, User } from "types";
+import { Member } from "types";
 
 type FetchMembersProps = {
   workspaceId: string;

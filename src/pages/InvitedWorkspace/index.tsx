@@ -1,14 +1,12 @@
+import { useEffect } from "react";
+
 import { KontenbaseResponse } from "@kontenbase/sdk";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
+
 import FullscreenLoading from "components/Loading/FullscreenLoading";
 import { useAppSelector } from "hooks/useAppSelector";
+
 import { kontenbase } from "lib/client";
-import React, { useEffect } from "react";
-import {
-  Navigate,
-  useLocation,
-  useNavigate,
-  useParams,
-} from "react-router-dom";
 import { WorkspaceResponse } from "types";
 
 function InvitedWorkspacePage() {
@@ -47,6 +45,7 @@ function InvitedWorkspacePage() {
       return navigate(`${pathname}/login`);
     }
     getWorkspaceData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.inviteIdm, auth]);
 
   return <FullscreenLoading />;

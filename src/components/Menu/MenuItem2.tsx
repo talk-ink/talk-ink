@@ -1,6 +1,6 @@
-import { Menu } from "@headlessui/react";
 import React from "react";
-import { BiTrash } from "react-icons/bi";
+
+import { Menu } from "@headlessui/react";
 
 type TProps = React.PropsWithChildren<{
   title?: string;
@@ -15,7 +15,7 @@ function MenuItem({ title, onClick = () => {}, icon, disabled }: TProps) {
       {({ active, disabled }) => (
         <button
           className={`rounded-md ${
-            disabled ? "opacity-50" : active ? "bg-cyan-50" : ""
+            disabled ? "opacity-50" : active ? "bg-indigo-50" : ""
           } flex justify-between p-2 w-full`}
           onClick={onClick}
           disabled={disabled}

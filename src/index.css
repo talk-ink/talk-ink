@@ -5,8 +5,10 @@
 @tailwind components;
 @tailwind utilities;
 
+@import "./styles/component.css";
+
 /* width */
-::-webkit-scrollbar {
+::-webkit-scrollbar  {
   width: 16px;
   height: 16px;
 }

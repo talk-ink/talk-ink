@@ -1,25 +1,25 @@
+import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
+
+import { useFormik } from "formik";
+import { BiErrorCircle } from "react-icons/bi";
+import { RiAccountCircleFill } from "react-icons/ri";
+import { kontenbase } from "lib/client";
+
 import Button from "components/Button/Button";
 import TextInput from "components/Form/TextInput";
 import Upload from "components/Form/Upload";
-import { updateUser } from "features/auth";
-import { useFormik } from "formik";
+import ChangePassword from "./ChangePassword";
+
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { kontenbase } from "lib/client";
-import React, { Dispatch, SetStateAction, useMemo, useState } from "react";
-import { BiErrorCircle } from "react-icons/bi";
-import { RiAccountCircleFill } from "react-icons/ri";
+
 import { SettingsModalRouteState } from "types";
+import { updateUser } from "features/auth";
+
 import { MAX_IMAGE_SIZE, SUPPORTED_IMAGE_TYPE } from "utils/constants";
-import {
-  beforeUploadImage,
-  getBase64,
-  getNameInitial,
-  resizeFile,
-} from "utils/helper";
+import { beforeUploadImage, getBase64, resizeFile } from "utils/helper";
 import { updateAccount } from "utils/validators";
-import ChangePassword from "./ChangePassword";
 
 type TypeInitialValues = {
   firstName: string;
@@ -45,7 +45,7 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const showChangePassword = useMemo(() => {
     return currentRoute.current === "changePassword";
-  }, [currentRoute.current]);
+  }, [currentRoute]);
 
   const initialValues: TypeInitialValues = {
     firstName: userData.firstName,
@@ -69,16 +69,15 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
       });
 
       try {
-        const name = `${userData.firstName
-          .toString()
-          .toLowerCase()
-          .replace("/s/g", "-")}-logo`;
         const resized = await resizeFile(file, 500);
-        const uploadImage = await kontenbase.storage.upload(resized);
+        const { data: uploadImage, error: uploadError } =
+          await kontenbase.storage.upload(resized);
+        if (uploadError) throw new Error(uploadError?.message);
 
-        const submitUpdate = await kontenbase.auth.update({
-          avatar: [uploadImage.data],
+        const { error } = await kontenbase.auth.update({
+          avatar: [uploadImage],
         });
+        if (error) throw new Error(error?.message);
       } catch (error) {
         console.log("err", error);
         showToast({ message: `${JSON.stringify(error)}` });
@@ -88,10 +87,12 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const removePhotoHandler = async () => {
     try {
-      dispatch(updateUser({ avatar: null }));
-      const removeAvatar = await kontenbase.auth.update({
+      const { error } = await kontenbase.auth.update({
         avatar: null,
       });
+      if (error) throw new Error(error?.message);
+
+      dispatch(updateUser({ avatar: null }));
     } catch (error) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error)}` });
@@ -100,9 +101,11 @@ function AccountSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const onSubmit = async (values: { firstName: string }) => {
     try {
-      const submitUpdate = await kontenbase.auth.update({
+      const { error } = await kontenbase.auth.update({
         firstName: values.firstName,
       });
+      if (error) throw new Error(error?.message);
+
       dispatch(updateUser({ firstName: values.firstName }));
     } catch (error) {
       console.log("err", error);

@@ -159,6 +159,7 @@ export const getBase64 = (
 };
 
 export const validateEmail = (email: string) => {
+  /* eslint-disable no-useless-escape */
   const emailRegex = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
 
   return emailRegex.test(email);

@@ -20,7 +20,6 @@ import {
   addInteractedUser,
 } from "features/threads";
 
-import { fetchChannels } from "features/channels/slice";
 import { fetchComments } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { kontenbase } from "lib/client";

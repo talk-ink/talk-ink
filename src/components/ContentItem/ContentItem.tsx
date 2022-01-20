@@ -4,24 +4,24 @@ import {
   BiCheck,
   BiCircle,
   BiDotsHorizontalRounded,
-  BiEdit,
   BiTrash,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
+import { Menu } from "@headlessui/react";
+import { kontenbase } from "lib/client";
 
 import IconButton from "components/Button/IconButton";
-import { Thread } from "types";
-import Popup from "components/Popup/Popup";
-import MenuItem from "components/Menu/MenuItem";
-import Menu from "components/Menu/Menu";
+import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import Divider from "components/Divider/Divider";
-import { useAppDispatch } from "hooks/useAppDispatch";
-import { addReadThread, deleteReadThread } from "features/auth";
-import { kontenbase } from "lib/client";
-import { useAppSelector } from "hooks/useAppSelector";
 import Avatar from "components/Avatar/Avatar";
+
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { useAppSelector } from "hooks/useAppSelector";
+
+import { addReadThread, deleteReadThread } from "features/auth";
+import { Thread } from "types";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -135,53 +135,62 @@ function ContentItem({
         </button>
         <div className="flex active:flex group-hover:flex gap-2">
           {otherButton}
-          <Popup
-            content={
-              <div>
-                <Menu>
-                  {isRead && (
-                    <MenuItem
-                      icon={<BiCircle size={20} className="text-neutral-400" />}
-                      title="Mark unread"
-                      onClick={() => {
-                        handleReadUnread({ type: "unread" });
-                      }}
-                    />
-                  )}
-                  {!isRead && (
-                    <MenuItem
-                      icon={<BiCheck size={20} className="text-neutral-400" />}
-                      title="Mark read"
-                      onClick={() => {
-                        handleReadUnread({ type: "read" });
-                      }}
-                    />
-                  )}
-                  {dataSource.createdBy._id === auth.user._id ||
-                    (dataSource?.draft && <Divider />)}
-                  {(dataSource.createdBy._id === auth.user._id ||
-                    dataSource?.draft) && (
-                    <MenuItem
-                      icon={<BiTrash size={20} className="text-neutral-400" />}
-                      title="Delete thread..."
-                      onClick={() => {
-                        setSelectedThread(dataSource);
-                      }}
-                    />
-                  )}
-
-                  {/* <MenuItem
-                    icon={<BiEdit size={20} className="text-neutral-400" />}
-                    title="Edit thread title..."
-                  /> */}
-                </Menu>
-              </div>
-            }
-          >
-            <IconButton>
-              <BiDotsHorizontalRounded size={24} className="text-neutral-400" />
-            </IconButton>
-          </Popup>
+          <Menu as="div" className="relative">
+            {({ open }) => (
+              <>
+                <div className="flex">
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton>
+                      <BiDotsHorizontalRounded
+                        size={24}
+                        className="text-neutral-400"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+                </div>
+                {open && (
+                  <Menu.Items static className="menu-container right-0">
+                    {isRead && (
+                      <MenuItem
+                        icon={
+                          <BiCircle size={20} className="text-neutral-400" />
+                        }
+                        title="Mark unread"
+                        onClick={() => {
+                          handleReadUnread({ type: "unread" });
+                        }}
+                      />
+                    )}
+                    {!isRead && (
+                      <MenuItem
+                        icon={
+                          <BiCheck size={20} className="text-neutral-400" />
+                        }
+                        title="Mark read"
+                        onClick={() => {
+                          handleReadUnread({ type: "read" });
+                        }}
+                      />
+                    )}
+                    {dataSource.createdBy._id === auth.user._id ||
+                      (dataSource?.draft && <Divider />)}
+                    {dataSource.createdBy._id === auth.user._id ||
+                      (dataSource?.draft && (
+                        <MenuItem
+                          icon={
+                            <BiTrash size={20} className="text-neutral-400" />
+                          }
+                          title="Delete thread..."
+                          onClick={() => {
+                            setSelectedThread(dataSource);
+                          }}
+                        />
+                      ))}
+                  </Menu.Items>
+                )}
+              </>
+            )}
+          </Menu>
         </div>
       </div>
     </div>

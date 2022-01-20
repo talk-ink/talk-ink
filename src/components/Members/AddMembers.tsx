@@ -48,6 +48,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
 
   const memberData = useMemo(() => {
     return member.members;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members]);
 
   const invitedEmails = useMemo(() => {
@@ -55,6 +56,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
     return workspaceData.invitedEmails.filter(
       (data) => !memberEmails.includes(data)
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, workspaceData]);
 
   const workspaceInviteIdHandler = async () => {
@@ -80,12 +82,14 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
 
   useEffect(() => {
     dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
   useEffect(() => {
     if (workspaceData && !workspaceData?.inviteId) {
       workspaceInviteIdHandler();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, workspaceData]);
 
   const loading = member.loading;
@@ -122,7 +126,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
 
               <div className="h-full px-2 flex-shrink-0">
                 <p
-                  className="text-cyan-600 text-sm cursor-pointer hover:underline"
+                  className="text-indigo-600 text-sm cursor-pointer hover:underline"
                   onClick={() => {
                     if (workspaceData.inviteId && !apiLoading) {
                       copy(`${frontendUrl}/j/${workspaceData?.inviteId ?? ""}`);

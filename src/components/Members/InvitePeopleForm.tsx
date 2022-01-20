@@ -1,22 +1,23 @@
-import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useState } from "react";
 
-import { useDebounce } from "use-debounce";
+import { BiErrorCircle } from "react-icons/bi";
+import { kontenbase } from "lib/client";
 
 import Button from "components/Button/Button";
-import { Workspace } from "types";
 import { useToast } from "hooks/useToast";
+import ClosableBadge from "components/Badge/ClosableBadge";
+
+import { useAppSelector } from "hooks/useAppSelector";
+import { useAppDispatch } from "hooks/useAppDispatch";
+
 import {
   frontendUrl,
   inviteWorkspaceTemplate,
   sendEmail,
   validateEmail,
 } from "utils/helper";
-import ClosableBadge from "components/Badge/ClosableBadge";
-import { BiErrorCircle } from "react-icons/bi";
-import { useAppSelector } from "hooks/useAppSelector";
-import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateWorkspace } from "features/workspaces";
-import { kontenbase } from "lib/client";
+import { Workspace } from "types";
 
 type TProps = {
   workspaceData: Workspace;

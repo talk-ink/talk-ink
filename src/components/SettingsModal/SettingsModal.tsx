@@ -1,16 +1,17 @@
-import Button from "components/Button/Button";
-import AddMembers from "components/Members/AddMembers";
 import React, { useState } from "react";
-import { BiArrowBack } from "react-icons/bi";
 
+import { BiArrowBack } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
-import { SettingsModalRouteState } from "types";
-import { SettingsModalHeader } from "utils/text-constants";
+
+import AddMembers from "components/Members/AddMembers";
 import AccountSettings from "./AccountSettings";
 import ComingSoonSettings from "./ComingSoon";
 import GeneralSettings from "./GeneralSettings";
 import ProfileSettings from "./ProfileSettings";
 import SettingsSidebar from "./SettingsSidebar";
+
+import { SettingsModalRouteState } from "types";
+import { SettingsModalHeader } from "utils/text-constants";
 
 type TProps = React.PropsWithChildren<{
   header?: React.ReactNode;
@@ -71,7 +72,6 @@ function SettingsModal({
         );
       default:
         return <ComingSoonSettings />;
-        break;
     }
   };
 

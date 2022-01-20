@@ -1,0 +1,7 @@
+@tailwind components;
+
+@layer components {
+  .menu-container {
+    @apply absolute w-60 shadow rounded-xl bg-white p-3 z-10 outline-none mt-2;
+  }
+}

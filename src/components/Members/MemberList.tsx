@@ -1,7 +1,7 @@
 import NameInitial from "components/Avatar/NameInitial";
 import ProfileImage from "components/ProfileImage";
 import React from "react";
-import { Member, User } from "types";
+import { Member } from "types";
 import { getNameInitial } from "utils/helper";
 
 type TProps = {

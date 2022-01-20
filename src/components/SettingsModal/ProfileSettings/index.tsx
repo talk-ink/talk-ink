@@ -1,10 +1,4 @@
-import React, {
-  Dispatch,
-  SetStateAction,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import { Dispatch, SetStateAction, useMemo, useState } from "react";
 
 import { useParams } from "react-router-dom";
 
@@ -45,7 +39,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
 
   const isHideEmail = useMemo(() => {
     return workspaceData?.hideEmail?.includes(auth.user._id);
-  }, [workspaceData]);
+  }, [workspaceData, auth.user._id]);
 
   const [displayEmail, setDisplayEmail] = useState(!isHideEmail);
 

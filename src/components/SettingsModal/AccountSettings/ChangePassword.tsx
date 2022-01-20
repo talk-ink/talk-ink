@@ -1,11 +1,11 @@
+import { useFormik } from "formik";
+import { BiErrorCircle } from "react-icons/bi";
+
 import Button from "components/Button/Button";
 import PasswordInput from "components/Form/PasswordInput";
 import SubLabel from "components/Form/SubLabel";
-import { useFormik } from "formik";
+
 import { useToast } from "hooks/useToast";
-import { kontenbase } from "lib/client";
-import React from "react";
-import { BiErrorCircle } from "react-icons/bi";
 import { changePasswordValidation } from "utils/validators";
 
 type TypeInitialValues = {

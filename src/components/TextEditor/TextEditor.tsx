@@ -31,6 +31,7 @@ const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
 };
 
 function TextEditor({ formik, loading, deleteDraft }: Props) {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
@@ -82,7 +83,7 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
         <div className="flex gap-2">
           {/* <Button
             className={` hover:bg-neutral-200 rounded text-xs font-medium px-5 ${
-              !preview ? "text-cyan-500" : "text-white bg-indigo-500"
+              !preview ? "text-indigo-500" : "text-white bg-indigo-500"
             }`}
             onClick={() => {
               setPreview((prev) => !prev);

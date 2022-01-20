@@ -43,6 +43,7 @@ function ChannelInfo({ data, onClose, showManageMemberModal }: TProps) {
       channelData?.members.includes(item._id)
     );
     return notJoined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, channelData]);
 
   const workspaceData = useMemo(() => {
@@ -54,7 +55,7 @@ function ChannelInfo({ data, onClose, showManageMemberModal }: TProps) {
       workspaceData.createdBy?._id === auth.user?._id ||
       channelData?.createdBy?._id === auth.user?._id
     );
-  }, [workspaceData, channelData]);
+  }, [workspaceData, channelData, auth.user._id]);
 
   const onSubmit = async (value: CreateChannel) => {
     try {
@@ -74,6 +75,7 @@ function ChannelInfo({ data, onClose, showManageMemberModal }: TProps) {
 
   useEffect(() => {
     dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, channelData]);
 
   return (

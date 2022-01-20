@@ -1,7 +1,6 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-import Logo from "../../assets/image/logo512.png";
 import Brand from "assets/image/landing/brand.svg";
 
 type TProps = React.PropsWithChildren<{

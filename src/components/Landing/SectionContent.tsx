@@ -1,6 +1,5 @@
 import React from "react";
 
-import HeroTemplate from "assets/image/landing/hero-temp.svg";
 import HeroEmail from "assets/image/landing/email.svg";
 import HeroThread from "assets/image/landing/thread.svg";
 import HeroChat from "assets/image/landing/chat.svg";
@@ -22,7 +21,7 @@ function SectionContent({ header, subHeader, reverse, type }: Props) {
   return (
     <div className="grid grid-cols-2 gap-5 md:gap-20 items-start mb-20">
       <div className={`${reverse && "order-2"}`}>
-        <img src={image[type]} className="w-full" />
+        <img src={image[type]} className="w-full" alt="section content" />
       </div>
       <div className={`${reverse && "order-1"}`}>
         <h2 className="font-montserrat font-extrabold text-2xl md:text-4xl mb-2">

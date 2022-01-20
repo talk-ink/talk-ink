@@ -1,10 +1,4 @@
-import React from "react";
-import { Link } from "react-router-dom";
-
-import Button from "components/Button/Button";
-
 import HeroImage from "assets/image/landing/hero1.svg";
-import { GoMarkGithub } from "react-icons/go";
 import GetStartedButton from "./GetStartedButton";
 import GithubButton from "./GithubButton";
 
@@ -31,7 +25,7 @@ function LandingHero() {
         </div>
       </div>
       <div>
-        <img className="w-full" src={HeroImage} />
+        <img className="w-full" src={HeroImage} alt="hero" />
       </div>
     </section>
   );
