@@ -43,6 +43,7 @@ import { FaPlus } from "react-icons/fa";
 import { updateWorkspace } from "features/workspaces";
 import ChannelInfo from "components/ChannelForm/ChannelInfo";
 import AddChannelMember from "components/ChannelForm/AddChannelMember";
+import BrowseChannels from "components/BrowseChannels";
 
 type TProps = {
   isMobile: boolean;
@@ -72,6 +73,7 @@ function SidebarComponent({
   const [leaveChannelModal, setLeaveChannelModal] = useState(false);
   const [settingsModal, setSettingsModal] = useState(false);
   const [addMemberModal, setAddMemberModal] = useState(false);
+  const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -266,7 +268,10 @@ function SidebarComponent({
                 setIsSidebarOpen={setIsSidebarOpen}
               /> */}
             </ul>
-            <ChannelButton onOptionClick={() => setCreateChannelModal(true)} />
+            <ChannelButton
+              onAddChannelClick={() => setCreateChannelModal(true)}
+              onBrowseChannels={() => setBrowseChannelsModal(true)}
+            />
             <div className="relative z-0">
               {channelData?.map((channel, idx) => (
                 <SidebarList
@@ -395,6 +400,28 @@ function SidebarComponent({
           onClose={() => {
             setAddMemberModal(false);
             setSelectedChannel(null);
+          }}
+        />
+      </Modal>
+      <Modal
+        header="Browse channels"
+        visible={browseChannelsModal}
+        onClose={() => {
+          setBrowseChannelsModal(false);
+        }}
+        onCancel={() => {
+          setBrowseChannelsModal(false);
+        }}
+        footer={null}
+        size="small"
+      >
+        <BrowseChannels
+          onAddNewChannel={() => {
+            setCreateChannelModal(true);
+            setBrowseChannelsModal(false);
+          }}
+          onClose={() => {
+            setBrowseChannelsModal(false);
           }}
         />
       </Modal>
