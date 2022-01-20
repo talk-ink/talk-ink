@@ -50,6 +50,8 @@ export const fetchThreads = createAsyncThunk(
           lookup: ["comments"],
         });
 
+        console.log(inboxResponse);
+
         const threadData: Thread[] = inboxResponse.data;
 
         // return threadData.filter((thread) => thread.createdBy._id !== userId);
@@ -94,11 +96,6 @@ export const createComment = createAsyncThunk(
     threadId: string;
     tagedUsers: string[];
   }) => {
-    const { data } = await kontenbase.service("Comments").create({
-      content,
-      threads: [threadId],
-    });
-
     if (tagedUsers.length > 0) {
       const commentHooksUrl: string =
         process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
@@ -107,7 +104,7 @@ export const createComment = createAsyncThunk(
         password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
       };
 
-      await axios.post(
+      axios.post(
         commentHooksUrl,
         { taggedUsers: tagedUsers, threadId },
         {
@@ -115,6 +112,11 @@ export const createComment = createAsyncThunk(
         }
       );
     }
+
+    const { data } = await kontenbase.service("Comments").create({
+      content,
+      threads: [threadId],
+    });
 
     return data;
   }

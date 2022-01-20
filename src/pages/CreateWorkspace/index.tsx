@@ -40,8 +40,6 @@ function CreateWorkspacePage() {
     },
   });
 
-  console.log(auth);
-
   const onSubmit = async (values: Workspace) => {
     setApiLoading(true);
     try {

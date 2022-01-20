@@ -124,7 +124,7 @@ function InboxPage() {
     let key: string | undefined;
 
     kontenbase.realtime
-      .subscribe("Threads", { event: "*" }, (message) => {
+      .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
 
         const isCurrentWorkspace = payload?.workspace?.includes(
@@ -136,6 +136,14 @@ function InboxPage() {
           payload?.channel?.[0]
         );
 
+        const { data } = await kontenbase.service("Users").find({
+          where: {
+            id: payload.createdBy,
+          },
+        });
+
+        const createdBy = data?.[0];
+
         if (
           isCurrentWorkspace &&
           isThreadInJoinedChannel &&
@@ -143,7 +151,7 @@ function InboxPage() {
         ) {
           switch (event) {
             case "CREATE_RECORD":
-              dispatch(addThread(payload));
+              dispatch(addThread({ ...payload, createdBy }));
               break;
             case "DELETE_RECORD":
               dispatch(deleteThread(payload));
