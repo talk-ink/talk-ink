@@ -46,7 +46,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
         return data.members.includes(auth.user._id);
       }
     },
-    []
+    [auth.user._id]
   );
 
   const getChannelsData = async () => {
@@ -74,6 +74,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
           data.description?.toLowerCase().includes(trimValue)) &&
         filterBySearchType({ data, type: searchType })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelList, searchDebounce, searchType]);
 
   const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
@@ -82,6 +83,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
 
   useEffect(() => {
     getChannelsData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
   useEffect(() => {
