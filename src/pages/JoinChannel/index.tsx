@@ -8,6 +8,10 @@ import ChannelList from "./ChannelList";
 
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { addWorkspace } from "features/workspaces";
+import { updateUser } from "features/auth";
+import FullscreenLoading from "components/Loading/FullscreenLoading";
 
 function JoinChannelPage() {
   const params = useParams();
@@ -15,16 +19,31 @@ function JoinChannelPage() {
   const [showToast] = useToast();
 
   const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const userId: string = auth.user._id;
 
   const [apiLoading, setApiLoading] = useState(false);
   const [channels, setChannels] = useState([]);
+  const [pageLoading, setPageLoading] = useState(true);
 
   const [selectedChannels, setSelectedChannels] = useState([]);
 
   const getChannels = async () => {
     setApiLoading(true);
     try {
+      const workspaceData = await kontenbase
+        .service("Workspaces")
+        .getById(params.workspaceId);
+
+      const parsedInvitedEmails: string[] = JSON.parse(
+        workspaceData?.data?.invitedEmails
+      );
+
+      if (!parsedInvitedEmails?.includes(auth.user.email)) {
+        return navigate("/404", {
+          state: { params: { message: "Workspace error" } },
+        });
+      }
       const getChannel = await kontenbase
         .service("Channels")
         .find({ where: { privacy: "public", workspace: params.workspaceId } });
@@ -67,26 +86,26 @@ function JoinChannelPage() {
     };
 
     try {
-      const userData = await kontenbase.service("Users").getById(userId);
+      const { user: userData } = await kontenbase.auth.user();
+      const workspaceData = await kontenbase
+        .service("Workspaces")
+        .getById(params.workspaceId);
+
       let workspaces = [];
 
-      if (userData.data.workspaces) {
-        if (userData.data.workspaces.includes(params.workspaceId)) {
+      if (userData.workspaces) {
+        if (userData.workspaces.includes(params.workspaceId)) {
           return showToast({ message: "Already in this workspace!" });
         }
-        workspaces = [params.workspaceId, ...userData.data.workspaces];
+        workspaces = [params.workspaceId, ...userData.workspaces];
       } else {
         workspaces = [params.workspaceId];
       }
 
-      const updateUser = await kontenbase.service("Users").updateById(userId, {
+      const { user: updateUserData } = await kontenbase.auth.update({
         workspaces,
         channels: selectedChannels,
       });
-
-      const workspaceData = await kontenbase
-        .service("Workspaces")
-        .getById(params.workspaceId);
 
       const joinWorkspace = await kontenbase
         .service("Workspaces")
@@ -96,7 +115,14 @@ function JoinChannelPage() {
 
       const joinBulkChannel = await joinBulkChannelHandler();
 
-      if (joinWorkspace.data && updateUser.data && joinBulkChannel) {
+      if (joinWorkspace.data && updateUserData && joinBulkChannel) {
+        dispatch(addWorkspace(workspaceData.data));
+        dispatch(
+          updateUser({
+            workspaces,
+            channels,
+          })
+        );
         navigate(`/a/${params.workspaceId}/inbox`);
       }
     } catch (error) {
@@ -112,7 +138,16 @@ function JoinChannelPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
-  return (
+  useEffect(() => {
+    setTimeout(() => {
+      setPageLoading(false);
+    }, 500);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return pageLoading ? (
+    <FullscreenLoading />
+  ) : (
     <div className="w-screen h-screen flex items-center justify-center py-10">
       <div className="w-6/12 border border-neutral-100 p-3 rounded-md">
         <h1 className="text-3xl font-semibold">Join channels</h1>
