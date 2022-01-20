@@ -226,7 +226,7 @@ function ChannelPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex flex-row-reverse mr-2">
+          <div className="flex flex-row mr-2">
             {memberList.map(
               (member, idx) =>
                 idx <= 3 && (
@@ -270,7 +270,15 @@ function ChannelPage() {
                   </div>
                 )
             )}
+            {memberList.length > 3 && (
+              <div
+                className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
+              >
+                +{memberList.length - 3 > 99 ? "99" : memberList.length - 3}
+              </div>
+            )}
           </div>
+
           {isChannelMember && (
             <Button
               className="bg-indigo-500 hover:bg-indigo-500 flex items-center"

@@ -40,6 +40,8 @@ function CreateWorkspacePage() {
     },
   });
 
+  console.log(auth);
+
   const onSubmit = async (values: Workspace) => {
     setApiLoading(true);
     try {
@@ -49,7 +51,12 @@ function CreateWorkspacePage() {
 
       dispatch(addWorkspace(data));
       dispatch(
-        updateUser({ workspaces: [...auth.user.workspaces, data?._id] })
+        updateUser({
+          workspaces:
+            auth.user.workspaces?.length > 0
+              ? [...auth.user.workspaces, data?._id]
+              : [data?._id],
+        })
       );
 
       if (data) {
