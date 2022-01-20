@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BiSearch } from "react-icons/bi";
@@ -38,19 +38,16 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
   const [search, setSearch] = useState("");
   const [searchDebounce] = useDebounce(search, 100);
 
-  const filterBySearchType = ({
-    data,
-    type,
-  }: {
-    data: Channel;
-    type: SearchType;
-  }) => {
-    if (type === "toJoin") {
-      return !data.members.includes(auth.user._id);
-    } else {
-      return data.members.includes(auth.user._id);
-    }
-  };
+  const filterBySearchType = useCallback(
+    ({ data, type }: { data: Channel; type: SearchType }) => {
+      if (type === "toJoin") {
+        return !data.members.includes(auth.user._id);
+      } else {
+        return data.members.includes(auth.user._id);
+      }
+    },
+    []
+  );
 
   const getChannelsData = async () => {
     try {
@@ -69,12 +66,12 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
   };
 
   const channels = useMemo(() => {
-    const trimValue = searchDebounce.trim();
+    const trimValue = searchDebounce.trim().toLowerCase();
 
     return channelList.filter(
       (data) =>
-        (data.name.includes(trimValue) ||
-          data.description?.includes(trimValue)) &&
+        (data.name.toLowerCase().includes(trimValue) ||
+          data.description?.toLowerCase().includes(trimValue)) &&
         filterBySearchType({ data, type: searchType })
     );
   }, [channelList, searchDebounce, searchType]);
