@@ -45,7 +45,9 @@ export const fetchThreads = createAsyncThunk(
         const inboxResponse = await kontenbase.service("Threads").find({
           where: {
             workspace: workspaceId,
+            tagedUsers: { $in: [userId] },
           },
+          lookup: ["comments"],
         });
 
         const threadData: Thread[] = inboxResponse.data;
@@ -61,14 +63,22 @@ export const fetchThreads = createAsyncThunk(
 
 export const fetchComments = createAsyncThunk(
   "channel/thread/fetchComments",
-  async ({ threadId }: { threadId: string }) => {
-    const { data } = await kontenbase
-      .service("Comments")
-      .find({ where: { threads: threadId } });
+  async ({ threadId, skip }: { threadId: string; skip: number }) => {
+    //@ts-ignore
+    const { data, count } = await kontenbase.service("Comments").find({
+      where: { threads: threadId },
+      lookup: ["subComments"],
+      skip,
+      limit: 10,
+      sort: {
+        createdAt: -1,
+      },
+    });
 
     return {
       comments: data,
       threadId,
+      count,
     };
   }
 );
@@ -97,7 +107,7 @@ export const createComment = createAsyncThunk(
         password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
       };
 
-      const updateTagged = await axios.post(
+      await axios.post(
         commentHooksUrl,
         { taggedUsers: tagedUsers, threadId },
         {

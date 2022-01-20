@@ -6,7 +6,6 @@ import Button from "components/Button/Button";
 import Editor from "rich-markdown-editor";
 import { kontenbase } from "lib/client";
 import Select from "react-select";
-import makeAnimated from "react-select/animated";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -34,7 +33,6 @@ interface INotifiedOption {
 }
 
 const NOTIFICATION_API = notificationUrl;
-const animatedComponents = makeAnimated();
 
 const Form: React.FC<IProps> = ({
   isShowEditor,
@@ -225,11 +223,15 @@ const Form: React.FC<IProps> = ({
               isClearable={false}
               className="text-sm custom-select "
               closeMenuOnSelect={false}
-              components={animatedComponents}
               defaultValue={[notifiedOptions[0]]}
               isMulti
               options={notifiedOptions}
               placeholder="Select Tags"
+              //@ts-ignore
+              components={{
+                DropdownIndicator: () => null,
+                IndicatorSeparator: () => null,
+              }}
             />
           </div>
           <Editor

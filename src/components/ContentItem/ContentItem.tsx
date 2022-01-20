@@ -63,6 +63,7 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
   return (
     <div
       className="
@@ -79,7 +80,7 @@ function ContentItem({
     last:after:bg-neutral-200
     "
     >
-      <div className="flex items-center justify-between px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
+      <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
@@ -120,14 +121,14 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="text-left w-52 md:w-full truncate  md:whitespace-nowrap 2xl:max-w-4xl xl:max-w-2xl md:max-w-xl text-xs text-neutral-500 pr-2">
-              <small className=" text-xs text-neutral-500">
+            <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
+              <small className=" text-xs text-neutral-500 table-cell truncate">
                 {dataSource?.draft ? "Me: " : ""}
                 {dataSource.comments?.length > 0
                   ? `Latest : ${dataSource.comments?.[
                       dataSource.comments?.length - 1
-                    ]?.content?.replace(/[^a-zA-Z ]/g, "")}`
-                  : dataSource.content?.replace(/[^a-zA-Z ]/g, "")}
+                    ]?.content?.replace(/[^a-zA-Z0-9 ]/g, "")}`
+                  : dataSource.content?.replace(/[^a-zA-Z0-9 ]/g, "")}
               </small>
             </div>
           </div>

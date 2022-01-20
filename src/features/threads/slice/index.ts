@@ -1,16 +1,19 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import { Thread, IComment } from "types";
+import moment from "moment-timezone";
+import { Thread, IComment, ISubComment } from "types";
 import { fetchComments, fetchThreads } from "./asyncThunk";
 
 type InitThreadState = {
   threads: Thread[];
   loading: boolean;
   commentLoading: boolean;
+  commentCount: number;
 };
 
 type TCommentsPayload = {
   comments: IComment[];
   threadId: string;
+  count?: number;
 };
 
 type TCommentPayload = {
@@ -28,10 +31,23 @@ type TInteractedUserPayload = {
   threadId: string;
 };
 
+type TSubCommentsPayload = {
+  subComment: ISubComment;
+  commentId: string;
+  threadId: string;
+};
+
+type TSubCommentsDeletePayload = {
+  subCommentId: string;
+  commentId: string;
+  threadId: string;
+};
+
 const initialState: InitThreadState = {
   threads: [],
   loading: true,
   commentLoading: true,
+  commentCount: 0,
 };
 
 const threadSlice = createSlice({
@@ -58,6 +74,7 @@ const threadSlice = createSlice({
       );
 
       state.threads = newThread;
+      state.commentCount = state.commentCount + 1;
     },
     updateComment: (state, action: PayloadAction<TCommentPayload>) => {
       console.log(action.payload);
@@ -90,6 +107,7 @@ const threadSlice = createSlice({
       );
 
       state.threads = filteredThread;
+      state.commentCount = state.commentCount - 1;
     },
     addInteractedUser: (
       state,
@@ -102,6 +120,94 @@ const threadSlice = createSlice({
               interactedUsers: item.interactedUsers
                 ? [...item.interactedUsers, action.payload.userId]
                 : [action.payload.userId],
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    refetchComment: (state, action: PayloadAction<TCommentsPayload>) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: action.payload.comments,
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    addSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments:
+                        comment.subComments.length > 0
+                          ? [...comment.subComments, action.payload.subComment]
+                          : [action.payload.subComment],
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    updateSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: comment.subComments.map((subComment) =>
+                        subComment._id === action.payload.subComment._id
+                          ? action.payload.subComment
+                          : subComment
+                      ),
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    deleteSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsDeletePayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: comment.subComments.filter(
+                        (subComment) =>
+                          subComment._id !== action.payload.subCommentId
+                      ),
+                    }
+                  : comment
+              ),
             }
           : item
       );
@@ -132,17 +238,40 @@ const threadSlice = createSlice({
     builder.addCase(
       fetchComments.fulfilled,
       (state, action: PayloadAction<TCommentsPayload>) => {
-        const newThread = state.threads.map((item) =>
-          item._id === action.payload.threadId
-            ? {
-                ...item,
-                comments: action.payload.comments,
+        const newThread = state.threads.map((item) => {
+          if (item._id === action.payload.threadId) {
+            const newComment =
+              item.comments?.length > 0
+                ? [...action.payload.comments, ...item.comments]
+                : action.payload.comments;
+
+            const result = [];
+            const map = new Map();
+            for (const comment of newComment) {
+              if (!map.has(comment._id)) {
+                map.set(comment._id, true); // set any value to Map
+                result.push(comment);
               }
-            : item
-        );
+            }
+
+            return {
+              ...item,
+              comments: result
+                .filter((item) => item.createdBy._id)
+                .sort(
+                  (a, b) =>
+                    moment(a.createdAt).valueOf() -
+                    moment(b.createdAt).valueOf()
+                ),
+            };
+          } else {
+            return item;
+          }
+        });
 
         state.threads = newThread;
         state.commentLoading = false;
+        state.commentCount = action.payload.count;
       }
     );
     builder.addCase(fetchComments.rejected, (state) => {
@@ -158,5 +287,9 @@ export const {
   deleteComment,
   updateComment,
   addInteractedUser,
+  refetchComment,
+  addSubCommentToComment,
+  updateSubCommentToComment,
+  deleteSubCommentToComment,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

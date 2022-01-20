@@ -54,16 +54,14 @@ function InboxPage() {
 
   const threadData = useMemo(
     () =>
-      thread.threads
-        .filter((data) =>
-          inboxFilter({
-            thread: data,
-            channelIds: channelData,
-            userData: auth.user,
-            isDoneThread,
-          })
-        )
-        .filter((item) => item.tagedUsers?.includes(auth.user._id)),
+      thread.threads.filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      ),
     [thread.threads, auth.user, params, channelData]
   );
 

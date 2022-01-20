@@ -11,7 +11,7 @@ import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
 
-import { Channel, Thread, Member } from "types";
+import { Channel, Thread, Member, ISubComment } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import {
   addComment,
@@ -28,6 +28,7 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
+import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 
 function useQuery() {
   const { search } = useLocation();
@@ -37,17 +38,25 @@ function useQuery() {
 
 function ThreadPage() {
   const [showToast] = useToast();
-  const { threadId, workspaceId, channelId } = useParams();
+  const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
   const query = useQuery();
-  const listRef = useRef<HTMLDivElement>(null);
-  const [memberList, setMemberList] = useState<Member[]>([]);
+  const { threadId, workspaceId, channelId } = useParams();
 
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
-  const auth = useAppSelector((state) => state.auth);
-  const dispatch = useAppDispatch();
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const [memberList, setMemberList] = useState<Member[]>([]);
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find((data) => data._id === channelId);
+  }, [channelId, channel.channels]);
+
+  const threadData: Thread = useMemo(() => {
+    return thread.threads.find((data) => data._id === threadId);
+  }, [thread.threads, threadId]);
 
   useEffect(() => {
     let key: string;
@@ -61,6 +70,7 @@ function ThreadPage() {
             : payload.threads?.[0] === threadId;
 
         let _createdBy;
+        let _subComments;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
           const { data } = await kontenbase.service("Users").find({
             where: {
@@ -71,6 +81,24 @@ function ThreadPage() {
             },
           });
           _createdBy = data?.[0];
+
+          if (
+            event === "UPDATE_RECORD" &&
+            payload.after.subComments.length > 0
+          ) {
+            const { data }: KontenbaseResponse<ISubComment> = await kontenbase
+              .service("SubComments")
+              .find({
+                where: {
+                  parent: payload.after._id,
+                },
+              });
+
+            _subComments = data.map((item) => ({
+              ...item,
+              createdBy: item.createdBy._id,
+            }));
+          }
         }
 
         if (isCurrentThread) {
@@ -92,21 +120,23 @@ function ThreadPage() {
                     ...payload.before,
                     ...payload.after,
                     createdBy: _createdBy,
+                    subComments: _subComments,
                   },
-                })
-              );
-              break;
-            case "DELETE_RECORD":
-              dispatch(
-                deleteComment({
-                  threadId,
-                  deletedId: payload._id,
                 })
               );
               break;
             default:
               break;
           }
+        }
+
+        if (event === "DELETE_RECORD") {
+          dispatch(
+            deleteComment({
+              threadId,
+              deletedId: payload._id,
+            })
+          );
         }
       })
       .then((result) => (key = result));
@@ -128,6 +158,7 @@ function ThreadPage() {
         await kontenbase
           .service("Threads")
           .link(threadId, { readedUsers: auth.user._id });
+
         dispatch(updateUser({ readedThreads: [...readedThreads, threadId] }));
       }
     } catch (error: any) {
@@ -137,16 +168,18 @@ function ThreadPage() {
   };
 
   useEffect(() => {
-    dispatch(fetchComments({ threadId: threadId }));
+    dispatch(fetchComments({ threadId: threadId, skip: 0 }));
   }, [dispatch, threadId]);
 
-  useEffect(() => {
-    updateReadedThreads();
-  }, [threadId]);
+  const loadMoreComment = () => {
+    dispatch(
+      fetchComments({ threadId: threadId, skip: threadData.comments.length })
+    );
+  };
 
-  const threadData: Thread = useMemo(() => {
-    return thread.threads.find((data) => data._id === threadId);
-  }, [thread.threads, threadId]);
+  useEffect(() => {
+    updateReadedThreads(); // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [threadId]);
 
   const scrollToBottom = () =>
     setTimeout(() => {
@@ -163,14 +196,12 @@ function ThreadPage() {
     };
   }, []);
 
-  const channelData: Channel = useMemo(() => {
-    return channel.channels.find((data) => data._id === channelId);
-  }, [channelId, channel.channels]);
-
   useEffect(() => {
     const setInteractedUser = async () => {
       try {
-        const { data } = await kontenbase.service("Threads").getById(threadId);
+        const { data }: KontenbaseSingleResponse<Thread> = await kontenbase
+          .service("Threads")
+          .getById(threadId);
 
         if (
           !data.interactedUsers?.find((item: any) => item === auth.user._id)
@@ -191,7 +222,7 @@ function ThreadPage() {
       }
     };
 
-    setInteractedUser();
+    setInteractedUser(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const getMemberHandler = async () => {
@@ -210,12 +241,12 @@ function ThreadPage() {
   };
 
   useEffect(() => {
-    getMemberHandler();
+    getMemberHandler(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(() => {
-    dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
-  }, [workspaceId]);
+  // useEffect(() => {
+  //   dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
+  // }, [workspaceId]);
 
   return (
     <MainContentContainer
@@ -228,7 +259,7 @@ function ThreadPage() {
         />
       }
     >
-      <div className="max-w-3xl ml-auto mr-auto -mt-4">
+      <div className="max-w-4xl ml-auto mr-auto -mt-4">
         <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl max-w-3xl break-words">
@@ -256,7 +287,7 @@ function ThreadPage() {
               )}
             </div>
 
-            <div className="flex-grow">
+            <div className="flex-grow text-sm">
               <Editor
                 value={threadData?.content}
                 readOnly
@@ -264,7 +295,17 @@ function ThreadPage() {
               />
             </div>
           </div>
-          <div className="border-t-2 border-gray-200 mb-8 mt-8" />
+          <div className="border-t-[1px] border-gray-200 mb-8 mt-8" />
+          {thread?.commentCount - threadData?.comments?.length > 0 && (
+            <p
+              className="text-sm mb-8 -mt-4 hover:opacity-80 hover:cursor-pointer"
+              onClick={loadMoreComment}
+            >
+              View More {thread?.commentCount - threadData?.comments?.length}{" "}
+              Comments
+            </p>
+          )}
+
           <div className="mb-10 ">
             {thread.commentLoading ? (
               <LoadingSkeleton />
@@ -272,6 +313,8 @@ function ThreadPage() {
               <CommentList
                 dataSource={threadData?.comments}
                 listRef={listRef}
+                memberList={memberList}
+                threadId={threadId}
               />
             )}
           </div>
