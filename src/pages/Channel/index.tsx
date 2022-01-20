@@ -201,8 +201,10 @@ function ChannelPage() {
     }
   };
 
+  console.log(auth);
+
   useEffect(() => {
-    if (channel.channels.length > 0 && auth.user._id) {
+    if (params.channelId && auth.user._id) {
       dispatch(
         fetchThreads({
           type: "threads",

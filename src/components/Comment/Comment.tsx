@@ -138,7 +138,7 @@ const Comment: React.FC<IProps> = ({
   };
 
   return (
-    <div className="group flex items-start mb-4 relative " ref={listRef}>
+    <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
       <div className=" w-8">
         {comment.createdBy?.avatar?.[0]?.url ? (
           <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
@@ -187,7 +187,7 @@ const Comment: React.FC<IProps> = ({
           <div>
             {comment.subComments?.length > 0 && (
               <>
-                <div className="border-t-[1px] border-gray-200 mb-6" />
+                <div className="border-t-[1px] border-gray-200 mb-8" />
                 {!isShowMoreSubComment && (
                   <div className="text-sm -mt-3">
                     {comment.subComments?.length > 1 && (
@@ -195,7 +195,7 @@ const Comment: React.FC<IProps> = ({
                         className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
                         onClick={() => setIsShowMoreSubComment(true)}
                       >
-                        View More {comment.subComments?.length - 1} Comment
+                        View More {comment.subComments?.length - 1} Comments
                       </p>
                     )}
                     <SubComment
@@ -297,7 +297,7 @@ const Comment: React.FC<IProps> = ({
           )}
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (
-          <div className="absolute top-0 right-0 z-50 hidden group-hover:block  ">
+          <div className="absolute top-0 right-0 z-50 hidden group-hover:block  group-focus:block">
             <Popup
               content={
                 <Menu>
