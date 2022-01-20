@@ -38,16 +38,19 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
   const [search, setSearch] = useState("");
   const [searchDebounce] = useDebounce(search, 100);
 
-  const channels = useMemo(() => {
-    const trimValue = searchDebounce.trim();
-    if (trimValue) {
-      return channelList.filter(
-        (data) =>
-          data.name.includes(trimValue) || data.description?.includes(trimValue)
-      );
+  const filterBySearchType = ({
+    data,
+    type,
+  }: {
+    data: Channel;
+    type: SearchType;
+  }) => {
+    if (type === "toJoin") {
+      return !data.members.includes(auth.user._id);
+    } else {
+      return data.members.includes(auth.user._id);
     }
-    return channelList;
-  }, [channelList, searchDebounce]);
+  };
 
   const getChannelsData = async () => {
     try {
@@ -58,25 +61,31 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
       if (error) throw new Error(error.message);
 
       const channelData: Channel[] = data;
-      if (searchType === "toJoin") {
-        setChannelList(
-          channelData.filter((data) => !data.members.includes(auth.user._id))
-        );
-      } else {
-        setChannelList(
-          channelData.filter((data) => data.members.includes(auth.user._id))
-        );
-      }
-      setSearch("");
+      setChannelList(channelData);
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
 
+  const channels = useMemo(() => {
+    const trimValue = searchDebounce.trim();
+
+    return channelList.filter(
+      (data) =>
+        (data.name.includes(trimValue) ||
+          data.description?.includes(trimValue)) &&
+        filterBySearchType({ data, type: searchType })
+    );
+  }, [channelList, searchDebounce, searchType]);
+
   useEffect(() => {
     getChannelsData();
-  }, [searchType, params.workspaceId]);
+  }, [params.workspaceId]);
+
+  useEffect(() => {
+    setSearch("");
+  }, [searchType]);
   return (
     <div className="min-h-[30vh]">
       <div className="flex items-center gap-2 mb-5">
@@ -87,6 +96,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
             className="w-full outline-none ml-2"
             placeholder="Search by channel name or description"
             onChange={(e) => setSearch(e.target.value)}
+            value={search}
           />
         </div>
         <Button

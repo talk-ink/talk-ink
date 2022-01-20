@@ -10,9 +10,12 @@ type TProps = {
 function BrowseChannelList({ onClick, data }: TProps) {
   return (
     <button
-      className="w-full p-3 hover:bg-indigo-100 rounded outline-none"
+      className="w-full p-3 hover:bg-indigo-100 rounded outline-none relative overflow-hidden mt-1 first:mt-0 group"
       onClick={onClick}
     >
+      <div
+        className={`h-full absolute left-0 top-0 w-[2px] group-hover:bg-indigo-500`}
+      ></div>
       <div className="flex gap-3">
         <HiOutlineHashtag size={16} className="text-indigo-500" />
         <div className="flex flex-col items-start">
