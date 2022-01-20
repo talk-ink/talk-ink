@@ -76,6 +76,10 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
     );
   }, [channelList, searchDebounce, searchType]);
 
+  const onInputChange: React.ChangeEventHandler<HTMLInputElement> = (e) => {
+    setSearch(e.target.value);
+  };
+
   useEffect(() => {
     getChannelsData();
   }, [params.workspaceId]);
@@ -92,7 +96,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
             type="text"
             className="w-full outline-none ml-2"
             placeholder="Search by channel name or description"
-            onChange={(e) => setSearch(e.target.value)}
+            onChange={onInputChange}
             value={search}
           />
         </div>
