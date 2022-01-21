@@ -33,7 +33,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
     initialValues: editedData
       ? {
           name: editedData.name,
-          description: editedData.description,
+          description: editedData.description ?? "",
           privacy: editedData.privacy,
         }
       : initialValues,
