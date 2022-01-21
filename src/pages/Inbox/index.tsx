@@ -187,7 +187,8 @@ function InboxPage() {
                 }
 
                 const { user: userData } = await kontenbase.auth.user();
-                dispatch(updateUser(userData));
+
+                dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
               }
               break;
             case "CREATE_RECORD":
