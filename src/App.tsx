@@ -20,6 +20,7 @@ import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, TUserProfile } from "types";
 import ThreadPage from "pages/Thread";
+import EditThreadPage from "pages/Thread/Edit";
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import { useToast } from "hooks/useToast";
 import JoinChannelPage from "pages/JoinChannel";
@@ -100,6 +101,10 @@ function App() {
           <Route path="messages" element={<>messages</>} />
           <Route path="ch/:channelId" element={<ChannelPage />} />
           <Route path="ch/:channelId/t/:threadId" element={<ThreadPage />} />
+          <Route
+            path="ch/:channelId/te/:threadId"
+            element={<EditThreadPage />}
+          />
           <Route
             path="ch/:channelId/compose/:composeId"
             element={<Compose />}
