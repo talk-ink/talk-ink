@@ -4,7 +4,7 @@ import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
-import { useNavigate, useParams, useLocation } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import OneSignal from "react-onesignal";
 import { kontenbase } from "lib/client";
 import { FaPlus } from "react-icons/fa";
@@ -41,7 +41,6 @@ import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
 
 import { Channel, CreateChannel, Thread } from "types";
-import { inboxFilter } from "utils/helper";
 
 type TProps = {
   isMobile: boolean;
@@ -78,8 +77,6 @@ function SidebarComponent({
     Channel | null | undefined
   >(null);
 
-  const { pathname } = useLocation();
-
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
@@ -95,21 +92,12 @@ function SidebarComponent({
     [channel.channels]
   );
 
-  const channelAllData: string[] = useMemo(
-    () => channel.channels.map((data) => data._id),
-    [channel.channels]
-  );
-
   const readedThreads: string[] = useMemo(() => {
     if (!auth.user.readedThreads) return [];
     return auth.user.readedThreads;
   }, [auth.user]);
 
   const userId: string = auth.user._id;
-
-  const isDoneThread = useMemo(() => {
-    return pathname.includes("inbox/done");
-  }, [pathname]);
 
   useEffect(() => {
     if (!userId || !params.workspaceId) return;
@@ -128,7 +116,7 @@ function SidebarComponent({
 
   const threadData = useMemo(() => {
     return inboxData
-      .filter((data) => !auth.user.doneThreads.includes(data._id))
+      .filter((data) => !auth.user.doneThreads?.includes(data._id))
       .filter((item) => item.tagedUsers?.includes(auth.user._id));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
