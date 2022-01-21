@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   BiCheck,
@@ -22,7 +22,7 @@ import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { addThread, deleteThread, updateThread } from "features/threads";
+
 import { inboxFilter } from "utils/helper";
 
 function InboxPage() {
@@ -122,94 +122,6 @@ function InboxPage() {
   // function timeout(delay: number) {
   //   return new Promise((res) => setTimeout(res, delay));
   // }
-
-  useEffect(() => {
-    let key: string | undefined;
-
-    kontenbase.realtime
-      .subscribe("Threads", { event: "*" }, async (message) => {
-        const { event, payload } = message;
-        const isUpdate = event === "UPDATE_RECORD";
-
-        const isCurrentWorkspace = isUpdate
-          ? payload?.before?.workspace?.includes(params.workspaceId)
-          : payload?.workspace?.includes(params.workspaceId);
-
-        const isNotCreatedByThisUser = isUpdate
-          ? payload?.before?.createdBy !== auth.user._id
-          : payload?.createdBy !== auth.user._id;
-
-        const isThreadInJoinedChannel = channelData.includes(
-          isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
-        );
-
-        const { data } = await kontenbase.service("Users").find({
-          where: {
-            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
-          },
-        });
-
-        const createdBy = data?.[0];
-
-        if (
-          isCurrentWorkspace &&
-          isThreadInJoinedChannel &&
-          isNotCreatedByThisUser
-        ) {
-          switch (event) {
-            case "UPDATE_RECORD":
-              if (payload.before.tagedUsers.includes(auth.user._id)) {
-                if (
-                  threadData.find((item) => item._id === payload.before?._id)
-                ) {
-                  const { data } = await kontenbase.service("Comments").find({
-                    where: {
-                      threads: payload.before._id,
-                    },
-                  });
-
-                  dispatch(
-                    updateThread({
-                      ...payload.before,
-                      ...payload.after,
-                      createdBy,
-                      comments: data,
-                    })
-                  );
-                } else {
-                  dispatch(
-                    addThread({
-                      ...payload.before,
-                      ...payload.after,
-                      createdBy,
-                    })
-                  );
-                }
-
-                const { user: userData } = await kontenbase.auth.user();
-
-                dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
-              }
-              break;
-            case "CREATE_RECORD":
-              dispatch(addThread({ ...payload, createdBy }));
-              break;
-            case "DELETE_RECORD":
-              dispatch(deleteThread(payload));
-              break;
-
-            default:
-              break;
-          }
-        }
-      })
-      .then((result) => (key = result));
-
-    return () => {
-      kontenbase.realtime.unsubscribe(key);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelData, threadData]);
 
   return (
     <MainContentContainer>

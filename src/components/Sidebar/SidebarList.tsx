@@ -102,12 +102,19 @@ function SidebarList({
         }
         onClick={() => setIsSidebarOpen(false)}
       >
-        <Icon
-          size={20}
-          className={`mr-2 text-gray-400 ${
-            type === "channel" && isDefault && "text-gray-400"
-          }`}
-        />
+        <div className="relative">
+          <Icon
+            size={20}
+            className={`mr-2 text-gray-400 ${
+              type === "channel" && isDefault && "text-gray-400"
+            }`}
+          />
+          <div
+            className={`absolute top-0 left-0 h-2 w-2 ${
+              type === "inbox" && count > 0 ? "bg-green-600" : "bg-transparent"
+            } rounded-full mr-2`}
+          ></div>
+        </div>
         <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
           {name}
         </p>
