@@ -125,7 +125,7 @@ function AddChannelMember({ data, onClose }: TProps) {
           />
         ))}
       </MemberSuggestion>
-      <div className="w-full h-[40vh] mt-2 border rounded border-gray-200 overflow-auto px-2">
+      <div className="w-full h-[40vh] mt-2 overflow-auto px-2">
         {joinedMemberData.map((data, idx) => (
           <MemberList
             data={data}
