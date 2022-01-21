@@ -1,4 +1,6 @@
 import React, { useMemo } from "react";
+
+import { BiCheck } from "react-icons/bi";
 import { HiOutlineHashtag } from "react-icons/hi";
 import { Channel } from "types";
 
@@ -30,10 +32,17 @@ function ChannelList({ data, onClick = () => {}, selectedChannels }: TProps) {
       </div>
       <div>
         <div
-          className={`h-5 w-5 border border-indigo-500 ${
+          className={`h-5 w-5 border-2 border-indigo-500 ${
             active && "bg-indigo-500"
-          } rounded-full`}
-        ></div>
+          } rounded flex items-center justify-center`}
+        >
+          {active && <BiCheck size={16} className="text-white font-bold" />}
+        </div>
+        {/* {active ? (
+          <BiCheckCircle size={24} className="text-indigo-500" />
+        ) : (
+          <BiCircle size={24} className="text-indigo-500" />
+        )} */}
       </div>
     </button>
   );

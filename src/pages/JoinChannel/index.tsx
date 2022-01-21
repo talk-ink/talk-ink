@@ -12,6 +12,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { addWorkspace } from "features/workspaces";
 import { updateUser } from "features/auth";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
+import { Channel } from "types";
 
 function JoinChannelPage() {
   const params = useParams();
@@ -34,6 +35,13 @@ function JoinChannelPage() {
       const getChannel = await kontenbase
         .service("Channels")
         .find({ where: { privacy: "public", workspace: params.workspaceId } });
+
+      if (getChannel.data) {
+        const channelIds: string[] = getChannel?.data?.map(
+          (data: Channel) => data._id
+        );
+        setSelectedChannels(channelIds);
+      }
 
       setChannels(getChannel.data);
     } catch (error) {
