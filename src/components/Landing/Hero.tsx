@@ -1,4 +1,4 @@
-import HeroImage from "assets/image/landing/hero1.svg";
+import HeroImage from "assets/image/landing/hero.webp";
 import GetStartedButton from "./GetStartedButton";
 import GithubButton from "./GithubButton";
 

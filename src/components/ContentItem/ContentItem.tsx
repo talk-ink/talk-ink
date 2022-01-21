@@ -5,10 +5,12 @@ import {
   BiCircle,
   BiDotsHorizontalRounded,
   BiTrash,
+  BiEdit,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
+import { useNavigate, useLocation } from "react-router";
 
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
@@ -40,6 +42,8 @@ function ContentItem({
 }: Props) {
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
+  const navigate = useNavigate();
+  const pathname = useLocation();
 
   const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
     try {
@@ -174,8 +178,18 @@ function ContentItem({
                     )}
                     {dataSource.createdBy._id === auth.user._id ||
                       (dataSource?.draft && <Divider />)}
-                    {dataSource.createdBy._id === auth.user._id ||
-                      (dataSource?.draft && (
+                    {(dataSource.createdBy._id === auth.user._id ||
+                      dataSource?.draft) && (
+                      <>
+                        <MenuItem
+                          icon={
+                            <BiEdit size={20} className="text-neutral-400" />
+                          }
+                          title="Edit thread..."
+                          onClick={() => {
+                            navigate(`te/${dataSource?._id}`);
+                          }}
+                        />
                         <MenuItem
                           icon={
                             <BiTrash size={20} className="text-neutral-400" />
@@ -185,7 +199,8 @@ function ContentItem({
                             setSelectedThread(dataSource);
                           }}
                         />
-                      ))}
+                      </>
+                    )}
                   </Menu.Items>
                 )}
               </>

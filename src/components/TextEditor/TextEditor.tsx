@@ -11,7 +11,8 @@ import { kontenbase } from "lib/client";
 type Props = React.PropsWithChildren<{
   formik: FormikProps<Thread>;
   loading: boolean;
-  deleteDraft: () => void;
+  deleteDraft?: () => void;
+  isEdit?: boolean;
 }>;
 
 type PropsDelay = React.PropsWithChildren<{
@@ -30,7 +31,7 @@ const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
   return isShown ? <>{children}</> : null;
 };
 
-function TextEditor({ formik, loading, deleteDraft }: Props) {
+function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
@@ -92,22 +93,24 @@ function TextEditor({ formik, loading, deleteDraft }: Props) {
             Preview
           </Button> */}
 
-          <Button
-            className=" hover:bg-neutral-200 rounded text-xs font-medium px-5"
-            onClick={() => {
-              deleteDraft();
-              navigate(`/a/${params?.workspaceId}/ch/${params?.channelId}`);
-            }}
-          >
-            Discard
-          </Button>
+          {!isEdit && (
+            <Button
+              className=" hover:bg-neutral-200 rounded text-xs font-medium px-5"
+              onClick={() => {
+                deleteDraft();
+                navigate(`/a/${params?.workspaceId}/ch/${params?.channelId}`);
+              }}
+            >
+              Discard
+            </Button>
+          )}
           <Button
             type="submit"
             className=" bg-indigo-500 hover:bg-indigo-500 rounded text-xs font-medium px-5 text-white"
             disabled={isDisabled}
             onClick={formik.handleSubmit}
           >
-            Post
+            {isEdit ? "Save" : "Post"}
           </Button>
         </div>
       </div>
