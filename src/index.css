@@ -8,7 +8,7 @@
 @import "./styles/component.css";
 
 /* width */
-::-webkit-scrollbar  {
+::-webkit-scrollbar {
   width: 16px;
   height: 16px;
 }
@@ -118,10 +118,12 @@
 
 .markdown-overrides ul {
   list-style: initial !important;
+  margin-bottom: 1rem !important;
 }
 
 .markdown-overrides ol {
   list-style: decimal !important;
+  margin-bottom: 1rem !important;
 }
 
 .markdown-overrides {
