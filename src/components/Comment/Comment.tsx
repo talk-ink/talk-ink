@@ -26,12 +26,15 @@ import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import { kontenbase } from "lib/client";
+import axios from "axios";
+import { notificationUrl } from "utils/helper";
 
 interface IProps {
   comment: IComment;
   listRef?: React.LegacyRef<HTMLDivElement>;
   memberList: Member[];
   threadId: string;
+  threadName: string;
 }
 
 interface INotifiedOption {
@@ -42,11 +45,14 @@ interface INotifiedOption {
   flag: number;
 }
 
+const NOTIFICATION_API = notificationUrl;
+
 const Comment: React.FC<IProps> = ({
   comment,
   listRef,
   memberList,
   threadId,
+  threadName,
 }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
@@ -114,10 +120,37 @@ const Comment: React.FC<IProps> = ({
 
   const handleCreateSubComment = async () => {
     try {
+      const invitedUsers: string[] = selectedNotifiedOptions.map(
+        (item) => item.value
+      );
+
       const { data, error } = await kontenbase.service("SubComments").create({
         content: subEditorState,
         parent: comment._id,
       });
+
+      if (invitedUsers.length > 0) {
+        const commentHooksUrl: string =
+          process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
+        const basicAuth: { username: string; password: string } = {
+          username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
+          password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
+        };
+
+        axios.post(
+          commentHooksUrl,
+          { taggedUsers: invitedUsers, threadId },
+          {
+            auth: basicAuth,
+          }
+        );
+
+        axios.post(NOTIFICATION_API, {
+          title: `${auth?.user.firstName} reply comment on ${threadName}`,
+          description: editorState.replace(/(<([^>]+)>)/gi, ""),
+          externalUserIds: invitedUsers,
+        });
+      }
 
       if (!error) {
         dispatch(

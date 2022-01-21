@@ -143,7 +143,7 @@ const Form: React.FC<IProps> = ({
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
           <div>
-            <Avatar src={auth.user.avatar || auth.user.avatar?.[0]?.url} />
+            <Avatar src={auth.user.avatar} />
           </div>
           <input
             className="ml-4  appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
