@@ -55,13 +55,19 @@ const threadSlice = createSlice({
   initialState,
   reducers: {
     addThread: (state, action: PayloadAction<Thread>) => {
-      state.threads.push(action.payload);
+      state.threads = [...state.threads, action.payload];
     },
     deleteThread: (state, action: PayloadAction<Thread>) => {
       let deletedIndex = state.threads.findIndex(
         (data) => data._id === action.payload._id
       );
       state.threads.splice(deletedIndex, 1);
+    },
+    updateThread: (state, action: PayloadAction<Thread>) => {
+      const updatedThread = state.threads.map((item) =>
+        item._id === action.payload._id ? action.payload : item
+      );
+      state.threads = updatedThread;
     },
     addComment: (state, action: PayloadAction<TCommentPayload>) => {
       const newThread = state.threads.map((item) =>
@@ -283,6 +289,7 @@ const threadSlice = createSlice({
 export const {
   addThread,
   deleteThread,
+  updateThread,
   addComment,
   deleteComment,
   updateComment,

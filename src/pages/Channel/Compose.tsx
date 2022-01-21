@@ -151,7 +151,14 @@ function Compose() {
         dispatch(
           addThread({
             ...createThread.data,
-            createdBy: auth.user,
+            createdBy: {
+              ...auth.user,
+              avatar: [
+                {
+                  url: auth.user.avatar,
+                },
+              ],
+            },
           })
         );
         navigate(

@@ -195,8 +195,6 @@ function ChannelPage() {
     }
   };
 
-  console.log(auth);
-
   useEffect(() => {
     if (params.channelId && auth.user._id) {
       dispatch(

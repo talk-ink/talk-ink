@@ -17,6 +17,7 @@ import { kontenbase } from "lib/client";
 import { deleteThread } from "features/threads";
 import { inboxFilter } from "utils/helper";
 import { updateChannelCount } from "features/channels/slice";
+import moment from "moment-timezone";
 
 type TProps = {
   type?: "active" | "done";
@@ -54,7 +55,10 @@ function InboxList({ type = "active" }: TProps) {
           isDoneThread,
         })
       )
-      .filter((item) => item.tagedUsers?.includes(auth.user._id));
+      .filter((item) => item.tagedUsers?.includes(auth.user._id))
+      .sort(
+        (a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
+      );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
 

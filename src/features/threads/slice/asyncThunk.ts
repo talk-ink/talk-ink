@@ -52,7 +52,6 @@ export const fetchThreads = createAsyncThunk(
 
         const threadData: Thread[] = inboxResponse.data;
 
-        // return threadData.filter((thread) => thread.createdBy._id !== userId);
         return threadData;
 
       default:

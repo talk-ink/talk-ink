@@ -8,6 +8,7 @@ interface IProps {
   listRef?: React.LegacyRef<HTMLDivElement>;
   memberList: Member[];
   threadId: string;
+  threadName: string;
 }
 
 const List: React.FC<IProps> = ({
@@ -15,6 +16,7 @@ const List: React.FC<IProps> = ({
   listRef,
   memberList,
   threadId,
+  threadName,
 }) => {
   return (
     <div>
@@ -25,6 +27,7 @@ const List: React.FC<IProps> = ({
             key={index}
             memberList={memberList}
             threadId={threadId}
+            threadName={threadName}
           />
         ))}
       <div ref={listRef} />

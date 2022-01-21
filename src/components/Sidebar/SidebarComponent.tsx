@@ -4,7 +4,7 @@ import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import OneSignal from "react-onesignal";
 import { kontenbase } from "lib/client";
 import { FaPlus } from "react-icons/fa";
@@ -37,8 +37,11 @@ import {
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
+import { addThread, deleteThread, updateThread } from "features/threads";
+import { updateUser } from "features/auth";
 
 import { Channel, CreateChannel } from "types";
+import { inboxFilter } from "utils/helper";
 
 type TProps = {
   isMobile: boolean;
@@ -74,6 +77,8 @@ function SidebarComponent({
     Channel | null | undefined
   >(null);
 
+  const { pathname } = useLocation();
+
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
@@ -83,7 +88,49 @@ function SidebarComponent({
       data.members.includes(auth.user._id)
     );
   }, [channel.channels, auth.user._id]);
+
+  const channelDataAll: string[] = useMemo(
+    () => channel.channels.map((data) => data._id),
+    [channel.channels]
+  );
+
+  const channelAllData: string[] = useMemo(
+    () => channel.channels.map((data) => data._id),
+    [channel.channels]
+  );
+
+  const readedThreads: string[] = useMemo(() => {
+    if (!auth.user.readedThreads) return [];
+    return auth.user.readedThreads;
+  }, [auth.user]);
+
   const userId: string = auth.user._id;
+
+  const thread = useAppSelector((state) => state.thread);
+
+  const isDoneThread = useMemo(() => {
+    return pathname.includes("inbox/done");
+  }, [pathname]);
+
+  const threadData = useMemo(() => {
+    return thread.threads
+      .filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelAllData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      )
+      .filter((item) => item.tagedUsers?.includes(auth.user._id));
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [thread.threads, auth.user, params, channelData]);
+
+  const inboxLeft: number = useMemo(() => {
+    return threadData.filter((item) => !readedThreads.includes(item._id))
+      .length;
+  }, [threadData, readedThreads]);
 
   const handleLogout = async () => {
     try {
@@ -160,6 +207,97 @@ function SidebarComponent({
     getChannels();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
+
+  useEffect(() => {
+    let key: string | undefined;
+
+    kontenbase.realtime
+      .subscribe("Threads", { event: "*" }, async (message) => {
+        const { event, payload } = message;
+        const isUpdate = event === "UPDATE_RECORD";
+
+        const isCurrentWorkspace = isUpdate
+          ? payload?.before?.workspace?.includes(params.workspaceId)
+          : payload?.workspace?.includes(params.workspaceId);
+
+        const isNotCreatedByThisUser = isUpdate
+          ? payload?.before?.createdBy !== auth.user._id
+          : payload?.createdBy !== auth.user._id;
+
+        const isThreadInJoinedChannel = channelDataAll.includes(
+          isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
+        );
+
+        const { data } = await kontenbase.service("Users").find({
+          where: {
+            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
+          },
+        });
+
+        const createdBy = data?.[0];
+
+        if (
+          isCurrentWorkspace &&
+          isThreadInJoinedChannel &&
+          isNotCreatedByThisUser
+        ) {
+          switch (event) {
+            case "UPDATE_RECORD":
+              console.log("fire");
+              if (payload.before.tagedUsers.includes(auth.user._id)) {
+                if (
+                  threadData.find((item) => item._id === payload.before?._id)
+                ) {
+                  const { data } = await kontenbase.service("Comments").find({
+                    where: {
+                      threads: payload.before._id,
+                    },
+                  });
+
+                  dispatch(
+                    updateThread({
+                      ...payload.before,
+                      ...payload.after,
+                      createdBy,
+                      comments: data,
+                    })
+                  );
+                } else {
+                  dispatch(
+                    addThread({
+                      ...payload.before,
+                      ...payload.after,
+                      createdBy,
+                    })
+                  );
+                }
+
+                const { user: userData } = await kontenbase.auth.user();
+
+                dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
+              }
+              break;
+            case "CREATE_RECORD":
+              console.log("fire");
+
+              dispatch(addThread({ ...payload, createdBy }));
+              break;
+            case "DELETE_RECORD":
+              dispatch(deleteThread(payload));
+              break;
+
+            default:
+              break;
+          }
+        }
+      })
+      .then((result) => (key = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channelData, threadData]);
 
   const loading = workspace.loading || channel.loading;
 
@@ -242,17 +380,18 @@ function SidebarComponent({
         {!loading && (
           <div className="p-2">
             <ul className="mb-1">
-              <SidebarList
+              {/* <SidebarList
                 type="search"
                 name="Search"
                 link={`/a/${workspaceData?._id}/search`}
                 setIsSidebarOpen={setIsSidebarOpen}
-              />
+              /> */}
               <SidebarList
                 type="inbox"
                 name="Inbox"
                 link={`/a/${workspaceData?._id}/inbox`}
                 setIsSidebarOpen={setIsSidebarOpen}
+                count={inboxLeft || 0}
               />
               {/* <SidebarList
                 type="saved"

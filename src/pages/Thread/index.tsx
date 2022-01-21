@@ -314,6 +314,7 @@ function ThreadPage() {
                 listRef={listRef}
                 memberList={memberList}
                 threadId={threadId}
+                threadName={threadData?.name}
               />
             )}
           </div>

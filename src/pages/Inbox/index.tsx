@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import {
   BiCheck,
@@ -22,7 +22,7 @@ import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { addThread, deleteThread } from "features/threads";
+
 import { inboxFilter } from "utils/helper";
 
 function InboxPage() {
@@ -52,14 +52,17 @@ function InboxPage() {
   );
 
   const threadData = useMemo(() => {
-    return thread.threads.filter((data) =>
-      inboxFilter({
-        thread: data,
-        channelIds: channelData,
-        userData: auth.user,
-        isDoneThread,
-      })
-    );
+    return thread.threads
+      .filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      )
+      .filter((item) => item.tagedUsers?.includes(auth.user._id));
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
 
@@ -116,81 +119,9 @@ function InboxPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
-  function timeout(delay: number) {
-    return new Promise((res) => setTimeout(res, delay));
-  }
-
-  useEffect(() => {
-    let key: string | undefined;
-
-    kontenbase.realtime
-      .subscribe("Threads", { event: "*" }, (message) => {
-        const { event, payload } = message;
-
-        const isCurrentWorkspace = payload?.workspace?.includes(
-          params.workspaceId
-        );
-
-        const isNotCreatedByThisUser = payload?.createdBy !== auth.user._id;
-        const isThreadInJoinedChannel = channelData.includes(
-          payload?.channel?.[0]
-        );
-
-        if (
-          isCurrentWorkspace &&
-          isThreadInJoinedChannel &&
-          isNotCreatedByThisUser
-        ) {
-          switch (event) {
-            case "CREATE_RECORD":
-              dispatch(addThread(payload));
-              break;
-            case "DELETE_RECORD":
-              dispatch(deleteThread(payload));
-              break;
-
-            default:
-              break;
-          }
-        }
-      })
-      .then((result) => (key = result));
-
-    return () => {
-      kontenbase.realtime.unsubscribe(key);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelData]);
-
-  useEffect(() => {
-    let key: string | undefined;
-
-    kontenbase.realtime
-      .subscribe("Comments", { event: "CREATE_RECORD" }, async (message) => {
-        const { payload } = message;
-
-        if (threadData.find((item) => item._id === payload.threads[0])) {
-          await timeout(3000);
-
-          dispatch(
-            fetchThreads({
-              type: "inbox",
-              workspaceId: params.workspaceId,
-              userId,
-            })
-          );
-
-          const { user: userData } = await kontenbase.auth.user();
-          dispatch(updateUser(userData));
-        }
-      })
-      .then((result) => (key = result));
-
-    return () => {
-      kontenbase.realtime.unsubscribe(key);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // function timeout(delay: number) {
+  //   return new Promise((res) => setTimeout(res, delay));
+  // }
 
   return (
     <MainContentContainer>
