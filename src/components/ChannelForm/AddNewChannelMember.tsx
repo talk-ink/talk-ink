@@ -119,7 +119,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
             leftContent={
               <div className="pr-2">
                 <span
-                  className="text-indigo-500 hover:underline cursor-pointer"
+                  className="text-indigo-500 hover:underline cursor-pointer text-sm"
                   onClick={() => {
                     if (auth.user._id === data._id) {
                       removeMemberHandler({
