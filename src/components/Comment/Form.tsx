@@ -12,7 +12,8 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { Channel, Member } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
-import { notificationUrl } from "utils/helper";
+import { getNameInitial, notificationUrl } from "utils/helper";
+import NameInitial from "components/Avatar/NameInitial";
 
 interface IProps {
   isShowEditor: boolean;
@@ -142,9 +143,15 @@ const Form: React.FC<IProps> = ({
     <div className="sticky bottom-0 left-0 z-30  bg-white">
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
-          <div>
+          {auth.user.avatar ? (
             <Avatar src={auth.user.avatar} />
-          </div>
+          ) : (
+            <NameInitial
+              name={getNameInitial(auth.user.firstName)}
+              className="mr-4"
+            />
+          )}
+
           <input
             className="ml-4  appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
