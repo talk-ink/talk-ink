@@ -63,6 +63,12 @@ const threadSlice = createSlice({
       );
       state.threads.splice(deletedIndex, 1);
     },
+    updateThread: (state, action: PayloadAction<Thread>) => {
+      const updatedThread = state.threads.map((item) =>
+        item._id === action.payload._id ? action.payload : item
+      );
+      state.threads = updatedThread;
+    },
     addComment: (state, action: PayloadAction<TCommentPayload>) => {
       const newThread = state.threads.map((item) =>
         item._id === action.payload.threadId
@@ -283,6 +289,7 @@ const threadSlice = createSlice({
 export const {
   addThread,
   deleteThread,
+  updateThread,
   addComment,
   deleteComment,
   updateComment,

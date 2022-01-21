@@ -54,7 +54,7 @@ function SidebarList({
   isAdmin,
 }: Props) {
   let Icon = AiOutlineInbox;
-  let showOption = type === "channel";
+  let showOption = type === "channel" || type === "inbox";
 
   const params = useParams();
   const { pathname } = useLocation();

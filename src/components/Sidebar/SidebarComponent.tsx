@@ -242,17 +242,18 @@ function SidebarComponent({
         {!loading && (
           <div className="p-2">
             <ul className="mb-1">
-              <SidebarList
+              {/* <SidebarList
                 type="search"
                 name="Search"
                 link={`/a/${workspaceData?._id}/search`}
                 setIsSidebarOpen={setIsSidebarOpen}
-              />
+              /> */}
               <SidebarList
                 type="inbox"
                 name="Inbox"
                 link={`/a/${workspaceData?._id}/inbox`}
                 setIsSidebarOpen={setIsSidebarOpen}
+                count={10}
               />
               {/* <SidebarList
                 type="saved"

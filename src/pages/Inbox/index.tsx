@@ -22,7 +22,7 @@ import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { addThread, deleteThread } from "features/threads";
+import { addThread, deleteThread, updateThread } from "features/threads";
 import { inboxFilter } from "utils/helper";
 
 function InboxPage() {
@@ -60,6 +60,7 @@ function InboxPage() {
         isDoneThread,
       })
     );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
 
@@ -126,19 +127,23 @@ function InboxPage() {
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
+        const isUpdate = event === "UPDATE_RECORD";
 
-        const isCurrentWorkspace = payload?.workspace?.includes(
-          params.workspaceId
-        );
+        const isCurrentWorkspace = isUpdate
+          ? payload?.before?.workspace?.includes(params.workspaceId)
+          : payload?.workspace?.includes(params.workspaceId);
 
-        const isNotCreatedByThisUser = payload?.createdBy !== auth.user._id;
+        const isNotCreatedByThisUser = isUpdate
+          ? payload?.before?.createdBy !== auth.user._id
+          : payload?.createdBy !== auth.user._id;
+
         const isThreadInJoinedChannel = channelData.includes(
-          payload?.channel?.[0]
+          isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
         );
 
         const { data } = await kontenbase.service("Users").find({
           where: {
-            id: payload.createdBy,
+            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
           },
         });
 
@@ -150,6 +155,39 @@ function InboxPage() {
           isNotCreatedByThisUser
         ) {
           switch (event) {
+            case "UPDATE_RECORD":
+              if (payload.before.tagedUsers.includes(auth.user._id)) {
+                const { data } = await kontenbase.service("Comments").find({
+                  where: {
+                    threads: payload.before._id,
+                  },
+                });
+
+                if (
+                  threadData.find((item) => item._id === payload.before?._id)
+                ) {
+                  dispatch(
+                    updateThread({
+                      ...payload.before,
+                      ...payload.after,
+                      createdBy,
+                      comments: data,
+                    })
+                  );
+                } else {
+                  dispatch(
+                    addThread({
+                      ...payload.before,
+                      ...payload.after,
+                      createdBy,
+                    })
+                  );
+                }
+
+                const { user: userData } = await kontenbase.auth.user();
+                dispatch(updateUser(userData));
+              }
+              break;
             case "CREATE_RECORD":
               dispatch(addThread({ ...payload, createdBy }));
               break;
@@ -169,36 +207,6 @@ function InboxPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelData]);
-
-  useEffect(() => {
-    let key: string | undefined;
-
-    kontenbase.realtime
-      .subscribe("Comments", { event: "CREATE_RECORD" }, async (message) => {
-        const { payload } = message;
-
-        if (threadData.find((item) => item._id === payload.threads[0])) {
-          await timeout(3000);
-
-          dispatch(
-            fetchThreads({
-              type: "inbox",
-              workspaceId: params.workspaceId,
-              userId,
-            })
-          );
-
-          const { user: userData } = await kontenbase.auth.user();
-          dispatch(updateUser(userData));
-        }
-      })
-      .then((result) => (key = result));
-
-    return () => {
-      kontenbase.realtime.unsubscribe(key);
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   return (
     <MainContentContainer>

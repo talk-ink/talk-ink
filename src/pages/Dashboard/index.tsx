@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Outlet, useParams, useNavigate } from "react-router";
 
 import SidebarComponent from "components/Sidebar/SidebarComponent";
