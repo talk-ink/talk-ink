@@ -31,19 +31,6 @@ function JoinChannelPage() {
   const getChannels = async () => {
     setApiLoading(true);
     try {
-      const workspaceData = await kontenbase
-        .service("Workspaces")
-        .getById(params.workspaceId);
-
-      const parsedInvitedEmails: string[] = JSON.parse(
-        workspaceData?.data?.invitedEmails
-      );
-
-      if (!parsedInvitedEmails?.includes(auth.user.email)) {
-        return navigate("/404", {
-          state: { params: { message: "Workspace error" } },
-        });
-      }
       const getChannel = await kontenbase
         .service("Channels")
         .find({ where: { privacy: "public", workspace: params.workspaceId } });

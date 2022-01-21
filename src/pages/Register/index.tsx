@@ -57,14 +57,7 @@ function RegisterPage() {
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
-            let invitedEmails: string[] = [];
-
-            if (workspaceData[0].invitedEmails) {
-              invitedEmails = JSON.parse(workspaceData[0].invitedEmails);
-            }
-
-            if (invitedEmails.includes(user.email))
-              toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
           }
         }
 
