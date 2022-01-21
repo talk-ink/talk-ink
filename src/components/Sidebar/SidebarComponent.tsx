@@ -40,7 +40,7 @@ import { useToast } from "hooks/useToast";
 import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
 
-import { Channel, CreateChannel } from "types";
+import { Channel, CreateChannel, Thread } from "types";
 import { inboxFilter } from "utils/helper";
 
 type TProps = {
@@ -72,6 +72,7 @@ function SidebarComponent({
   const [settingsModal, setSettingsModal] = useState(false);
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
+  const [inboxData, setInboxData] = useState<Thread[]>([]);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -106,26 +107,32 @@ function SidebarComponent({
 
   const userId: string = auth.user._id;
 
-  const thread = useAppSelector((state) => state.thread);
-
   const isDoneThread = useMemo(() => {
     return pathname.includes("inbox/done");
   }, [pathname]);
 
+  useEffect(() => {
+    if (!userId || !params.workspaceId) return;
+
+    (async () => {
+      const { data } = await kontenbase.service("Threads").find({
+        where: {
+          workspace: params.workspaceId,
+          tagedUsers: { $in: [userId] },
+        },
+      });
+
+      setInboxData(data);
+    })();
+  }, [params.workspaceId, userId]);
+
   const threadData = useMemo(() => {
-    return thread.threads
-      .filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelAllData,
-          userData: auth.user,
-          isDoneThread,
-        })
-      )
+    return inboxData
+      .filter((data) => !auth.user.doneThreads.includes(data._id))
       .filter((item) => item.tagedUsers?.includes(auth.user._id));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [thread.threads, auth.user, params, channelData]);
+  }, [inboxData, auth.user, params, channelData]);
 
   const inboxLeft: number = useMemo(() => {
     return threadData.filter((item) => !readedThreads.includes(item._id))
@@ -243,7 +250,6 @@ function SidebarComponent({
         ) {
           switch (event) {
             case "UPDATE_RECORD":
-              console.log("fire");
               if (payload.before.tagedUsers.includes(auth.user._id)) {
                 if (
                   threadData.find((item) => item._id === payload.before?._id)
@@ -262,6 +268,16 @@ function SidebarComponent({
                       comments: data,
                     })
                   );
+
+                  const updatedInbox = inboxData.map((item) =>
+                    item._id === payload.before._id
+                      ? {
+                          ...payload.before,
+                          ...payload.after,
+                        }
+                      : item
+                  );
+                  setInboxData(updatedInbox);
                 } else {
                   dispatch(
                     addThread({
@@ -270,6 +286,16 @@ function SidebarComponent({
                       createdBy,
                     })
                   );
+
+                  const newInboxData = [
+                    ...inboxData,
+                    {
+                      ...payload.before,
+                      ...payload.after,
+                    },
+                  ];
+
+                  setInboxData(newInboxData);
                 }
 
                 const { user: userData } = await kontenbase.auth.user();
@@ -278,8 +304,6 @@ function SidebarComponent({
               }
               break;
             case "CREATE_RECORD":
-              console.log("fire");
-
               dispatch(addThread({ ...payload, createdBy }));
               break;
             case "DELETE_RECORD":
@@ -338,6 +362,7 @@ function SidebarComponent({
                     onClick={() => {
                       navigate("/a/create_workspace");
                     }}
+                    disabled
                   />
 
                   <Divider />
