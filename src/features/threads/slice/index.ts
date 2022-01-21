@@ -55,7 +55,17 @@ const threadSlice = createSlice({
   initialState,
   reducers: {
     addThread: (state, action: PayloadAction<Thread>) => {
-      state.threads = [...state.threads, action.payload];
+      const newThread = [...state.threads, action.payload];
+      const result = [];
+      const map = new Map();
+      for (const thread of newThread) {
+        if (!map.has(thread._id)) {
+          map.set(thread._id, true);
+          result.push(thread);
+        }
+      }
+
+      state.threads = result;
     },
     deleteThread: (state, action: PayloadAction<Thread>) => {
       let deletedIndex = state.threads.findIndex(
@@ -255,7 +265,7 @@ const threadSlice = createSlice({
             const map = new Map();
             for (const comment of newComment) {
               if (!map.has(comment._id)) {
-                map.set(comment._id, true); // set any value to Map
+                map.set(comment._id, true);
                 result.push(comment);
               }
             }
