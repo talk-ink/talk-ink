@@ -55,7 +55,7 @@ const threadSlice = createSlice({
   initialState,
   reducers: {
     addThread: (state, action: PayloadAction<Thread>) => {
-      state.threads.push(action.payload);
+      state.threads = [...state.threads, action.payload];
     },
     deleteThread: (state, action: PayloadAction<Thread>) => {
       let deletedIndex = state.threads.findIndex(

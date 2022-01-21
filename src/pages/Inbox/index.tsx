@@ -52,14 +52,16 @@ function InboxPage() {
   );
 
   const threadData = useMemo(() => {
-    return thread.threads.filter((data) =>
-      inboxFilter({
-        thread: data,
-        channelIds: channelData,
-        userData: auth.user,
-        isDoneThread,
-      })
-    );
+    return thread.threads
+      .filter((data) =>
+        inboxFilter({
+          thread: data,
+          channelIds: channelData,
+          userData: auth.user,
+          isDoneThread,
+        })
+      )
+      .filter((item) => item.tagedUsers?.includes(auth.user._id));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
@@ -117,9 +119,9 @@ function InboxPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
-  function timeout(delay: number) {
-    return new Promise((res) => setTimeout(res, delay));
-  }
+  // function timeout(delay: number) {
+  //   return new Promise((res) => setTimeout(res, delay));
+  // }
 
   useEffect(() => {
     let key: string | undefined;
@@ -157,15 +159,15 @@ function InboxPage() {
           switch (event) {
             case "UPDATE_RECORD":
               if (payload.before.tagedUsers.includes(auth.user._id)) {
-                const { data } = await kontenbase.service("Comments").find({
-                  where: {
-                    threads: payload.before._id,
-                  },
-                });
-
                 if (
                   threadData.find((item) => item._id === payload.before?._id)
                 ) {
+                  const { data } = await kontenbase.service("Comments").find({
+                    where: {
+                      threads: payload.before._id,
+                    },
+                  });
+
                   dispatch(
                     updateThread({
                       ...payload.before,
@@ -206,7 +208,7 @@ function InboxPage() {
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelData]);
+  }, [channelData, threadData]);
 
   return (
     <MainContentContainer>

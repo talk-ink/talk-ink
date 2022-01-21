@@ -57,7 +57,7 @@ function InboxList({ type = "active" }: TProps) {
       )
       .filter((item) => item.tagedUsers?.includes(auth.user._id))
       .sort(
-        (a, b) => moment(b.updatedAt).valueOf() - moment(a.updatedAt).valueOf()
+        (a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
       );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
