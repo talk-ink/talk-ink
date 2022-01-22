@@ -33,6 +33,7 @@ import {
   addChannel,
   deleteChannel,
   fetchChannels,
+  updateChannel,
 } from "features/channels/slice";
 import limitImage from "assets/image/limit.svg";
 
@@ -314,6 +315,57 @@ function SidebarComponent({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelData, threadData]);
+
+  useEffect(() => {
+    let key: string | undefined;
+
+    kontenbase.realtime
+      .subscribe("Channels", { event: "*" }, async (message) => {
+        const { event, payload } = message;
+        const isUpdate = event === "UPDATE_RECORD";
+
+        const { data } = await kontenbase.service("Users").find({
+          where: {
+            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
+          },
+        });
+
+        const createdBy = data?.[0];
+
+        const channelCurrentWorkspace = isUpdate
+          ? payload.before.workspace.includes(params.workspaceId)
+          : payload.workspace.includes(params.workspaceId);
+
+        if (channelCurrentWorkspace) {
+          switch (event) {
+            case "UPDATE_RECORD":
+              dispatch(
+                updateChannel({
+                  ...payload.before,
+                  ...payload.after,
+                })
+              );
+              break;
+            case "CREATE_RECORD":
+              dispatch(
+                addChannel({
+                  ...payload,
+                  createdBy,
+                })
+              );
+              break;
+            default:
+              break;
+          }
+        }
+      })
+      .then((result) => (key = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const loading = workspace.loading || channel.loading;
 

@@ -128,7 +128,7 @@ const Comment: React.FC<IProps> = ({
           />
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (
-          <div className="absolute top-0 right-0  hidden group-hover:block  ">
+          <div className="absolute -top-3 right-0  hidden group-hover:block  ">
             <Popup
               content={
                 <Menu>

@@ -193,7 +193,7 @@ const Comment: React.FC<IProps> = ({
           </p>
         </div>
         <div className=" w-[70vw] sm:w-full ">
-          <div className={`relative min-h-[2.5rem]`}>
+          <div className={`min-h-[2.5rem]`}>
             <Preview
               content={comment.content}
               isEdit={isEdit}
@@ -316,11 +316,11 @@ const Comment: React.FC<IProps> = ({
           )}
         </div>
 
-        <div className="absolute top-0 right-0 z-50">
+        <div className="absolute -top-3 right-0 z-50">
           <Menu as="div" className="relative flex">
             {({ open }) => (
               <>
-                {!isReplyEditorVisible && (
+                {!isReplyEditorVisible && !isEdit && (
                   <IconButton
                     size="medium"
                     className={`${
