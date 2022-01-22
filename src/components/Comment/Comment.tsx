@@ -5,7 +5,7 @@ import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Menu } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
-import { BsReply } from "react-icons/bs";
+import { HiOutlineReply } from "react-icons/hi";
 import Select from "react-select";
 
 import Avatar from "components/Avatar/Avatar";
@@ -171,14 +171,11 @@ const Comment: React.FC<IProps> = ({
 
   return (
     <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
-      <div className=" w-8">
+      <div className="w-8">
         {comment.createdBy?.avatar?.[0]?.url ? (
           <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
         ) : (
-          <NameInitial
-            name={getNameInitial(comment.createdBy?.firstName)}
-            className="mr-4"
-          />
+          <NameInitial name={getNameInitial(comment.createdBy?.firstName)} />
         )}
       </div>
       <div className="ml-4 w-full">
@@ -327,8 +324,8 @@ const Comment: React.FC<IProps> = ({
                       open ? "flex" : "hidden"
                     } group-hover:flex items-center`}
                   >
-                    <BsReply
-                      size={25}
+                    <HiOutlineReply
+                      size={20}
                       className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
                       onClick={() => setIsShowReplyEditorVisible(true)}
                     />

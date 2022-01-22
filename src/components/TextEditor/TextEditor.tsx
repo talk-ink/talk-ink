@@ -40,7 +40,7 @@ function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
   const isDisabled = !formik.values.name || !formik.values.content || loading;
 
   return (
-    <div className="flex flex-col h-full ">
+    <div className="flex flex-col h-full mb-10">
       <div></div>
       <div className="flex flex-col h-full min-h-0">
         <input
@@ -65,7 +65,7 @@ function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
                 const { data } = await kontenbase.storage.upload(file);
                 return data.url;
               }}
-              className="markdown-overrides fix-editor"
+              className="markdown-overrides fix-editor thread-editor"
             />
           </Delayed>
         )}

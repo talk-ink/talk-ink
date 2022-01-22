@@ -370,105 +370,119 @@ function SidebarComponent({
   const loading = workspace.loading || channel.loading;
 
   return (
-    <div>
-      <div
-        className={
-          isMobile
-            ? `bg-[#F7FAFB] top-0 left-0 fixed h-full z-40  ease-in-out duration-300 ${
-                isSidebarOpen
-                  ? "translate-x-0 w-[80vw] "
-                  : "-translate-x-full w-full"
-              } md:block`
-            : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51] `
+    <div
+      id="modal-container"
+      className={
+        isSidebarOpen &&
+        `w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+      }
+      onClick={(e: any) => {
+        if (e?.target?.id === "modal-container") {
+          setIsSidebarOpen(false);
         }
-      >
-        <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 fixed: md:sticky top-0 z-[51]">
-          <Popup
-            content={
-              <div>
-                <Menu>
-                  <div className="max-h-40 overflow-auto">
-                    {workspace.workspaces.map((data, idx) => (
-                      <WorkspaceListButton
-                        key={idx}
-                        data={data}
-                        onClick={() => {
-                          navigate(`/a/${data._id}/inbox`);
-                        }}
-                      />
-                    ))}
-                  </div>
+      }}
+    >
+      <div>
+        <div
+          className={
+            isMobile
+              ? `bg-[#F7FAFB] top-0 left-0 fixed h-full z-40  ease-in-out duration-300 ${
+                  isSidebarOpen
+                    ? "translate-x-0 w-[80vw] "
+                    : "-translate-x-full w-full"
+                } md:block`
+              : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51] `
+          }
+        >
+          <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 fixed: md:sticky top-0 z-[51]">
+            <Popup
+              content={
+                <div>
+                  <Menu>
+                    <div className="max-h-40 overflow-auto">
+                      {workspace.workspaces.map((data, idx) => (
+                        <WorkspaceListButton
+                          key={idx}
+                          data={data}
+                          onClick={() => {
+                            navigate(`/a/${data._id}/inbox`);
+                          }}
+                        />
+                      ))}
+                    </div>
 
-                  <Divider />
-                  <MenuItem
-                    icon={<BiPlus size={20} className="text-neutral-400" />}
-                    title="Create new workspace"
-                    onClick={() => {
-                      if (
-                        workspace.workspaces.find(
-                          (item) => item.createdBy._id === auth.user._id
-                        )
-                      ) {
-                        return setIsWorkspaceLimitModalVisible(true);
+                    <Divider />
+                    <MenuItem
+                      icon={<BiPlus size={20} className="text-neutral-400" />}
+                      title="Create new workspace"
+                      onClick={() => {
+                        if (
+                          workspace.workspaces.find(
+                            (item) => item.createdBy._id === auth.user._id
+                          )
+                        ) {
+                          return setIsWorkspaceLimitModalVisible(true);
+                        }
+                        navigate("/a/create_workspace");
+                      }}
+                    />
+
+                    <Divider />
+
+                    <MenuItem
+                      icon={
+                        <FiSettings size={20} className="text-neutral-400" />
                       }
-                      navigate("/a/create_workspace");
-                    }}
-                  />
-
-                  <Divider />
-
-                  <MenuItem
-                    icon={<FiSettings size={20} className="text-neutral-400" />}
-                    title="Settings & members"
-                    onClick={() => {
-                      setSettingsModal(true);
-                    }}
-                  />
-                  <MenuItem
-                    icon={<BiLogOut size={20} className="text-neutral-400" />}
-                    title="Log Out"
-                    onClick={handleLogout}
-                  />
-                </Menu>
-              </div>
-            }
-            position={isMobile ? "bottom" : "right"}
-          >
-            {!loading && <WorkspaceButton workspaceData={workspaceData} />}
-          </Popup>
-          {isMobile ? (
-            <IconButton>
-              <MdClose
-                size={18}
-                className="text-neutral-400"
-                onClick={() => setIsSidebarOpen(false)}
-              />
-            </IconButton>
-          ) : (
-            <>
-              {/* <IconButton>
+                      title="Settings & members"
+                      onClick={() => {
+                        setSettingsModal(true);
+                      }}
+                    />
+                    <MenuItem
+                      icon={<BiLogOut size={20} className="text-neutral-400" />}
+                      title="Log Out"
+                      onClick={handleLogout}
+                    />
+                  </Menu>
+                </div>
+              }
+              position={isMobile ? "bottom" : "right"}
+            >
+              {!loading && <WorkspaceButton workspaceData={workspaceData} />}
+            </Popup>
+            {isMobile ? (
+              <IconButton>
+                <MdClose
+                  size={18}
+                  className="text-neutral-400"
+                  onClick={() => setIsSidebarOpen(false)}
+                />
+              </IconButton>
+            ) : (
+              <>
+                {/* <IconButton>
                 <BiMoon size={18} className="text-neutral-400" />
               </IconButton> */}
-            </>
-          )}
-        </div>
-        {!loading && (
-          <div className="p-2">
-            <ul className="mb-1">
-              {/* <SidebarList
+              </>
+            )}
+          </div>
+          {!loading && (
+            <div className="p-2">
+              <ul className="mb-1">
+                {/* <SidebarList
                 type="search"
                 name="Search"
                 link={`/a/${workspaceData?._id}/search`}
                 setIsSidebarOpen={setIsSidebarOpen}
               /> */}
-              <SidebarList
-                type="inbox"
-                name="Inbox"
-                link={`/a/${workspaceData?._id}/inbox`}
-                setIsSidebarOpen={setIsSidebarOpen}
-                count={inboxLeft || 0}
-              />
-              {/* <SidebarList
+                <SidebarList
+                  type="inbox"
+                  name="Inbox"
+                  link={`/a/${workspaceData?._id}/inbox`}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                  count={inboxLeft || 0}
+                />
+                {/* <SidebarList
                 type="saved"
                 name="Saved"
                 link={`/a/${workspaceData?._id}/saved`}
@@ -480,208 +494,209 @@ function SidebarComponent({
                 link={`/a/${workspaceData?._id}/messages`}
                 setIsSidebarOpen={setIsSidebarOpen}
               /> */}
-            </ul>
-            <ChannelButton
-              onAddChannelClick={() => setCreateChannelModal(true)}
-              onBrowseChannels={() => setBrowseChannelsModal(true)}
-            />
-            <div className="relative z-0">
-              {channelData?.map((channel, idx) => (
-                <SidebarList
-                  setIsSidebarOpen={setIsSidebarOpen}
-                  key={idx + channel._id}
-                  type="channel"
-                  name={channel.name}
-                  data={channel}
-                  link={`/a/${workspaceData?._id}/ch/${channel._id}`}
-                  isDefault
-                  count={channel.threads.length ?? 0}
-                  leaveModalHandler={(channel) => {
-                    setLeaveChannelModal(true);
-                    setSelectedChannel(channel);
-                  }}
-                  editModalHandler={(channel) => {
-                    setEditChannelModal(true);
-                    setSelectedChannel(channel);
-                  }}
-                  channelInfoHandler={(channel) => {
-                    setChannelInfoModal(true);
-                    setSelectedChannel(channel);
-                  }}
-                  addMemberHandler={(channel) => {
-                    showManageMemberModal(channel);
-                  }}
-                  isAdmin={
-                    workspaceData.createdBy?._id === auth.user?._id ||
-                    channel?.createdBy?._id === auth.user?._id
-                  }
-                />
-              ))}
-              <div
-                className="cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between group mt-1"
-                onClick={() => setCreateChannelModal(true)}
-              >
-                <div className=" `w-full flex items-center text-sm pl-3 h-8`">
-                  <FaPlus size={15} className="mr-3 text-gray-400" />
-                  <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
-                    New Channel
-                  </p>
+              </ul>
+              <ChannelButton
+                onAddChannelClick={() => setCreateChannelModal(true)}
+                onBrowseChannels={() => setBrowseChannelsModal(true)}
+              />
+              <div className="relative z-0">
+                {channelData?.map((channel, idx) => (
+                  <SidebarList
+                    setIsSidebarOpen={setIsSidebarOpen}
+                    key={idx + channel._id}
+                    type="channel"
+                    name={channel.name}
+                    data={channel}
+                    link={`/a/${workspaceData?._id}/ch/${channel._id}`}
+                    isDefault
+                    count={channel.threads.length ?? 0}
+                    leaveModalHandler={(channel) => {
+                      setLeaveChannelModal(true);
+                      setSelectedChannel(channel);
+                    }}
+                    editModalHandler={(channel) => {
+                      setEditChannelModal(true);
+                      setSelectedChannel(channel);
+                    }}
+                    channelInfoHandler={(channel) => {
+                      setChannelInfoModal(true);
+                      setSelectedChannel(channel);
+                    }}
+                    addMemberHandler={(channel) => {
+                      showManageMemberModal(channel);
+                    }}
+                    isAdmin={
+                      workspaceData.createdBy?._id === auth.user?._id ||
+                      channel?.createdBy?._id === auth.user?._id
+                    }
+                  />
+                ))}
+                <div
+                  className="cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between group mt-1"
+                  onClick={() => setCreateChannelModal(true)}
+                >
+                  <div className=" `w-full flex items-center text-sm pl-3 h-8`">
+                    <FaPlus size={15} className="mr-3 text-gray-400" />
+                    <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
+                      New Channel
+                    </p>
+                  </div>
                 </div>
               </div>
             </div>
-          </div>
-        )}
-      </div>
-      <Modal
-        header="Wokrspace Reach Max Limit"
-        onClose={() => {
-          setIsWorkspaceLimitModalVisible(false);
-        }}
-        visible={isWorkspaceLimitModalVisible}
-        footer={null}
-        size="small"
-      >
-        <div className="flex justify-center items-center px-10 py-10">
-          <img src={limitImage} alt="limit" className="w-100 md:max-w-xs" />
+          )}
         </div>
-      </Modal>
-      <Modal
-        header="Create new channel"
-        onClose={() => {
-          setCreateChannelModal(false);
-        }}
-        visible={createChannelModal}
-        footer={null}
-        size="small"
-      >
-        <ChannelForm
-          onSubmit={createChannelHandler}
-          loading={modalLoading}
-          onCancel={() => {
+        <Modal
+          header="Wokrspace Reach Max Limit"
+          onClose={() => {
+            setIsWorkspaceLimitModalVisible(false);
+          }}
+          visible={isWorkspaceLimitModalVisible}
+          footer={null}
+          size="small"
+        >
+          <div className="flex justify-center items-center px-10 py-10">
+            <img src={limitImage} alt="limit" className="w-100 md:max-w-xs" />
+          </div>
+        </Modal>
+        <Modal
+          header="Create new channel"
+          onClose={() => {
             setCreateChannelModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Edit channel"
-        visible={editChannelModal}
-        onClose={() => {
-          setEditChannelModal(false);
-          setSelectedChannel(null);
-        }}
-        onCancel={() => {
-          setEditChannelModal(false);
-          setSelectedChannel(null);
-        }}
-        footer={null}
-        size="small"
-      >
-        <EditChannelForm
-          data={selectedChannel}
+          visible={createChannelModal}
+          footer={null}
+          size="small"
+        >
+          <ChannelForm
+            onSubmit={createChannelHandler}
+            loading={modalLoading}
+            onCancel={() => {
+              setCreateChannelModal(false);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Edit channel"
+          visible={editChannelModal}
           onClose={() => {
             setEditChannelModal(false);
             setSelectedChannel(null);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Channel information"
-        visible={channelInfoModal}
-        onClose={() => {
-          setChannelInfoModal(false);
-          setSelectedChannel(null);
-        }}
-        onCancel={() => {
-          setChannelInfoModal(false);
-          setSelectedChannel(null);
-        }}
-        footer={null}
-        size="small"
-      >
-        <ChannelInfo
-          data={selectedChannel}
+          onCancel={() => {
+            setEditChannelModal(false);
+            setSelectedChannel(null);
+          }}
+          footer={null}
+          size="small"
+        >
+          <EditChannelForm
+            data={selectedChannel}
+            onClose={() => {
+              setEditChannelModal(false);
+              setSelectedChannel(null);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Channel information"
+          visible={channelInfoModal}
           onClose={() => {
             setChannelInfoModal(false);
             setSelectedChannel(null);
           }}
-          showManageMemberModal={showManageMemberModal}
-        />
-      </Modal>
-      <Modal
-        header="Manage members"
-        visible={addMemberModal}
-        onClose={() => {
-          setAddMemberModal(false);
-          setSelectedChannel(null);
-        }}
-        onCancel={() => {
-          setAddMemberModal(false);
-          setSelectedChannel(null);
-        }}
-        footer={null}
-        size="small"
-      >
-        <AddChannelMember
-          data={selectedChannel}
+          onCancel={() => {
+            setChannelInfoModal(false);
+            setSelectedChannel(null);
+          }}
+          footer={null}
+          size="small"
+        >
+          <ChannelInfo
+            data={selectedChannel}
+            onClose={() => {
+              setChannelInfoModal(false);
+              setSelectedChannel(null);
+            }}
+            showManageMemberModal={showManageMemberModal}
+          />
+        </Modal>
+        <Modal
+          header="Manage members"
+          visible={addMemberModal}
           onClose={() => {
             setAddMemberModal(false);
             setSelectedChannel(null);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Browse channels"
-        visible={browseChannelsModal}
-        onClose={() => {
-          setBrowseChannelsModal(false);
-        }}
-        onCancel={() => {
-          setBrowseChannelsModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <BrowseChannels
-          onAddNewChannel={() => {
-            setCreateChannelModal(true);
-            setBrowseChannelsModal(false);
+          onCancel={() => {
+            setAddMemberModal(false);
+            setSelectedChannel(null);
           }}
+          footer={null}
+          size="small"
+        >
+          <AddChannelMember
+            data={selectedChannel}
+            onClose={() => {
+              setAddMemberModal(false);
+              setSelectedChannel(null);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Browse channels"
+          visible={browseChannelsModal}
           onClose={() => {
             setBrowseChannelsModal(false);
           }}
+          onCancel={() => {
+            setBrowseChannelsModal(false);
+          }}
+          footer={null}
+          size="small"
+        >
+          <BrowseChannels
+            onAddNewChannel={() => {
+              setCreateChannelModal(true);
+              setBrowseChannelsModal(false);
+            }}
+            onClose={() => {
+              setBrowseChannelsModal(false);
+            }}
+          />
+        </Modal>
+        <Modal
+          header={`Leave ${
+            selectedChannel?.privacy === "private" ? "private" : "public"
+          } channel?`}
+          okButtonText="Leave channel"
+          visible={!!selectedChannel && leaveChannelModal}
+          onCancel={() => {
+            setSelectedChannel(null);
+            setLeaveChannelModal(false);
+          }}
+          onClose={() => {
+            setSelectedChannel(null);
+            setLeaveChannelModal(false);
+          }}
+          onConfirm={() => {
+            leaveChannelHandler();
+          }}
+          size="xs"
+        >
+          <p className="text-sm">
+            Are you sure you want to leave this channel? You can always join it
+            again later.
+          </p>
+        </Modal>
+        <SettingsModal
+          footer={null}
+          visible={settingsModal}
+          onClose={() => {
+            setSettingsModal(false);
+          }}
         />
-      </Modal>
-      <Modal
-        header={`Leave ${
-          selectedChannel?.privacy === "private" ? "private" : "public"
-        } channel?`}
-        okButtonText="Leave channel"
-        visible={!!selectedChannel && leaveChannelModal}
-        onCancel={() => {
-          setSelectedChannel(null);
-          setLeaveChannelModal(false);
-        }}
-        onClose={() => {
-          setSelectedChannel(null);
-          setLeaveChannelModal(false);
-        }}
-        onConfirm={() => {
-          leaveChannelHandler();
-        }}
-        size="xs"
-      >
-        <p className="text-sm">
-          Are you sure you want to leave this channel? You can always join it
-          again later.
-        </p>
-      </Modal>
-      <SettingsModal
-        footer={null}
-        visible={settingsModal}
-        onClose={() => {
-          setSettingsModal(false);
-        }}
-      />
+      </div>
     </div>
   );
 }
