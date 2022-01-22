@@ -98,17 +98,18 @@ const Comment: React.FC<IProps> = ({
     <div className="group flex items-start relative " ref={listRef}>
       <div className=" w-8">
         {comment.createdBy?.avatar?.[0]?.url ? (
-          <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
+          <Avatar src={comment.createdBy?.avatar?.[0]?.url} size="small" />
         ) : (
           <NameInitial
             name={getNameInitial(comment.createdBy?.firstName)}
             className="mr-4"
+            size="small"
           />
         )}
       </div>
-      <div className="ml-4 w-full">
+      <div className="w-full">
         <div className="-mt-1.5 flex items-center justify-start">
-          <p className=" font-semibold mb-0 mt-0 mr-2">
+          <p className="text-xs font-semibold mb-0 mt-0 mr-2">
             {comment.createdBy?.firstName}
           </p>{" "}
           <p className="mb-0 mt-0 text-xs">
@@ -117,7 +118,7 @@ const Comment: React.FC<IProps> = ({
             </ReactMoment>
           </p>
         </div>
-        <div className=" w-[70vw] sm:w-full min-h-[3rem]">
+        <div className=" w-[70vw] sm:w-full min-h-[3rem] text-xs">
           <Preview
             content={comment.content}
             isEdit={isEdit}

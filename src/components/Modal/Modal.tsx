@@ -33,10 +33,10 @@ function Modal({
   size = "medium",
 }: TProps) {
   const modalContentSize = {
-    xs: "w-4/12 2xl:w-3/12",
-    small: "w-5/12 2xl:w-4/12",
-    medium: "w-6/12 2xl:w-5/12",
-    large: "w-7/12 2xl:w-6/12",
+    xs: "md:w-4/12 2xl:w-3/12",
+    small: "md:w-5/12 md:2xl:w-4/12",
+    medium: "md:w-6/12 2xl:w-5/12",
+    large: "md:w-7/12 2xl:w-6/12",
   };
   return visible ? (
     <div
@@ -49,7 +49,7 @@ function Modal({
       }}
     >
       <div
-        className={`${modalContentSize[size]} h-auto bg-white rounded-lg mt-20`}
+        className={`w-[90vw] ${modalContentSize[size]} h-auto bg-white rounded-lg mt-20`}
       >
         <header className="flex items-center justify-between p-3">
           <h2 className="text-lg font-bold -mb-1">{header}</h2>

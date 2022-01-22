@@ -34,6 +34,7 @@ import {
   deleteChannel,
   fetchChannels,
 } from "features/channels/slice";
+import limitImage from "assets/image/limit.svg";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
@@ -72,6 +73,8 @@ function SidebarComponent({
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
   const [inboxData, setInboxData] = useState<Thread[]>([]);
+  const [isWorkspaceLimitModalVisible, setIsWorkspaceLimitModalVisible] =
+    useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -348,9 +351,15 @@ function SidebarComponent({
                     icon={<BiPlus size={20} className="text-neutral-400" />}
                     title="Create new workspace"
                     onClick={() => {
+                      if (
+                        workspace.workspaces.find(
+                          (item) => item.createdBy._id === auth.user._id
+                        )
+                      ) {
+                        return setIsWorkspaceLimitModalVisible(true);
+                      }
                       navigate("/a/create_workspace");
                     }}
-                    disabled
                   />
 
                   <Divider />
@@ -470,6 +479,19 @@ function SidebarComponent({
           </div>
         )}
       </div>
+      <Modal
+        header="Wokrspace Reach Max Limit"
+        onClose={() => {
+          setIsWorkspaceLimitModalVisible(false);
+        }}
+        visible={isWorkspaceLimitModalVisible}
+        footer={null}
+        size="small"
+      >
+        <div className="flex justify-center items-center px-10 py-10">
+          <img src={limitImage} alt="limit" className="w-100 md:max-w-xs" />
+        </div>
+      </Modal>
       <Modal
         header="Create new channel"
         onClose={() => {
