@@ -249,6 +249,7 @@ function SidebarComponent({
                     where: {
                       threads: payload.before._id,
                     },
+                    lookup: ["subComments"],
                   });
 
                   dispatch(

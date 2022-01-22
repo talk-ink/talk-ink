@@ -5,7 +5,7 @@ import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Menu } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
-import { BsFillChatRightDotsFill } from "react-icons/bs";
+import { BsReply } from "react-icons/bs";
 import Select from "react-select";
 
 import Avatar from "components/Avatar/Avatar";
@@ -193,11 +193,7 @@ const Comment: React.FC<IProps> = ({
           </p>
         </div>
         <div className=" w-[70vw] sm:w-full ">
-          <div
-            className={`relative ${
-              isReplyEditorVisible ? "mb-0" : "mb-10"
-            } min-h-[2.5rem]`}
-          >
+          <div className={`relative min-h-[2.5rem]`}>
             <Preview
               content={comment.content}
               isEdit={isEdit}
@@ -205,15 +201,6 @@ const Comment: React.FC<IProps> = ({
               discardComment={discardComment}
               handleUpdateComment={handleUpdateComment}
             />
-            {!isReplyEditorVisible && (
-              <div
-                className="text-sm absolute -bottom-7 left-0 z-20 flex items-center hover:cursor-pointer hover:opacity-80 text-gray-500"
-                onClick={() => setIsShowReplyEditorVisible(true)}
-              >
-                <BsFillChatRightDotsFill className="mr-1" />
-                Reply
-              </div>
-            )}
           </div>
 
           <div>
@@ -328,11 +315,27 @@ const Comment: React.FC<IProps> = ({
             </div>
           )}
         </div>
-        {auth.user._id === comment.createdBy?._id && !isEdit && (
-          <div className="absolute top-0 right-0 z-50">
-            <Menu as="div" className="relative">
-              {({ open }) => (
-                <>
+
+        <div className="absolute top-0 right-0 z-50">
+          <Menu as="div" className="relative flex">
+            {({ open }) => (
+              <>
+                {!isReplyEditorVisible && (
+                  <IconButton
+                    size="medium"
+                    className={`${
+                      open ? "flex" : "hidden"
+                    } group-hover:flex items-center`}
+                  >
+                    <BsReply
+                      size={25}
+                      className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                      onClick={() => setIsShowReplyEditorVisible(true)}
+                    />
+                  </IconButton>
+                )}
+
+                {auth.user._id === comment.createdBy?._id && !isEdit && (
                   <Menu.Button as={React.Fragment}>
                     <IconButton
                       size="medium"
@@ -346,32 +349,30 @@ const Comment: React.FC<IProps> = ({
                       />
                     </IconButton>
                   </Menu.Button>
-                  {open && (
-                    <Menu.Items static className="menu-container right-0">
-                      <MenuItem
-                        icon={
-                          <BiEditAlt size={20} className="text-neutral-400" />
-                        }
-                        onClick={() => {
-                          setIsEdit(true);
-                          setEditorState(comment.content);
-                        }}
-                        title="Edit Comment"
-                      />
-                      <MenuItem
-                        icon={
-                          <BiTrash size={20} className="text-neutral-400" />
-                        }
-                        onClick={handleDeleteComment}
-                        title="Delete Comment"
-                      />
-                    </Menu.Items>
-                  )}
-                </>
-              )}
-            </Menu>
-          </div>
-        )}
+                )}
+                {open && (
+                  <Menu.Items static className="menu-container right-0">
+                    <MenuItem
+                      icon={
+                        <BiEditAlt size={20} className="text-neutral-400" />
+                      }
+                      onClick={() => {
+                        setIsEdit(true);
+                        setEditorState(comment.content);
+                      }}
+                      title="Edit Comment"
+                    />
+                    <MenuItem
+                      icon={<BiTrash size={20} className="text-neutral-400" />}
+                      onClick={handleDeleteComment}
+                      title="Delete Comment"
+                    />
+                  </Menu.Items>
+                )}
+              </>
+            )}
+          </Menu>
+        </div>
       </div>
     </div>
   );
