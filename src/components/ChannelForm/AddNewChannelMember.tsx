@@ -110,7 +110,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
           />
         ))}
       </MemberSuggestion>
-      <div className="w-full h-[40vh] mt-2 border rounded border-gray-200 overflow-auto px-2">
+      <div className="w-full h-[40vh] mt-2 overflow-auto px-2">
         {joinedMemberData.map((data, idx) => (
           <MemberList
             data={data}
@@ -119,7 +119,7 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
             leftContent={
               <div className="pr-2">
                 <span
-                  className="text-indigo-500 hover:underline cursor-pointer"
+                  className="text-indigo-500 hover:underline cursor-pointer text-sm"
                   onClick={() => {
                     if (auth.user._id === data._id) {
                       removeMemberHandler({

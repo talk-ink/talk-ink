@@ -58,19 +58,11 @@ function LoginPage() {
               .find({ where: { inviteId: params.inviteId } });
 
           if (workspaceData?.length > 0) {
-            let invitedEmails: string[] = [];
-
-            if (workspaceData[0].invitedEmails) {
-              invitedEmails = JSON.parse(workspaceData[0].invitedEmails);
-            }
-
             if (
               user._id === workspaceData[0]?.createdBy?._id ||
               workspaceData[0]?.peoples.includes(user._id)
             ) {
               toWorkspaceId = `${workspaceData[0]._id}/inbox`;
-            } else if (!invitedEmails.includes(user.email)) {
-              return showToast({ message: "Invite link not valid!" });
             } else {
               toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
             }

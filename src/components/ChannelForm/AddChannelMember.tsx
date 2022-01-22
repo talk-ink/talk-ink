@@ -125,7 +125,7 @@ function AddChannelMember({ data, onClose }: TProps) {
           />
         ))}
       </MemberSuggestion>
-      <div className="w-full h-[40vh] mt-2 border rounded border-gray-200 overflow-auto px-2">
+      <div className="w-full h-[40vh] mt-2 overflow-auto px-2">
         {joinedMemberData.map((data, idx) => (
           <MemberList
             data={data}
@@ -135,7 +135,7 @@ function AddChannelMember({ data, onClose }: TProps) {
               <div className="pr-2">
                 <Popover className="relative">
                   <Popover.Button as={React.Fragment}>
-                    <span className="text-indigo-500 hover:underline cursor-pointer">
+                    <span className="text-indigo-500 hover:underline cursor-pointer text-sm">
                       {auth.user._id === data._id ? "Leave" : "Remove"}
                     </span>
                   </Popover.Button>
