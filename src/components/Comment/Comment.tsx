@@ -171,14 +171,11 @@ const Comment: React.FC<IProps> = ({
 
   return (
     <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
-      <div className=" w-8">
+      <div className="w-8">
         {comment.createdBy?.avatar?.[0]?.url ? (
           <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
         ) : (
-          <NameInitial
-            name={getNameInitial(comment.createdBy?.firstName)}
-            className="mr-4"
-          />
+          <NameInitial name={getNameInitial(comment.createdBy?.firstName)} />
         )}
       </div>
       <div className="ml-4 w-full">
