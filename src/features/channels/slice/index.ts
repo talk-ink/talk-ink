@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
 import { Channel } from "types";
+import { filterDistinct } from "utils/helper";
 
 type FetchChannelsProps = {
   userId: string;
@@ -33,7 +34,11 @@ const channelSlice = createSlice({
   initialState,
   reducers: {
     addChannel: (state, action) => {
-      state.channels.push(action.payload);
+      const channels = [...state.channels, action.payload];
+
+      const distinctChannels = filterDistinct(channels, "_id");
+
+      state.channels = distinctChannels;
     },
     deleteChannel: (state, action: PayloadAction<Channel>) => {
       let deletedIndex = state.channels.findIndex(

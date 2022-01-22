@@ -85,7 +85,7 @@ function SettingsModal({
         }
       }}
     >
-      <div className="w-7/12 h-[75vh] bg-white rounded-lg mt-20 overflow-hidden">
+      <div className="w-[90vw] md:w-7/12 h-[75vh] bg-white rounded-lg mt-20 overflow-hidden">
         <div className="grid grid-cols-[250px_1fr] h-full max-h-full overflow-auto">
           <SettingsSidebar
             currentActive={currentRoute.route}

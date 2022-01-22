@@ -34,11 +34,11 @@ const Preview: React.FC<IProps> = ({
       />
     </Delayed>
   ) : (
-    <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-4 mt-2 ">
+    <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-4 mt-2  ">
       <Editor
         key="edited"
         defaultValue={content}
-        className="markdown-overrides"
+        className="markdown-overrides "
         onChange={(getContent: () => string) => setEditorState(getContent())}
         autoFocus
         uploadImage={async (file: File) => {

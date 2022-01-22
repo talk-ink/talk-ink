@@ -3,6 +3,7 @@ import React, { useMemo, useEffect, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { useParams, useLocation } from "react-router";
 import Editor from "rich-markdown-editor";
+import ReactMoment from "react-moment";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
@@ -281,12 +282,21 @@ function ThreadPage() {
               ) : (
                 <NameInitial
                   name={getNameInitial(threadData?.createdBy?.firstName)}
-                  className="mr-4"
                 />
               )}
             </div>
 
             <div className="flex-grow text-sm">
+              <div className="-mt-1.5 flex items-center justify-start">
+                <p className=" font-semibold mb-0 mt-0 mr-2">
+                  {threadData.createdBy?.firstName}
+                </p>{" "}
+                <p className="mb-0 mt-0 text-xs">
+                  <ReactMoment format="DD/MM/YYYY LT">
+                    {threadData?.updatedAt || threadData?.createdAt}
+                  </ReactMoment>
+                </p>
+              </div>
               <Editor
                 value={threadData?.content}
                 readOnly

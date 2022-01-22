@@ -55,44 +55,6 @@
   bottom: 25px !important;
 }
 
-.ck.ck-reset.ck-editor {
-  display: -webkit-box;
-  display: -moz-box;
-  display: -ms-flexbox;
-  display: -webkit-flex;
-  display: flex;
-  -webkit-flex-direction: column-reverse;
-  -moz-flex-direction: column-reverse;
-  -ms-flex-direction: column-reverse;
-  flex-direction: column-reverse;
-}
-
-.ck.ck-editor__main > .ck-editor__editable {
-  height: 200px;
-}
-
-.ck.ck-editor .ck-editor__top .ck-sticky-panel .ck-toolbar,
-.ck-sticky-panel__content {
-  height: 54px;
-}
-
-.ck-focused,
-.ck.ck-editor__editable:not(.ck-editor__nested-editable).ck-focused {
-  border: none;
-  border: none;
-  outline: none !important;
-  -moz-outline: none !important;
-  -webkit-outline: none !important;
-  -ms-outline: none !important;
-  -webkit-box-shadow: none;
-  -moz-box-shadow: none;
-  box-shadow: none;
-}
-
-.ck-editor__editable_inline {
-  min-height: 400px;
-}
-
 .markdown-overrides h1 {
   margin-top: 0 !important;
   font-size: 2em !important;

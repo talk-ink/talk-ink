@@ -1,6 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment-timezone";
 import { Thread, IComment, ISubComment } from "types";
+import { filterDistinct } from "utils/helper";
 import { fetchComments, fetchThreads } from "./asyncThunk";
 
 type InitThreadState = {
@@ -56,16 +57,10 @@ const threadSlice = createSlice({
   reducers: {
     addThread: (state, action: PayloadAction<Thread>) => {
       const newThread = [...state.threads, action.payload];
-      const result = [];
-      const map = new Map();
-      for (const thread of newThread) {
-        if (!map.has(thread._id)) {
-          map.set(thread._id, true);
-          result.push(thread);
-        }
-      }
 
-      state.threads = result;
+      const distinctThreads = filterDistinct(newThread, "_id");
+
+      state.threads = distinctThreads;
     },
     deleteThread: (state, action: PayloadAction<Thread>) => {
       let deletedIndex = state.threads.findIndex(
@@ -261,18 +256,11 @@ const threadSlice = createSlice({
                 ? [...action.payload.comments, ...item.comments]
                 : action.payload.comments;
 
-            const result = [];
-            const map = new Map();
-            for (const comment of newComment) {
-              if (!map.has(comment._id)) {
-                map.set(comment._id, true);
-                result.push(comment);
-              }
-            }
+            const distinctComments = filterDistinct(newComment, "_id");
 
             return {
               ...item,
-              comments: result
+              comments: distinctComments
                 .filter((item) => item.createdBy._id)
                 .sort(
                   (a, b) =>

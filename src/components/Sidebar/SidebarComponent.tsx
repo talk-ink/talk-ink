@@ -33,7 +33,9 @@ import {
   addChannel,
   deleteChannel,
   fetchChannels,
+  updateChannel,
 } from "features/channels/slice";
+import limitImage from "assets/image/limit.svg";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
@@ -72,6 +74,8 @@ function SidebarComponent({
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
   const [inboxData, setInboxData] = useState<Thread[]>([]);
+  const [isWorkspaceLimitModalVisible, setIsWorkspaceLimitModalVisible] =
+    useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -246,6 +250,7 @@ function SidebarComponent({
                     where: {
                       threads: payload.before._id,
                     },
+                    lookup: ["subComments"],
                   });
 
                   dispatch(
@@ -311,6 +316,57 @@ function SidebarComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [channelData, threadData]);
 
+  useEffect(() => {
+    let key: string | undefined;
+
+    kontenbase.realtime
+      .subscribe("Channels", { event: "*" }, async (message) => {
+        const { event, payload } = message;
+        const isUpdate = event === "UPDATE_RECORD";
+
+        const { data } = await kontenbase.service("Users").find({
+          where: {
+            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
+          },
+        });
+
+        const createdBy = data?.[0];
+
+        const channelCurrentWorkspace = isUpdate
+          ? payload.before.workspace.includes(params.workspaceId)
+          : payload.workspace.includes(params.workspaceId);
+
+        if (channelCurrentWorkspace) {
+          switch (event) {
+            case "UPDATE_RECORD":
+              dispatch(
+                updateChannel({
+                  ...payload.before,
+                  ...payload.after,
+                })
+              );
+              break;
+            case "CREATE_RECORD":
+              dispatch(
+                addChannel({
+                  ...payload,
+                  createdBy,
+                })
+              );
+              break;
+            default:
+              break;
+          }
+        }
+      })
+      .then((result) => (key = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const loading = workspace.loading || channel.loading;
 
   return (
@@ -348,9 +404,15 @@ function SidebarComponent({
                     icon={<BiPlus size={20} className="text-neutral-400" />}
                     title="Create new workspace"
                     onClick={() => {
+                      if (
+                        workspace.workspaces.find(
+                          (item) => item.createdBy._id === auth.user._id
+                        )
+                      ) {
+                        return setIsWorkspaceLimitModalVisible(true);
+                      }
                       navigate("/a/create_workspace");
                     }}
-                    disabled
                   />
 
                   <Divider />
@@ -470,6 +532,19 @@ function SidebarComponent({
           </div>
         )}
       </div>
+      <Modal
+        header="Wokrspace Reach Max Limit"
+        onClose={() => {
+          setIsWorkspaceLimitModalVisible(false);
+        }}
+        visible={isWorkspaceLimitModalVisible}
+        footer={null}
+        size="small"
+      >
+        <div className="flex justify-center items-center px-10 py-10">
+          <img src={limitImage} alt="limit" className="w-100 md:max-w-xs" />
+        </div>
+      </Modal>
       <Modal
         header="Create new channel"
         onClose={() => {

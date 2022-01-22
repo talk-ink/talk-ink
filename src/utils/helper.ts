@@ -240,3 +240,16 @@ export const isDevelopmet =
 export const frontendUrl = process.env.REACT_APP_FRONTEND_URL;
 export const notificationUrl = process.env.REACT_APP_NOTIFICATION_API;
 export const oneSignalId = process.env.REACT_APP_ONE_SIGNAL_ID;
+
+export const filterDistinct = (array: any[], key: string) => {
+  const result: any[] = [];
+  const map = new Map();
+  for (const item of array) {
+    if (!map.has(item[key])) {
+      map.set(item[key], true);
+      result.push(item);
+    }
+  }
+
+  return result;
+};
