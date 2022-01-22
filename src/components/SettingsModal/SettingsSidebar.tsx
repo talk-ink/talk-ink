@@ -21,7 +21,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
   }, [workspace.workspaces, params.workspaceId]);
 
   return (
-    <div className="bg-indigo-100">
+    <div className="bg-indigo-50">
       <header className="flex items-center p-3">
         <h2 className="text-lg font-bold -mb-1">Settings</h2>
       </header>
@@ -44,7 +44,7 @@ function SettingsSidebar({ currentActive, setCurrentActive }: TProps) {
                     />
                   </div>
                 ) : (
-                  <RiAccountCircleFill size={20} className="text-neutral-200" />
+                  <RiAccountCircleFill size={20} className="text-neutral-400" />
                 )
               }
               type="account"
