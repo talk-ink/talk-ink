@@ -114,6 +114,10 @@
   height: 12rem !important;
 }
 
+.thread-editor .ProseMirror {
+  min-height: 55vh !important;
+}
+
 .custom-select > div {
   border: none !important;
   border-width: 0 !important;
@@ -121,4 +125,9 @@
   box-shadow: none !important;
   margin-left: -5px !important;
   min-width: 15rem;
+  z-index: -1;
+}
+
+.h-inherit {
+  height: inherit !important;
 }

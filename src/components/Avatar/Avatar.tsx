@@ -7,13 +7,13 @@ interface IProps {
 
 const Avatar: React.FC<IProps> = ({ src, size = "medium" }) => {
   const avatarWidth = {
-    small: "h-6 w-8",
+    small: "h-6 w-6",
     medium: "h-8 w-8 ",
   };
 
   return (
-    <div className={`${avatarWidth[size]} rounded-full overflow-hidden`}>
-      <img src={src} className="h-8 w-8" alt="img" />
+    <div className={`${avatarWidth[size]} rounded-full overflow-hidden `}>
+      <img src={src} className="h-8 w-8 object-fill" alt="img" />
     </div>
   );
 };

@@ -126,7 +126,7 @@ function EditThread() {
         />
       }
     >
-      <div className="w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-3 mx-auto relative ">
+      <div className="w-full sm:w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-3 mx-auto relative -mt-12 sm:mt-0">
         <TextEditor formik={formik} loading={loading} isEdit={true} />
       </div>
     </MainContentContainer>

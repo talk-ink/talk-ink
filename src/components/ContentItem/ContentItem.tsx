@@ -10,7 +10,7 @@ import {
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate } from "react-router";
 
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
@@ -24,6 +24,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 
 import { addReadThread, deleteReadThread } from "features/auth";
 import { Thread } from "types";
+import logoImage from "assets/image/logo512.png";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -43,7 +44,7 @@ function ContentItem({
   const dispatch = useAppDispatch();
   const auth = useAppSelector((state) => state.auth);
   const navigate = useNavigate();
-  const pathname = useLocation();
+  const isFromTalkink = dataSource.name === "Welcome to Talk.ink";
 
   const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
     try {
@@ -98,7 +99,13 @@ function ContentItem({
             ></div>
             <div className="mr-4">
               {dataSource.createdBy?.avatar?.[0]?.url ? (
-                <Avatar src={dataSource.createdBy?.avatar?.[0]?.url} />
+                <Avatar
+                  src={
+                    isFromTalkink
+                      ? logoImage
+                      : dataSource.createdBy?.avatar?.[0]?.url
+                  }
+                />
               ) : (
                 <NameInitial
                   name={getNameInitial(dataSource.createdBy?.firstName)}
@@ -142,16 +149,19 @@ function ContentItem({
           <Menu as="div" className="relative">
             {({ open }) => (
               <>
-                <div className="flex">
-                  <Menu.Button as={React.Fragment}>
-                    <IconButton>
-                      <BiDotsHorizontalRounded
-                        size={24}
-                        className="text-neutral-400"
-                      />
-                    </IconButton>
-                  </Menu.Button>
-                </div>
+                {!dataSource?.draft && (
+                  <div className="flex">
+                    <Menu.Button as={React.Fragment}>
+                      <IconButton>
+                        <BiDotsHorizontalRounded
+                          size={24}
+                          className="text-neutral-400"
+                        />
+                      </IconButton>
+                    </Menu.Button>
+                  </div>
+                )}
+
                 {open && (
                   <Menu.Items static className="menu-container right-0">
                     {isRead && (
@@ -176,31 +186,35 @@ function ContentItem({
                         }}
                       />
                     )}
-                    {dataSource.createdBy._id === auth.user._id ||
-                      (dataSource?.draft && <Divider />)}
                     {(dataSource.createdBy._id === auth.user._id ||
-                      dataSource?.draft) && (
-                      <>
-                        <MenuItem
-                          icon={
-                            <BiEdit size={20} className="text-neutral-400" />
-                          }
-                          title="Edit thread..."
-                          onClick={() => {
-                            navigate(`te/${dataSource?._id}`);
-                          }}
-                        />
-                        <MenuItem
-                          icon={
-                            <BiTrash size={20} className="text-neutral-400" />
-                          }
-                          title="Delete thread..."
-                          onClick={() => {
-                            setSelectedThread(dataSource);
-                          }}
-                        />
-                      </>
-                    )}
+                      dataSource?.draft) &&
+                      !isFromTalkink &&
+                      !dataSource?.draft && <Divider />}
+                    {(dataSource.createdBy._id === auth.user._id ||
+                      dataSource?.draft) &&
+                      !isFromTalkink &&
+                      !dataSource?.draft && (
+                        <>
+                          <MenuItem
+                            icon={
+                              <BiEdit size={20} className="text-neutral-400" />
+                            }
+                            title="Edit thread..."
+                            onClick={() => {
+                              navigate(`te/${dataSource?._id}`);
+                            }}
+                          />
+                          <MenuItem
+                            icon={
+                              <BiTrash size={20} className="text-neutral-400" />
+                            }
+                            title="Delete thread..."
+                            onClick={() => {
+                              setSelectedThread(dataSource);
+                            }}
+                          />
+                        </>
+                      )}
                   </Menu.Items>
                 )}
               </>
