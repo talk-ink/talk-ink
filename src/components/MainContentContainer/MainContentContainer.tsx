@@ -11,7 +11,7 @@ function MainContentContainer({ children, className, header, listRef }: Props) {
     <div className="w-full h-screen items-center md:overflow-auto ">
       {header}
       <div
-        className={`max-w-4xl px-5 md:ml-auto md:mr-auto pt-20 ${className} `}
+        className={`max-w-4xl px-5 md:ml-auto md:mr-auto pt-20 pb-20 ${className} `}
       >
         {children}
       </div>
