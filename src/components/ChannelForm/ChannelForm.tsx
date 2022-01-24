@@ -100,19 +100,22 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
             )}
           </FormControl>
           <FormControl>
-            <FormLabel required>Privacy</FormLabel>
-            <div className="flex items-center gap-3">
+            <FormLabel required>Make private</FormLabel>
+            <div className="flex items-center justify-between gap-3 w-full">
+              <p className="text-sm text-indigo-500">
+                When a channel is set to private, it can only be viewed or
+                joined by invitation.
+              </p>
               <Switch
-                value={formik.values.privacy === "public" ?? true}
+                value={formik.values.privacy !== "public" ?? false}
                 onChange={(values) => {
-                  if (values) {
+                  if (!values) {
                     formik.setFieldValue("privacy", "public");
                   } else {
                     formik.setFieldValue("privacy", "private");
                   }
                 }}
               />
-              <p className="text-sm">{privacyStr[formik.values.privacy]}</p>
             </div>
 
             {formik.errors.privacy && (
