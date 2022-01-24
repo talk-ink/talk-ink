@@ -85,11 +85,11 @@ function SidebarComponent({
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
 
+  const userId = useMemo(() => auth.user._id, [auth.user._id]);
+
   const channelData: Channel[] = useMemo(() => {
-    return channel.channels.filter((data) =>
-      data.members.includes(auth.user._id)
-    );
-  }, [channel.channels, auth.user._id]);
+    return channel.channels.filter((data) => data.members.includes(userId));
+  }, [channel.channels, userId]);
 
   const channelDataAll: string[] = useMemo(
     () => channel.channels.map((data) => data._id),
@@ -100,8 +100,6 @@ function SidebarComponent({
     if (!auth.user.readedThreads) return [];
     return auth.user.readedThreads;
   }, [auth.user]);
-
-  const userId: string = auth.user._id;
 
   useEffect(() => {
     if (!userId || !params.workspaceId) return;
@@ -121,7 +119,7 @@ function SidebarComponent({
   const threadData = useMemo(() => {
     return inboxData
       .filter((data) => !auth.user.doneThreads?.includes(data._id))
-      .filter((item) => item.tagedUsers?.includes(auth.user._id));
+      .filter((item) => item.tagedUsers?.includes(userId));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inboxData, auth.user, params, channelData]);
@@ -167,7 +165,7 @@ function SidebarComponent({
           })
         );
         setCreateChannelModal(false);
-        if (values?.members?.includes(auth.user._id)) {
+        if (values?.members?.includes(userId)) {
           navigate(`/a/${params.workspaceId}/ch/${createChannel?.data?._id}`);
         }
       }
@@ -220,8 +218,8 @@ function SidebarComponent({
           : payload?.workspace?.includes(params.workspaceId);
 
         // const isNotCreatedByThisUser = isUpdate
-        //   ? payload?.before?.createdBy !== auth.user._id
-        //   : payload?.createdBy !== auth.user._id;
+        //   ? payload?.before?.createdBy !== userId
+        //   : payload?.createdBy !== userId;
 
         const isThreadInJoinedChannel = channelDataAll.includes(
           isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
@@ -244,7 +242,7 @@ function SidebarComponent({
         if (isCurrentWorkspace && isThreadInJoinedChannel) {
           switch (event) {
             case "UPDATE_RECORD":
-              if (payload.before.tagedUsers.includes(auth.user._id)) {
+              if (payload.before.tagedUsers.includes(userId)) {
                 if (
                   threadData.find((item) => item._id === payload.before?._id)
                 ) {
