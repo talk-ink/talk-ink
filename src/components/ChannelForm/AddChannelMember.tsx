@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";
@@ -7,17 +7,16 @@ import { Popover } from "@headlessui/react";
 import SuggestionMemberList from "components/Suggestion/Member/List";
 import MemberList from "components/Members/MemberList";
 import Button from "components/Button/Button";
+import Suggestion from "components/Suggestion";
+import ClosableBadge from "components/Badge/ClosableBadge";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 
 import { Channel, Member } from "types";
-import { fetchMembers } from "features/members";
 import { removeChannelMember, updateChannel } from "features/channels/slice";
 import { kontenbase } from "lib/client";
-import Suggestion from "components/Suggestion";
-import ClosableBadge from "components/Badge/ClosableBadge";
 import { createUniqueArray } from "utils/helper";
 
 type TProps = {
@@ -124,11 +123,6 @@ function AddChannelMember({ data, onClose }: TProps) {
       showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
-
-  useEffect(() => {
-    dispatch(fetchMembers({ workspaceId: params.workspaceId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.workspaceId, channelData]);
 
   return (
     <div className="min-h-[50vh] overflow-auto">

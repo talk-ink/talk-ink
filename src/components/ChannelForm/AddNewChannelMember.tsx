@@ -11,11 +11,9 @@ import ClosableBadge from "components/Badge/ClosableBadge";
 import Button from "components/Button/Button";
 
 import { useAppSelector } from "hooks/useAppSelector";
-import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 
 import { CreateChannel, Member } from "types";
-import { fetchMembers } from "features/members";
 import { createUniqueArray } from "utils/helper";
 
 type TProps = {
@@ -29,7 +27,6 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
-  const dispatch = useAppDispatch();
 
   const [joinedMemberIds, setJoinedMemberIds] = useState<string[]>(
     member.members.map((data) => data._id)
@@ -97,11 +94,6 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
       showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
-
-  useEffect(() => {
-    dispatch(fetchMembers({ workspaceId: params.workspaceId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.workspaceId]);
 
   useEffect(() => {
     if (joinedMemberIds.length === 0) {

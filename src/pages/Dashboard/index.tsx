@@ -16,6 +16,7 @@ import NotFoundChannelPage from "pages/Channel/NotFoundChannel";
 import RestrictedChannelPage from "pages/Channel/RestrictedChannel";
 import { setPageStatus } from "features/pageStatus";
 import { addChannel } from "features/channels/slice";
+import { fetchMembers } from "features/members";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -99,6 +100,12 @@ function DashboardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, params.channelId, workspace.workspaces]);
+
+  useEffect(() => {
+    if (params.workspaceId)
+      dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId]);
 
   const loading =
     workspace.loading ||
