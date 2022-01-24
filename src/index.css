@@ -118,6 +118,14 @@
   min-height: 55vh !important;
 }
 
+.comment-editor .ProseMirror {
+  min-height: 12rem !important;
+}
+
+.sub-comment-editor .ProseMirror {
+  min-height: 8rem !important;
+}
+
 .custom-select > div {
   border: none !important;
   border-width: 0 !important;

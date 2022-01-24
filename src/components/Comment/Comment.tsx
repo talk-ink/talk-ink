@@ -283,7 +283,7 @@ const Comment: React.FC<IProps> = ({
                 <Editor
                   key="edited"
                   defaultValue={subEditorState}
-                  className="markdown-overrides"
+                  className="markdown-overrides sub-comment-editor"
                   onChange={(getContent: () => string) =>
                     setSubEditorState(getContent())
                   }
@@ -305,7 +305,7 @@ const Comment: React.FC<IProps> = ({
                     className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
                     onClick={handleCreateSubComment}
                   >
-                    Post
+                    Reply
                   </Button>
                 </div>
               </div>
