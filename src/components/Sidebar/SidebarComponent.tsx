@@ -219,9 +219,9 @@ function SidebarComponent({
           ? payload?.before?.workspace?.includes(params.workspaceId)
           : payload?.workspace?.includes(params.workspaceId);
 
-        const isNotCreatedByThisUser = isUpdate
-          ? payload?.before?.createdBy !== auth.user._id
-          : payload?.createdBy !== auth.user._id;
+        // const isNotCreatedByThisUser = isUpdate
+        //   ? payload?.before?.createdBy !== auth.user._id
+        //   : payload?.createdBy !== auth.user._id;
 
         const isThreadInJoinedChannel = channelDataAll.includes(
           isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
@@ -241,11 +241,7 @@ function SidebarComponent({
           dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
         };
 
-        if (
-          isCurrentWorkspace &&
-          isThreadInJoinedChannel &&
-          isNotCreatedByThisUser
-        ) {
+        if (isCurrentWorkspace && isThreadInJoinedChannel) {
           switch (event) {
             case "UPDATE_RECORD":
               if (payload.before.tagedUsers.includes(auth.user._id)) {
