@@ -13,6 +13,7 @@ import { addWorkspace } from "features/workspaces";
 import { updateUser } from "features/auth";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
 import { Channel } from "types";
+import ConnectImage from "assets/image/connect.svg";
 
 function JoinChannelPage() {
   const params = useParams();
@@ -143,29 +144,38 @@ function JoinChannelPage() {
   return pageLoading ? (
     <FullscreenLoading />
   ) : (
-    <div className="w-screen h-screen flex items-center justify-center py-10">
-      <div className="w-6/12 border border-neutral-100 p-3 rounded-md">
-        <h1 className="text-3xl font-semibold">Join channels</h1>
-        <div className="max-w-sm max-h-[50vh] overflow-auto mt-3">
-          {channels.map((data, idx) => (
-            <ChannelList
-              key={idx}
-              data={data}
-              onClick={() => {
-                handleSelect(data._id);
-              }}
-              selectedChannels={selectedChannels}
-            />
-          ))}
+    <div className="w-screen h-screen flex items-center justify-center py-10 bg-indigo-500">
+      <div className="w-10/12 md:w-8/12 lg:w-6/12 border border-neutral-100 p-5 rounded-md bg-white shadow flex">
+        <div className="flex-1 ">
+          <h1 className="text-3xl font-semibold">Join channels</h1>
+          <div className="w-full max-h-[50vh] overflow-auto mt-3">
+            {channels.map((data, idx) => (
+              <ChannelList
+                key={idx}
+                data={data}
+                onClick={() => {
+                  handleSelect(data._id);
+                }}
+                selectedChannels={selectedChannels}
+              />
+            ))}
+          </div>
+          <div className="w-full mt-5">
+            <Button
+              className="w-full bg-indigo-500 text-white font-semibold text-xl p-5 flex items-center justify-center"
+              disabled={selectedChannels.length === 0 || apiLoading}
+              onClick={joinChannelsHandler}
+            >
+              Join Channels
+            </Button>
+          </div>
         </div>
-        <div className="max-w-sm mt-5">
-          <Button
-            className="w-full bg-indigo-500 text-white font-semibold text-xl p-5 flex items-center justify-center"
-            disabled={selectedChannels.length === 0 || apiLoading}
-            onClick={joinChannelsHandler}
-          >
-            Join Channels
-          </Button>
+        <div className="flex-1 items-center justify-center hidden xl:flex">
+          <img
+            src={ConnectImage}
+            alt="join channels"
+            className="w-10/12 object-cover"
+          />
         </div>
       </div>
     </div>
