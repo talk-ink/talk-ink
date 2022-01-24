@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, KeyboardEvent, useRef } from "react";
 
 import { FormikProps } from "formik";
 import Button from "components/Button/Button";
@@ -36,8 +36,18 @@ function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
   const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
+  const textEditorRef = useRef(null);
 
   const isDisabled = !formik.values.name || !formik.values.content || loading;
+
+  const handleEnter = (
+    event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    if (event.key.toLowerCase() === "enter") {
+      textEditorRef.current?.focusAtStart();
+      event.preventDefault();
+    }
+  };
 
   return (
     <div className="flex flex-col h-full mb-10">
@@ -49,12 +59,13 @@ function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
           onChange={formik.handleChange("name")}
           onBlur={formik.handleBlur("name")}
           value={formik.values.name}
+          autoFocus
+          onKeyDown={handleEnter}
         />
 
         {!preview && (
           <Delayed>
             <Editor
-              autoFocus
               key="editor"
               onChange={(getContent) =>
                 formik.setFieldValue("content", getContent())
@@ -66,6 +77,7 @@ function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
                 return data.url;
               }}
               className="markdown-overrides fix-editor thread-editor"
+              ref={textEditorRef}
             />
           </Delayed>
         )}

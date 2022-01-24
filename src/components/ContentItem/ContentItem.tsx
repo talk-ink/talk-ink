@@ -94,7 +94,9 @@ function ContentItem({
           <div className="flex items-center">
             <div
               className={`h-3 w-3 ${
-                !isRead ? "bg-indigo-500" : "bg-transparent"
+                !isRead && !dataSource?.draft
+                  ? "bg-indigo-500"
+                  : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
             <div className="mr-4">

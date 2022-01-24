@@ -235,6 +235,12 @@ function SidebarComponent({
 
         const createdBy = data?.[0];
 
+        const updateUserStore = async () => {
+          const { user: userData } = await kontenbase.auth.user();
+
+          dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
+        };
+
         if (
           isCurrentWorkspace &&
           isThreadInJoinedChannel &&
@@ -291,13 +297,17 @@ function SidebarComponent({
                   setInboxData(newInboxData);
                 }
 
-                const { user: userData } = await kontenbase.auth.user();
-
-                dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
+                updateUserStore();
               }
               break;
             case "CREATE_RECORD":
               dispatch(addThread({ ...payload, createdBy }));
+
+              const newInboxData = [...inboxData, { ...payload, createdBy }];
+
+              setInboxData(newInboxData);
+
+              updateUserStore();
               break;
             case "DELETE_RECORD":
               dispatch(deleteThread(payload));

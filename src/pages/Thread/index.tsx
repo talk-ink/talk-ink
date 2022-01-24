@@ -187,6 +187,7 @@ function ThreadPage() {
     }, 1000);
 
   useEffect(() => {
+    if (threadData.comments?.length === 0) return;
     scrollToBottom();
 
     const timedId = scrollToBottom();
@@ -194,7 +195,7 @@ function ThreadPage() {
     return () => {
       clearTimeout(timedId);
     };
-  }, []);
+  }, [threadData.comments]);
 
   useEffect(() => {
     const setInteractedUser = async () => {
@@ -269,7 +270,7 @@ function ThreadPage() {
               {channelData?.members?.length} Participants{" "}
               <Link
                 to={`/a/${workspaceId}/ch/${channelId}`}
-                className="text-indigo-800"
+                className="text-blue-500"
               >
                 #{channelData?.name}
               </Link>

@@ -70,8 +70,8 @@ function Compose() {
     const selectedDraft = parsedThreadDraft[+params.composeId];
 
     if (selectedDraft) {
-      formik.setFieldValue("name", selectedDraft.name);
-      formik.setFieldValue("content", selectedDraft.content);
+      formik.setFieldValue("name", selectedDraft?.name);
+      formik.setFieldValue("content", selectedDraft?.content);
     }
   };
 
@@ -236,6 +236,19 @@ function Compose() {
       }
     >
       <div className="w-full sm:w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-3 mx-auto relative -mt-12 sm:mt-0">
+        <div className="flex items-center mb-4">
+          <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm mr-2">
+            Post In:
+          </div>
+          <p
+            className="text-sm text-blue-500 cursor-pointer"
+            onClick={() =>
+              navigate(`/a/${params.workspaceId}/ch/${params.channelId}`)
+            }
+          >
+            #{channelData?.name}
+          </p>
+        </div>
         <div className="mb-2 flex w-fit items-center">
           <div className="mr-2">
             <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
