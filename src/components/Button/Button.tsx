@@ -1,12 +1,12 @@
 import React from "react";
 
-type Props = React.PropsWithChildren<{
+interface Props extends React.HTMLProps<HTMLButtonElement> {
   children?: React.ReactNode;
   className?: string;
   onClick?: () => void;
   type?: "button" | "submit" | "reset";
   disabled?: boolean;
-}>;
+}
 
 function Button({
   children,
