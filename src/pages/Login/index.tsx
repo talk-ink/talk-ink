@@ -92,10 +92,8 @@ function LoginPage() {
       console.log("err", error);
 
       if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
+        setApiError(`${error?.message}`);
       }
-
-      setApiError(`${error?.message}`);
     } finally {
       setApiLoading(false);
     }

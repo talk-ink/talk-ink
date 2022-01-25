@@ -126,7 +126,7 @@ function SettingsModal({
                 <GrClose size={18} />
               </button>
             </header>
-            <div className="h-[92.5%] overflow-auto">
+            <div className="h-full ">
               <div className="p-3 h-full">
                 {settingsRender(currentRoute.route)}
               </div>

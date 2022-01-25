@@ -145,7 +145,7 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
     !formik.values.name || !!formik.errors.name || !!formik.errors.logo;
 
   return (
-    <div className="min-h-[50vh] overflow-auto">
+    <div className="min-h-[50vh]">
       {currentRoute.current === "general" && (
         <form onSubmit={formik.handleSubmit}>
           <div className="border-b border-neutral-100 pb-5">

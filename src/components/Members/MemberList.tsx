@@ -19,7 +19,7 @@ function MemberList({ data, hideEmail, invited, leftContent }: TProps) {
           {!data.avatar && (
             <NameInitial name={getNameInitial(data.firstName)} />
           )}
-          {data.avatar && <ProfileImage source={data.avatar[0].url} />}
+          {data.avatar && <ProfileImage source={data.avatar?.[0]?.url} />}
         </div>
         <div>
           <div className="flex items-center">
