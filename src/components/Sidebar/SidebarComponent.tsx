@@ -435,12 +435,42 @@ function SidebarComponent({
           if (channelCurrentWorkspace) {
             switch (event) {
               case "UPDATE_RECORD":
-                dispatch(
-                  updateChannel({
-                    ...payload.before,
-                    ...payload.after,
-                  })
+                const dataIndex = channel.channels.findIndex(
+                  (data) => data._id === payload.after?._id
                 );
+
+                if (dataIndex >= 0) {
+                  if (payload?.after?.members?.includes(auth.user._id)) {
+                    dispatch(
+                      updateChannel({
+                        ...payload.before,
+                        ...payload.after,
+                      })
+                    );
+                  } else {
+                    if (params.channelId === payload.after._id) {
+                      navigate(`/a/${params.workspaceId}/inbox`);
+                    }
+                    dispatch(deleteChannel(payload.after));
+                  }
+                } else {
+                  if (payload?.after?.members?.includes(auth.user._id)) {
+                    dispatch(
+                      addChannel({
+                        ...payload.after,
+                        createdBy:
+                          payload?.after?.createdBy === auth.user._id
+                            ? auth.user._id
+                            : null,
+                      })
+                    );
+                  } else {
+                    if (params.channelId === payload.after._id) {
+                      navigate(`/a/${params.workspaceId}/inbox`);
+                    }
+                    dispatch(deleteChannel(payload.after));
+                  }
+                }
                 break;
               case "CREATE_RECORD":
                 dispatch(
@@ -466,7 +496,7 @@ function SidebarComponent({
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [params.workspaceId, params.channelId]);
 
   const loading = workspace.loading || channel.loading;
 
