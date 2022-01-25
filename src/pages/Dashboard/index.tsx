@@ -105,6 +105,8 @@ function DashboardPage() {
   }, [params.workspaceId, params.channelId, workspace.workspaces]);
 
   useEffect(() => {
+    dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+
     let key: string | undefined;
     kontenbase.realtime
       .subscribe("Workspaces", { event: "UPDATE_RECORD" }, (message) => {
