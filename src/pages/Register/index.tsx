@@ -80,10 +80,9 @@ function RegisterPage() {
       }
     } catch (error: any) {
       console.log("error");
-      setApiError(`${error.message}`);
 
       if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
+        setApiError(`${error.message}`);
       }
     } finally {
       setApiLoading(false);
