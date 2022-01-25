@@ -458,10 +458,7 @@ function SidebarComponent({
                     dispatch(
                       addChannel({
                         ...payload.after,
-                        createdBy:
-                          payload?.after?.createdBy === auth.user._id
-                            ? auth.user._id
-                            : null,
+                        createdBy,
                       })
                     );
                   } else {

@@ -72,12 +72,9 @@ function JoinChannelPage() {
 
     const joinBulkChannelHandler = () => {
       const join = selectedChannels.map(async (data) => {
-        const channelData = await kontenbase.service("Channels").getById(data);
-        const joinChannel = await kontenbase
-          .service("Channels")
-          .updateById(data, {
-            members: [...channelData.data.members, userId],
-          });
+        const joinChannel = await kontenbase.service("Channels").link(data, {
+          members: userId,
+        });
         return joinChannel.data;
       });
 
@@ -108,9 +105,13 @@ function JoinChannelPage() {
 
       const joinWorkspace = await kontenbase
         .service("Workspaces")
-        .updateById(params.workspaceId, {
-          peoples: [...workspaceData.data.peoples, userId],
+        .link(params.workspaceId, {
+          peoples: userId,
         });
+      const { error: workspaceError } = await kontenbase
+        .service("Workspaces")
+        .updateById(params.workspaceId, { name: workspaceData?.data?.name });
+      if (workspaceError) throw new Error(workspaceError.message);
 
       const joinBulkChannel = await joinBulkChannelHandler();
 
