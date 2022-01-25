@@ -72,32 +72,48 @@ function ThreadPage() {
         let _createdBy;
         let _subComments;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
-          const { data } = await kontenbase.service("Users").find({
-            where: {
-              id:
-                event === "UPDATE_RECORD"
-                  ? payload.before.createdBy
-                  : payload.createdBy,
-            },
-          });
-          _createdBy = data?.[0];
+          try {
+            const { data, error } = await kontenbase.service("Users").find({
+              where: {
+                id:
+                  event === "UPDATE_RECORD"
+                    ? payload.before.createdBy
+                    : payload.createdBy,
+              },
+            });
+
+            if (error) throw new Error(error.message);
+
+            _createdBy = data?.[0];
+          } catch (error) {
+            if (error instanceof Error) {
+              showToast({ message: `${JSON.stringify(error?.message)}` });
+            }
+          }
 
           if (
             event === "UPDATE_RECORD" &&
             payload.after.subComments.length > 0
           ) {
-            const { data }: KontenbaseResponse<ISubComment> = await kontenbase
-              .service("SubComments")
-              .find({
-                where: {
-                  parent: payload.after._id,
-                },
-              });
+            try {
+              const { data, error }: KontenbaseResponse<ISubComment> =
+                await kontenbase.service("SubComments").find({
+                  where: {
+                    parent: payload.after._id,
+                  },
+                });
 
-            _subComments = data.map((item) => ({
-              ...item,
-              createdBy: item.createdBy._id,
-            }));
+              if (error) throw new Error(error.message);
+
+              _subComments = data.map((item) => ({
+                ...item,
+                createdBy: item.createdBy._id,
+              }));
+            } catch (error) {
+              if (error instanceof Error) {
+                showToast({ message: `${JSON.stringify(error?.message)}` });
+              }
+            }
           }
         }
 
@@ -200,9 +216,10 @@ function ThreadPage() {
   useEffect(() => {
     const setInteractedUser = async () => {
       try {
-        const { data }: KontenbaseSingleResponse<Thread> = await kontenbase
-          .service("Threads")
-          .getById(threadId);
+        const { data, error }: KontenbaseSingleResponse<Thread> =
+          await kontenbase.service("Threads").getById(threadId);
+
+        if (error) throw new Error(error.message);
 
         if (
           !data.interactedUsers?.find((item: any) => item === auth.user._id)
@@ -219,7 +236,9 @@ function ThreadPage() {
           );
         }
       } catch (error) {
-        console.log(error);
+        if (error instanceof Error) {
+          showToast({ message: `${JSON.stringify(error?.message)}` });
+        }
       }
     };
 
@@ -232,12 +251,16 @@ function ThreadPage() {
         where: { workspaces: workspaceId, channels: channelId },
         lookup: ["avatar"],
       });
+
+      if (memberList.error) throw new Error(memberList.error.message);
+
       if (memberList.data) {
         setMemberList(memberList.data);
       }
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${JSON.stringify(error)}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 
@@ -321,7 +344,7 @@ function ThreadPage() {
               <LoadingSkeleton />
             ) : (
               <CommentList
-                dataSource={threadData?.comments}
+                dataSource={threadData?.comments || []}
                 listRef={listRef}
                 memberList={memberList}
                 threadId={threadId}

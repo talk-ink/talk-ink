@@ -137,6 +137,8 @@ function Compose() {
         tagedUsers: _invitedUsers,
       });
 
+      if (createThread.error) throw new Error(createThread.error.message);
+
       if (_invitedUsers.length > 0) {
         axios.post(NOTIFICATION_API, {
           title: `New Thread - ${channelData?.name}`,
@@ -166,8 +168,9 @@ function Compose() {
         );
       }
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       setApiLoading(false);
     }
@@ -179,12 +182,16 @@ function Compose() {
         where: { workspaces: params.workspaceId, channels: params.channelId },
         lookup: ["avatar"],
       });
+
+      if (memberList.error) throw new Error(memberList.error.message);
+
       if (memberList.data) {
         setMemberList(memberList.data);
       }
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${JSON.stringify(error)}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 

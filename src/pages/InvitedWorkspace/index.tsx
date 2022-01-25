@@ -8,8 +8,11 @@ import { useAppSelector } from "hooks/useAppSelector";
 
 import { kontenbase } from "lib/client";
 import { WorkspaceResponse } from "types";
+import { useToast } from "hooks/useToast";
 
 function InvitedWorkspacePage() {
+  const [showToast] = useToast();
+
   const params = useParams();
   const { pathname } = useLocation();
   const navigate = useNavigate();
@@ -18,10 +21,14 @@ function InvitedWorkspacePage() {
 
   const getWorkspaceData = async () => {
     try {
-      const { data: workspaceData }: KontenbaseResponse<WorkspaceResponse> =
-        await kontenbase
-          .service("Workspaces")
-          .find({ where: { inviteId: params.inviteId } });
+      const {
+        data: workspaceData,
+        error,
+      }: KontenbaseResponse<WorkspaceResponse> = await kontenbase
+        .service("Workspaces")
+        .find({ where: { inviteId: params.inviteId } });
+
+      if (error) throw new Error(error.message);
 
       let toWorkspaceId = "";
       if (workspaceData.length > 0) {
@@ -36,7 +43,9 @@ function InvitedWorkspacePage() {
 
       navigate(`/a/${toWorkspaceId}`);
     } catch (error) {
-      console.log("err", error);
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 

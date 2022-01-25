@@ -35,12 +35,13 @@ function LoginPage() {
   const onSubmit = async (values: Login) => {
     setApiLoading(true);
     try {
-      const { user: userLogin, token } = await kontenbase.auth.login(values);
+      const { token, error } = await kontenbase.auth.login(values);
 
-      const { user: userData } = await kontenbase.auth.user();
+      if (error) throw new Error(error.message);
 
-      if (!userLogin) throw new Error("Invalid login");
-      if (!userData) throw new Error("Invalid user");
+      const { user: userData, error: errorUser } = await kontenbase.auth.user();
+
+      if (errorUser) throw new Error(errorUser.message);
 
       if (userData) {
         OneSignal.setExternalUserId(userData.id).then(() =>
@@ -89,6 +90,10 @@ function LoginPage() {
       }
     } catch (error: any) {
       console.log("err", error);
+
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
 
       setApiError(`${error?.message}`);
     } finally {

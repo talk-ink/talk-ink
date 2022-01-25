@@ -15,6 +15,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthToken, setAuthUser } from "features/auth";
 import { KontenbaseResponse } from "@kontenbase/sdk";
 import OneSignal from "react-onesignal";
+import { useToast } from "hooks/useToast";
 
 const initialValues: Register = {
   email: "",
@@ -23,6 +24,7 @@ const initialValues: Register = {
 };
 
 function RegisterPage() {
+  const [showToast] = useToast();
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const params = useParams();
@@ -34,13 +36,13 @@ function RegisterPage() {
   const onSubmit = async (values: Register) => {
     setApiLoading(true);
     try {
-      const { user: userRegister, token } = await kontenbase.auth.register(
-        values
-      );
-      const { user: userData } = await kontenbase.auth.user();
+      const { token, error } = await kontenbase.auth.register(values);
 
-      if (!userRegister) throw new Error("Invalid register");
-      if (!userData) throw new Error("Invalid user");
+      if (error) throw new Error(error.message);
+
+      const { user: userData, error: errorUser } = await kontenbase.auth.user();
+
+      if (errorUser) throw new Error(errorUser.message);
 
       if (userData) {
         OneSignal.setExternalUserId(userData.id).then(() =>
@@ -51,13 +53,23 @@ function RegisterPage() {
         let toWorkspaceId = "create_workspace";
 
         if (params.inviteId) {
-          const { data: workspaceData }: KontenbaseResponse<WorkspaceResponse> =
-            await kontenbase
+          try {
+            const {
+              data: workspaceData,
+              error,
+            }: KontenbaseResponse<WorkspaceResponse> = await kontenbase
               .service("Workspaces")
               .find({ where: { inviteId: params.inviteId } });
 
-          if (workspaceData?.length > 0) {
-            toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            if (error) throw new Error(error.message);
+
+            if (workspaceData?.length > 0) {
+              toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+            }
+          } catch (error) {
+            if (error instanceof Error) {
+              showToast({ message: `${JSON.stringify(error?.message)}` });
+            }
           }
         }
 
@@ -69,6 +81,10 @@ function RegisterPage() {
     } catch (error: any) {
       console.log("error");
       setApiError(`${error.message}`);
+
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       setApiLoading(false);
     }

@@ -70,12 +70,14 @@ function EditThread() {
     setApiLoading(true);
 
     try {
-      const { data } = await kontenbase
+      const { data, error } = await kontenbase
         .service("Threads")
         .updateById(params.threadId, {
           name: values.name,
           content: values.content,
         });
+
+      if (error) throw new Error(error.message);
 
       if (data) {
         dispatch(
@@ -97,8 +99,9 @@ function EditThread() {
         );
       }
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       setApiLoading(false);
     }

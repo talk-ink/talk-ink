@@ -61,11 +61,13 @@ function DashboardPage() {
       );
 
       if (params?.channelId) {
-        const { data: channelData }: KontenbaseResponse<Channel> =
+        const { data: channelData, error }: KontenbaseResponse<Channel> =
           await kontenbase.service("Channels").find({
             where: { id: params.channelId },
             select: ["name", "members", "privacy"],
           });
+
+        if (error) throw new Error(error.message);
 
         if (
           !workspaceData?.channels?.includes(params?.channelId) ||
@@ -88,8 +90,9 @@ function DashboardPage() {
       }
       return dispatch(setPageStatus(null));
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${JSON.stringify(error)}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 

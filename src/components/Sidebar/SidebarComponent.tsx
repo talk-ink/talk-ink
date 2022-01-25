@@ -76,6 +76,7 @@ function SidebarComponent({
   const [inboxData, setInboxData] = useState<Thread[]>([]);
   const [isWorkspaceLimitModalVisible, setIsWorkspaceLimitModalVisible] =
     useState(false);
+  const [runOnce, setRunOnce] = useState(false);
 
   const [selectedChannel, setSelectedChannel] = useState<
     Channel | null | undefined
@@ -101,21 +102,6 @@ function SidebarComponent({
     return auth.user.readedThreads;
   }, [auth.user]);
 
-  useEffect(() => {
-    if (!userId || !params.workspaceId) return;
-
-    (async () => {
-      const { data } = await kontenbase.service("Threads").find({
-        where: {
-          workspace: params.workspaceId,
-          tagedUsers: { $in: [userId] },
-        },
-      });
-
-      setInboxData(data);
-    })();
-  }, [params.workspaceId, userId]);
-
   const threadData = useMemo(() => {
     return inboxData
       .filter((data) => !auth.user.doneThreads?.includes(data._id))
@@ -129,17 +115,46 @@ function SidebarComponent({
       .length;
   }, [threadData, readedThreads]);
 
+  useEffect(() => {
+    if (!userId || !params.workspaceId || runOnce) return;
+
+    (async () => {
+      try {
+        const { data, error } = await kontenbase.service("Threads").find({
+          where: {
+            workspace: params.workspaceId,
+            tagedUsers: { $in: [userId] },
+          },
+        });
+
+        if (error) throw new Error(error.message);
+
+        setInboxData(data);
+        setRunOnce(true);
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast({ message: `${JSON.stringify(error?.message)}` });
+        }
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId, userId, runOnce]);
+
   const handleLogout = async () => {
     try {
-      await kontenbase.auth.logout();
+      const { error } = await kontenbase.auth.logout();
+
+      if (error) throw new Error(error.message);
 
       cookies.remove("token");
       OneSignal.removeExternalUserId();
       dispatch(logout());
       navigate("/login");
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 
@@ -156,7 +171,9 @@ function SidebarComponent({
         workspace: params.workspaceId,
       });
 
-      if (createChannel) {
+      if (createChannel?.error) throw new Error(createChannel.error.message);
+
+      if (createChannel.data) {
         dispatch(addChannel(createChannel.data));
         dispatch(
           updateWorkspace({
@@ -170,8 +187,9 @@ function SidebarComponent({
         }
       }
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       setModalLoading(false);
     }
@@ -181,23 +199,47 @@ function SidebarComponent({
     try {
       let members = selectedChannel.members.filter((data) => data !== userId);
 
-      await kontenbase.service("Channels").updateById(selectedChannel?._id, {
-        members,
-      });
+      const { error } = await kontenbase
+        .service("Channels")
+        .updateById(selectedChannel?._id, {
+          members,
+        });
+
+      if (error) throw new Error(error.message);
 
       dispatch(deleteChannel(selectedChannel));
       setSelectedChannel(null);
       setLeaveChannelModal(false);
       navigate(`/a/${params.workspaceId}/inbox`);
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 
   const showManageMemberModal = (channel: Channel) => {
     setAddMemberModal(true);
     setSelectedChannel(channel);
+  };
+
+  const updateUserStore = async () => {
+    try {
+      const { user: userData, error } = await kontenbase.auth.user();
+
+      if (error) throw new Error(error.message);
+
+      dispatch(
+        updateUser({
+          avatar: auth.user.avatar,
+          readedThreads: userData.readedThreads,
+        })
+      );
+    } catch (error) {
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
+    }
   };
 
   useEffect(() => {
@@ -225,90 +267,137 @@ function SidebarComponent({
           isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
         );
 
-        const { data } = await kontenbase.service("Users").find({
-          where: {
-            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
-          },
-        });
+        let _createdBy;
 
-        const createdBy = data?.[0];
+        try {
+          const { data, error } = await kontenbase.service("Users").find({
+            where: {
+              id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
+            },
+          });
 
-        const updateUserStore = async () => {
-          const { user: userData } = await kontenbase.auth.user();
+          if (error) throw new Error(error.message);
 
-          dispatch(updateUser({ ...userData, avatar: auth.user.avatar }));
-        };
+          _createdBy = data?.[0];
 
-        if (isCurrentWorkspace && isThreadInJoinedChannel) {
-          switch (event) {
-            case "UPDATE_RECORD":
-              if (payload.before.tagedUsers.includes(userId)) {
-                if (
-                  threadData.find((item) => item._id === payload.before?._id)
-                ) {
-                  const { data } = await kontenbase.service("Comments").find({
-                    where: {
-                      threads: payload.before._id,
-                    },
-                    lookup: ["subComments"],
-                  });
+          if (isCurrentWorkspace && isThreadInJoinedChannel) {
+            switch (event) {
+              case "UPDATE_RECORD":
+                if (payload.before.tagedUsers.includes(userId)) {
+                  let _currentThread;
+                  try {
+                    const { data, error } = await kontenbase
+                      .service("Threads")
+                      .find({
+                        where: {
+                          workspace: params.workspaceId,
+                          tagedUsers: { $in: [userId] },
+                        },
+                      });
 
-                  dispatch(
-                    updateThread({
-                      ...payload.before,
-                      ...payload.after,
-                      createdBy,
-                      comments: data,
-                    })
-                  );
+                    if (error) throw new Error(error.message);
 
-                  const updatedInbox = inboxData.map((item) =>
-                    item._id === payload.before._id
-                      ? {
+                    _currentThread = data
+                      .filter(
+                        (data) => !auth.user.doneThreads?.includes(data._id)
+                      )
+                      .filter((item) => item.tagedUsers?.includes(userId));
+                  } catch (error) {
+                    if (error instanceof Error) {
+                      showToast({
+                        message: `${JSON.stringify(error?.message)}`,
+                      });
+                    }
+                  }
+
+                  if (
+                    _currentThread.find(
+                      (item) => item._id === payload.before?._id
+                    )
+                  ) {
+                    try {
+                      const { data, error } = await kontenbase
+                        .service("Comments")
+                        .find({
+                          where: {
+                            threads: payload.before._id,
+                          },
+                          lookup: ["subComments"],
+                        });
+
+                      if (error) throw new Error(error.message);
+
+                      dispatch(
+                        updateThread({
                           ...payload.before,
                           ...payload.after,
-                        }
-                      : item
-                  );
-                  setInboxData(updatedInbox);
-                } else {
-                  dispatch(
-                    addThread({
-                      ...payload.before,
-                      ...payload.after,
-                      createdBy,
-                    })
-                  );
+                          createdBy: _createdBy,
+                          comments: data,
+                        })
+                      );
 
-                  const newInboxData = [
-                    ...inboxData,
-                    {
-                      ...payload.before,
-                      ...payload.after,
-                    },
-                  ];
+                      const updatedInbox = inboxData.map((item) =>
+                        item._id === payload.before._id
+                          ? {
+                              ...payload.before,
+                              ...payload.after,
+                            }
+                          : item
+                      );
+                      setInboxData(updatedInbox);
+                    } catch (error) {
+                      if (error instanceof Error) {
+                        showToast({
+                          message: `${JSON.stringify(error?.message)}`,
+                        });
+                      }
+                    }
+                  } else {
+                    dispatch(
+                      addThread({
+                        ...payload.before,
+                        ...payload.after,
+                        createdBy: _createdBy,
+                      })
+                    );
 
-                  setInboxData(newInboxData);
+                    const newInboxData = [
+                      ...inboxData,
+                      {
+                        ...payload.before,
+                        ...payload.after,
+                      },
+                    ];
+
+                    setInboxData(newInboxData);
+                  }
+
+                  updateUserStore();
                 }
+                break;
+              case "CREATE_RECORD":
+                dispatch(addThread({ ...payload, createdBy: _createdBy }));
+
+                const newInboxData = [
+                  ...inboxData,
+                  { ...payload, createdBy: _createdBy },
+                ];
+
+                setInboxData(newInboxData);
 
                 updateUserStore();
-              }
-              break;
-            case "CREATE_RECORD":
-              dispatch(addThread({ ...payload, createdBy }));
+                break;
+              case "DELETE_RECORD":
+                dispatch(deleteThread(payload));
+                break;
 
-              const newInboxData = [...inboxData, { ...payload, createdBy }];
-
-              setInboxData(newInboxData);
-
-              updateUserStore();
-              break;
-            case "DELETE_RECORD":
-              dispatch(deleteThread(payload));
-              break;
-
-            default:
-              break;
+              default:
+                break;
+            }
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            showToast({ message: `${JSON.stringify(error?.message)}` });
           }
         }
       })
@@ -318,7 +407,7 @@ function SidebarComponent({
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelData, threadData]);
+  }, [channelDataAll]);
 
   useEffect(() => {
     let key: string | undefined;
@@ -328,38 +417,46 @@ function SidebarComponent({
         const { event, payload } = message;
         const isUpdate = event === "UPDATE_RECORD";
 
-        const { data } = await kontenbase.service("Users").find({
-          where: {
-            id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
-          },
-        });
+        try {
+          const { data, error } = await kontenbase.service("Users").find({
+            where: {
+              id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
+            },
+          });
 
-        const createdBy = data?.[0];
+          if (error) throw new Error(error.message);
 
-        const channelCurrentWorkspace = isUpdate
-          ? payload.before.workspace.includes(params.workspaceId)
-          : payload.workspace.includes(params.workspaceId);
+          const createdBy = data?.[0];
 
-        if (channelCurrentWorkspace) {
-          switch (event) {
-            case "UPDATE_RECORD":
-              dispatch(
-                updateChannel({
-                  ...payload.before,
-                  ...payload.after,
-                })
-              );
-              break;
-            case "CREATE_RECORD":
-              dispatch(
-                addChannel({
-                  ...payload,
-                  createdBy,
-                })
-              );
-              break;
-            default:
-              break;
+          const channelCurrentWorkspace = isUpdate
+            ? payload.before.workspace.includes(params.workspaceId)
+            : payload.workspace.includes(params.workspaceId);
+
+          if (channelCurrentWorkspace) {
+            switch (event) {
+              case "UPDATE_RECORD":
+                dispatch(
+                  updateChannel({
+                    ...payload.before,
+                    ...payload.after,
+                  })
+                );
+                break;
+              case "CREATE_RECORD":
+                dispatch(
+                  addChannel({
+                    ...payload,
+                    createdBy,
+                  })
+                );
+                break;
+              default:
+                break;
+            }
+          }
+        } catch (error) {
+          if (error instanceof Error) {
+            showToast({ message: `${JSON.stringify(error?.message)}` });
           }
         }
       })
@@ -421,9 +518,17 @@ function SidebarComponent({
                       title="Create new workspace"
                       onClick={() => {
                         if (
-                          workspace.workspaces.find(
-                            (item) => item.createdBy._id === auth.user._id
-                          )
+                          workspace.workspaces.find((item) => {
+                            if (item.createdBy?._id) {
+                              return item.createdBy?._id === auth.user?._id;
+                            }
+
+                            if (!item.createdBy?._id) {
+                              return true;
+                            }
+
+                            return false;
+                          })
                         ) {
                           return setIsWorkspaceLimitModalVisible(true);
                         }
