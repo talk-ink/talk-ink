@@ -45,7 +45,7 @@ function RegisterPage() {
       if (errorUser) throw new Error(errorUser.message);
 
       if (userData) {
-        OneSignal.setExternalUserId(userData.id).then(() =>
+        OneSignal.setExternalUserId(userData._id).then(() =>
           OneSignal.setSubscription(true)
         );
         const user: TUserProfile = userData;

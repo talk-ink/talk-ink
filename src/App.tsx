@@ -51,6 +51,10 @@ function App() {
         OneSignal.showSlidedownPrompt();
       });
 
+      OneSignal.setExternalUserId(userData._id).then(() =>
+        OneSignal.setSubscription(true)
+      );
+
       const token: Token = { token: cookiesToken };
       const user: TUserProfile = userData;
 
