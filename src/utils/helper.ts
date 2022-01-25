@@ -253,3 +253,8 @@ export const filterDistinct = (array: any[], key: string) => {
 
   return result;
 };
+
+export const createUniqueArray = (array: string[]): string[] => {
+  const unique = new Set([...array]);
+  return [...unique];
+};

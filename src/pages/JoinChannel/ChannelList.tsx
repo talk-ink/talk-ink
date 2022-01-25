@@ -18,7 +18,7 @@ function ChannelList({ data, onClick = () => {}, selectedChannels }: TProps) {
 
   return (
     <button
-      className="w-full outline-none border-b border-neutral-100 first:border-t py-3 px-2 flex items-center justify-between"
+      className="w-full outline-none border-b border-neutral-100 first:border-t-0 py-3 px-2 flex items-center justify-between hover:bg-indigo-50 rounded-sm"
       onClick={onClick}
     >
       <div className="flex items-center">

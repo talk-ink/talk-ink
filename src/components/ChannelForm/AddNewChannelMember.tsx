@@ -4,16 +4,17 @@ import { useParams } from "react-router-dom";
 import { useDebounce } from "use-debounce";
 import { FormikProps } from "formik";
 
-import MemberSuggestion from "components/Suggestion/Member";
 import SuggestionMemberList from "components/Suggestion/Member/List";
 import MemberList from "components/Members/MemberList";
+import Suggestion from "components/Suggestion";
+import ClosableBadge from "components/Badge/ClosableBadge";
+import Button from "components/Button/Button";
 
 import { useAppSelector } from "hooks/useAppSelector";
-import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 
 import { CreateChannel, Member } from "types";
-import { fetchMembers } from "features/members";
+import { createUniqueArray } from "utils/helper";
 
 type TProps = {
   setIsMemberEmpty: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,18 +27,21 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
-  const dispatch = useAppDispatch();
 
-  const [joinedMemberIds, setJoinedMemberIds] = useState<string[]>([
-    auth.user._id,
-  ]);
+  const [joinedMemberIds, setJoinedMemberIds] = useState<string[]>(
+    member.members.map((data) => data._id)
+  );
 
   const [search, setSearch] = useState("");
   const [searchDebounce] = useDebounce(search, 100);
 
+  const [invitedList, setInvitedList] = useState<Member[]>([]);
+
   const notJoinedMemberData: Member[] = useMemo(() => {
     const notJoined = member.members.filter(
-      (item) => !joinedMemberIds.includes(item._id)
+      (item) =>
+        !joinedMemberIds.includes(item._id) &&
+        invitedList.findIndex((data) => data._id === item._id) < 0
     );
     if (!searchDebounce) return notJoined;
     const trimValue = searchDebounce.trim();
@@ -46,7 +50,13 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
         data.firstName.includes(trimValue) || data.email.includes(trimValue)
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.workspaceId, member.members, searchDebounce, joinedMemberIds]);
+  }, [
+    params.workspaceId,
+    member.members,
+    searchDebounce,
+    joinedMemberIds,
+    invitedList,
+  ]);
 
   const joinedMemberData: Member[] = useMemo(() => {
     const notJoined = member.members.filter((item) =>
@@ -56,9 +66,14 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, member.members, joinedMemberIds]);
 
-  const inviteMemberHandler = async (id: string) => {
+  const inviteMemberHandler = () => {
     try {
-      setJoinedMemberIds((prev) => [...prev, id]);
+      const ids: string[] = invitedList.map((data) => data._id);
+      const members = createUniqueArray([...joinedMemberIds, ...ids]);
+
+      setJoinedMemberIds(members);
+      setInvitedList([]);
+      setSearch("");
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
@@ -81,11 +96,6 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
   };
 
   useEffect(() => {
-    dispatch(fetchMembers({ workspaceId: params.workspaceId }));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.workspaceId]);
-
-  useEffect(() => {
     if (joinedMemberIds.length === 0) {
       setIsMemberEmpty(true);
     } else {
@@ -96,20 +106,54 @@ function AddNewChannelMember({ setIsMemberEmpty, formik }: TProps) {
   }, [joinedMemberIds]);
 
   return (
-    <div className="h-[50vh] overflow-auto">
+    <div className="min-h-[50vh] overflow-auto">
       <p className="text-sm font-semibold">Add members</p>
-      <MemberSuggestion onChange={(e) => setSearch(e.target.value)}>
+      <Suggestion
+        header={
+          <div className="w-full text-sm p-2 rounded-md outline-0 border border-neutral-200 focus:border-neutral-300 flex flex-wrap gap-2">
+            {invitedList.map((item, idx) => (
+              <ClosableBadge
+                key={idx}
+                text={item.firstName}
+                onClose={() => {
+                  setInvitedList((prev) =>
+                    prev.filter((data) => data._id !== item._id)
+                  );
+                }}
+              />
+            ))}
+
+            <input
+              type="text"
+              className="flex-1 outline-none h-6"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by name"
+            />
+          </div>
+        }
+      >
         {notJoinedMemberData.map((data, idx) => (
           <SuggestionMemberList
             key={idx}
             data={data}
             onClick={() => {
-              inviteMemberHandler(data._id);
+              setInvitedList((prev) => [...prev, data]);
               setSearch("");
             }}
           />
         ))}
-      </MemberSuggestion>
+      </Suggestion>
+      <div className="flex justify-end mt-2">
+        <Button
+          className="text-white bg-indigo-500 text-sm px-5"
+          onClick={() => {
+            inviteMemberHandler();
+          }}
+        >
+          Add
+        </Button>
+      </div>
       <div className="w-full h-[40vh] mt-2 overflow-auto px-2">
         {joinedMemberData.map((data, idx) => (
           <MemberList
