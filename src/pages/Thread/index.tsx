@@ -45,6 +45,7 @@ function ThreadPage() {
 
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
+  const member = useAppSelector((state) => state.member);
 
   const listRef = useRef<HTMLDivElement>(null);
   const [memberList, setMemberList] = useState<Member[]>([]);
@@ -245,28 +246,30 @@ function ThreadPage() {
     setInteractedUser(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const getMemberHandler = async () => {
-    try {
-      const memberList = await kontenbase.service("Users").find({
-        where: { workspaces: workspaceId, channels: channelId },
-        lookup: ["avatar"],
-      });
+  // const getMemberHandler = async () => {
+  //   try {
+  //     const memberList = await kontenbase.service("Users").find({
+  //       where: { workspaces: workspaceId, channels: channelId },
+  //       lookup: ["avatar"],
+  //     });
 
-      if (memberList.error) throw new Error(memberList.error.message);
+  //     if (memberList.error) throw new Error(memberList.error.message);
 
-      if (memberList.data) {
-        setMemberList(memberList.data);
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
-      }
-    }
-  };
+  //     if (memberList.data) {
+  //       setMemberList(memberList.data);
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       showToast({ message: `${JSON.stringify(error?.message)}` });
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
-    getMemberHandler(); // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+    // getMemberHandler();
+    setMemberList(member.members);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [member.members]);
 
   // useEffect(() => {
   //   dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));

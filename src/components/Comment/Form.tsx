@@ -12,8 +12,15 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { Channel, Member } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
-import { getNameInitial, notificationUrl } from "utils/helper";
+import {
+  createUniqueArray,
+  getNameInitial,
+  notificationUrl,
+} from "utils/helper";
 import NameInitial from "components/Avatar/NameInitial";
+import CommentBadge from "./CommentBadge";
+import { updateChannel } from "features/channels/slice";
+import { useToast } from "hooks/useToast";
 
 interface IProps {
   isShowEditor: boolean;
@@ -31,6 +38,7 @@ interface INotifiedOption {
   color?: string;
   isFixed?: boolean;
   flag: number;
+  invited?: boolean;
 }
 
 const NOTIFICATION_API = notificationUrl;
@@ -44,6 +52,7 @@ const Form: React.FC<IProps> = ({
   interactedUsers,
   memberList,
 }) => {
+  const [showToast] = useToast();
   const params = useParams();
   const dispatch = useAppDispatch();
   const [editorState, setEditorState] = useState<string>("");
@@ -54,7 +63,14 @@ const Form: React.FC<IProps> = ({
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
 
+  const [invitedUser, setInvitedUser] = useState<
+    INotifiedOption | null | undefined
+  >(null);
+
   useEffect(() => {
+    const everyoneInChannelCount = memberList.filter((data) =>
+      data.channels.includes(params.channelId)
+    );
     const options: INotifiedOption[] = [
       {
         value: "INTERACTEDUSERS",
@@ -63,7 +79,7 @@ const Form: React.FC<IProps> = ({
       },
       {
         value: "ALLUSERSINCHANNEL",
-        label: `Everyone in Channel (${memberList.length || 1})`,
+        label: `Everyone in Channel (${everyoneInChannelCount.length || 1})`,
         flag: 2,
       },
       ...memberList
@@ -77,7 +93,7 @@ const Form: React.FC<IProps> = ({
 
     setNotifiedOptions(options);
     setSelectedNotifiedOptions([options[0]]);
-  }, [interactedUsers, memberList, auth]);
+  }, [interactedUsers, memberList, auth, params.channelId]);
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === params.channelId);
@@ -88,7 +104,7 @@ const Form: React.FC<IProps> = ({
     setEditorState("");
   };
 
-  const handleCreateComment = () => {
+  const handleCreateComment = async () => {
     let _invitedUsers: string[] = [];
 
     const isInteractedUsersSelected = !!selectedNotifiedOptions.find(
@@ -124,6 +140,33 @@ const Form: React.FC<IProps> = ({
         tagedUsers: _invitedUsers,
       })
     );
+
+    try {
+      const findInvitedToChannel = selectedNotifiedOptions
+        .filter((data) => data?.invited)
+        .map((data) => data.value);
+      const members = createUniqueArray([
+        ...channelData.members,
+        ...findInvitedToChannel,
+      ]);
+
+      if (findInvitedToChannel.length > 0) {
+        const { error: updateChannelError } = await kontenbase
+          .service("Channels")
+          .updateById(params.channelId, { members });
+        if (updateChannelError) throw new Error(updateChannelError.message);
+
+        dispatch(
+          updateChannel({
+            _id: params.channelId,
+            members,
+          })
+        );
+      }
+    } catch (error: any) {
+      console.log("err", error?.message);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
 
     if (_invitedUsers.length > 0) {
       axios.post(NOTIFICATION_API, {
@@ -175,6 +218,13 @@ const Form: React.FC<IProps> = ({
             <Select
               value={selectedNotifiedOptions}
               onChange={(e: any) => {
+                const ids: string[] = e?.map(
+                  (data: INotifiedOption) => data?.value
+                );
+                const dataIndex = selectedNotifiedOptions.findIndex(
+                  (data) => !ids.includes(data.value)
+                );
+
                 const isInteractedUsersSelected =
                   !!selectedNotifiedOptions.find(
                     (item) => item.value === "INTERACTEDUSERS"
@@ -196,6 +246,17 @@ const Form: React.FC<IProps> = ({
                 const isCurrMemberSelected = !!e.find(
                   (item: any) => item.flag === 3
                 );
+
+                if (
+                  e.length > 0 &&
+                  dataIndex < 0 &&
+                  !channelData.members.includes(e?.[e?.length - 1]?.value) &&
+                  !["INTERACTEDUSERS", "ALLUSERSINCHANNEL"].includes(
+                    e?.[e?.length - 1]?.value
+                  )
+                ) {
+                  return setInvitedUser(e?.[e?.length - 1]);
+                }
 
                 const currSelectedOptions = e.filter((item: any) => {
                   if (isAllChannelSelected) {
@@ -275,6 +336,22 @@ const Form: React.FC<IProps> = ({
             </div>
           </div>
         </div>
+      )}
+      {!!invitedUser && (
+        <CommentBadge
+          name={invitedUser?.label}
+          onInvited={() => {
+            setSelectedNotifiedOptions((prev) => [
+              ...prev.filter(
+                (data) =>
+                  !["INTERACTEDUSERS", "ALLUSERSINCHANNEL"].includes(data.value)
+              ),
+              { ...invitedUser, invited: true },
+            ]);
+            setInvitedUser(null);
+          }}
+          onCancel={() => setInvitedUser(null)}
+        />
       )}
     </div>
   );

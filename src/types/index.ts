@@ -89,7 +89,7 @@ export interface User {
   lastName?: string;
   email: string;
   workspaces?: string[];
-  channels?: Channel[];
+  channels?: string[];
   avatar?: string | any;
   about?: string;
   contact?: string;
