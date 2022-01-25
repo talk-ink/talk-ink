@@ -55,6 +55,7 @@ function BrowseChannels({ onAddNewChannel, onClose }: TProps) {
         where: { workspace: params.workspaceId, privacy: { $ne: "private" } },
         select: ["name", "description", "members"],
       });
+
       if (error) throw new Error(error.message);
 
       const channelData: Channel[] = data;

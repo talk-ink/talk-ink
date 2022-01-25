@@ -20,39 +20,55 @@ export const fetchThreads = createAsyncThunk(
   }: FetchThreadsProps) => {
     switch (type) {
       case "threads":
-        const threadResponse = await kontenbase
-          .service("Threads")
-          .find({ where: { channel: channelId }, lookup: ["comments"] });
+        try {
+          const threadResponse = await kontenbase
+            .service("Threads")
+            .find({ where: { channel: channelId }, lookup: ["comments"] });
 
-        const parsedThreadsDraft: object = JSON.parse(
-          localStorage.getItem("threadsDraft")
-        );
+          const parsedThreadsDraft: object = JSON.parse(
+            localStorage.getItem("threadsDraft")
+          );
 
-        let draft = [];
+          let draft = [];
 
-        if (parsedThreadsDraft) {
-          draft = Object.entries(parsedThreadsDraft)
-            .map(([key, value]) => ({
-              id: key,
-              draft: true,
-              ...value,
-            }))
-            .filter((data) => data.channelId === channelId);
+          if (threadResponse.error)
+            throw new Error(threadResponse.error.message);
+
+          if (parsedThreadsDraft) {
+            draft = Object.entries(parsedThreadsDraft)
+              .map(([key, value]) => ({
+                id: key,
+                draft: true,
+                ...value,
+              }))
+              .filter((data) => data.channelId === channelId);
+          }
+
+          return [...draft, ...threadResponse.data];
+        } catch (error) {
+          console.log(error);
+          return [];
         }
 
-        return [...draft, ...threadResponse.data];
       case "inbox":
-        const inboxResponse = await kontenbase.service("Threads").find({
-          where: {
-            workspace: workspaceId,
-            tagedUsers: { $in: [userId] },
-          },
-          lookup: ["comments"],
-        });
+        try {
+          const inboxResponse = await kontenbase.service("Threads").find({
+            where: {
+              workspace: workspaceId,
+              tagedUsers: { $in: [userId] },
+            },
+            lookup: ["comments"],
+          });
 
-        const threadData: Thread[] = inboxResponse.data;
+          if (inboxResponse.error) throw new Error(inboxResponse.error.message);
 
-        return threadData;
+          const threadData: Thread[] = inboxResponse.data;
+
+          return threadData;
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
 
       default:
         break;
@@ -63,22 +79,34 @@ export const fetchThreads = createAsyncThunk(
 export const fetchComments = createAsyncThunk(
   "channel/thread/fetchComments",
   async ({ threadId, skip }: { threadId: string; skip: number }) => {
-    //@ts-ignore
-    const { data, count } = await kontenbase.service("Comments").find({
-      where: { threads: threadId },
-      lookup: ["subComments"],
-      skip,
-      limit: 10,
-      sort: {
-        createdAt: -1,
-      },
-    });
+    try {
+      //@ts-ignore
+      const { data, count, error } = await kontenbase.service("Comments").find({
+        where: { threads: threadId },
+        lookup: ["subComments"],
+        skip,
+        limit: 10,
+        sort: {
+          createdAt: -1,
+        },
+      });
 
-    return {
-      comments: data,
-      threadId,
-      count,
-    };
+      if (error) throw new Error(error.message);
+
+      return {
+        comments: data,
+        threadId,
+        count,
+      };
+    } catch (error) {
+      console.log(error);
+
+      return {
+        comments: [],
+        threadId,
+        count: 0,
+      };
+    }
   }
 );
 

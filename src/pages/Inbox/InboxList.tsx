@@ -84,9 +84,10 @@ function InboxList({ type = "active" }: TProps) {
         if (error) throw new Error(error.message);
         dispatch(addDoneThread(threadId));
       }
-    } catch (error: any) {
-      console.log("err", error);
-      showToast({ message: `${JSON.stringify(error?.message)}` });
+    } catch (error) {
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 
@@ -95,6 +96,8 @@ function InboxList({ type = "active" }: TProps) {
       const deletedThread = await kontenbase
         .service("Threads")
         .deleteById(selectedThread?._id);
+
+      if (deletedThread.error) throw new Error(deletedThread.error.message);
 
       if (deletedThread?.data) {
         setSelectedThread(null);
@@ -107,8 +110,9 @@ function InboxList({ type = "active" }: TProps) {
         })
       );
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     }
   };
 

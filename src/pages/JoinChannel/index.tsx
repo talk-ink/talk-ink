@@ -36,6 +36,8 @@ function JoinChannelPage() {
         .service("Channels")
         .find({ where: { privacy: "public", workspace: params.workspaceId } });
 
+      if (getChannel.error) throw new Error(getChannel.error.message);
+
       if (getChannel.data) {
         const channelIds: string[] = getChannel?.data?.map(
           (data: Channel) => data._id
@@ -45,8 +47,9 @@ function JoinChannelPage() {
 
       setChannels(getChannel.data);
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       setApiLoading(false);
     }

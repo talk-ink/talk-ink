@@ -36,9 +36,9 @@ function App() {
       const cookiesToken = cookies.get("token");
       if (!cookiesToken) return;
 
-      const { user: userData } = await kontenbase.auth.user();
+      const { user: userData, error } = await kontenbase.auth.user();
 
-      if (!userData) throw new Error("Invalid user");
+      if (error) throw new Error(error.message);
 
       OneSignal.init({
         appId: oneSignalId,
@@ -57,8 +57,9 @@ function App() {
       dispatch(setAuthToken(token));
       dispatch(setAuthUser(user));
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       dispatch(setAuthLoading(false));
     }

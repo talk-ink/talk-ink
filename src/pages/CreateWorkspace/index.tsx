@@ -43,7 +43,7 @@ function CreateWorkspacePage() {
   const onSubmit = async (values: Workspace) => {
     setApiLoading(true);
     try {
-      const { data } = await kontenbase
+      const { data, error } = await kontenbase
         .service("Workspaces")
         .create({ name: values.name, peoples: auth.user._id });
 
@@ -56,6 +56,8 @@ function CreateWorkspacePage() {
               : [data?._id],
         })
       );
+
+      if (error) throw new Error(error.message);
 
       if (data) {
         const generalChannel = await kontenbase.service("Channels").create({
@@ -95,8 +97,9 @@ function CreateWorkspacePage() {
         }
       }
     } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
+      if (error instanceof Error) {
+        showToast({ message: `${JSON.stringify(error?.message)}` });
+      }
     } finally {
       setApiLoading(false);
     }
