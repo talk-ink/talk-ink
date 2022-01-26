@@ -90,9 +90,11 @@ function SearchPage() {
               dataSource={data}
               onClick={() => {
                 navigate(
-                  `/a/${params.workspaceId}/ch/${data.channelId}/t/${data.threadId}`
+                  `/a/${params.workspaceId}/ch/${data.channelId}/t/${data.threadId}`,
+                  { state: { from: "search" } }
                 );
               }}
+              search={search}
             />
           ))}
         </div>

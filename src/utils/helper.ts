@@ -272,7 +272,9 @@ export const sendSearch = async ({
     username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
     password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
   };
-  const url = process.env.REACT_APP_FUNCTION_HOOKS_SEARCH_URL;
+  const url = true
+    ? process.env.REACT_APP_FUNCTION_HOOKS_SEARCH_URL
+    : "http://localhost:4000/search";
 
   const { data: searchData }: { data: SearchResponse[] } = await axios.post(
     url,
