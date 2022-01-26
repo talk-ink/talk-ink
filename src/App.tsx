@@ -27,6 +27,7 @@ import JoinChannelPage from "pages/JoinChannel";
 import InboxList from "pages/Inbox/InboxList";
 import InvitedWorkspacePage from "pages/InvitedWorkspace";
 import { oneSignalId } from "utils/helper";
+import SearchPage from "pages/Search";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -92,7 +93,7 @@ function App() {
             </RestrictedRoute>
           }
         >
-          <Route path="search" element={<>search</>} />
+          <Route path="search" element={<SearchPage />} />
           <Route path="inbox/" element={<InboxPage />}>
             <Route path="" element={<InboxList />} />
             <Route path="done" element={<InboxList type="done" />} />

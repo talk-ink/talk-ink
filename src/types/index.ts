@@ -150,3 +150,12 @@ export type PageStatus =
   | "channel-notFound"
   | null
   | undefined;
+
+export interface SearchResponse {
+  _threadId: string;
+  _channelId: string;
+  title: string;
+  subTitle: string;
+  _createdById: string;
+  thread: Thread;
+}

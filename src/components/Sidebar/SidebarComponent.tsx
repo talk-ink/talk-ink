@@ -605,12 +605,12 @@ function SidebarComponent({
           {!loading && (
             <div className="p-2">
               <ul className="mb-1">
-                {/* <SidebarList
-                type="search"
-                name="Search"
-                link={`/a/${workspaceData?._id}/search`}
-                setIsSidebarOpen={setIsSidebarOpen}
-              /> */}
+                <SidebarList
+                  type="search"
+                  name="Search"
+                  link={`/a/${workspaceData?._id}/search`}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                />
                 <SidebarList
                   type="inbox"
                   name="Inbox"

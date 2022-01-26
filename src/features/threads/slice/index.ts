@@ -62,6 +62,13 @@ const threadSlice = createSlice({
 
       state.threads = distinctThreads;
     },
+    bulkAddThread: (state, action: PayloadAction<Thread[]>) => {
+      const newThread = [...state.threads, ...action.payload];
+
+      const distinctThreads = filterDistinct(newThread, "_id");
+
+      state.threads = distinctThreads;
+    },
     deleteThread: (state, action: PayloadAction<Thread>) => {
       let deletedIndex = state.threads.findIndex(
         (data) => data._id === action.payload._id
@@ -286,6 +293,7 @@ const threadSlice = createSlice({
 
 export const {
   addThread,
+  bulkAddThread,
   deleteThread,
   updateThread,
   addComment,
