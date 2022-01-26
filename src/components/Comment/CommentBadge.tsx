@@ -10,7 +10,7 @@ type TProps = {
 
 function CommentBadge({ name, onInvited, onCancel }: TProps) {
   return (
-    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 p-3 bg-slate-800 rounded-md flex items-center justify-between">
+    <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 p-3 bg-slate-800 rounded-md flex items-center justify-between z-10">
       <div className="flex items-center mr-5">
         <BiPlusCircle className="text-white mr-2" size={18} />
         <p className="text-sm text-white max-w-sm whitespace-nowrap overflow-hidden text-ellipsis mr-1">
