@@ -14,7 +14,7 @@ function SearchItem({ dataSource, onClick }: TProps) {
   const member = useAppSelector((state) => state.member);
 
   const createdByData: Member = useMemo(() => {
-    return member.members.find((data) => data._id === dataSource._createdById);
+    return member.members.find((data) => data._id === dataSource.createdById);
   }, [member.members, dataSource]);
 
   return (

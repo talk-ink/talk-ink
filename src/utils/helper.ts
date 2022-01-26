@@ -1,4 +1,4 @@
-import { SendEmail, Thread, User } from "types";
+import { SearchResponse, SendEmail, Thread, User } from "types";
 import axios, { AxiosResponse } from "axios";
 import FileResizer from "react-image-file-resizer";
 
@@ -257,4 +257,31 @@ export const filterDistinct = (array: any[], key: string) => {
 export const createUniqueArray = (array: string[]): string[] => {
   const unique = new Set([...array]);
   return [...unique];
+};
+
+export const sendSearch = async ({
+  userId,
+  workspaceId,
+  search,
+}: {
+  userId: string;
+  workspaceId: string;
+  search: string;
+}) => {
+  const basicAuth: { username: string; password: string } = {
+    username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
+    password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
+  };
+  const url = process.env.REACT_APP_FUNCTION_HOOKS_SEARCH_URL;
+
+  const { data: searchData }: { data: SearchResponse[] } = await axios.post(
+    url,
+    {
+      userId,
+      workspaceId,
+      search,
+    },
+    { auth: basicAuth }
+  );
+  return searchData;
 };

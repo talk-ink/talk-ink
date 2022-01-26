@@ -152,10 +152,10 @@ export type PageStatus =
   | undefined;
 
 export interface SearchResponse {
-  _threadId: string;
-  _channelId: string;
+  threadId: string;
+  channelId: string;
   title: string;
   subTitle: string;
-  _createdById: string;
+  createdById: string;
   thread: Thread;
 }

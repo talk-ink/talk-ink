@@ -13,6 +13,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { bulkAddThread } from "features/threads";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import SearchEmpty from "components/EmptyContent/SearchEmpty";
+import { sendSearch } from "utils/helper";
 
 function SearchPage() {
   const navigate = useNavigate();
@@ -31,14 +32,12 @@ function SearchPage() {
     if (!search) return;
     setSearchLoading(true);
     try {
-      const { data: searchData }: { data: SearchResponse[] } = await axios.post(
-        "https://gateway.onlyfunction.com/function/dft-searchhooks7cfcm",
-        {
-          userId: auth.user._id,
-          workspaceId: params.workspaceId,
-          search,
-        }
-      );
+      const searchData = await sendSearch({
+        userId: auth.user._id,
+        workspaceId: params.workspaceId,
+        search,
+      });
+
       if (searchData.length > 0) {
         setSearchResult(searchData);
 
@@ -91,7 +90,7 @@ function SearchPage() {
               dataSource={data}
               onClick={() => {
                 navigate(
-                  `/a/${params.workspaceId}/ch/${data._channelId}/t/${data._threadId}`
+                  `/a/${params.workspaceId}/ch/${data.channelId}/t/${data.threadId}`
                 );
               }}
             />
