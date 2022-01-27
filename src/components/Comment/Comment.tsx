@@ -211,7 +211,7 @@ const Comment: React.FC<IProps> = ({
                         className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
                         onClick={() => setIsShowMoreSubComment(true)}
                       >
-                        View More {comment.subComments?.length - 1} Comments
+                        Show More {comment.subComments?.length - 1} Comments
                       </p>
                     )}
                     <SubComment
