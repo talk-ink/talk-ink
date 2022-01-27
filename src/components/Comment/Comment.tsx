@@ -253,9 +253,16 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           {isReplyEditorVisible && (
-            <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
+            <div
+              className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2"
+              onBlur={(e) => {
+                if (!e.relatedTarget && isReplyEditorVisible) {
+                  setIsShowReplyEditorVisible(false);
+                }
+              }}
+            >
               <div>
-                <div className="mt-1 flex w-fit items-center">
+                <div className="mt-1 flex w-full items-center">
                   <div className="mr-2">
                     <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
                       Tag:
@@ -277,6 +284,16 @@ const Comment: React.FC<IProps> = ({
                     components={{
                       DropdownIndicator: () => null,
                       IndicatorSeparator: () => null,
+                    }}
+                    styles={{
+                      container: (base) => ({
+                        ...base,
+                        width: "100%",
+                      }),
+                      menuList: (base) => ({
+                        ...base,
+                        maxWidth: 300,
+                      }),
                     }}
                   />
                 </div>
