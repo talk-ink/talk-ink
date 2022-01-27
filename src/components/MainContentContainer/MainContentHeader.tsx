@@ -46,7 +46,7 @@ function MainContentHeader({
         </Button>
       </div>
       <div className="flex items-center justify-center grid-cols-1">
-        <h1 className="text-md font-bold max-w-md overflow-hidden text-ellipsis">
+        <h1 className="text-md font-bold max-w-md overflow-hidden text-ellipsis whitespace-nowrap">
           {title}
         </h1>
       </div>
