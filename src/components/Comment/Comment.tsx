@@ -7,6 +7,7 @@ import { Menu } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
 import { HiOutlineReply } from "react-icons/hi";
 import Select from "react-select";
+import { VscReactions } from "react-icons/vsc";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -15,12 +16,16 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment, Member } from "types";
+import { IComment, IReaction, Member } from "types";
 import {
   deleteComment,
   updateComment,
 } from "features/threads/slice/asyncThunk";
-import { addSubCommentToComment } from "features/threads/slice";
+import {
+  addSubCommentToComment,
+  addReactionToComment,
+  removeReactionFromComment,
+} from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
@@ -28,6 +33,7 @@ import { getNameInitial } from "utils/helper";
 import { kontenbase } from "lib/client";
 import axios from "axios";
 import { notificationUrl } from "utils/helper";
+import Reaction from "./Reaction";
 
 interface IProps {
   comment: IComment;
@@ -169,6 +175,30 @@ const Comment: React.FC<IProps> = ({
     }
   };
 
+  const addReactionToCommentHandler = async ({
+    commentId,
+  }: {
+    commentId: string;
+  }) => {
+    dispatch(
+      addReactionToComment({
+        commentId,
+        emoji: "🤒",
+        user: { ...auth.user, avatar: [{ url: auth.user.avatar }] },
+      })
+    );
+  };
+
+  const removeReactionFromCommentHandler = async ({
+    commentId,
+    reaction,
+  }: {
+    commentId: string;
+    reaction: IReaction;
+  }) => {
+    dispatch(removeReactionFromComment({ commentId, ...reaction }));
+  };
+
   return (
     <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
       <div className="w-8">
@@ -198,6 +228,33 @@ const Comment: React.FC<IProps> = ({
               discardComment={discardComment}
               handleUpdateComment={handleUpdateComment}
             />
+            <div className="flex items-center gap-2 flex-wrap mb-4">
+              {comment?.reactions?.map(
+                (reaction, idx) =>
+                  reaction.users.length > 0 && (
+                    <Reaction
+                      key={idx}
+                      data={reaction}
+                      active={
+                        reaction.users.findIndex(
+                          (data) => data._id === auth.user._id
+                        ) >= 0
+                      }
+                      onClick={() => {
+                        if (
+                          reaction.users.length === 1 &&
+                          reaction.users[0]._id === auth.user._id
+                        ) {
+                          removeReactionFromCommentHandler({
+                            commentId: comment._id,
+                            reaction,
+                          });
+                        }
+                      }}
+                    />
+                  )
+              )}
+            </div>
           </div>
 
           <div>
@@ -317,6 +374,20 @@ const Comment: React.FC<IProps> = ({
           <Menu as="div" className="relative flex">
             {({ open }) => (
               <>
+                <IconButton
+                  size="medium"
+                  className={`${
+                    open ? "flex" : "hidden"
+                  } group-hover:flex items-center`}
+                  onClick={() => {
+                    addReactionToCommentHandler({ commentId: comment._id });
+                  }}
+                >
+                  <VscReactions
+                    size={24}
+                    className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                  />
+                </IconButton>
                 {!isReplyEditorVisible && !isEdit && (
                   <IconButton
                     size="medium"
