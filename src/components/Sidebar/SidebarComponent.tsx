@@ -353,30 +353,38 @@ function SidebarComponent({
                       }
                     }
                   } else {
-                    dispatch(
-                      addThread({
-                        ...payload.before,
-                        ...payload.after,
-                        createdBy: _createdBy,
-                      })
-                    );
+                    if (
+                      params.channelId &&
+                      payload?.after?.channel?.includes(params.channelId)
+                    ) {
+                      dispatch(
+                        addThread({
+                          ...payload.before,
+                          ...payload.after,
+                          createdBy: _createdBy,
+                        })
+                      );
+                    }
 
-                    const newInboxData = [
-                      ...inboxData,
+                    setInboxData((prev) => [
+                      ...prev,
                       {
                         ...payload.before,
                         ...payload.after,
                       },
-                    ];
-
-                    setInboxData(newInboxData);
+                    ]);
                   }
 
                   updateUserStore();
                 }
                 break;
               case "CREATE_RECORD":
-                dispatch(addThread({ ...payload, createdBy: _createdBy }));
+                if (
+                  params.channelId &&
+                  payload?.channel?.includes(params.channelId)
+                ) {
+                  dispatch(addThread({ ...payload, createdBy: _createdBy }));
+                }
 
                 setInboxData((prev) => [
                   ...prev,
