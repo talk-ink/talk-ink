@@ -13,7 +13,7 @@ const Avatar: React.FC<IProps> = ({ src, size = "medium" }) => {
 
   return (
     <div className={`${avatarWidth[size]} rounded-full overflow-hidden `}>
-      <img src={src} className="h-8 w-8 object-fill" alt="img" />
+      <img src={src} className={`h-full w-full object-cover`} alt="avatar" />
     </div>
   );
 };
