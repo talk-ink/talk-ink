@@ -42,7 +42,7 @@ import { useToast } from "hooks/useToast";
 import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
 
-import { Channel, CreateChannel, Thread } from "types";
+import { Channel, CreateChannel, Thread, User } from "types";
 
 type TProps = {
   isMobile: boolean;
@@ -267,7 +267,7 @@ function SidebarComponent({
           isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
         );
 
-        let _createdBy;
+        let _createdBy: User;
 
         try {
           const { data, error } = await kontenbase.service("Users").find({
@@ -378,12 +378,10 @@ function SidebarComponent({
               case "CREATE_RECORD":
                 dispatch(addThread({ ...payload, createdBy: _createdBy }));
 
-                const newInboxData = [
-                  ...inboxData,
+                setInboxData((prev) => [
+                  ...prev,
                   { ...payload, createdBy: _createdBy },
-                ];
-
-                setInboxData(newInboxData);
+                ]);
 
                 updateUserStore();
                 break;
