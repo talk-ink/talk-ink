@@ -206,24 +206,55 @@ const Comment: React.FC<IProps> = ({
                 <div className="border-t-[1px] border-gray-200 mb-8" />
                 {!isShowMoreSubComment && (
                   <div className="text-sm -mt-3">
-                    {comment.subComments?.length > 1 && (
+                    {comment.subComments?.length > 2 && (
                       <p
                         className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
                         onClick={() => setIsShowMoreSubComment(true)}
                       >
-                        Show More {comment.subComments?.length - 1} Comments
+                        Show More {comment.subComments?.length - 2} Comments
                       </p>
+                    )}
+                    {comment.subComments?.length >= 2 && (
+                      <SubComment
+                        comment={{
+                          ...comment.subComments?.[
+                            comment.subComments.length - 2
+                          ],
+                          createdBy: memberList.find(
+                            (item) =>
+                              //@ts-ignore
+                              item._id ===
+                              comment.subComments?.[
+                                comment.subComments.length - 2
+                              ].createdBy
+                          ),
+                        }}
+                        key={
+                          comment.subComments?.[comment.subComments.length - 2]
+                            ?._id
+                        }
+                        parentId={comment._id}
+                        threadId={threadId}
+                      />
                     )}
                     <SubComment
                       comment={{
-                        ...comment.subComments?.[0],
+                        ...comment.subComments?.[
+                          comment.subComments.length - 1
+                        ],
                         createdBy: memberList.find(
                           (item) =>
                             //@ts-ignore
-                            item._id === comment.subComments?.[0].createdBy
+                            item._id ===
+                            comment.subComments?.[
+                              comment.subComments.length - 1
+                            ].createdBy
                         ),
                       }}
-                      key={comment.subComments?.[0]?._id}
+                      key={
+                        comment.subComments?.[comment.subComments.length - 1]
+                          ?._id
+                      }
                       parentId={comment._id}
                       threadId={threadId}
                     />
