@@ -102,9 +102,16 @@ function AddChannelMember({ data, onClose }: TProps) {
     memberId: string;
   }) => {
     try {
-      const { data: removeData } = await kontenbase
+      const { data: removeData, error: removeError } = await kontenbase
         .service("Channels")
         .unlink(data._id, { members: memberId });
+      if (removeError) throw new Error(removeError.message);
+
+      const { error: updateError } = await kontenbase
+        .service("Channels")
+        .updateById(data._id, { name: channelData.name });
+      if (updateError) throw new Error(updateError.message);
+
       if (removeData) {
         dispatch(
           removeChannelMember({

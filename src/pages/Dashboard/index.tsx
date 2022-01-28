@@ -105,8 +105,22 @@ function DashboardPage() {
   }, [params.workspaceId, params.channelId, workspace.workspaces]);
 
   useEffect(() => {
-    if (params.workspaceId)
-      dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+    dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+
+    let key: string | undefined;
+    kontenbase.realtime
+      .subscribe("Workspaces", { event: "UPDATE_RECORD" }, (message) => {
+        const { payload } = message;
+        const isCurrentWorkspace = payload.after?._id === params.workspaceId;
+        if (isCurrentWorkspace) {
+          dispatch(fetchMembers({ workspaceId: params.workspaceId }));
+        }
+      })
+      .then((result) => (key = result));
+
+    return () => {
+      kontenbase.realtime.unsubscribe(key);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 

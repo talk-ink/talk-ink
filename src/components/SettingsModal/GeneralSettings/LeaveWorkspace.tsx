@@ -14,8 +14,9 @@ function LeaveWorkspace() {
   const params = useParams();
   const navigate = useNavigate();
 
-  const workspace = useAppSelector((state) => state.workspace);
   const auth = useAppSelector((state) => state.auth);
+  const workspace = useAppSelector((state) => state.workspace);
+  const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
   const userId: string = auth.user._id;
@@ -27,6 +28,18 @@ function LeaveWorkspace() {
   }, [workspace.workspaces, params.workspaceId]);
 
   const handleLeaveWorkspace = async () => {
+    const leaveBulkChannelHandler = () => {
+      const join = channel.channels.map(async (data) => {
+        const joinChannel = await kontenbase
+          .service("Channels")
+          .unlink(data._id, {
+            members: userId,
+          });
+        return joinChannel.data;
+      });
+
+      return Promise.all(join);
+    };
     try {
       const newWorkspaces = workspace.workspaces.filter(
         (data) => data._id !== workspaceData._id
@@ -35,8 +48,16 @@ function LeaveWorkspace() {
       const leave = await kontenbase
         .service("Workspaces")
         .unlink(workspaceData._id, { peoples: userId });
+      if (leave.error) throw new Error(leave.error.message);
 
-      if (leave.data) {
+      const { error: updateError } = await kontenbase
+        .service("Workspaces")
+        .updateById(workspaceData._id, { name: workspaceData.name });
+      if (updateError) throw new Error(updateError.message);
+
+      const leaveChannels = await leaveBulkChannelHandler();
+
+      if (leave.data && leaveChannels) {
         if (newWorkspaces.length > 0) {
           navigate(`/a/${newWorkspaces[0]._id}/inbox`);
         } else {
