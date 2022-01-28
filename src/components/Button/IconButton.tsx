@@ -29,6 +29,7 @@ function IconButton({
   };
   return (
     <button
+      type="button"
       className={`flex items-center justify-center hover:bg-neutral-200 ${buttonSize[size]} rounded-md ${className}`}
       onClick={onClick}
     >
