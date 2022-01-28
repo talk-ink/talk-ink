@@ -284,14 +284,7 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           {isReplyEditorVisible && (
-            <div
-              className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2"
-              onBlur={(e) => {
-                if (!e.relatedTarget && isReplyEditorVisible) {
-                  setIsShowReplyEditorVisible(false);
-                }
-              }}
-            >
+            <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
               <div>
                 <div className="mt-1 flex w-full items-center">
                   <div className="mr-2">

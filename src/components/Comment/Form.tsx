@@ -140,15 +140,7 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div
-      className="sticky bottom-0 left-0 z-30  bg-white"
-      id="comment-form"
-      onBlur={(e) => {
-        if (!e.relatedTarget && isShowEditor) {
-          setIsShowEditor(false);
-        }
-      }}
-    >
+    <div className="sticky bottom-0 left-0 z-30  bg-white" id="comment-form">
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
           {auth.user.avatar ? (
