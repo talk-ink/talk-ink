@@ -336,15 +336,16 @@ function SidebarComponent({
                         })
                       );
 
-                      const updatedInbox = inboxData.map((item) =>
-                        item._id === payload.before._id
-                          ? {
-                              ...payload.before,
-                              ...payload.after,
-                            }
-                          : item
+                      setInboxData((prev) =>
+                        prev.map((item) =>
+                          item._id === payload.before._id
+                            ? {
+                                ...payload.before,
+                                ...payload.after,
+                              }
+                            : item
+                        )
                       );
-                      setInboxData(updatedInbox);
                     } catch (error) {
                       if (error instanceof Error) {
                         showToast({
