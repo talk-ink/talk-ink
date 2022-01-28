@@ -22,13 +22,18 @@ const authSlice = createSlice({
     },
     setAuthUser: (state, action: PayloadAction<TUserProfile>) => {
       let avatar = null;
+      let doneThreads: string[] = [];
 
       if (action.payload.avatar) {
         avatar = action.payload.avatar[0]?.url;
       }
+      if (action.payload.doneThreads) {
+        doneThreads = action.payload.doneThreads;
+      }
       state.user = {
         ...action.payload,
         avatar,
+        doneThreads,
       };
     },
     setAuthLoading: (state, action: PayloadAction<boolean>) => {
