@@ -110,6 +110,14 @@
   display: none !important;
 } */
 
+#onesignal-bell-container.onesignal-reset
+  .onesignal-bell-launcher.onesignal-bell-launcher-theme-default
+  .onesignal-bell-launcher-button
+  svg
+  .background {
+  fill: rgb(37, 56, 228) !important;
+}
+
 .comment-editor {
   height: 12rem !important;
 }

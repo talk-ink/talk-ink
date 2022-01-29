@@ -41,20 +41,31 @@ function App() {
 
       if (error) throw new Error(error.message);
 
-      OneSignal.init({
+      await OneSignal.init({
         appId: oneSignalId,
         notifyButton: {
           enable: true,
         },
         allowLocalhostAsSecureOrigin: true,
         autoResubscribe: true,
-      }).then(() => {
-        OneSignal.showSlidedownPrompt();
+        autoRegister: true,
+        persistNotification: true,
       });
 
-      OneSignal.setExternalUserId(userData._id).then(() =>
-        OneSignal.setSubscription(true)
-      );
+      await OneSignal.showSlidedownPrompt();
+
+      if (userData._id) {
+        const isSubscribe = await OneSignal.getSubscription();
+        const isIdSet = await OneSignal.getExternalUserId();
+
+        if (!isIdSet) {
+          await OneSignal.setExternalUserId(userData._id);
+        }
+
+        if (!isSubscribe) {
+          await OneSignal.setSubscription(true);
+        }
+      }
 
       const token: Token = { token: cookiesToken };
       const user: TUserProfile = userData;
