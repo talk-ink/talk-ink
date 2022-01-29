@@ -4,7 +4,7 @@ import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import OneSignal from "react-onesignal";
 import { kontenbase } from "lib/client";
 import { FaPlus } from "react-icons/fa";
@@ -60,6 +60,7 @@ function SidebarComponent({
   const channel = useAppSelector((state) => state.channel);
   const [showToast] = useToast();
 
+  const { pathname } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -355,8 +356,9 @@ function SidebarComponent({
                     }
                   } else {
                     if (
-                      params.channelId &&
-                      payload?.after?.channel?.includes(params.channelId)
+                      (params.channelId &&
+                        payload?.after?.channel?.includes(params.channelId)) ||
+                      pathname.includes(`/a/${params.workspaceId}/inbox`)
                     ) {
                       dispatch(
                         addThread({
@@ -381,8 +383,9 @@ function SidebarComponent({
                 break;
               case "CREATE_RECORD":
                 if (
-                  params.channelId &&
-                  payload?.channel?.includes(params.channelId)
+                  (params.channelId &&
+                    payload?.channel?.includes(params.channelId)) ||
+                  pathname.includes(`/a/${params.workspaceId}/inbox`)
                 ) {
                   dispatch(addThread({ ...payload, createdBy: _createdBy }));
                 }
