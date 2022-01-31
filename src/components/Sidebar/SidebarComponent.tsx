@@ -43,6 +43,7 @@ import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
 
 import { Channel, CreateChannel, Thread, User } from "types";
+import { lastWorkspaceId } from "utils/helper";
 
 type TProps = {
   isMobile: boolean;
@@ -150,6 +151,9 @@ function SidebarComponent({
 
       cookies.remove("token");
       OneSignal.removeExternalUserId();
+
+      lastWorkspaceId().remove();
+
       dispatch(logout());
       navigate("/login");
     } catch (error) {

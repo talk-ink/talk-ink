@@ -17,6 +17,7 @@ import RestrictedChannelPage from "pages/Channel/RestrictedChannel";
 import { setPageStatus } from "features/pageStatus";
 import { addChannel } from "features/channels/slice";
 import { fetchMembers } from "features/members";
+import { lastWorkspaceId } from "utils/helper";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -123,6 +124,12 @@ function DashboardPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
+
+  useEffect(() => {
+    if (auth?.user?.workspaces?.includes(params.workspaceId)) {
+      lastWorkspaceId().set({ id: params.workspaceId });
+    }
+  }, [params.workspaceId, auth.user]);
 
   const loading =
     workspace.loading ||
