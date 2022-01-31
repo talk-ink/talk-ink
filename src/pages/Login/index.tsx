@@ -77,7 +77,11 @@ function LoginPage() {
               .find({ where: { peoples: user._id } });
 
           if (workspaceData?.length > 0) {
-            toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+            if (user.lastWorkspace?.length > 0) {
+              toWorkspaceId = `${user.lastWorkspace[0]}/inbox`;
+            } else {
+              toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+            }
           } else {
             toWorkspaceId = `create_workspace`;
           }

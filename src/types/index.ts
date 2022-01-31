@@ -103,6 +103,7 @@ export interface User {
   contact?: string;
   doneThreads?: string[];
   readedThreads?: string[];
+  lastWorkspace?: string[] | null | undefined;
 }
 
 export interface Login {
