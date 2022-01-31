@@ -1,6 +1,6 @@
 import IconButton from "components/Button/IconButton";
 import React from "react";
-import { BiFilter, BiSearch } from "react-icons/bi";
+import { BiSearch } from "react-icons/bi";
 import { GrClose } from "react-icons/gr";
 
 interface Props extends React.HTMLProps<HTMLInputElement> {

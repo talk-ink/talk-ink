@@ -100,18 +100,17 @@ function ContentItem({
               } rounded-full mr-2`}
             ></div>
             <div className="mr-4">
-              {dataSource.createdBy?.avatar?.[0]?.url ? (
-                <Avatar
-                  src={
-                    isFromTalkink
-                      ? logoImage
-                      : dataSource.createdBy?.avatar?.[0]?.url
-                  }
-                />
-              ) : (
-                <NameInitial
-                  name={getNameInitial(dataSource.createdBy?.firstName)}
-                />
+              {isFromTalkink && <Avatar src={logoImage} />}
+              {!isFromTalkink && (
+                <>
+                  {dataSource.createdBy?.avatar?.[0]?.url ? (
+                    <Avatar src={dataSource.createdBy?.avatar?.[0]?.url} />
+                  ) : (
+                    <NameInitial
+                      name={getNameInitial(dataSource.createdBy?.firstName)}
+                    />
+                  )}
+                </>
               )}
             </div>
           </div>

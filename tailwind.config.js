@@ -13,9 +13,14 @@ module.exports = {
           "0%": { transform: "translateY(-100%)" },
           "100%": { transform: "translateY(0px)" },
         },
+        easeOpacity: {
+          "0%": { opacity: 0 },
+          "100%": { opacity: 1 },
+        },
       },
       animation: {
         showToast: "showToast 0.1s ease-in-out",
+        easeOpacity: "easeOpacity 0.1s ease-in",
       },
     },
     fontFamily: {

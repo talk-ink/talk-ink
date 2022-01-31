@@ -7,7 +7,7 @@ import FullscreenLoading from "components/Loading/FullscreenLoading";
 type Props = React.PropsWithChildren<{
   children: JSX.Element;
   type?: "public" | "private";
-  from?: string;
+  from?: "login" | "inviteLogin" | "register" | "inviteRegister" | "landing";
 }>;
 
 function RestrictedRoute({ children, type = "private", from }: Props) {
@@ -55,6 +55,14 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
           ["login", "register"].includes(from) &&
           auth.user?.workspaces?.length > 0
         ) {
+          return (
+            <Navigate
+              to={`/a/${auth.user?.workspaces[0]}/inbox`}
+              state={{ from: location }}
+            />
+          );
+        }
+        if (from === "landing") {
           return (
             <Navigate
               to={`/a/${auth.user?.workspaces[0]}/inbox`}

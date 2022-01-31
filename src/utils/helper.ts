@@ -1,6 +1,7 @@
 import { SearchResponse, SendEmail, Thread, User } from "types";
 import axios, { AxiosResponse } from "axios";
 import FileResizer from "react-image-file-resizer";
+import { LocalStorageKey } from "types/enum";
 
 const EMAIL_API: string = process.env.REACT_APP_EMAIL_API;
 
@@ -286,4 +287,39 @@ export const sendSearch = async ({
     { auth: basicAuth }
   );
   return searchData;
+};
+
+export const lastWorkspaceId = (): {
+  set: ({ id }: { id: string }) => boolean;
+  remove: () => boolean;
+  get: () => string | undefined | null;
+} => {
+  const get = (): string | undefined | null => {
+    try {
+      return localStorage.getItem(LocalStorageKey.LastWorkspaceId);
+    } catch (error: any) {
+      console.log("err", error?.message);
+      return undefined;
+    }
+  };
+  const set = ({ id }: { id: string }): boolean => {
+    try {
+      localStorage.setItem(LocalStorageKey.LastWorkspaceId, id);
+      return true;
+    } catch (error: any) {
+      console.log("err", error?.message);
+      return false;
+    }
+  };
+  const remove = (): boolean => {
+    try {
+      localStorage.removeItem(LocalStorageKey.LastWorkspaceId);
+      return true;
+    } catch (error: any) {
+      console.log("err", error?.message);
+      return false;
+    }
+  };
+
+  return { set, remove, get };
 };

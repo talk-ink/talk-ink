@@ -12,15 +12,15 @@ import App from "./App";
 
 ReactDOM.render(
   <React.StrictMode>
-    <ErrorBoundary fallback={<NotFound />}>
-      <Provider store={store}>
-        <PersistGate loading={null} persistor={persistor}>
-          <BrowserRouter>
+    <BrowserRouter>
+      <ErrorBoundary fallback={<NotFound />}>
+        <Provider store={store}>
+          <PersistGate loading={null} persistor={persistor}>
             <App />
-          </BrowserRouter>
-        </PersistGate>
-      </Provider>
-    </ErrorBoundary>
+          </PersistGate>
+        </Provider>
+      </ErrorBoundary>
+    </BrowserRouter>
   </React.StrictMode>,
   document.getElementById("root")
 );
