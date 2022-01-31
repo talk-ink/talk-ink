@@ -17,17 +17,12 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment, IReaction, Member, User } from "types";
+import { IComment, IReaction, Member } from "types";
 import {
   deleteComment,
   updateComment,
 } from "features/threads/slice/asyncThunk";
-import {
-  addSubCommentToComment,
-  addReactionToComment,
-  removeReactionFromComment,
-  updateReactionUser,
-} from "features/threads/slice";
+import { addSubCommentToComment } from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
@@ -202,28 +197,24 @@ const Comment: React.FC<IProps> = ({
             comment: [commentId],
           });
         if (addReactionError) throw new Error(addReactionError.message);
+
         const { error: linkCommentsError } = await kontenbase
           .service("Comments")
           .link(commentId, { reactions: addReactionData?._id });
         if (linkCommentsError) throw new Error(linkCommentsError.message);
 
+        const { error: updateComment } = await kontenbase
+          .service("Comments")
+          .updateById(commentId, { content: comment.content });
+        if (updateComment) throw new Error(updateComment.message);
+
         let newReaction: IReaction = {
           emoji: emoji,
-
           unified: unified,
           users: [auth.user],
         };
 
         return setReactions((prev) => [...prev, newReaction]);
-
-        // return dispatch(
-        //   addReactionToComment({
-        //     commentId,
-        //     emoji,
-        //     unified,
-        //     user: { ...auth.user, avatar: [{ url: auth.user.avatar }] },
-        //   })
-        // );
       }
 
       showToast({ message: `This emoji is already used` });
@@ -238,13 +229,83 @@ const Comment: React.FC<IProps> = ({
   }: {
     reaction: IReaction;
   }) => {
-    setReactions((prev) =>
-      prev.filter((data) => data.unified !== reaction.unified)
-    );
+    try {
+      if (reaction._id) {
+        const { error: removeReactionError } = await kontenbase
+          .service("Reactions")
+          .deleteById(reaction._id);
+        if (removeReactionError) throw new Error(removeReactionError.message);
+
+        const { error: updateComment } = await kontenbase
+          .service("Comments")
+          .updateById(comment._id, { content: comment.content });
+        if (updateComment) throw new Error(updateComment.message);
+      }
+
+      setReactions((prev) =>
+        prev.filter((data) => data.unified !== reaction.unified)
+      );
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
   };
 
-  const addReactionUser = async ({ user }: { user: User }) => {
+  const reactionUser = async ({
+    reaction,
+    type,
+  }: {
+    reaction: IReaction;
+    type: "add" | "remove";
+  }) => {
     try {
+      if (reaction._id) {
+        switch (type) {
+          case "add":
+            const { error: linkError } = await kontenbase
+              .service("Reactions")
+              .link(reaction._id, { users: auth.user._id });
+            if (linkError) throw new Error(linkError.message);
+
+            setReactions((prev) => {
+              return prev.map((data) => {
+                if (data._id === reaction._id) {
+                  return { ...data, users: [...data.users, auth.user] };
+                }
+                return data;
+              });
+            });
+            break;
+          case "remove":
+            const { error: unlinkError } = await kontenbase
+              .service("Reactions")
+              .unlink(reaction._id, { users: auth.user._id });
+            if (unlinkError) throw new Error(unlinkError.message);
+
+            setReactions((prev) => {
+              return prev.map((data) => {
+                if (data._id === reaction._id) {
+                  return {
+                    ...data,
+                    users: data.users.filter(
+                      (user) => user._id !== auth.user._id
+                    ),
+                  };
+                }
+                return data;
+              });
+            });
+            break;
+
+          default:
+            break;
+        }
+
+        const { error: updateComment } = await kontenbase
+          .service("Comments")
+          .updateById(comment._id, { content: comment.content });
+        if (updateComment) throw new Error(updateComment.message);
+      }
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
@@ -253,12 +314,14 @@ const Comment: React.FC<IProps> = ({
 
   const fetchReactions = async () => {
     try {
-      const { data: reactionsData, error: reactionsError } = await kontenbase
-        .service("Reactions")
-        .find({ where: { comment: comment._id }, lookup: ["users"] });
-      if (reactionsError) throw new Error(reactionsError.message);
+      if (comment?.reactions?.length > 0) {
+        const { data: reactionsData, error: reactionsError } = await kontenbase
+          .service("Reactions")
+          .find({ where: { comment: comment._id }, lookup: ["users"] });
+        if (reactionsError) throw new Error(reactionsError.message);
 
-      setReactions(reactionsData);
+        setReactions(reactionsData);
+      }
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
@@ -267,6 +330,7 @@ const Comment: React.FC<IProps> = ({
 
   useEffect(() => {
     fetchReactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comment.reactions]);
 
   return (
@@ -318,6 +382,16 @@ const Comment: React.FC<IProps> = ({
                           removeReactionHandler({
                             reaction,
                           });
+                        } else {
+                          const findUser: boolean =
+                            reaction.users.findIndex(
+                              (data) => data._id === auth.user._id
+                            ) >= 0;
+                          if (!findUser) {
+                            reactionUser({ reaction, type: "add" });
+                          } else {
+                            reactionUser({ reaction, type: "remove" });
+                          }
                         }
                       }}
                     />

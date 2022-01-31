@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment-timezone";
-import { Thread, IComment, ISubComment, IReaction, Member } from "types";
-import { createUniqueArray, filterDistinct } from "utils/helper";
+import { Thread, IComment, ISubComment } from "types";
+import { filterDistinct } from "utils/helper";
 import { fetchComments, fetchThreads } from "./asyncThunk";
 
 type InitThreadState = {
@@ -43,17 +43,6 @@ type TSubCommentsDeletePayload = {
   commentId: string;
   threadId: string;
 };
-
-interface IAddReactionToComment extends IReaction {
-  commentId: string;
-  emoji: string;
-  unified?: string;
-  user: Member;
-}
-interface IRemoveReactionFromComment
-  extends Omit<IAddReactionToComment, "user"> {}
-
-interface IUpdateReaction extends IAddReactionToComment {}
 
 const initialState: InitThreadState = {
   threads: [],
@@ -243,107 +232,6 @@ const threadSlice = createSlice({
 
       state.threads = newThread;
     },
-    addReactionToComment: (
-      state,
-      action: PayloadAction<IAddReactionToComment>
-    ) => {
-      const findThreadIndex = state.threads.findIndex(
-        (thread) =>
-          !!thread.comments.find(
-            (comment) => comment._id === action.payload.commentId
-          )
-      );
-      const findCommentIndex = state.threads[
-        findThreadIndex
-      ].comments.findIndex(
-        (comment) => comment._id === action.payload.commentId
-      );
-
-      let reactions =
-        state.threads[findThreadIndex].comments[findCommentIndex].reactions ??
-        [];
-      let newReaction: IReaction = {
-        emoji: action.payload.emoji,
-        comment: [action.payload.commentId],
-        unified: action.payload.unified,
-        users: [action.payload.user],
-      };
-      if (reactions.length === 0) {
-        reactions = [newReaction];
-      } else {
-        reactions = [...reactions, newReaction];
-      }
-
-      state.threads[findThreadIndex].comments[findCommentIndex].reactions =
-        reactions;
-    },
-    removeReactionFromComment: (
-      state,
-      action: PayloadAction<IRemoveReactionFromComment>
-    ) => {
-      const findThreadIndex = state.threads.findIndex(
-        (thread) =>
-          !!thread.comments.find(
-            (comment) => comment._id === action.payload.commentId
-          )
-      );
-      const findCommentIndex = state.threads[
-        findThreadIndex
-      ].comments.findIndex(
-        (comment) => comment._id === action.payload.commentId
-      );
-
-      let reactions =
-        state.threads[findThreadIndex].comments[findCommentIndex].reactions;
-      const findReactionIndex = reactions.findIndex(
-        (reaction) =>
-          reaction.emoji === action.payload.emoji &&
-          reaction.unified === action.payload.unified
-      );
-
-      state.threads[findThreadIndex].comments[
-        findCommentIndex
-      ].reactions.splice(findReactionIndex, 1);
-    },
-    updateReactionUser: (state, action: PayloadAction<IUpdateReaction>) => {
-      const findThreadIndex = state.threads.findIndex(
-        (thread) =>
-          !!thread.comments.find(
-            (comment) => comment._id === action.payload.commentId
-          )
-      );
-      const findCommentIndex = state.threads[
-        findThreadIndex
-      ].comments.findIndex(
-        (comment) => comment._id === action.payload.commentId
-      );
-
-      let reactions =
-        state.threads[findThreadIndex].comments[findCommentIndex].reactions;
-      const findReactionIndex = reactions.findIndex(
-        (reaction) =>
-          reaction.emoji === action.payload.emoji &&
-          reaction.unified === action.payload.unified
-      );
-      let reaction =
-        state.threads[findThreadIndex].comments[findCommentIndex].reactions[
-          findReactionIndex
-        ];
-
-      const userIndex = reaction.users.findIndex(
-        (data) => data._id === action.payload.user._id
-      );
-
-      if (userIndex >= 0) {
-        state.threads[findThreadIndex].comments[findCommentIndex].reactions[
-          findReactionIndex
-        ].users.splice(userIndex, 1);
-      } else {
-        state.threads[findThreadIndex].comments[findCommentIndex].reactions[
-          findReactionIndex
-        ].users.push(action.payload.user);
-      }
-    },
   },
   extraReducers: (builder) => {
     //fetch thread
@@ -416,8 +304,5 @@ export const {
   addSubCommentToComment,
   updateSubCommentToComment,
   deleteSubCommentToComment,
-  addReactionToComment,
-  removeReactionFromComment,
-  updateReactionUser,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;
