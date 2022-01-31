@@ -3,11 +3,12 @@ import { Navigate, useLocation, useParams } from "react-router";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
+import { lastWorkspaceId } from "utils/helper";
 
 type Props = React.PropsWithChildren<{
   children: JSX.Element;
   type?: "public" | "private";
-  from?: string;
+  from?: "login" | "inviteLogin" | "register" | "inviteRegister" | "landing";
 }>;
 
 function RestrictedRoute({ children, type = "private", from }: Props) {
@@ -55,12 +56,42 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
           ["login", "register"].includes(from) &&
           auth.user?.workspaces?.length > 0
         ) {
+          const getLastWorkspaceId = lastWorkspaceId().get();
+
+          if (auth?.user?.workspaces?.includes(getLastWorkspaceId)) {
+            return (
+              <Navigate
+                to={`/a/${getLastWorkspaceId}/inbox`}
+                state={{ from: location }}
+              />
+            );
+          }
+
           return (
             <Navigate
               to={`/a/${auth.user?.workspaces[0]}/inbox`}
               state={{ from: location }}
             />
           );
+        }
+        if (from === "landing") {
+          const getLastWorkspaceId = lastWorkspaceId().get();
+
+          if (auth?.user?.workspaces?.includes(getLastWorkspaceId)) {
+            return (
+              <Navigate
+                to={`/a/${getLastWorkspaceId}/inbox`}
+                state={{ from: location }}
+              />
+            );
+          } else {
+            return (
+              <Navigate
+                to={`/a/${auth.user?.workspaces[0]}/inbox`}
+                state={{ from: location }}
+              />
+            );
+          }
         }
         return <Navigate to="/404" state={{ from: location }} />;
       }

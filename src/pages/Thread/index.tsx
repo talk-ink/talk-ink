@@ -51,6 +51,8 @@ function ThreadPage() {
   const [memberList, setMemberList] = useState<Member[]>([]);
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
 
+  const [showTitle, setShowTitle] = useState<boolean>(false);
+
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === channelId);
   }, [channelId, channel.channels]);
@@ -283,8 +285,16 @@ function ThreadPage() {
           title={threadData?.name}
           thread
           from={query.get("fromInbox") === "1" && "inbox"}
+          showTitle={showTitle}
         />
       }
+      onScroll={(e: any) => {
+        if (e?.target?.scrollTop >= 120) {
+          setShowTitle(true);
+        } else {
+          setShowTitle(false);
+        }
+      }}
     >
       <div className="max-w-4xl ml-auto mr-auto -mt-4">
         <div className="relative">

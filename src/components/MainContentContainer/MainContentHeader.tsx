@@ -10,6 +10,7 @@ type Props = React.PropsWithChildren<{
   thread?: boolean;
   onBackClick?: () => void;
   from?: string;
+  showTitle?: boolean;
 }>;
 
 function MainContentHeader({
@@ -18,6 +19,7 @@ function MainContentHeader({
   thread,
   onBackClick = () => {},
   from,
+  showTitle = false,
 }: Props) {
   const navigate = useNavigate();
   const params = useParams();
@@ -46,9 +48,11 @@ function MainContentHeader({
         </Button>
       </div>
       <div className="flex items-center justify-center grid-cols-1">
-        <h1 className="text-md font-bold max-w-md overflow-hidden text-ellipsis whitespace-nowrap">
-          {title}
-        </h1>
+        {showTitle && (
+          <h1 className="text-md font-bold max-w-md overflow-hidden text-ellipsis whitespace-nowrap animate-easeOpacity">
+            {title}
+          </h1>
+        )}
       </div>
       {thread && (
         <div className="grid-cols-1 flex items-center justify-end"></div>

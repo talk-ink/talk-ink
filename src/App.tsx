@@ -89,7 +89,15 @@ function App() {
   return (
     <ToastProvider>
       <Routes>
-        <Route caseSensitive path="/" element={<LandingPage />} />
+        <Route
+          caseSensitive
+          path="/"
+          element={
+            <RestrictedRoute type="public" from="landing">
+              <LandingPage />
+            </RestrictedRoute>
+          }
+        />
         <Route
           caseSensitive
           path="/a/create_workspace"

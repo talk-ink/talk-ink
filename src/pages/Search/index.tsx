@@ -6,7 +6,6 @@ import SearchItem from "components/SearchItem";
 
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
-import axios from "axios";
 import { SearchResponse, Thread } from "types";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch } from "hooks/useAppDispatch";
