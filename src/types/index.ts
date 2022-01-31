@@ -23,6 +23,7 @@ export interface IReaction {
   emoji: string;
   comment?: string[];
   users?: Member[];
+  unified?: string;
 }
 
 export interface IComment {

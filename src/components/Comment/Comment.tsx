@@ -3,11 +3,12 @@ import React, { useEffect, useState } from "react";
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Menu } from "@headlessui/react";
+import { Menu, Popover } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
 import { HiOutlineReply } from "react-icons/hi";
 import Select from "react-select";
 import { VscReactions } from "react-icons/vsc";
+import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -16,7 +17,7 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment, IReaction, Member } from "types";
+import { IComment, IReaction, Member, User } from "types";
 import {
   deleteComment,
   updateComment,
@@ -25,6 +26,7 @@ import {
   addSubCommentToComment,
   addReactionToComment,
   removeReactionFromComment,
+  updateReactionUser,
 } from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
@@ -74,6 +76,8 @@ const Comment: React.FC<IProps> = ({
   const [selectedNotifiedOptions, setSelectedNotifiedOptions] = useState<
     INotifiedOption[]
   >([]);
+
+  const [reactions, setReactions] = useState<IReaction[]>([]);
 
   useEffect(() => {
     if (memberList.length <= 0 || !auth || !comment) return;
@@ -177,27 +181,93 @@ const Comment: React.FC<IProps> = ({
 
   const addReactionToCommentHandler = async ({
     commentId,
+    emoji,
+    unified,
   }: {
     commentId: string;
+    emoji: string;
+    unified: string;
   }) => {
-    dispatch(
-      addReactionToComment({
-        commentId,
-        emoji: "🤒",
-        user: { ...auth.user, avatar: [{ url: auth.user.avatar }] },
-      })
+    try {
+      const findSameReaction = reactions.find(
+        (data) => data.unified === unified || data.emoji === emoji
+      );
+
+      if (!findSameReaction) {
+        const { data: addReactionData, error: addReactionError } =
+          await kontenbase.service("Reactions").create({
+            emoji,
+            unified,
+            users: [auth.user._id],
+            comment: [commentId],
+          });
+        if (addReactionError) throw new Error(addReactionError.message);
+        const { error: linkCommentsError } = await kontenbase
+          .service("Comments")
+          .link(commentId, { reactions: addReactionData?._id });
+        if (linkCommentsError) throw new Error(linkCommentsError.message);
+
+        let newReaction: IReaction = {
+          emoji: emoji,
+
+          unified: unified,
+          users: [auth.user],
+        };
+
+        return setReactions((prev) => [...prev, newReaction]);
+
+        // return dispatch(
+        //   addReactionToComment({
+        //     commentId,
+        //     emoji,
+        //     unified,
+        //     user: { ...auth.user, avatar: [{ url: auth.user.avatar }] },
+        //   })
+        // );
+      }
+
+      showToast({ message: `This emoji is already used` });
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const removeReactionHandler = async ({
+    reaction,
+  }: {
+    reaction: IReaction;
+  }) => {
+    setReactions((prev) =>
+      prev.filter((data) => data.unified !== reaction.unified)
     );
   };
 
-  const removeReactionFromCommentHandler = async ({
-    commentId,
-    reaction,
-  }: {
-    commentId: string;
-    reaction: IReaction;
-  }) => {
-    dispatch(removeReactionFromComment({ commentId, ...reaction }));
+  const addReactionUser = async ({ user }: { user: User }) => {
+    try {
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
   };
+
+  const fetchReactions = async () => {
+    try {
+      const { data: reactionsData, error: reactionsError } = await kontenbase
+        .service("Reactions")
+        .find({ where: { comment: comment._id }, lookup: ["users"] });
+      if (reactionsError) throw new Error(reactionsError.message);
+
+      setReactions(reactionsData);
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  useEffect(() => {
+    fetchReactions();
+  }, [comment.reactions]);
 
   return (
     <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
@@ -229,7 +299,7 @@ const Comment: React.FC<IProps> = ({
               handleUpdateComment={handleUpdateComment}
             />
             <div className="flex items-center gap-2 flex-wrap mb-4">
-              {comment?.reactions?.map(
+              {reactions?.map(
                 (reaction, idx) =>
                   reaction.users.length > 0 && (
                     <Reaction
@@ -245,8 +315,7 @@ const Comment: React.FC<IProps> = ({
                           reaction.users.length === 1 &&
                           reaction.users[0]._id === auth.user._id
                         ) {
-                          removeReactionFromCommentHandler({
-                            commentId: comment._id,
+                          removeReactionHandler({
                             reaction,
                           });
                         }
@@ -415,20 +484,41 @@ const Comment: React.FC<IProps> = ({
           <Menu as="div" className="relative flex">
             {({ open }) => (
               <>
-                <IconButton
-                  size="medium"
-                  className={`${
-                    open ? "flex" : "hidden"
-                  } group-hover:flex items-center`}
-                  onClick={() => {
-                    addReactionToCommentHandler({ commentId: comment._id });
-                  }}
-                >
-                  <VscReactions
-                    size={24}
-                    className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
-                  />
-                </IconButton>
+                <Popover className="relative">
+                  {({ open: popOpen, close }) => (
+                    <>
+                      <Popover.Button as={React.Fragment}>
+                        <IconButton
+                          size="medium"
+                          className={`${
+                            open || popOpen ? "flex" : "hidden"
+                          } group-hover:flex items-center`}
+                        >
+                          <VscReactions
+                            size={24}
+                            className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                          />
+                        </IconButton>
+                      </Popover.Button>
+                      <Popover.Panel className="absolute z-10 right-full top-0 mr-2">
+                        <Picker
+                          onEmojiClick={(_, emojiObject) => {
+                            addReactionToCommentHandler({
+                              commentId: comment._id,
+                              emoji: emojiObject.emoji,
+                              unified: emojiObject.unified,
+                            });
+
+                            close();
+                          }}
+                          skinTone={SKIN_TONE_NEUTRAL}
+                          disableSkinTonePicker
+                          native
+                        />
+                      </Popover.Panel>
+                    </>
+                  )}
+                </Popover>
                 {!isReplyEditorVisible && !isEdit && (
                   <IconButton
                     size="medium"
