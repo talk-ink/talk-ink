@@ -4,7 +4,7 @@ import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
-import { useNavigate, useParams } from "react-router";
+import { useNavigate, useParams, useLocation } from "react-router";
 import OneSignal from "react-onesignal";
 import { kontenbase } from "lib/client";
 import { FaPlus } from "react-icons/fa";
@@ -42,7 +42,7 @@ import { useToast } from "hooks/useToast";
 import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
 
-import { Channel, CreateChannel, Thread } from "types";
+import { Channel, CreateChannel, Thread, User } from "types";
 
 type TProps = {
   isMobile: boolean;
@@ -60,6 +60,7 @@ function SidebarComponent({
   const channel = useAppSelector((state) => state.channel);
   const [showToast] = useToast();
 
+  const { pathname } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -267,7 +268,7 @@ function SidebarComponent({
           isUpdate ? payload?.before?.channel?.[0] : payload?.channel?.[0]
         );
 
-        let _createdBy;
+        let _createdBy: User;
 
         try {
           const { data, error } = await kontenbase.service("Users").find({
@@ -336,15 +337,16 @@ function SidebarComponent({
                         })
                       );
 
-                      const updatedInbox = inboxData.map((item) =>
-                        item._id === payload.before._id
-                          ? {
-                              ...payload.before,
-                              ...payload.after,
-                            }
-                          : item
+                      setInboxData((prev) =>
+                        prev.map((item) =>
+                          item._id === payload.before._id
+                            ? {
+                                ...payload.before,
+                                ...payload.after,
+                              }
+                            : item
+                        )
                       );
-                      setInboxData(updatedInbox);
                     } catch (error) {
                       if (error instanceof Error) {
                         showToast({
@@ -353,37 +355,45 @@ function SidebarComponent({
                       }
                     }
                   } else {
-                    dispatch(
-                      addThread({
-                        ...payload.before,
-                        ...payload.after,
-                        createdBy: _createdBy,
-                      })
-                    );
+                    if (
+                      (params.channelId &&
+                        payload?.after?.channel?.includes(params.channelId)) ||
+                      pathname.includes(`/a/${params.workspaceId}/inbox`)
+                    ) {
+                      dispatch(
+                        addThread({
+                          ...payload.before,
+                          ...payload.after,
+                          createdBy: _createdBy,
+                        })
+                      );
+                    }
 
-                    const newInboxData = [
-                      ...inboxData,
+                    setInboxData((prev) => [
+                      ...prev,
                       {
                         ...payload.before,
                         ...payload.after,
                       },
-                    ];
-
-                    setInboxData(newInboxData);
+                    ]);
                   }
 
                   updateUserStore();
                 }
                 break;
               case "CREATE_RECORD":
-                dispatch(addThread({ ...payload, createdBy: _createdBy }));
+                if (
+                  (params.channelId &&
+                    payload?.channel?.includes(params.channelId)) ||
+                  pathname.includes(`/a/${params.workspaceId}/inbox`)
+                ) {
+                  dispatch(addThread({ ...payload, createdBy: _createdBy }));
+                }
 
-                const newInboxData = [
-                  ...inboxData,
+                setInboxData((prev) => [
+                  ...prev,
                   { ...payload, createdBy: _createdBy },
-                ];
-
-                setInboxData(newInboxData);
+                ]);
 
                 updateUserStore();
                 break;

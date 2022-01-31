@@ -45,7 +45,7 @@ function RegisterPage() {
       if (errorUser) throw new Error(errorUser.message);
 
       if (userData) {
-        OneSignal.setExternalUserId(userData.id).then(() =>
+        OneSignal.setExternalUserId(userData._id).then(() =>
           OneSignal.setSubscription(true)
         );
         const user: TUserProfile = userData;
@@ -80,10 +80,9 @@ function RegisterPage() {
       }
     } catch (error: any) {
       console.log("error");
-      setApiError(`${error.message}`);
 
       if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
+        setApiError(`${error.message}`);
       }
     } finally {
       setApiLoading(false);

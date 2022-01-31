@@ -183,7 +183,7 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div className="sticky bottom-0 left-0 z-30  bg-white">
+    <div className="sticky bottom-0 left-0 z-30  bg-white" id="comment-form">
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
           {auth.user.avatar ? (
@@ -208,8 +208,8 @@ const Form: React.FC<IProps> = ({
       )}
 
       {isShowEditor && (
-        <div className="px-2 border-solid border-[1px] border-light-blue-500 rounded-xl mb-5	">
-          <div className="mt-1 flex w-fit items-center">
+        <div className="px-2 border-solid border-[1px] border-light-blue-500 rounded-xl mb-5">
+          <div className="mt-1 flex w-full items-center">
             <div className="mr-2">
               <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
                 Tag:
@@ -289,7 +289,7 @@ const Form: React.FC<IProps> = ({
                 setSelectedNotifiedOptions(currSelectedOptions);
               }}
               isClearable={false}
-              className="text-sm custom-select "
+              className="text-sm custom-select"
               closeMenuOnSelect={false}
               defaultValue={[notifiedOptions[0]]}
               isMulti
@@ -299,6 +299,16 @@ const Form: React.FC<IProps> = ({
               components={{
                 DropdownIndicator: () => null,
                 IndicatorSeparator: () => null,
+              }}
+              styles={{
+                container: (base) => ({
+                  ...base,
+                  width: "100%",
+                }),
+                menuList: (base) => ({
+                  ...base,
+                  maxWidth: 300,
+                }),
               }}
             />
           </div>

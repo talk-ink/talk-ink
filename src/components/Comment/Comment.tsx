@@ -263,24 +263,55 @@ const Comment: React.FC<IProps> = ({
                 <div className="border-t-[1px] border-gray-200 mb-8" />
                 {!isShowMoreSubComment && (
                   <div className="text-sm -mt-3">
-                    {comment.subComments?.length > 1 && (
+                    {comment.subComments?.length > 2 && (
                       <p
                         className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
                         onClick={() => setIsShowMoreSubComment(true)}
                       >
-                        View More {comment.subComments?.length - 1} Comments
+                        Show More {comment.subComments?.length - 2} Comments
                       </p>
+                    )}
+                    {comment.subComments?.length >= 2 && (
+                      <SubComment
+                        comment={{
+                          ...comment.subComments?.[
+                            comment.subComments.length - 2
+                          ],
+                          createdBy: memberList.find(
+                            (item) =>
+                              //@ts-ignore
+                              item._id ===
+                              comment.subComments?.[
+                                comment.subComments.length - 2
+                              ].createdBy
+                          ),
+                        }}
+                        key={
+                          comment.subComments?.[comment.subComments.length - 2]
+                            ?._id
+                        }
+                        parentId={comment._id}
+                        threadId={threadId}
+                      />
                     )}
                     <SubComment
                       comment={{
-                        ...comment.subComments?.[0],
+                        ...comment.subComments?.[
+                          comment.subComments.length - 1
+                        ],
                         createdBy: memberList.find(
                           (item) =>
                             //@ts-ignore
-                            item._id === comment.subComments?.[0].createdBy
+                            item._id ===
+                            comment.subComments?.[
+                              comment.subComments.length - 1
+                            ].createdBy
                         ),
                       }}
-                      key={comment.subComments?.[0]?._id}
+                      key={
+                        comment.subComments?.[comment.subComments.length - 1]
+                          ?._id
+                      }
                       parentId={comment._id}
                       threadId={threadId}
                     />
@@ -312,7 +343,7 @@ const Comment: React.FC<IProps> = ({
           {isReplyEditorVisible && (
             <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
               <div>
-                <div className="mt-1 flex w-fit items-center">
+                <div className="mt-1 flex w-full items-center">
                   <div className="mr-2">
                     <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
                       Tag:
@@ -334,6 +365,16 @@ const Comment: React.FC<IProps> = ({
                     components={{
                       DropdownIndicator: () => null,
                       IndicatorSeparator: () => null,
+                    }}
+                    styles={{
+                      container: (base) => ({
+                        ...base,
+                        width: "100%",
+                      }),
+                      menuList: (base) => ({
+                        ...base,
+                        maxWidth: 300,
+                      }),
                     }}
                   />
                 </div>

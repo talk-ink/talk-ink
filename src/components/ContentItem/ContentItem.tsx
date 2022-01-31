@@ -118,7 +118,7 @@ function ContentItem({
           <div>
             <div className="flex flex-col items-start md:flex-row md:items-center">
               <p
-                className={`font-body text-sm mr-2 max-w-xs overflow-hidden text-ellipsis ${
+                className={`font-body text-sm mr-2 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap ${
                   dataSource?.draft && "text-blue-500"
                 } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >
