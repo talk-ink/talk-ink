@@ -3,7 +3,6 @@ import { Navigate, useLocation, useParams } from "react-router";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
-import { lastWorkspaceId } from "utils/helper";
 
 type Props = React.PropsWithChildren<{
   children: JSX.Element;
@@ -56,7 +55,7 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
           ["login", "register"].includes(from) &&
           auth.user?.workspaces?.length > 0
         ) {
-          const getLastWorkspaceId = lastWorkspaceId().get();
+          const getLastWorkspaceId = auth.user.lastWorkspace[0] ?? "";
 
           if (auth?.user?.workspaces?.includes(getLastWorkspaceId)) {
             return (
@@ -75,7 +74,7 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
           );
         }
         if (from === "landing") {
-          const getLastWorkspaceId = lastWorkspaceId().get();
+          const getLastWorkspaceId = auth.user.lastWorkspace[0] ?? "";
 
           if (auth?.user?.workspaces?.includes(getLastWorkspaceId)) {
             return (

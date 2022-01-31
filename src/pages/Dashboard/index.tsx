@@ -17,7 +17,7 @@ import RestrictedChannelPage from "pages/Channel/RestrictedChannel";
 import { setPageStatus } from "features/pageStatus";
 import { addChannel } from "features/channels/slice";
 import { fetchMembers } from "features/members";
-import { lastWorkspaceId } from "utils/helper";
+import { updateUser } from "features/auth";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -125,11 +125,26 @@ function DashboardPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
+  const setLastWorkspace = async ({ id }: { id: string }) => {
+    try {
+      if (auth.user?.lastWorkspace?.[0] !== id) {
+        const { error } = await kontenbase.auth.update({ lastWorkspace: [id] });
+        if (error) throw new Error(error?.message);
+
+        dispatch(updateUser({ lastWorkspace: [id] }));
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
   useEffect(() => {
     if (auth?.user?.workspaces?.includes(params.workspaceId)) {
-      lastWorkspaceId().set({ id: params.workspaceId });
+      setLastWorkspace({ id: params.workspaceId });
     }
-  }, [params.workspaceId, auth.user]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId, auth.user.workspaces]);
 
   const loading =
     workspace.loading ||
