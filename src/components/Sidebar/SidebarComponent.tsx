@@ -150,6 +150,7 @@ function SidebarComponent({
 
       cookies.remove("token");
       OneSignal.removeExternalUserId();
+
       dispatch(logout());
       navigate("/login");
     } catch (error) {
