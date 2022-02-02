@@ -26,7 +26,7 @@ const List: React.FC<IProps> = ({
         dataSource.map((item, index) => (
           <Comment
             comment={item}
-            key={index}
+            key={item._id}
             memberList={memberList}
             threadId={threadId}
             threadName={threadName}
