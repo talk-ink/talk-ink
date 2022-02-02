@@ -183,7 +183,7 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div className="sticky bottom-0 left-0 z-30  bg-white" id="comment-form">
+    <div className=" bg-white">
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
           {auth.user.avatar ? (
@@ -196,7 +196,7 @@ const Form: React.FC<IProps> = ({
           )}
 
           <input
-            className="ml-4  appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
+            className="ml-4 appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
             placeholder="Input Your Message"
             readOnly
