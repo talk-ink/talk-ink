@@ -628,6 +628,12 @@ function SidebarComponent({
                   setIsSidebarOpen={setIsSidebarOpen}
                   count={inboxLeft || 0}
                 />
+                <SidebarList
+                  type="trash"
+                  name="Trash"
+                  link={`/a/${workspaceData?._id}/trash`}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                />
                 {/* <SidebarList
                 type="saved"
                 name="Saved"

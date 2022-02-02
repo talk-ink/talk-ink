@@ -28,6 +28,7 @@ import InboxList from "pages/Inbox/InboxList";
 import InvitedWorkspacePage from "pages/InvitedWorkspace";
 import { oneSignalId } from "utils/helper";
 import SearchPage from "pages/Search";
+import TrashPage from "pages/Trash";
 
 function App() {
   const dispatch = useAppDispatch();
@@ -121,6 +122,7 @@ function App() {
             <Route path="" element={<InboxList />} />
             <Route path="close" element={<InboxList type="close" />} />
           </Route>
+          <Route path="trash" element={<TrashPage />} />
 
           <Route path="saved" element={<>saved</>} />
           <Route path="messages" element={<>messages</>} />

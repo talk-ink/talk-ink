@@ -11,6 +11,7 @@ import {
   BiInfoCircle,
   BiLock,
   BiLogOut,
+  BiTrash,
   BiUserPlus,
 } from "react-icons/bi";
 import {
@@ -22,7 +23,13 @@ import { NavLink, useLocation, useParams } from "react-router-dom";
 
 import { Channel } from "types";
 
-type SidebarType = "search" | "inbox" | "saved" | "messages" | "channel";
+type SidebarType =
+  | "search"
+  | "inbox"
+  | "saved"
+  | "messages"
+  | "channel"
+  | "trash";
 
 type Props = React.PropsWithChildren<{
   type: SidebarType;
@@ -84,7 +91,9 @@ function SidebarList({
     case "channel":
       Icon = HiOutlineHashtag;
       break;
-
+    case "trash":
+      Icon = BiTrash;
+      break;
     default:
       Icon = AiOutlineInbox;
       break;

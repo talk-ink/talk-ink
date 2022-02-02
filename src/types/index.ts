@@ -58,6 +58,8 @@ export interface Thread {
   closedBy?: string[];
   closedAt?: string;
   closeDescription?: string;
+  isDeleted?: boolean;
+  deletedAt?: string;
 }
 export interface Channel {
   id?: string;
