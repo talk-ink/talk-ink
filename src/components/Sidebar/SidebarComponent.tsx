@@ -209,7 +209,6 @@ function SidebarComponent({
 
       if (error) throw new Error(error.message);
 
-      dispatch(deleteChannel(selectedChannel));
       setSelectedChannel(null);
       setLeaveChannelModal(false);
       navigate(`/a/${params.workspaceId}/inbox`);
