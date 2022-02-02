@@ -14,6 +14,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
 import {
   createUniqueArray,
+  draft,
   getNameInitial,
   notificationUrl,
 } from "utils/helper";
@@ -100,6 +101,8 @@ const Form: React.FC<IProps> = ({
   }, [params.channelId, channel.channels]);
 
   const discardComment = () => {
+    draft("comment").deleteByKey(params.threadId);
+
     setIsShowEditor(false);
     setEditorState("");
   };
@@ -176,11 +179,33 @@ const Form: React.FC<IProps> = ({
       });
     }
 
+    draft("comment").deleteByKey(params.threadId);
+
     discardComment();
     setTimeout(() => {
       scrollToBottom();
     }, 500);
   };
+
+  useEffect(() => {
+    if (editorState) {
+      draft("comment").set(params.threadId, {
+        content: editorState,
+        createdById: auth.user._id,
+        threadId: params.threadId,
+      });
+    }
+  }, [editorState, auth.user._id, params.threadId]);
+
+  useEffect(() => {
+    const getCommentDraft = draft("comment").get(params.threadId);
+    if (
+      getCommentDraft.content &&
+      getCommentDraft.createdById === auth.user._id
+    ) {
+      setEditorState(getCommentDraft.content);
+    }
+  }, [auth.user._id, params.threadId]);
 
   return (
     <div className=" bg-white">
