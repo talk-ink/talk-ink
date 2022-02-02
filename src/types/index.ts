@@ -37,6 +37,7 @@ export interface IComment {
   tagedUsers?: string[];
   subComments?: ISubComment[];
   reactions?: IReaction[];
+  isClosedComment?: boolean;
 }
 export interface Thread {
   id?: string;

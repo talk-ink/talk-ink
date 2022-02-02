@@ -416,7 +416,6 @@ function ChannelPage() {
           onClose={() => {
             setSelectedThread(null);
           }}
-          channelData={channelData}
         />
       </Modal>
       <Modal

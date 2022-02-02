@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { kontenbase } from "lib/client";
 import moment from "moment-timezone";
+import axios from "axios";
 
 import Button from "components/Button/Button";
 
@@ -12,11 +13,13 @@ import { useToast } from "hooks/useToast";
 import { Channel, Thread } from "types";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateThread } from "features/threads";
+import { createComment } from "features/threads/slice/asyncThunk";
+import { notificationUrl } from "utils/helper";
 
 type Props = {
   data: Thread;
   onClose?: () => void;
-  channelData?: Channel;
+
   from?: "inbox" | null;
 };
 
@@ -24,13 +27,20 @@ type InitialValuesProps = {
   closeDescription: string;
 };
 
-function CloseThreadForm({ data, onClose, channelData, from }: Props) {
+const NOTIFICATION_API: string = notificationUrl;
+
+function CloseThreadForm({ data, onClose, from }: Props) {
   const [showToast] = useToast();
-  const params = useParams();
 
   const auth = useAppSelector((state) => state.auth);
-
+  const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find(
+      (channel) => channel._id === data.channel?.[0]
+    );
+  }, [channel.channels]);
 
   const initialValues: InitialValuesProps = {
     closeDescription: "",
@@ -46,13 +56,33 @@ function CloseThreadForm({ data, onClose, channelData, from }: Props) {
         closeDescription: values.closeDescription,
         closedAt: now,
       };
+
+      let _invitedUsers: string[] = channelData.members.filter(
+        (item) => item !== auth.user._id
+      );
+
+      dispatch(
+        createComment({
+          content: values.closeDescription,
+          threadId: data._id,
+          tagedUsers: [],
+          isClosedComment: true,
+        })
+      );
+
       const { data: closeData, error: closeError } = await kontenbase
         .service("Threads")
         .updateById(data._id, payload);
 
-      console.log("cc", closeData);
-
       if (closeError) throw new Error(closeError.message);
+
+      if (_invitedUsers.length > 0) {
+        axios.post(NOTIFICATION_API, {
+          title: `${auth?.user.firstName} closed "${data.name}" thread`,
+          description: values.closeDescription.replace(/(<([^>]+)>)/gi, ""),
+          externalUserIds: _invitedUsers,
+        });
+      }
 
       dispatch(updateThread({ ...data, ...payload }));
 

@@ -18,6 +18,7 @@ import { deleteThread } from "features/threads";
 import { updateChannelCount } from "features/channels/slice";
 import moment from "moment-timezone";
 import { Thread } from "types";
+import CloseThreadForm from "components/Thread/CloseThreadForm";
 
 type TProps = {
   type?: "open" | "close";
@@ -171,6 +172,25 @@ function InboxList({ type = "open" }: TProps) {
         okButtonText="Confirm"
       >
         Are you sure you want to delete this thread?
+      </Modal>
+      <Modal
+        header="Close Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
+        footer={null}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+      >
+        <CloseThreadForm
+          data={selectedThread?.thread}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+          from="inbox"
+        />
       </Modal>
     </div>
   );

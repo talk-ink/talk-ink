@@ -366,6 +366,11 @@ const Comment: React.FC<IProps> = ({
         </div>
         <div className=" w-[70vw] sm:w-full ">
           <div className={`min-h-[2.5rem]`}>
+            {comment?.isClosedComment && (
+              <p className="text-sm text-green-600 font-semibold mt-1">
+                Added a conclusion:
+              </p>
+            )}
             <Preview
               content={comment.content}
               isEdit={isEdit}
