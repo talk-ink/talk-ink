@@ -158,7 +158,7 @@ function InboxList({ type = "open" }: TProps) {
 
       <Modal
         header="Delete Thread"
-        visible={!!selectedThread}
+        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
         onClose={() => {
           setSelectedThread(null);
         }}

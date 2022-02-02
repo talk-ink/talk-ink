@@ -19,6 +19,7 @@ import {
   deleteComment,
   updateComment,
   addInteractedUser,
+  updateThread,
 } from "features/threads";
 
 import { fetchComments } from "features/threads/slice/asyncThunk";
@@ -29,6 +30,7 @@ import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
+import ThreadBadge from "components/Thread/ThreadBadge";
 
 function useQuery() {
   const { search } = useLocation();
@@ -183,6 +185,20 @@ function ThreadPage() {
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error.message)}` });
+    }
+  };
+
+  const reopenThreadHandler = async () => {
+    try {
+      const { error } = await kontenbase
+        .service("Threads")
+        .updateById(threadData._id, { isClosed: false });
+      if (error) throw new Error(error?.message);
+
+      dispatch(updateThread({ ...threadData, isClosed: false }));
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
 
@@ -362,6 +378,7 @@ function ThreadPage() {
                 memberList={memberList}
                 threadId={threadId}
                 threadName={threadData?.name}
+                threadData={threadData}
               />
             )}
           </div>
@@ -374,6 +391,13 @@ function ThreadPage() {
               interactedUsers={[...new Set(threadData?.interactedUsers)]}
               scrollToBottom={scrollToBottom}
               memberList={memberList}
+            />
+          )}
+          {threadData?.isClosed && (
+            <ThreadBadge.Reopen
+              onReopen={() => {
+                reopenThreadHandler();
+              }}
             />
           )}
         </div>

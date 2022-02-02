@@ -17,7 +17,7 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment, IReaction, Member } from "types";
+import { IComment, IReaction, Member, Thread } from "types";
 import {
   deleteComment,
   updateComment,
@@ -38,6 +38,7 @@ interface IProps {
   memberList: Member[];
   threadId: string;
   threadName: string;
+  threadData?: Thread;
 }
 
 interface INotifiedOption {
@@ -56,6 +57,7 @@ const Comment: React.FC<IProps> = ({
   memberList,
   threadId,
   threadName,
+  threadData,
 }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
@@ -385,6 +387,7 @@ const Comment: React.FC<IProps> = ({
                           ) >= 0
                         }
                         onClick={() => {
+                          if (threadData?.isClosed) return;
                           if (
                             reaction.users.length === 1 &&
                             reaction.users[0]._id === auth.user._id
@@ -405,8 +408,9 @@ const Comment: React.FC<IProps> = ({
                           }
                         }}
                         tooltip={reactionTooltip({ member: reaction.users })}
+                        disabled={threadData?.isClosed}
                       />
-                      {idx === arr.length - 1 && (
+                      {idx === arr.length - 1 && !threadData?.isClosed && (
                         <Popover className="relative">
                           {({ open: popOpen, close }) => (
                             <>
@@ -603,7 +607,11 @@ const Comment: React.FC<IProps> = ({
           )}
         </div>
 
-        <div className="absolute -top-3 right-0 z-50">
+        <div
+          className={`absolute -top-3 right-0 z-50 ${
+            threadData?.isClosed ? "hidden" : ""
+          }`}
+        >
           <Menu as="div" className="relative flex">
             {({ open }) => (
               <>

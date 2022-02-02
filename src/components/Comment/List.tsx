@@ -1,7 +1,7 @@
 import React from "react";
 
 import Comment from "components/Comment/Comment";
-import { IComment, Member } from "types";
+import { IComment, Member, Thread } from "types";
 
 interface IProps {
   dataSource: IComment[];
@@ -9,6 +9,7 @@ interface IProps {
   memberList: Member[];
   threadId: string;
   threadName: string;
+  threadData?: Thread;
 }
 
 const List: React.FC<IProps> = ({
@@ -17,6 +18,7 @@ const List: React.FC<IProps> = ({
   memberList,
   threadId,
   threadName,
+  threadData,
 }) => {
   return (
     <div>
@@ -28,6 +30,7 @@ const List: React.FC<IProps> = ({
             memberList={memberList}
             threadId={threadId}
             threadName={threadName}
+            threadData={threadData}
           />
         ))}
       <div ref={listRef} />
