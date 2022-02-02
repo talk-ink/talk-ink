@@ -56,7 +56,7 @@ export interface Thread {
   tagedUsers?: string[];
   isClosed?: boolean;
   closedBy?: string[];
-  closedAt?: Date;
+  closedAt?: string;
   closeDescription?: string;
 }
 export interface Channel {

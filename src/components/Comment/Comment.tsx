@@ -350,7 +350,7 @@ const Comment: React.FC<IProps> = ({
   }, [comment.reactions]);
 
   return (
-    <div>
+    <div key={comment._id}>
       {comment?.isClosedComment && (
         <div className="flex items-start mb-2">
           <div className="w-8 flex flex-col items-center">
@@ -407,9 +407,8 @@ const Comment: React.FC<IProps> = ({
                 {reactions?.map(
                   (reaction, idx, arr) =>
                     reaction.users.length > 0 && (
-                      <>
+                      <div key={idx + reaction.unified}>
                         <Reaction
-                          key={idx}
                           data={reaction}
                           active={
                             reaction.users.findIndex(
@@ -477,7 +476,7 @@ const Comment: React.FC<IProps> = ({
                             )}
                           </Popover>
                         )}
-                      </>
+                      </div>
                     )
                 )}
               </div>

@@ -49,11 +49,18 @@ function CloseThreadForm({ data, onClose, from }: Props) {
     try {
       const now = moment().tz("Asia/Jakarta").toDate();
 
-      const payload = {
+      const payload: {
+        isClosed: boolean;
+        closedBy: [string];
+        closeDescription: string;
+        closedAt: Date;
+        readedUsers: string[];
+      } = {
         isClosed: true,
         closedBy: [auth.user._id],
         closeDescription: values.closeDescription,
         closedAt: now,
+        readedUsers: [],
       };
 
       let _invitedUsers: string[] = channelData.members.filter(
@@ -64,7 +71,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
         createComment({
           content: values.closeDescription,
           threadId: data._id,
-          tagedUsers: [],
+          tagedUsers: _invitedUsers,
           isClosedComment: true,
         })
       );
@@ -83,7 +90,12 @@ function CloseThreadForm({ data, onClose, from }: Props) {
         });
       }
 
-      dispatch(updateThread({ ...data, ...payload }));
+      dispatch(
+        updateThread({
+          ...data,
+          ...{ ...payload, closedAt: now.toDateString() },
+        })
+      );
 
       if (closeData) {
         onClose();
