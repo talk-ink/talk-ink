@@ -373,38 +373,77 @@ const Comment: React.FC<IProps> = ({
             />
             <div className="flex items-center gap-2 flex-wrap mb-4">
               {reactions?.map(
-                (reaction, idx) =>
+                (reaction, idx, arr) =>
                   reaction.users.length > 0 && (
-                    <Reaction
-                      key={idx}
-                      data={reaction}
-                      active={
-                        reaction.users.findIndex(
-                          (data) => data._id === auth.user._id
-                        ) >= 0
-                      }
-                      onClick={() => {
-                        if (
-                          reaction.users.length === 1 &&
-                          reaction.users[0]._id === auth.user._id
-                        ) {
-                          removeReactionHandler({
-                            reaction,
-                          });
-                        } else {
-                          const findUser: boolean =
-                            reaction.users.findIndex(
-                              (data) => data._id === auth.user._id
-                            ) >= 0;
-                          if (!findUser) {
-                            reactionUser({ reaction, type: "add" });
-                          } else {
-                            reactionUser({ reaction, type: "remove" });
-                          }
+                    <>
+                      <Reaction
+                        key={idx}
+                        data={reaction}
+                        active={
+                          reaction.users.findIndex(
+                            (data) => data._id === auth.user._id
+                          ) >= 0
                         }
-                      }}
-                      tooltip={reactionTooltip({ member: reaction.users })}
-                    />
+                        onClick={() => {
+                          if (
+                            reaction.users.length === 1 &&
+                            reaction.users[0]._id === auth.user._id
+                          ) {
+                            removeReactionHandler({
+                              reaction,
+                            });
+                          } else {
+                            const findUser: boolean =
+                              reaction.users.findIndex(
+                                (data) => data._id === auth.user._id
+                              ) >= 0;
+                            if (!findUser) {
+                              reactionUser({ reaction, type: "add" });
+                            } else {
+                              reactionUser({ reaction, type: "remove" });
+                            }
+                          }
+                        }}
+                        tooltip={reactionTooltip({ member: reaction.users })}
+                      />
+                      {idx === arr.length - 1 && (
+                        <Popover className="relative">
+                          {({ open: popOpen, close }) => (
+                            <>
+                              <Popover.Button as={React.Fragment}>
+                                <IconButton
+                                  size="medium"
+                                  className={`${
+                                    popOpen ? "flex" : "hidden"
+                                  } group-hover:flex items-center`}
+                                >
+                                  <VscReactions
+                                    size={18}
+                                    className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                                  />
+                                </IconButton>
+                              </Popover.Button>
+                              <Popover.Panel className="absolute z-40 right-full top-1/2 transform -translate-y-1/2 mr-2">
+                                <Picker
+                                  onEmojiClick={(_, emojiObject) => {
+                                    addReactionToCommentHandler({
+                                      commentId: comment._id,
+                                      emoji: emojiObject.emoji,
+                                      unified: emojiObject.unified,
+                                    });
+
+                                    close();
+                                  }}
+                                  skinTone={SKIN_TONE_NEUTRAL}
+                                  disableSkinTonePicker
+                                  native
+                                />
+                              </Popover.Panel>
+                            </>
+                          )}
+                        </Popover>
+                      )}
+                    </>
                   )
               )}
             </div>
