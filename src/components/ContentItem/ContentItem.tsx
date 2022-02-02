@@ -160,7 +160,7 @@ function ContentItem({
               )}
               {dataSource.isClosed && (
                 <small className=" text-xs text-neutral-500 table-cell truncate">
-                  {closedBy.firstName} closed this thread.
+                  {closedBy?.firstName} closed this thread.
                 </small>
               )}
             </div>
