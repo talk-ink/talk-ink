@@ -119,7 +119,7 @@ function App() {
           <Route path="search" element={<SearchPage />} />
           <Route path="inbox/" element={<InboxPage />}>
             <Route path="" element={<InboxList />} />
-            <Route path="done" element={<InboxList type="done" />} />
+            <Route path="close" element={<InboxList type="close" />} />
           </Route>
 
           <Route path="saved" element={<>saved</>} />

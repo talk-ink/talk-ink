@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { useMemo } from "react";
 
 import {
   BiCheck,
@@ -6,6 +6,7 @@ import {
   BiDotsHorizontalRounded,
   BiTrash,
   BiEdit,
+  BiCheckCircle,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
@@ -23,13 +24,21 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 
 import { addReadThread, deleteReadThread } from "features/auth";
-import { Thread } from "types";
+import { Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
+import { updateThread } from "features/threads";
+import { useToast } from "hooks/useToast";
+import { BsArrowUpCircle } from "react-icons/bs";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
-  setSelectedThread?: Dispatch<SetStateAction<Thread | null | undefined>>;
+  setSelectedThread?: React.Dispatch<
+    React.SetStateAction<{
+      thread: Thread;
+      type: "delete" | "close";
+    }>
+  >;
   otherButton?: React.ReactNode;
   isRead?: boolean;
 }>;
@@ -41,8 +50,11 @@ function ContentItem({
   otherButton,
   isRead,
 }: Props) {
+  const [showToast] = useToast();
   const dispatch = useAppDispatch();
+
   const auth = useAppSelector((state) => state.auth);
+  const member = useAppSelector((state) => state.member);
   const navigate = useNavigate();
   const isFromTalkink = dataSource.name === "Welcome to Talk.ink";
 
@@ -68,6 +80,29 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
+  const reopenThreadHandler = async () => {
+    try {
+      const { data, error } = await kontenbase
+        .service("Threads")
+        .updateById(dataSource._id, { isClosed: false });
+      if (error) throw new Error(error?.message);
+
+      if (data) {
+        dispatch(updateThread({ ...dataSource, isClosed: false }));
+        onClick();
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const closedBy: Member = useMemo(() => {
+    return member.members.find(
+      (data) => data._id === dataSource?.closedBy?.[0]
+    );
+  }, [dataSource?.closedBy, member.members]);
 
   return (
     <div
@@ -134,18 +169,30 @@ function ContentItem({
               </span>
             </div>
             <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
-              <small className=" text-xs text-neutral-500 table-cell truncate">
-                {dataSource?.draft ? "Me: " : ""}
-                {dataSource.comments?.length > 0
-                  ? `Latest : ${dataSource.comments?.[
-                      dataSource.comments?.length - 1
-                    ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                  : dataSource.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}
-              </small>
+              {!dataSource.isClosed && (
+                <small className=" text-xs text-neutral-500 table-cell truncate">
+                  {dataSource?.draft ? "Me: " : ""}
+                  {dataSource.comments?.length > 0
+                    ? `Latest : ${dataSource.comments?.[
+                        dataSource.comments?.length - 1
+                      ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
+                    : dataSource.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}
+                </small>
+              )}
+              {dataSource.isClosed && (
+                <small className=" text-xs text-neutral-500 table-cell truncate">
+                  {closedBy?.firstName} closed this thread.
+                </small>
+              )}
             </div>
           </div>
         </button>
-        <div className="flex active:flex group-hover:flex gap-2">
+        <div className="flex active:flex group-hover:flex gap-2 items-center">
+          {dataSource?.isClosed && (
+            <div className="bg-indigo-500 p-1 px-2 rounded-full">
+              <p className="text-xs text-white font-semibold">Closed</p>
+            </div>
+          )}
           {otherButton}
           <Menu as="div" className="relative">
             {({ open }) => (
@@ -211,11 +258,45 @@ function ContentItem({
                             }
                             title="Delete thread..."
                             onClick={() => {
-                              setSelectedThread(dataSource);
+                              setSelectedThread({
+                                thread: dataSource,
+                                type: "delete",
+                              });
                             }}
                           />
                         </>
                       )}
+                    {!dataSource?.isClosed && (
+                      <MenuItem
+                        icon={
+                          <BiCheckCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        title="Close thread"
+                        onClick={() => {
+                          setSelectedThread({
+                            thread: dataSource,
+                            type: "close",
+                          });
+                        }}
+                      />
+                    )}
+                    {dataSource?.isClosed && (
+                      <MenuItem
+                        icon={
+                          <BsArrowUpCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        title="Reopen thread"
+                        onClick={() => {
+                          reopenThreadHandler();
+                        }}
+                      />
+                    )}
                   </Menu.Items>
                 )}
               </>

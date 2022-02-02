@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 
-import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
+import {
+  BiDotsHorizontalRounded,
+  BiEditAlt,
+  BiMessageAltCheck,
+  BiTrash,
+} from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Menu, Popover } from "@headlessui/react";
@@ -17,7 +22,7 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment, IReaction, Member } from "types";
+import { IComment, IReaction, Member, Thread } from "types";
 import {
   deleteComment,
   updateComment,
@@ -38,6 +43,7 @@ interface IProps {
   memberList: Member[];
   threadId: string;
   threadName: string;
+  threadData?: Thread;
 }
 
 interface INotifiedOption {
@@ -56,6 +62,7 @@ const Comment: React.FC<IProps> = ({
   memberList,
   threadId,
   threadName,
+  threadData,
 }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
@@ -343,357 +350,392 @@ const Comment: React.FC<IProps> = ({
   }, [comment.reactions]);
 
   return (
-    <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
-      <div className="w-8">
-        {comment.createdBy?.avatar?.[0]?.url ? (
-          <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
-        ) : (
-          <NameInitial name={getNameInitial(comment.createdBy?.firstName)} />
-        )}
-      </div>
-      <div className="ml-4 w-full">
-        <div className="-mt-1.5 flex items-center justify-start">
-          <p className=" font-semibold mb-0 mt-0 mr-2">
-            {comment.createdBy?.firstName}
-          </p>{" "}
-          <p className="mb-0 mt-0 text-xs">
-            <ReactMoment format="DD/MM/YYYY LT">
-              {comment?.updatedAt || comment?.createdAt}
-            </ReactMoment>
-          </p>
-        </div>
-        <div className=" w-[70vw] sm:w-full ">
-          <div className={`min-h-[2.5rem]`}>
-            <Preview
-              content={comment.content}
-              isEdit={isEdit}
-              setEditorState={setEditorState}
-              discardComment={discardComment}
-              handleUpdateComment={handleUpdateComment}
-            />
-            <div className="flex items-center gap-2 flex-wrap mb-4">
-              {reactions?.map(
-                (reaction, idx, arr) =>
-                  reaction.users.length > 0 && (
-                    <>
-                      <Reaction
-                        key={idx}
-                        data={reaction}
-                        active={
-                          reaction.users.findIndex(
-                            (data) => data._id === auth.user._id
-                          ) >= 0
-                        }
-                        onClick={() => {
-                          if (
-                            reaction.users.length === 1 &&
-                            reaction.users[0]._id === auth.user._id
-                          ) {
-                            removeReactionHandler({
-                              reaction,
-                            });
-                          } else {
-                            const findUser: boolean =
-                              reaction.users.findIndex(
-                                (data) => data._id === auth.user._id
-                              ) >= 0;
-                            if (!findUser) {
-                              reactionUser({ reaction, type: "add" });
-                            } else {
-                              reactionUser({ reaction, type: "remove" });
-                            }
-                          }
-                        }}
-                        tooltip={reactionTooltip({ member: reaction.users })}
-                      />
-                      {idx === arr.length - 1 && (
-                        <Popover className="relative">
-                          {({ open: popOpen, close }) => (
-                            <>
-                              <Popover.Button as={React.Fragment}>
-                                <IconButton
-                                  size="medium"
-                                  className={`${
-                                    popOpen ? "flex" : "hidden"
-                                  } group-hover:flex items-center`}
-                                >
-                                  <VscReactions
-                                    size={18}
-                                    className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
-                                  />
-                                </IconButton>
-                              </Popover.Button>
-                              <Popover.Panel className="absolute z-40 right-full top-1/2 transform -translate-y-1/2 mr-2">
-                                <Picker
-                                  onEmojiClick={(_, emojiObject) => {
-                                    addReactionToCommentHandler({
-                                      commentId: comment._id,
-                                      emoji: emojiObject.emoji,
-                                      unified: emojiObject.unified,
-                                    });
-
-                                    close();
-                                  }}
-                                  skinTone={SKIN_TONE_NEUTRAL}
-                                  disableSkinTonePicker
-                                  native
-                                />
-                              </Popover.Panel>
-                            </>
-                          )}
-                        </Popover>
-                      )}
-                    </>
-                  )
-              )}
-            </div>
+    <div>
+      {comment?.isClosedComment && (
+        <div className="flex items-start mb-2">
+          <div className="w-8 flex flex-col items-center">
+            <BiMessageAltCheck size={18} className="text-indigo-500" />
+            <div className="w-[2px] bg-neutral-300 h-4 my-1"></div>
           </div>
+          <div className="ml-4 w-full">
+            <p className="text-xs text-neutral-500">
+              <span className="font-semibold">
+                {comment.createdBy?.firstName}
+              </span>{" "}
+              closed this thread.
+            </p>
+          </div>
+        </div>
+      )}
+      <div
+        className="group flex items-start mb-4 relative text-sm"
+        ref={listRef}
+      >
+        <div className="w-8">
+          {comment.createdBy?.avatar?.[0]?.url ? (
+            <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
+          ) : (
+            <NameInitial name={getNameInitial(comment.createdBy?.firstName)} />
+          )}
+        </div>
+        <div className="ml-4 w-full">
+          <div className="-mt-1.5 flex items-center justify-start">
+            <p className=" font-semibold mb-0 mt-0 mr-2">
+              {comment.createdBy?.firstName}
+            </p>{" "}
+            <p className="mb-0 mt-0 text-xs">
+              <ReactMoment format="DD/MM/YYYY LT">
+                {comment?.updatedAt || comment?.createdAt}
+              </ReactMoment>
+            </p>
+          </div>
+          <div className=" w-[70vw] sm:w-full ">
+            <div className={`min-h-[2.5rem]`}>
+              {comment?.isClosedComment && (
+                <p className="text-sm text-green-600 font-semibold mt-1">
+                  Added a conclusion:
+                </p>
+              )}
+              <Preview
+                content={comment.content}
+                isEdit={isEdit}
+                setEditorState={setEditorState}
+                discardComment={discardComment}
+                handleUpdateComment={handleUpdateComment}
+              />
+              <div className="flex items-center gap-2 flex-wrap mb-4">
+                {reactions?.map(
+                  (reaction, idx, arr) =>
+                    reaction.users.length > 0 && (
+                      <>
+                        <Reaction
+                          key={idx}
+                          data={reaction}
+                          active={
+                            reaction.users.findIndex(
+                              (data) => data._id === auth.user._id
+                            ) >= 0
+                          }
+                          onClick={() => {
+                            if (threadData?.isClosed) return;
+                            if (
+                              reaction.users.length === 1 &&
+                              reaction.users[0]._id === auth.user._id
+                            ) {
+                              removeReactionHandler({
+                                reaction,
+                              });
+                            } else {
+                              const findUser: boolean =
+                                reaction.users.findIndex(
+                                  (data) => data._id === auth.user._id
+                                ) >= 0;
+                              if (!findUser) {
+                                reactionUser({ reaction, type: "add" });
+                              } else {
+                                reactionUser({ reaction, type: "remove" });
+                              }
+                            }
+                          }}
+                          tooltip={reactionTooltip({ member: reaction.users })}
+                          disabled={threadData?.isClosed}
+                        />
+                        {idx === arr.length - 1 && !threadData?.isClosed && (
+                          <Popover className="relative">
+                            {({ open: popOpen, close }) => (
+                              <>
+                                <Popover.Button as={React.Fragment}>
+                                  <IconButton
+                                    size="medium"
+                                    className={`${
+                                      popOpen ? "flex" : "hidden"
+                                    } group-hover:flex items-center`}
+                                  >
+                                    <VscReactions
+                                      size={18}
+                                      className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                                    />
+                                  </IconButton>
+                                </Popover.Button>
+                                <Popover.Panel className="absolute z-40 right-full top-1/2 transform -translate-y-1/2 mr-2">
+                                  <Picker
+                                    onEmojiClick={(_, emojiObject) => {
+                                      addReactionToCommentHandler({
+                                        commentId: comment._id,
+                                        emoji: emojiObject.emoji,
+                                        unified: emojiObject.unified,
+                                      });
 
-          <div>
-            {comment.subComments?.length > 0 && (
-              <>
-                <div className="border-t-[1px] border-gray-200 mb-8" />
-                {!isShowMoreSubComment && (
-                  <div className="text-sm -mt-3">
-                    {comment.subComments?.length > 2 && (
-                      <p
-                        className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
-                        onClick={() => setIsShowMoreSubComment(true)}
-                      >
-                        Show More {comment.subComments?.length - 2} Comments
-                      </p>
-                    )}
-                    {comment.subComments?.length >= 2 && (
+                                      close();
+                                    }}
+                                    skinTone={SKIN_TONE_NEUTRAL}
+                                    disableSkinTonePicker
+                                    native
+                                  />
+                                </Popover.Panel>
+                              </>
+                            )}
+                          </Popover>
+                        )}
+                      </>
+                    )
+                )}
+              </div>
+            </div>
+
+            <div>
+              {comment.subComments?.length > 0 && (
+                <>
+                  <div className="border-t-[1px] border-gray-200 mb-8" />
+                  {!isShowMoreSubComment && (
+                    <div className="text-sm -mt-3">
+                      {comment.subComments?.length > 2 && (
+                        <p
+                          className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
+                          onClick={() => setIsShowMoreSubComment(true)}
+                        >
+                          Show More {comment.subComments?.length - 2} Comments
+                        </p>
+                      )}
+                      {comment.subComments?.length >= 2 && (
+                        <SubComment
+                          comment={{
+                            ...comment.subComments?.[
+                              comment.subComments.length - 2
+                            ],
+                            createdBy: memberList.find(
+                              (item) =>
+                                //@ts-ignore
+                                item._id ===
+                                comment.subComments?.[
+                                  comment.subComments.length - 2
+                                ].createdBy
+                            ),
+                          }}
+                          key={
+                            comment.subComments?.[
+                              comment.subComments.length - 2
+                            ]?._id
+                          }
+                          parentId={comment._id}
+                          threadId={threadId}
+                        />
+                      )}
                       <SubComment
                         comment={{
                           ...comment.subComments?.[
-                            comment.subComments.length - 2
+                            comment.subComments.length - 1
                           ],
                           createdBy: memberList.find(
                             (item) =>
                               //@ts-ignore
                               item._id ===
                               comment.subComments?.[
-                                comment.subComments.length - 2
+                                comment.subComments.length - 1
                               ].createdBy
                           ),
                         }}
                         key={
-                          comment.subComments?.[comment.subComments.length - 2]
+                          comment.subComments?.[comment.subComments.length - 1]
                             ?._id
                         }
                         parentId={comment._id}
                         threadId={threadId}
                       />
-                    )}
-                    <SubComment
-                      comment={{
-                        ...comment.subComments?.[
-                          comment.subComments.length - 1
-                        ],
+                    </div>
+                  )}
+                  {isShowMoreSubComment &&
+                    comment.subComments?.map((subComment) => {
+                      const newSubComment = {
+                        ...subComment,
                         createdBy: memberList.find(
-                          (item) =>
-                            //@ts-ignore
-                            item._id ===
-                            comment.subComments?.[
-                              comment.subComments.length - 1
-                            ].createdBy
+                          //@ts-ignore
+                          (item) => item._id === subComment.createdBy
                         ),
+                      };
+
+                      return (
+                        <SubComment
+                          comment={newSubComment}
+                          key={subComment._id}
+                          parentId={comment._id}
+                          threadId={threadId}
+                        />
+                      );
+                    })}
+                </>
+              )}
+            </div>
+
+            {isReplyEditorVisible && (
+              <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
+                <div>
+                  <div className="mt-1 flex w-full items-center">
+                    <div className="mr-2">
+                      <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
+                        Tag:
+                      </div>
+                    </div>
+                    <Select
+                      value={selectedNotifiedOptions}
+                      onChange={(e: any) => {
+                        setSelectedNotifiedOptions(e);
                       }}
-                      key={
-                        comment.subComments?.[comment.subComments.length - 1]
-                          ?._id
-                      }
-                      parentId={comment._id}
-                      threadId={threadId}
+                      isClearable={false}
+                      className="text-sm custom-select "
+                      closeMenuOnSelect={false}
+                      defaultValue={[notifiedOptions[0]]}
+                      isMulti
+                      options={notifiedOptions}
+                      placeholder="Select Tags"
+                      //@ts-ignore
+                      components={{
+                        DropdownIndicator: () => null,
+                        IndicatorSeparator: () => null,
+                      }}
+                      styles={{
+                        container: (base) => ({
+                          ...base,
+                          width: "100%",
+                        }),
+                        menuList: (base) => ({
+                          ...base,
+                          maxWidth: 300,
+                        }),
+                      }}
                     />
                   </div>
-                )}
-                {isShowMoreSubComment &&
-                  comment.subComments?.map((subComment) => {
-                    const newSubComment = {
-                      ...subComment,
-                      createdBy: memberList.find(
-                        //@ts-ignore
-                        (item) => item._id === subComment.createdBy
-                      ),
-                    };
-
-                    return (
-                      <SubComment
-                        comment={newSubComment}
-                        key={subComment._id}
-                        parentId={comment._id}
-                        threadId={threadId}
-                      />
-                    );
-                  })}
-              </>
+                  <Editor
+                    key="edited"
+                    defaultValue={subEditorState}
+                    className="markdown-overrides sub-comment-editor"
+                    onChange={(getContent: () => string) =>
+                      setSubEditorState(getContent())
+                    }
+                    placeholder={`Reply to ${comment.createdBy?.firstName}`}
+                    autoFocus
+                  />
+                </div>
+                <div className="flex justify-end ">
+                  <div className="flex items-center py-2">
+                    <Button
+                      type="submit"
+                      className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
+                      onClick={discardSubComment}
+                    >
+                      Discard
+                    </Button>
+                    <Button
+                      type="submit"
+                      className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
+                      onClick={handleCreateSubComment}
+                    >
+                      Reply
+                    </Button>
+                  </div>
+                </div>
+              </div>
             )}
           </div>
 
-          {isReplyEditorVisible && (
-            <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
-              <div>
-                <div className="mt-1 flex w-full items-center">
-                  <div className="mr-2">
-                    <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
-                      Tag:
-                    </div>
-                  </div>
-                  <Select
-                    value={selectedNotifiedOptions}
-                    onChange={(e: any) => {
-                      setSelectedNotifiedOptions(e);
-                    }}
-                    isClearable={false}
-                    className="text-sm custom-select "
-                    closeMenuOnSelect={false}
-                    defaultValue={[notifiedOptions[0]]}
-                    isMulti
-                    options={notifiedOptions}
-                    placeholder="Select Tags"
-                    //@ts-ignore
-                    components={{
-                      DropdownIndicator: () => null,
-                      IndicatorSeparator: () => null,
-                    }}
-                    styles={{
-                      container: (base) => ({
-                        ...base,
-                        width: "100%",
-                      }),
-                      menuList: (base) => ({
-                        ...base,
-                        maxWidth: 300,
-                      }),
-                    }}
-                  />
-                </div>
-                <Editor
-                  key="edited"
-                  defaultValue={subEditorState}
-                  className="markdown-overrides sub-comment-editor"
-                  onChange={(getContent: () => string) =>
-                    setSubEditorState(getContent())
-                  }
-                  placeholder={`Reply to ${comment.createdBy?.firstName}`}
-                  autoFocus
-                />
-              </div>
-              <div className="flex justify-end ">
-                <div className="flex items-center py-2">
-                  <Button
-                    type="submit"
-                    className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
-                    onClick={discardSubComment}
-                  >
-                    Discard
-                  </Button>
-                  <Button
-                    type="submit"
-                    className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-                    onClick={handleCreateSubComment}
-                  >
-                    Reply
-                  </Button>
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
+          <div
+            className={`absolute -top-3 right-0 z-50 ${
+              threadData?.isClosed ? "hidden" : ""
+            }`}
+          >
+            <Menu as="div" className="relative flex">
+              {({ open }) => (
+                <>
+                  <Popover className="relative">
+                    {({ open: popOpen, close }) => (
+                      <>
+                        <Popover.Button as={React.Fragment}>
+                          <IconButton
+                            size="medium"
+                            className={`${
+                              open || popOpen ? "flex" : "hidden"
+                            } group-hover:flex items-center`}
+                          >
+                            <VscReactions
+                              size={24}
+                              className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                            />
+                          </IconButton>
+                        </Popover.Button>
+                        <Popover.Panel className="absolute z-10 right-full top-0 mr-2">
+                          <Picker
+                            onEmojiClick={(_, emojiObject) => {
+                              addReactionToCommentHandler({
+                                commentId: comment._id,
+                                emoji: emojiObject.emoji,
+                                unified: emojiObject.unified,
+                              });
 
-        <div className="absolute -top-3 right-0 z-50">
-          <Menu as="div" className="relative flex">
-            {({ open }) => (
-              <>
-                <Popover className="relative">
-                  {({ open: popOpen, close }) => (
-                    <>
-                      <Popover.Button as={React.Fragment}>
-                        <IconButton
-                          size="medium"
-                          className={`${
-                            open || popOpen ? "flex" : "hidden"
-                          } group-hover:flex items-center`}
-                        >
-                          <VscReactions
-                            size={24}
-                            className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                              close();
+                            }}
+                            skinTone={SKIN_TONE_NEUTRAL}
+                            disableSkinTonePicker
+                            native
                           />
-                        </IconButton>
-                      </Popover.Button>
-                      <Popover.Panel className="absolute z-10 right-full top-0 mr-2">
-                        <Picker
-                          onEmojiClick={(_, emojiObject) => {
-                            addReactionToCommentHandler({
-                              commentId: comment._id,
-                              emoji: emojiObject.emoji,
-                              unified: emojiObject.unified,
-                            });
-
-                            close();
-                          }}
-                          skinTone={SKIN_TONE_NEUTRAL}
-                          disableSkinTonePicker
-                          native
-                        />
-                      </Popover.Panel>
-                    </>
-                  )}
-                </Popover>
-                {!isReplyEditorVisible && !isEdit && (
-                  <IconButton
-                    size="medium"
-                    className={`${
-                      open ? "flex" : "hidden"
-                    } group-hover:flex items-center`}
-                  >
-                    <HiOutlineReply
-                      size={20}
-                      className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
-                      onClick={() => setIsShowReplyEditorVisible(true)}
-                    />
-                  </IconButton>
-                )}
-
-                {auth.user._id === comment.createdBy?._id && !isEdit && (
-                  <Menu.Button as={React.Fragment}>
+                        </Popover.Panel>
+                      </>
+                    )}
+                  </Popover>
+                  {!isReplyEditorVisible && !isEdit && (
                     <IconButton
                       size="medium"
                       className={`${
                         open ? "flex" : "hidden"
                       } group-hover:flex items-center`}
                     >
-                      <BiDotsHorizontalRounded
-                        size={25}
+                      <HiOutlineReply
+                        size={20}
                         className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                        onClick={() => setIsShowReplyEditorVisible(true)}
                       />
                     </IconButton>
-                  </Menu.Button>
-                )}
-                {open && (
-                  <Menu.Items static className="menu-container right-0">
-                    <MenuItem
-                      icon={
-                        <BiEditAlt size={20} className="text-neutral-400" />
-                      }
-                      onClick={() => {
-                        setIsEdit(true);
-                        setEditorState(comment.content);
-                      }}
-                      title="Edit Comment"
-                    />
-                    <MenuItem
-                      icon={<BiTrash size={20} className="text-neutral-400" />}
-                      onClick={handleDeleteComment}
-                      title="Delete Comment"
-                    />
-                  </Menu.Items>
-                )}
-              </>
-            )}
-          </Menu>
+                  )}
+
+                  {auth.user._id === comment.createdBy?._id && !isEdit && (
+                    <Menu.Button as={React.Fragment}>
+                      <IconButton
+                        size="medium"
+                        className={`${
+                          open ? "flex" : "hidden"
+                        } group-hover:flex items-center`}
+                      >
+                        <BiDotsHorizontalRounded
+                          size={25}
+                          className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                        />
+                      </IconButton>
+                    </Menu.Button>
+                  )}
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      <MenuItem
+                        icon={
+                          <BiEditAlt size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setIsEdit(true);
+                          setEditorState(comment.content);
+                        }}
+                        title="Edit Comment"
+                      />
+                      <MenuItem
+                        icon={
+                          <BiTrash size={20} className="text-neutral-400" />
+                        }
+                        onClick={handleDeleteComment}
+                        title="Delete Comment"
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+          </div>
         </div>
       </div>
     </div>

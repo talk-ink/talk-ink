@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  BiCheck,
-  BiCheckCircle,
-  BiDotsHorizontalRounded,
-} from "react-icons/bi";
+import { BiCheck, BiDotsHorizontalRounded } from "react-icons/bi";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 
 import Badge from "components/Badge/Badge";
@@ -23,8 +19,6 @@ import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
 
-import { inboxFilter } from "utils/helper";
-
 function InboxPage() {
   const [showToast] = useToast();
 
@@ -42,8 +36,8 @@ function InboxPage() {
 
   const userId: string = auth.user._id;
 
-  const isDoneThread = useMemo(() => {
-    return pathname.includes("inbox/done");
+  const isClosedThread = useMemo(() => {
+    return pathname.includes("inbox/close");
   }, [pathname]);
 
   const channelData: string[] = useMemo(
@@ -52,19 +46,14 @@ function InboxPage() {
   );
 
   const threadData = useMemo(() => {
-    return thread.threads
-      .filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelData,
-          userData: auth.user,
-          isDoneThread,
-        })
-      )
-      .filter((item) => item.tagedUsers?.includes(auth.user._id));
+    return thread.threads.filter((item) =>
+      item.tagedUsers?.includes(auth.user._id) && isClosedThread
+        ? item.isClosed
+        : !item.isClosed
+    );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [thread.threads, auth.user, params, channelData]);
+  }, [thread.threads, auth.user, params, channelData, isClosedThread]);
 
   const readAllHandler = async () => {
     try {
@@ -128,7 +117,7 @@ function InboxPage() {
       <header className="mb-2">
         <div className="mb-7">
           <h1 className="font-bold text-3xl">Inbox</h1>
-          {!isDoneThread && (
+          {!isClosedThread && (
             <>
               {threadData.length > 0 ? (
                 <p className="text-neutral-500 font-body">
@@ -141,7 +130,7 @@ function InboxPage() {
               )}
             </>
           )}
-          {isDoneThread && (
+          {isClosedThread && (
             <p className="text-neutral-500 font-body">
               Done is better than perfect.
             </p>
@@ -150,14 +139,14 @@ function InboxPage() {
         <div className="flex justify-between">
           <nav className="flex gap-2 items-center">
             <Badge
-              active={!pathname.includes("/done")}
-              title="Active"
+              active={!pathname.includes("/close")}
+              title="Open"
               link={`/a/${params.workspaceId}/inbox`}
             />
             <Badge
-              active={pathname.includes("/done")}
-              title="Done"
-              link={`/a/${params.workspaceId}/inbox/done`}
+              active={pathname.includes("/close")}
+              title="Close"
+              link={`/a/${params.workspaceId}/inbox/close`}
             />
           </nav>
           {threadData.length > 0 && (
@@ -165,7 +154,7 @@ function InboxPage() {
               content={
                 <div>
                   <Menu>
-                    <MenuItem
+                    {/* <MenuItem
                       icon={
                         <BiCheckCircle size={20} className="text-neutral-400" />
                       }
@@ -173,15 +162,15 @@ function InboxPage() {
                         setInboxModal("done");
                       }}
                       title="Mark all done"
-                      disabled={isDoneThread}
-                    />
+                      disabled={isClosedThread}
+                    /> */}
                     <MenuItem
                       icon={<BiCheck size={20} className="text-neutral-400" />}
                       onClick={() => {
                         setInboxModal("read");
                       }}
                       title="Mark all read"
-                      disabled={isDoneThread}
+                      disabled={isClosedThread}
                     />
                   </Menu>
                 </div>

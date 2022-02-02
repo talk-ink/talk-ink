@@ -116,14 +116,17 @@ export const createComment = createAsyncThunk(
     content,
     threadId,
     tagedUsers,
+    isClosedComment,
   }: {
     content: any;
     threadId: string;
     tagedUsers: string[];
+    isClosedComment?: boolean;
   }) => {
     const { data } = await kontenbase.service("Comments").create({
       content,
       threads: [threadId],
+      isClosedComment: isClosedComment,
     });
 
     if (tagedUsers.length > 0) {

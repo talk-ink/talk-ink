@@ -6,9 +6,10 @@ type TProps = {
   active?: boolean;
   onClick?: () => void;
   tooltip?: string;
+  disabled?: boolean;
 };
 
-function Reaction({ data, active, onClick, tooltip }: TProps) {
+function Reaction({ data, active, onClick, tooltip, disabled }: TProps) {
   const [showTooltip, setShowTooltip] = useState<boolean>(false);
   return (
     <div className="relative">
@@ -20,7 +21,7 @@ function Reaction({ data, active, onClick, tooltip }: TProps) {
       <button
         className={`py-1 px-2 flex items-center gap-2 rounded-full border border-indigo-200 outline-none hover:border-indigo-500 hover:bg-indigo-100 ${
           active ? "border-indigo-500 bg-indigo-100" : ""
-        }`}
+        } ${disabled ? "cursor-default" : ""} `}
         onClick={onClick}
         onMouseEnter={() => setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
