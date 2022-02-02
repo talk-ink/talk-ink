@@ -219,18 +219,18 @@ export const inboxFilter = ({
   thread,
   channelIds,
   userData,
-  isDoneThread,
+  isClosedThread,
 }: {
   thread: Thread;
   channelIds: string[];
   userData: User;
-  isDoneThread: boolean;
+  isClosedThread: boolean;
 }) => {
   if (thread.draft) return false;
   if (!channelIds.includes(thread.channel[0])) return false;
 
   if (!userData.doneThreads) return true;
-  if (isDoneThread) return userData.doneThreads.includes(thread._id);
+  if (isClosedThread) return userData.doneThreads.includes(thread._id);
   return !userData.doneThreads.includes(thread._id);
 };
 

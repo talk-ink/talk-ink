@@ -39,6 +39,7 @@ import { deleteChannel, updateChannelCount } from "features/channels/slice";
 import { kontenbase } from "lib/client";
 import { Channel, Member, Thread } from "types";
 import { getNameInitial } from "utils/helper";
+import CloseThreadForm from "components/Thread/CloseThreadForm";
 
 moment.locale("id");
 
@@ -58,9 +59,8 @@ function ChannelPage() {
 
   const dispatch = useAppDispatch();
 
-  const [selectedThread, setSelectedThread] = useState<
-    Thread | null | undefined
-  >();
+  const [selectedThread, setSelectedThread] =
+    useState<{ thread: Thread; type: "delete" | "close" }>();
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [channelInfoModal, setChannelInfoModal] = useState<boolean>(false);
@@ -139,10 +139,10 @@ function ChannelPage() {
 
   const threadDeleteHandler = async () => {
     try {
-      if (!selectedThread?.draft) {
+      if (!selectedThread?.thread.draft) {
         const deletedThread = await kontenbase
           .service("Threads")
-          .deleteById(selectedThread?._id);
+          .deleteById(selectedThread?.thread._id);
 
         if (deletedThread?.data) {
           setSelectedThread(null);
@@ -151,12 +151,12 @@ function ChannelPage() {
         dispatch(
           updateChannelCount({
             chanelId: deletedThread.data?.channel?.[0],
-            threadId: selectedThread?._id,
+            threadId: selectedThread?.thread._id,
           })
         );
       } else {
-        deleteDraft(selectedThread.id);
-        dispatch(deleteThread(selectedThread));
+        deleteDraft(selectedThread.thread.id);
+        dispatch(deleteThread(selectedThread.thread));
         setSelectedThread(null);
       }
     } catch (error) {
@@ -385,7 +385,7 @@ function ChannelPage() {
 
       <Modal
         header="Delete Thread"
-        visible={!!selectedThread}
+        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
         onClose={() => {
           setSelectedThread(null);
         }}
@@ -399,6 +399,25 @@ function ChannelPage() {
         size="xs"
       >
         Are you sure you want to delete this thread?
+      </Modal>
+      <Modal
+        header="Close Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
+        footer={null}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+      >
+        <CloseThreadForm
+          data={selectedThread?.thread}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+          channelData={channelData}
+        />
       </Modal>
       <Modal
         header="Edit channel"

@@ -6,6 +6,7 @@ import {
   BiDotsHorizontalRounded,
   BiTrash,
   BiEdit,
+  BiCheckCircle,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
@@ -29,7 +30,12 @@ import logoImage from "assets/image/logo512.png";
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
-  setSelectedThread?: Dispatch<SetStateAction<Thread | null | undefined>>;
+  setSelectedThread?: React.Dispatch<
+    React.SetStateAction<{
+      thread: Thread;
+      type: "delete" | "close";
+    }>
+  >;
   otherButton?: React.ReactNode;
   isRead?: boolean;
 }>;
@@ -211,11 +217,31 @@ function ContentItem({
                             }
                             title="Delete thread..."
                             onClick={() => {
-                              setSelectedThread(dataSource);
+                              setSelectedThread({
+                                thread: dataSource,
+                                type: "delete",
+                              });
                             }}
                           />
                         </>
                       )}
+                    {!dataSource?.isClosed && (
+                      <MenuItem
+                        icon={
+                          <BiCheckCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        title="Close thread"
+                        onClick={() => {
+                          setSelectedThread({
+                            thread: dataSource,
+                            type: "close",
+                          });
+                        }}
+                      />
+                    )}
                   </Menu.Items>
                 )}
               </>

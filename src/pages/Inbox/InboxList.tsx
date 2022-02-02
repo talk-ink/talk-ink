@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { BiCheckCircle, BiCircle } from "react-icons/bi";
+import { BiCheckCircle } from "react-icons/bi";
 
 import InboxEmpty from "components/EmptyContent/InboxEmpty";
 import ContentItem from "components/ContentItem/ContentItem";
@@ -15,15 +15,15 @@ import { addDoneThread, deleteDoneThread } from "features/auth";
 import Modal from "components/Modal/Modal";
 import { kontenbase } from "lib/client";
 import { deleteThread } from "features/threads";
-import { inboxFilter } from "utils/helper";
 import { updateChannelCount } from "features/channels/slice";
 import moment from "moment-timezone";
+import { Thread } from "types";
 
 type TProps = {
-  type?: "active" | "done";
+  type?: "open" | "close";
 };
 
-function InboxList({ type = "active" }: TProps) {
+function InboxList({ type = "open" }: TProps) {
   const [showToast] = useToast();
 
   const params = useParams();
@@ -34,10 +34,11 @@ function InboxList({ type = "active" }: TProps) {
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
-  const [selectedThread, setSelectedThread] = useState(null);
+  const [selectedThread, setSelectedThread] =
+    useState<{ thread: Thread; type: "delete" | "close" }>();
 
-  const isDoneThread = useMemo(() => {
-    return type === "done";
+  const isClosedThread = useMemo(() => {
+    return type === "close";
   }, [type]);
 
   const channelData: string[] = useMemo(
@@ -47,18 +48,15 @@ function InboxList({ type = "active" }: TProps) {
 
   const threadData = useMemo(() => {
     return thread.threads
-      .filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelData,
-          userData: auth.user,
-          isDoneThread,
-        })
+      .filter((item) =>
+        item.tagedUsers?.includes(auth.user._id) && isClosedThread
+          ? item.isClosed
+          : !item.isClosed
       )
-      .filter((item) => item.tagedUsers?.includes(auth.user._id))
       .sort(
         (a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
       );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
 
@@ -69,7 +67,7 @@ function InboxList({ type = "active" }: TProps) {
 
   const markHandler = async (threadId: string) => {
     try {
-      if (isDoneThread) {
+      if (isClosedThread) {
         const { error } = await kontenbase
           .service("Threads")
           .unlink(threadId, { doneUsers: auth.user._id });
@@ -95,7 +93,7 @@ function InboxList({ type = "active" }: TProps) {
     try {
       const deletedThread = await kontenbase
         .service("Threads")
-        .deleteById(selectedThread?._id);
+        .deleteById(selectedThread?.thread?._id);
 
       if (deletedThread.error) throw new Error(deletedThread.error.message);
 
@@ -106,7 +104,7 @@ function InboxList({ type = "active" }: TProps) {
       dispatch(
         updateChannelCount({
           chanelId: deletedThread.data?.channel?.[0],
-          threadId: selectedThread?._id,
+          threadId: selectedThread?.thread?._id,
         })
       );
     } catch (error) {
@@ -135,18 +133,15 @@ function InboxList({ type = "active" }: TProps) {
                     );
                   }}
                   otherButton={
-                    <IconButton
-                      onClick={() => {
-                        markHandler(inbox._id);
-                      }}
-                    >
-                      {isDoneThread && (
-                        <BiCircle size={24} className="text-neutral-400" />
-                      )}
-                      {!isDoneThread && (
+                    !isClosedThread && (
+                      <IconButton
+                        onClick={() => {
+                          markHandler(inbox._id);
+                        }}
+                      >
                         <BiCheckCircle size={24} className="text-neutral-400" />
-                      )}
-                    </IconButton>
+                      </IconButton>
+                    )
                   }
                   setSelectedThread={setSelectedThread}
                   isRead={readedThreads.includes(inbox._id)}

@@ -44,6 +44,10 @@ export interface Thread {
   interactedUsers?: string[];
   channelId?: string;
   tagedUsers?: string[];
+  isClosed?: boolean;
+  closedBy?: string[];
+  closedAt?: Date;
+  closeDescription?: string;
 }
 export interface Channel {
   id?: string;
