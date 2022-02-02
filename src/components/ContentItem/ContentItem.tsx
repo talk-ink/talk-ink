@@ -26,6 +26,9 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { addReadThread, deleteReadThread } from "features/auth";
 import { Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
+import { updateThread } from "features/threads";
+import { useToast } from "hooks/useToast";
+import { BsArrowUpCircle } from "react-icons/bs";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -47,6 +50,7 @@ function ContentItem({
   otherButton,
   isRead,
 }: Props) {
+  const [showToast] = useToast();
   const dispatch = useAppDispatch();
 
   const auth = useAppSelector((state) => state.auth);
@@ -74,6 +78,23 @@ function ContentItem({
       }
     } catch (error: any) {
       console.log("err", error);
+    }
+  };
+
+  const reopenThreadHandler = async () => {
+    try {
+      const { data, error } = await kontenbase
+        .service("Threads")
+        .updateById(dataSource._id, { isClosed: false });
+      if (error) throw new Error(error?.message);
+
+      if (data) {
+        dispatch(updateThread({ ...dataSource, isClosed: false }));
+        onClick();
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
 
@@ -259,6 +280,20 @@ function ContentItem({
                             thread: dataSource,
                             type: "close",
                           });
+                        }}
+                      />
+                    )}
+                    {dataSource?.isClosed && (
+                      <MenuItem
+                        icon={
+                          <BsArrowUpCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        title="Reopen thread"
+                        onClick={() => {
+                          reopenThreadHandler();
                         }}
                       />
                     )}

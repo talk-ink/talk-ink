@@ -2,23 +2,23 @@ import { useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BiCheckCircle } from "react-icons/bi";
+import moment from "moment-timezone";
+import { kontenbase } from "lib/client";
 
 import InboxEmpty from "components/EmptyContent/InboxEmpty";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import IconButton from "components/Button/IconButton";
+import Modal from "components/Modal/Modal";
+import CloseThreadForm from "components/Thread/CloseThreadForm";
 
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { addDoneThread, deleteDoneThread } from "features/auth";
-import Modal from "components/Modal/Modal";
-import { kontenbase } from "lib/client";
+
 import { deleteThread } from "features/threads";
 import { updateChannelCount } from "features/channels/slice";
-import moment from "moment-timezone";
 import { Thread } from "types";
-import CloseThreadForm from "components/Thread/CloseThreadForm";
 
 type TProps = {
   type?: "open" | "close";
@@ -66,29 +66,29 @@ function InboxList({ type = "open" }: TProps) {
     return auth.user.readedThreads;
   }, [auth.user]);
 
-  const markHandler = async (threadId: string) => {
-    try {
-      if (isClosedThread) {
-        const { error } = await kontenbase
-          .service("Threads")
-          .unlink(threadId, { doneUsers: auth.user._id });
+  // const markHandler = async (threadId: string) => {
+  //   try {
+  //     if (isClosedThread) {
+  //       const { error } = await kontenbase
+  //         .service("Threads")
+  //         .unlink(threadId, { doneUsers: auth.user._id });
 
-        if (error) throw new Error(error.message);
-        dispatch(deleteDoneThread(threadId));
-      } else {
-        const { error } = await kontenbase
-          .service("Threads")
-          .link(threadId, { doneUsers: auth.user._id });
+  //       if (error) throw new Error(error.message);
+  //       dispatch(deleteDoneThread(threadId));
+  //     } else {
+  //       const { error } = await kontenbase
+  //         .service("Threads")
+  //         .link(threadId, { doneUsers: auth.user._id });
 
-        if (error) throw new Error(error.message);
-        dispatch(addDoneThread(threadId));
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
-      }
-    }
-  };
+  //       if (error) throw new Error(error.message);
+  //       dispatch(addDoneThread(threadId));
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       showToast({ message: `${JSON.stringify(error?.message)}` });
+  //     }
+  //   }
+  // };
 
   const threadDeleteHandler = async () => {
     try {
@@ -137,7 +137,7 @@ function InboxList({ type = "open" }: TProps) {
                     !isClosedThread && (
                       <IconButton
                         onClick={() => {
-                          markHandler(inbox._id);
+                          setSelectedThread({ thread: inbox, type: "close" });
                         }}
                       >
                         <BiCheckCircle size={24} className="text-neutral-400" />
