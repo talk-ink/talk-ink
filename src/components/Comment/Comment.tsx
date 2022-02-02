@@ -328,6 +328,15 @@ const Comment: React.FC<IProps> = ({
     }
   };
 
+  const reactionTooltip = ({ member }: { member: Member[] }) => {
+    if (member.length === 1) {
+      return member[0].firstName;
+    }
+    return `${member[member.length - 1].firstName} and ${member.length - 1} ${
+      member.length - 1 > 1 ? "others" : "other"
+    }`;
+  };
+
   useEffect(() => {
     fetchReactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -394,6 +403,7 @@ const Comment: React.FC<IProps> = ({
                           }
                         }
                       }}
+                      tooltip={reactionTooltip({ member: reaction.users })}
                     />
                   )
               )}
