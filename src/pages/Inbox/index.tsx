@@ -158,7 +158,7 @@ function InboxPage() {
               content={
                 <div>
                   <Menu>
-                    <MenuItem
+                    {/* <MenuItem
                       icon={
                         <BiCheckCircle size={20} className="text-neutral-400" />
                       }
@@ -167,7 +167,7 @@ function InboxPage() {
                       }}
                       title="Mark all done"
                       disabled={isClosedThread}
-                    />
+                    /> */}
                     <MenuItem
                       icon={<BiCheck size={20} className="text-neutral-400" />}
                       onClick={() => {
