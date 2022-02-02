@@ -3,10 +3,12 @@ import React, { useEffect, useState } from "react";
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Menu } from "@headlessui/react";
+import { Menu, Popover } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
 import { HiOutlineReply } from "react-icons/hi";
 import Select from "react-select";
+import { VscReactions } from "react-icons/vsc";
+import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -15,7 +17,7 @@ import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
 import Button from "components/Button/Button";
 
-import { IComment, Member } from "types";
+import { IComment, IReaction, Member } from "types";
 import {
   deleteComment,
   updateComment,
@@ -28,6 +30,7 @@ import { getNameInitial } from "utils/helper";
 import { kontenbase } from "lib/client";
 import axios from "axios";
 import { notificationUrl } from "utils/helper";
+import Reaction from "./Reaction";
 
 interface IProps {
   comment: IComment;
@@ -68,6 +71,8 @@ const Comment: React.FC<IProps> = ({
   const [selectedNotifiedOptions, setSelectedNotifiedOptions] = useState<
     INotifiedOption[]
   >([]);
+
+  const [reactions, setReactions] = useState<IReaction[]>([]);
 
   useEffect(() => {
     if (memberList.length <= 0 || !auth || !comment) return;
@@ -169,6 +174,174 @@ const Comment: React.FC<IProps> = ({
     }
   };
 
+  const addReactionToCommentHandler = async ({
+    commentId,
+    emoji,
+    unified,
+  }: {
+    commentId: string;
+    emoji: string;
+    unified: string;
+  }) => {
+    try {
+      const findSameReaction = reactions.find(
+        (data) => data.unified === unified || data.emoji === emoji
+      );
+
+      if (!findSameReaction) {
+        const { data: addReactionData, error: addReactionError } =
+          await kontenbase.service("Reactions").create({
+            emoji,
+            unified,
+            users: [auth.user._id],
+            comment: [commentId],
+          });
+        if (addReactionError) throw new Error(addReactionError.message);
+
+        const { error: linkCommentsError } = await kontenbase
+          .service("Comments")
+          .link(commentId, { reactions: addReactionData?._id });
+        if (linkCommentsError) throw new Error(linkCommentsError.message);
+
+        const { error: updateComment } = await kontenbase
+          .service("Comments")
+          .updateById(commentId, { content: comment.content });
+        if (updateComment) throw new Error(updateComment.message);
+
+        let newReaction: IReaction = {
+          emoji: emoji,
+          unified: unified,
+          users: [auth.user],
+        };
+
+        return setReactions((prev) => [...prev, newReaction]);
+      }
+
+      showToast({ message: `This emoji is already used` });
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const removeReactionHandler = async ({
+    reaction,
+  }: {
+    reaction: IReaction;
+  }) => {
+    try {
+      if (reaction._id) {
+        const { error: removeReactionError } = await kontenbase
+          .service("Reactions")
+          .deleteById(reaction._id);
+        if (removeReactionError) throw new Error(removeReactionError.message);
+
+        const { error: updateComment } = await kontenbase
+          .service("Comments")
+          .updateById(comment._id, { content: comment.content });
+        if (updateComment) throw new Error(updateComment.message);
+      }
+
+      setReactions((prev) =>
+        prev.filter((data) => data.unified !== reaction.unified)
+      );
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const reactionUser = async ({
+    reaction,
+    type,
+  }: {
+    reaction: IReaction;
+    type: "add" | "remove";
+  }) => {
+    try {
+      if (reaction._id) {
+        switch (type) {
+          case "add":
+            const { error: linkError } = await kontenbase
+              .service("Reactions")
+              .link(reaction._id, { users: auth.user._id });
+            if (linkError) throw new Error(linkError.message);
+
+            setReactions((prev) => {
+              return prev.map((data) => {
+                if (data._id === reaction._id) {
+                  return { ...data, users: [...data.users, auth.user] };
+                }
+                return data;
+              });
+            });
+            break;
+          case "remove":
+            const { error: unlinkError } = await kontenbase
+              .service("Reactions")
+              .unlink(reaction._id, { users: auth.user._id });
+            if (unlinkError) throw new Error(unlinkError.message);
+
+            setReactions((prev) => {
+              return prev.map((data) => {
+                if (data._id === reaction._id) {
+                  return {
+                    ...data,
+                    users: data.users.filter(
+                      (user) => user._id !== auth.user._id
+                    ),
+                  };
+                }
+                return data;
+              });
+            });
+            break;
+
+          default:
+            break;
+        }
+
+        const { error: updateComment } = await kontenbase
+          .service("Comments")
+          .updateById(comment._id, { content: comment.content });
+        if (updateComment) throw new Error(updateComment.message);
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const fetchReactions = async () => {
+    try {
+      if (comment?.reactions?.length > 0) {
+        const { data: reactionsData, error: reactionsError } = await kontenbase
+          .service("Reactions")
+          .find({ where: { comment: comment._id }, lookup: ["users"] });
+        if (reactionsError) throw new Error(reactionsError.message);
+
+        setReactions(reactionsData);
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const reactionTooltip = ({ member }: { member: Member[] }) => {
+    if (member.length === 1) {
+      return member[0].firstName;
+    }
+    return `${member[member.length - 1].firstName} and ${member.length - 1} ${
+      member.length - 1 > 1 ? "others" : "other"
+    }`;
+  };
+
+  useEffect(() => {
+    fetchReactions();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [comment.reactions]);
+
   return (
     <div className="group flex items-start mb-4 relative text-sm" ref={listRef}>
       <div className="w-8">
@@ -198,6 +371,82 @@ const Comment: React.FC<IProps> = ({
               discardComment={discardComment}
               handleUpdateComment={handleUpdateComment}
             />
+            <div className="flex items-center gap-2 flex-wrap mb-4">
+              {reactions?.map(
+                (reaction, idx, arr) =>
+                  reaction.users.length > 0 && (
+                    <>
+                      <Reaction
+                        key={idx}
+                        data={reaction}
+                        active={
+                          reaction.users.findIndex(
+                            (data) => data._id === auth.user._id
+                          ) >= 0
+                        }
+                        onClick={() => {
+                          if (
+                            reaction.users.length === 1 &&
+                            reaction.users[0]._id === auth.user._id
+                          ) {
+                            removeReactionHandler({
+                              reaction,
+                            });
+                          } else {
+                            const findUser: boolean =
+                              reaction.users.findIndex(
+                                (data) => data._id === auth.user._id
+                              ) >= 0;
+                            if (!findUser) {
+                              reactionUser({ reaction, type: "add" });
+                            } else {
+                              reactionUser({ reaction, type: "remove" });
+                            }
+                          }
+                        }}
+                        tooltip={reactionTooltip({ member: reaction.users })}
+                      />
+                      {idx === arr.length - 1 && (
+                        <Popover className="relative">
+                          {({ open: popOpen, close }) => (
+                            <>
+                              <Popover.Button as={React.Fragment}>
+                                <IconButton
+                                  size="medium"
+                                  className={`${
+                                    popOpen ? "flex" : "hidden"
+                                  } group-hover:flex items-center`}
+                                >
+                                  <VscReactions
+                                    size={18}
+                                    className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                                  />
+                                </IconButton>
+                              </Popover.Button>
+                              <Popover.Panel className="absolute z-40 right-full top-1/2 transform -translate-y-1/2 mr-2">
+                                <Picker
+                                  onEmojiClick={(_, emojiObject) => {
+                                    addReactionToCommentHandler({
+                                      commentId: comment._id,
+                                      emoji: emojiObject.emoji,
+                                      unified: emojiObject.unified,
+                                    });
+
+                                    close();
+                                  }}
+                                  skinTone={SKIN_TONE_NEUTRAL}
+                                  disableSkinTonePicker
+                                  native
+                                />
+                              </Popover.Panel>
+                            </>
+                          )}
+                        </Popover>
+                      )}
+                    </>
+                  )
+              )}
+            </div>
           </div>
 
           <div>
@@ -358,6 +607,41 @@ const Comment: React.FC<IProps> = ({
           <Menu as="div" className="relative flex">
             {({ open }) => (
               <>
+                <Popover className="relative">
+                  {({ open: popOpen, close }) => (
+                    <>
+                      <Popover.Button as={React.Fragment}>
+                        <IconButton
+                          size="medium"
+                          className={`${
+                            open || popOpen ? "flex" : "hidden"
+                          } group-hover:flex items-center`}
+                        >
+                          <VscReactions
+                            size={24}
+                            className="text-neutral-400 hover:cursor-pointer hover:text-neutral-500"
+                          />
+                        </IconButton>
+                      </Popover.Button>
+                      <Popover.Panel className="absolute z-10 right-full top-0 mr-2">
+                        <Picker
+                          onEmojiClick={(_, emojiObject) => {
+                            addReactionToCommentHandler({
+                              commentId: comment._id,
+                              emoji: emojiObject.emoji,
+                              unified: emojiObject.unified,
+                            });
+
+                            close();
+                          }}
+                          skinTone={SKIN_TONE_NEUTRAL}
+                          disableSkinTonePicker
+                          native
+                        />
+                      </Popover.Panel>
+                    </>
+                  )}
+                </Popover>
                 {!isReplyEditorVisible && !isEdit && (
                   <IconButton
                     size="medium"
