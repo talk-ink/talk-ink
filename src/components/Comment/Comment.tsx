@@ -493,7 +493,7 @@ const Comment: React.FC<IProps> = ({
                           className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
                           onClick={() => setIsShowMoreSubComment(true)}
                         >
-                          Show More {comment.subComments?.length - 2} Comments
+                          Show {comment.subComments?.length - 2} More Comments
                         </p>
                       )}
                       {comment.subComments?.length >= 2 && (
