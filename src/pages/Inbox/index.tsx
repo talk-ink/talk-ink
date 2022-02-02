@@ -1,10 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 
-import {
-  BiCheck,
-  BiCheckCircle,
-  BiDotsHorizontalRounded,
-} from "react-icons/bi";
+import { BiCheck, BiDotsHorizontalRounded } from "react-icons/bi";
 import { Outlet, useLocation, useParams } from "react-router-dom";
 
 import Badge from "components/Badge/Badge";

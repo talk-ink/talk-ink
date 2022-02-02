@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useMemo } from "react";
+import React, { useMemo } from "react";
 
 import {
   BiCheck,
@@ -81,7 +81,7 @@ function ContentItem({
     return member.members.find(
       (data) => data._id === dataSource?.closedBy?.[0]
     );
-  }, [dataSource?.isClosed, dataSource?.closedBy]);
+  }, [dataSource?.closedBy, member.members]);
 
   return (
     <div

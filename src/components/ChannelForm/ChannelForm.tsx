@@ -58,11 +58,6 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
     return !!editedData;
   }, [editedData]);
 
-  const privacyStr = {
-    public: "Public",
-    private: "Private",
-  };
-
   const isDisabled: boolean =
     !formik.values.name ||
     !formik.values.privacy ||

@@ -1,6 +1,5 @@
 import { useMemo } from "react";
 
-import { useParams } from "react-router-dom";
 import { useFormik } from "formik";
 import { kontenbase } from "lib/client";
 import moment from "moment-timezone";
@@ -40,7 +39,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
     return channel.channels.find(
       (channel) => channel._id === data.channel?.[0]
     );
-  }, [channel.channels]);
+  }, [channel.channels, data?.channel]);
 
   const initialValues: InitialValuesProps = {
     closeDescription: "",

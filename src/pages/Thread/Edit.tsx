@@ -3,13 +3,13 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
-import Select from "react-select";
+// import Select from "react-select";
 // import makeAnimated from "react-select/animated";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import TextEditor from "components/TextEditor/TextEditor";
 import { useFormik } from "formik";
-import { Thread, Member, Channel } from "types";
+import { Thread, Channel } from "types";
 import { createThreadValidation } from "utils/validators";
 import { kontenbase } from "lib/client";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
@@ -17,15 +17,14 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
-import { fetchChannels } from "features/channels/slice";
 
-interface INotifiedOption {
-  value: string;
-  label: string;
-  color?: string;
-  isFixed?: boolean;
-  flag: number;
-}
+// interface INotifiedOption {
+//   value: string;
+//   label: string;
+//   color?: string;
+//   isFixed?: boolean;
+//   flag: number;
+// }
 
 // const animatedComponents = makeAnimated();
 
