@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { Dispatch, SetStateAction, useMemo } from "react";
 
 import {
   BiCheck,
@@ -24,7 +24,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 
 import { addReadThread, deleteReadThread } from "features/auth";
-import { Thread } from "types";
+import { Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
 
 type Props = React.PropsWithChildren<{
@@ -48,7 +48,9 @@ function ContentItem({
   isRead,
 }: Props) {
   const dispatch = useAppDispatch();
+
   const auth = useAppSelector((state) => state.auth);
+  const member = useAppSelector((state) => state.member);
   const navigate = useNavigate();
   const isFromTalkink = dataSource.name === "Welcome to Talk.ink";
 
@@ -74,6 +76,12 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
+  const closedBy: Member = useMemo(() => {
+    return member.members.find(
+      (data) => data._id === dataSource?.closedBy?.[0]
+    );
+  }, [dataSource?.isClosed, dataSource?.closedBy]);
 
   return (
     <div
@@ -140,18 +148,30 @@ function ContentItem({
               </span>
             </div>
             <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
-              <small className=" text-xs text-neutral-500 table-cell truncate">
-                {dataSource?.draft ? "Me: " : ""}
-                {dataSource.comments?.length > 0
-                  ? `Latest : ${dataSource.comments?.[
-                      dataSource.comments?.length - 1
-                    ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                  : dataSource.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}
-              </small>
+              {!dataSource.isClosed && (
+                <small className=" text-xs text-neutral-500 table-cell truncate">
+                  {dataSource?.draft ? "Me: " : ""}
+                  {dataSource.comments?.length > 0
+                    ? `Latest : ${dataSource.comments?.[
+                        dataSource.comments?.length - 1
+                      ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
+                    : dataSource.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}
+                </small>
+              )}
+              {dataSource.isClosed && (
+                <small className=" text-xs text-neutral-500 table-cell truncate">
+                  {closedBy.firstName} closed this thread.
+                </small>
+              )}
             </div>
           </div>
         </button>
-        <div className="flex active:flex group-hover:flex gap-2">
+        <div className="flex active:flex group-hover:flex gap-2 items-center">
+          {dataSource?.isClosed && (
+            <div className="bg-indigo-500 p-1 px-2 rounded-full">
+              <p className="text-xs text-white font-semibold">Closed</p>
+            </div>
+          )}
           {otherButton}
           <Menu as="div" className="relative">
             {({ open }) => (
