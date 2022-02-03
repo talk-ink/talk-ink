@@ -363,7 +363,7 @@ function ThreadPage() {
               className="text-sm mb-8 -mt-4 hover:opacity-80 hover:cursor-pointer"
               onClick={loadMoreComment}
             >
-              View More {thread?.commentCount - threadData?.comments?.length}{" "}
+              Show {thread?.commentCount - threadData?.comments?.length} More
               Comments
             </p>
           )}
