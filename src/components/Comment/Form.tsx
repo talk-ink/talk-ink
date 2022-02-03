@@ -1,11 +1,13 @@
 import React, { useState, useMemo, useEffect } from "react";
 
 import axios from "axios";
+import Select from "react-select";
+
 import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
-import Editor from "rich-markdown-editor";
-import { kontenbase } from "lib/client";
-import Select from "react-select";
+import NameInitial from "components/Avatar/NameInitial";
+import CommentBadge from "./CommentBadge";
+import Remirror from "components/Remirror";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -17,8 +19,8 @@ import {
   getNameInitial,
   notificationUrl,
 } from "utils/helper";
-import NameInitial from "components/Avatar/NameInitial";
-import CommentBadge from "./CommentBadge";
+import { kontenbase } from "lib/client";
+
 import { updateChannel } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 
@@ -312,7 +314,7 @@ const Form: React.FC<IProps> = ({
               }}
             />
           </div>
-          <Editor
+          {/* <Editor
             key="editor"
             defaultValue={editorState}
             onChange={(getContent: () => string) =>
@@ -324,7 +326,7 @@ const Form: React.FC<IProps> = ({
               return data.url;
             }}
             className="markdown-overrides comment-editor"
-          />
+          /> */}
 
           <div className="flex justify-between">
             <div />
@@ -347,6 +349,9 @@ const Form: React.FC<IProps> = ({
           </div>
         </div>
       )}
+
+      <Remirror />
+
       {!!invitedUser && (
         <CommentBadge
           name={invitedUser?.label}
