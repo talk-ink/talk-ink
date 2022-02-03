@@ -41,6 +41,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
+import { createUniqueArray } from "utils/helper";
 
 import { Channel, CreateChannel, Thread, User } from "types";
 
@@ -75,6 +76,7 @@ function SidebarComponent({
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
   const [inboxData, setInboxData] = useState<Thread[]>([]);
+  const [trashData, setTrashData] = useState<string[]>([]);
   const [isWorkspaceLimitModalVisible, setIsWorkspaceLimitModalVisible] =
     useState(false);
   const [runOnce, setRunOnce] = useState(false);
@@ -118,6 +120,26 @@ function SidebarComponent({
 
   useEffect(() => {
     if (!userId || !params.workspaceId || runOnce) return;
+
+    (async () => {
+      try {
+        const { data, error } = await kontenbase.service("Threads").find({
+          where: {
+            workspace: params.workspaceId,
+            createdBy: userId,
+            isDeleted: true,
+          },
+        });
+
+        if (error) throw new Error(error.message);
+
+        setTrashData(data.map((item) => item._id));
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast({ message: `${JSON.stringify(error?.message)}` });
+        }
+      }
+    })();
 
     (async () => {
       try {
@@ -255,6 +277,7 @@ function SidebarComponent({
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
         const isUpdate = event === "UPDATE_RECORD";
+        const isDelete = event === "DELETE_RECORD";
 
         const isCurrentWorkspace = isUpdate
           ? payload?.before?.workspace?.includes(params.workspaceId)
@@ -281,7 +304,10 @@ function SidebarComponent({
 
           _createdBy = data?.[0];
 
-          if (isCurrentWorkspace && isThreadInJoinedChannel) {
+          if (
+            (!isDelete ? isCurrentWorkspace : true) &&
+            (!isDelete ? isThreadInJoinedChannel : true)
+          ) {
             switch (event) {
               case "UPDATE_RECORD":
                 if (payload.before.tagedUsers.includes(userId)) {
@@ -380,6 +406,18 @@ function SidebarComponent({
 
                   updateUserStore();
                 }
+
+                if (payload.after?.createdBy === auth.user._id) {
+                  if (payload?.after?.isDeleted) {
+                    setTrashData((prev) =>
+                      createUniqueArray([...prev, payload.after?._id])
+                    );
+                  } else {
+                    setTrashData((prev) =>
+                      prev.filter((item) => item !== payload?.after?._id)
+                    );
+                  }
+                }
                 break;
               case "CREATE_RECORD":
                 if (
@@ -398,7 +436,11 @@ function SidebarComponent({
                 updateUserStore();
                 break;
               case "DELETE_RECORD":
+                console.log("awee");
                 dispatch(deleteThread(payload));
+                setTrashData((prev) =>
+                  prev.filter((item) => item !== payload?._id)
+                );
                 break;
 
               default:
@@ -627,6 +669,15 @@ function SidebarComponent({
                   link={`/a/${workspaceData?._id}/inbox`}
                   setIsSidebarOpen={setIsSidebarOpen}
                   count={inboxLeft || 0}
+                />
+                <SidebarList
+                  type="trash"
+                  name="Trash"
+                  link={`/a/${workspaceData?._id}/trash`}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                  count={
+                    (trashData.length > 10 ? "10+" : trashData.length) || 0
+                  }
                 />
                 {/* <SidebarList
                 type="saved"

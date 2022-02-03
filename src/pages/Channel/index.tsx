@@ -140,9 +140,14 @@ function ChannelPage() {
   const threadDeleteHandler = async () => {
     try {
       if (!selectedThread?.thread.draft) {
+        const now = moment().tz("Asia/Jakarta").toDate();
+
         const deletedThread = await kontenbase
           .service("Threads")
-          .deleteById(selectedThread?.thread._id);
+          .updateById(selectedThread?.thread._id, {
+            isDeleted: true,
+            deletedAt: now,
+          });
 
         if (deletedThread?.data) {
           setSelectedThread(null);
@@ -398,7 +403,8 @@ function ChannelPage() {
         okButtonText="Confirm"
         size="xs"
       >
-        Are you sure you want to delete this thread?
+        Are you sure you want to delete this thread? It will be moved into
+        trash.
       </Modal>
       <Modal
         header="Close Thread"

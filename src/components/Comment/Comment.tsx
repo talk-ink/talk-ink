@@ -31,7 +31,7 @@ import { addSubCommentToComment } from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
-import { getNameInitial } from "utils/helper";
+import { draft, getNameInitial } from "utils/helper";
 import { kontenbase } from "lib/client";
 import axios from "axios";
 import { notificationUrl } from "utils/helper";
@@ -126,6 +126,8 @@ const Comment: React.FC<IProps> = ({
   };
 
   const discardSubComment = () => {
+    draft("reply").deleteByKey(comment._id);
+
     setIsShowReplyEditorVisible(false);
     setSubEditorState("");
   };
@@ -172,6 +174,8 @@ const Comment: React.FC<IProps> = ({
             commentId: comment._id,
           })
         );
+
+        draft("reply").deleteByKey(comment._id);
 
         discardSubComment();
         setIsShowMoreSubComment(true);
@@ -348,6 +352,23 @@ const Comment: React.FC<IProps> = ({
     fetchReactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [comment.reactions]);
+
+  useEffect(() => {
+    if (subEditorState) {
+      draft("reply").set(comment._id, {
+        content: subEditorState,
+        createdById: auth.user._id,
+        threadId,
+      });
+    }
+  }, [subEditorState, auth.user._id, comment._id, threadId]);
+
+  useEffect(() => {
+    const getReplyDraft = draft("reply").get(comment._id);
+    if (getReplyDraft.content && getReplyDraft.createdById === auth.user._id) {
+      setSubEditorState(getReplyDraft.content);
+    }
+  }, [auth.user._id, comment._id]);
 
   return (
     <div key={comment._id}>

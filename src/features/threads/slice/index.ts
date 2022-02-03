@@ -77,7 +77,9 @@ const threadSlice = createSlice({
       let deletedIndex = state.threads.findIndex(
         (data) => data._id === action.payload._id
       );
-      state.threads.splice(deletedIndex, 1);
+      if (deletedIndex >= 0) {
+        state.threads.splice(deletedIndex, 1);
+      }
     },
     updateThread: (state, action: PayloadAction<IUpdateThreadPayload>) => {
       const updatedThread = state.threads.map((item) =>
