@@ -73,7 +73,7 @@ function SettingsModal({
   return visible ? (
     <div
       id="modal-container"
-      className="w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]"
+      className="w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]"
       onClick={(e: any) => {
         if (e?.target?.id === "modal-container") {
           onClose();
