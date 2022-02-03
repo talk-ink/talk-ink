@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import "remirror/styles/all.css";
+import "remirror/styles/extension-file.css";
 import "./editor.css";
 
 import {
@@ -26,10 +27,11 @@ import {
   ImageExtensionAttributes,
 } from "remirror/extensions";
 import { cx, ExtensionPriority, htmlToProsemirrorNode } from "remirror";
+import { AllStyledComponent } from "@remirror/styles/emotion";
+
 import {
   FileExtension,
   createBaseuploadFileUploader,
-  createDataUrlFileUploader,
 } from "@remirror/extension-file";
 
 import css from "refractor/lang/css";
@@ -292,6 +294,7 @@ function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
   const promises: Array<DelayedPromiseCreator<ImageAttributes>> = [];
 
   for (const { file, progress } of files) {
+    // eslint-disable-next-line no-loop-func
     promises.push(async () => {
       const { data } = await kontenbase.storage.upload(file);
 
@@ -300,7 +303,7 @@ function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
 
         reader.addEventListener(
           "load",
-          (readerEvent) => {
+          (_readerEvent) => {
             completed += 1;
             progress(completed / files.length);
             resolve({
@@ -319,56 +322,6 @@ function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
   return promises;
 }
 
-const extensions = () => [
-  new MentionAtomExtension({
-    extraAttributes: { type: "user" },
-    matchers: [{ name: "at", char: "@", appendText: " ", matchOffset: 0 }],
-  }),
-  new LinkExtension({ autoLink: true }),
-  new BoldExtension({}),
-  new StrikeExtension(),
-  new ItalicExtension(),
-  new HeadingExtension({}),
-  new LinkExtension({}),
-  new BlockquoteExtension(),
-  new BulletListExtension({ enableSpine: true }),
-  new OrderedListExtension(),
-  new ListItemExtension({
-    priority: ExtensionPriority.High,
-    enableCollapsible: true,
-  }),
-  new CodeExtension(),
-  new CodeBlockExtension({
-    supportedLanguages: [css, javascript, json, markdown, typescript],
-  }),
-  new TrailingNodeExtension(),
-  new TableExtension(),
-  new MarkdownExtension({ copyAsMarkdown: false }),
-  new HardBreakExtension(),
-  new TaskListExtension(),
-  new ImageExtension({
-    enableResizing: true,
-    //@ts-ignore
-    uploadHandler,
-  }),
-  new DropCursorExtension(),
-  new FileExtension({
-    render: FileComponent,
-    pasteRuleRegexp: /.*/,
-    uploadFileHandler: createBaseuploadFileUploader,
-    extraAttributes: {
-      showPreview: {
-        default: false,
-        parseDOM: (dom) => dom.getAttribute("data-show-preview") === "true",
-        toDOM: (attrs) => [
-          "data-show-preview",
-          Boolean(attrs.showPreview).toString(),
-        ],
-      },
-    },
-  }),
-];
-
 interface IProps {
   editor?: "Social" | "Custom";
 }
@@ -379,9 +332,9 @@ export const Menu = ({
   inputFile: React.RefObject<HTMLInputElement>;
 }) => {
   // Using command chaining
-  const chain = useChainedCommands();
+  // const chain = useChainedCommands();
   const active = useActive();
-  const { focus } = useCommands();
+  // const { focus } = useCommands();
 
   return (
     <button
@@ -401,38 +354,80 @@ export const Menu = ({
 const MyEditor: React.FC<IProps> = ({ editor }) => {
   const inputFile = useRef(null);
 
-  const { manager, setState, state } = useRemirror({
+  const extensions = useCallback(
+    () => [
+      new MentionAtomExtension({
+        extraAttributes: { type: "user" },
+        matchers: [{ name: "at", char: "@", appendText: " ", matchOffset: 0 }],
+      }),
+      new LinkExtension({ autoLink: true }),
+      new BoldExtension({}),
+      new StrikeExtension(),
+      new ItalicExtension(),
+      new HeadingExtension({}),
+      new LinkExtension({}),
+      new BlockquoteExtension(),
+      new BulletListExtension({ enableSpine: true }),
+      new OrderedListExtension(),
+      new ListItemExtension({
+        priority: ExtensionPriority.High,
+        enableCollapsible: true,
+      }),
+      new CodeExtension(),
+      new CodeBlockExtension({
+        supportedLanguages: [css, javascript, json, markdown, typescript],
+      }),
+      new TrailingNodeExtension(),
+      new TableExtension(),
+      new MarkdownExtension({ copyAsMarkdown: false }),
+      new HardBreakExtension(),
+      new TaskListExtension(),
+      new ImageExtension({
+        enableResizing: true,
+        uploadHandler,
+      }),
+
+      new FileExtension({
+        uploadFileHandler: createBaseuploadFileUploader,
+      }),
+      new DropCursorExtension(),
+    ],
+    []
+  );
+
+  const { manager, onChange, state } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
     content: "",
   });
 
-  console.log(new TextEncoder().encode(JSON.stringify(state)).length);
+  {
+    /* <Menu inputFile={inputFile} /> */
+  }
 
   return (
     <div className="remirror-theme">
-      <ThemeProvider>
-        <Remirror
-          autoFocus
-          manager={manager}
-          autoRender="end"
-          onChange={(parameter) => {
-            return setState(parameter.state);
-          }}
-          state={state}
-        >
-          <UserSuggestor />
-          <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
-          <Menu inputFile={inputFile} />
-        </Remirror>
-      </ThemeProvider>
-
+      <AllStyledComponent>
+        <ThemeProvider>
+          <Remirror
+            autoFocus
+            manager={manager}
+            autoRender="end"
+            onChange={onChange}
+            initialContent={state}
+          >
+            <UserSuggestor />
+            <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
+          </Remirror>
+        </ThemeProvider>
+      </AllStyledComponent>
+      {/* 
       <input
         type="file"
         id="file"
         ref={inputFile}
         style={{ display: "none" }}
-      />
+      /> */}
     </div>
   );
 };

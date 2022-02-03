@@ -32,27 +32,29 @@ export const FileComponent: React.FC<FileComponentProps> = ({
   }, [updateAttributes, attrs.showPreview]);
 
   return (
-    <div className="file-container">
-      <div className="file-info">
-        <IconButton>
-          <FileIcon />
-        </IconButton>
-        <div className={ExtensionFileTheme.FILE_NAME}>{attrs.fileName}</div>
-        <div className={ExtensionFileTheme.FILE_SIZE}>{fileSize}</div>
-        {/* <div style={{ flex: 1, minWidth: "8px", textAlign: "center" }}>
+    <div className="file-content-container">
+      <div className="file-container">
+        <div className="file-info">
+          <IconButton>
+            <FileIcon />
+          </IconButton>
+          <div className={ExtensionFileTheme.FILE_NAME}>{attrs.fileName}</div>
+          <div className={ExtensionFileTheme.FILE_SIZE}>{fileSize}</div>
+          {/* <div style={{ flex: 1, minWidth: "8px", textAlign: "center" }}>
           <button onClick={handleToggle}>Preview</button>
         </div> */}
 
-        {context ? (
-          <UploadingFileAction context={context} abort={abort} />
-        ) : (
-          <UploadedFileAction
-            attrs={attrs}
-            getPosition={getPosition as () => number}
-          />
-        )}
+          {context ? (
+            <UploadingFileAction context={context} abort={abort} />
+          ) : (
+            <UploadedFileAction
+              attrs={attrs}
+              getPosition={getPosition as () => number}
+            />
+          )}
+        </div>
+        {attrs.showPreview && <iframe src={attrs.url} />}
       </div>
-      {attrs.showPreview && <iframe src={attrs.url} />}
     </div>
   );
 };
