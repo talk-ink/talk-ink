@@ -403,7 +403,8 @@ function ChannelPage() {
         okButtonText="Confirm"
         size="xs"
       >
-        Are you sure you want to delete this thread?
+        Are you sure you want to delete this thread? It will be moved into
+        trash.
       </Modal>
       <Modal
         header="Close Thread"

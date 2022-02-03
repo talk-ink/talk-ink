@@ -51,7 +51,7 @@ function SidebarList({
   name,
   link,
   isDefault,
-  count,
+  count = 0,
   leaveModalHandler,
   editModalHandler,
   data,
@@ -61,7 +61,7 @@ function SidebarList({
   isAdmin,
 }: Props) {
   let Icon = AiOutlineInbox;
-  let showOption = type === "channel" || type === "inbox";
+  let showOption = type === "channel";
 
   const params = useParams();
   const { pathname } = useLocation();
@@ -203,6 +203,11 @@ function SidebarList({
             </>
           )}
         </Menu>
+      )}
+      {!showOption && (
+        <div className={`h-7 w-8 flex items-center justify-center`}>
+          <p className="text-neutral-400 text-xs">{count === 0 ? "" : count}</p>
+        </div>
       )}
     </div>
   );
