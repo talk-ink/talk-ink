@@ -229,7 +229,7 @@ function ChannelPage() {
           </p>
         </div>
         <div className="flex items-center gap-3">
-          <div className="flex flex-row mr-2">
+          <div className="hidden md:flex flex-row mr-2">
             {memberList.map(
               (member, idx) =>
                 idx <= 3 && (
