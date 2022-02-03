@@ -13,7 +13,6 @@ import SettingsSidebar from "./SettingsSidebar";
 import { SettingsModalRouteState } from "types";
 import { SettingsModalHeader } from "utils/text-constants";
 import { useMediaQuery } from "react-responsive";
-import { FcMenu } from "react-icons/fc";
 
 type TProps = React.PropsWithChildren<{
   onClose?: () => void;
@@ -125,17 +124,19 @@ function SettingsModal({
                 <GrClose size={18} />
               </button>
             </header>
-            <div className="h-full">
+            <div className="h-full md:h-auto">
               <div className="p-3 h-full ">
                 {settingsRender(currentRoute.route)}
               </div>
-              <div className="fixed top-1/2 left-2 transform -translate-y-1/2 bg-indigo-500 h-8 w-8 flex items-center justify-center rounded-full shadow-md">
-                <BiMenu
-                  size={16}
-                  onClick={() => setIsSidebarOpen((prev) => !prev)}
-                  className="text-white"
-                />
-              </div>
+              {isMobile && (
+                <div className="fixed top-1/2 left-2 transform -translate-y-1/2 bg-indigo-500 h-8 w-8 flex items-center justify-center rounded-full shadow-md">
+                  <BiMenu
+                    size={16}
+                    onClick={() => setIsSidebarOpen((prev) => !prev)}
+                    className="text-white"
+                  />
+                </div>
+              )}
             </div>
           </div>
         </div>
