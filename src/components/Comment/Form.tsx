@@ -348,7 +348,7 @@ const Form: React.FC<IProps> = ({
               const { data } = await kontenbase.storage.upload(file);
               return data.url;
             }}
-            className="markdown-overrides comment-editor"
+            className="markdown-overrides"
           />
 
           <div className="flex justify-between">

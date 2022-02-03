@@ -604,7 +604,7 @@ const Comment: React.FC<IProps> = ({
             </div>
 
             {isReplyEditorVisible && (
-              <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md min-h-[12rem] mb-2">
+              <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md mb-2">
                 <div>
                   <div className="mt-1 flex w-full items-center">
                     <div className="mr-2">
@@ -644,7 +644,7 @@ const Comment: React.FC<IProps> = ({
                   <Editor
                     key="edited"
                     defaultValue={subEditorState}
-                    className="markdown-overrides sub-comment-editor"
+                    className="markdown-overrides"
                     onChange={(getContent: () => string) =>
                       setSubEditorState(getContent())
                     }
