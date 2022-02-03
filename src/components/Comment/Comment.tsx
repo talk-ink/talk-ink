@@ -428,7 +428,10 @@ const Comment: React.FC<IProps> = ({
                 {reactions?.map(
                   (reaction, idx, arr) =>
                     reaction.users.length > 0 && (
-                      <div key={idx + reaction.unified}>
+                      <div
+                        key={idx + reaction.unified}
+                        className="flex items-center gap-2"
+                      >
                         <Reaction
                           data={reaction}
                           active={
@@ -659,7 +662,7 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           <div
-            className={`absolute -top-3 right-0 z-50 ${
+            className={`absolute -top-3 right-0 z-50 bg-white rounded px-1 shadow ${
               threadData?.isClosed ? "hidden" : ""
             }`}
           >
