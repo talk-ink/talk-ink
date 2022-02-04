@@ -1,18 +1,16 @@
-import React, { useState } from "react";
-
-import Editor from "rich-markdown-editor";
+import React, { useRef, useState } from "react";
 
 import Button from "components/Button/Button";
-import Delayed from "components/Delay";
-
-import { kontenbase } from "lib/client";
+import Remirror from "components/Remirror";
 
 interface IProps {
-  content: string;
-  isEdit: boolean;
-  setEditorState: React.Dispatch<React.SetStateAction<string>>;
-  discardComment: () => void;
-  handleUpdateComment: () => void;
+  content?: string;
+  isEdit?: boolean;
+  setEditorState?: React.Dispatch<React.SetStateAction<string>>;
+  discardComment?: () => void;
+  handleUpdateComment?: () => void;
+  remmirorProps?: any;
+  editorRef?: any;
 }
 
 const Preview: React.FC<IProps> = ({
@@ -21,33 +19,27 @@ const Preview: React.FC<IProps> = ({
   setEditorState,
   discardComment,
   handleUpdateComment,
+  remmirorProps,
+  editorRef,
 }) => {
+  const { manager, onChange, state } = remmirorProps || {};
   const [imageLoading, setImageLoading] = useState<boolean>(false);
 
-  return typeof content === "string" && !isEdit ? (
-    <Delayed waitBeforeShow={100}>
-      <Editor
-        key="preview"
-        value={content}
-        readOnly
-        className="markdown-overrides fix-editor"
-      />
-    </Delayed>
+  return !isEdit ? (
+    <Remirror
+      remmirorProps={{ manager, onChange, state }}
+      fromComment
+      readOnly
+      editorRef={editorRef}
+    />
   ) : (
     <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-4 mt-2  ">
-      <Editor
-        key="edited"
-        defaultValue={content}
-        className="markdown-overrides "
-        onChange={(getContent: () => string) => setEditorState(getContent())}
-        autoFocus
-        uploadImage={async (file: File) => {
-          setImageLoading(true);
-          const { data } = await kontenbase.storage.upload(file);
-          setImageLoading(false);
-          return data.url;
-        }}
+      <Remirror
+        remmirorProps={{ manager, onChange, state }}
+        fromComment
+        editorRef={editorRef}
       />
+
       <div className="flex justify-between ">
         <div />
         <div className="flex items-center py-2">

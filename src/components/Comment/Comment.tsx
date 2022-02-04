@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   BiDotsHorizontalRounded,
@@ -37,6 +37,12 @@ import NameInitial from "components/Avatar/NameInitial";
 import { draft, getNameInitial } from "utils/helper";
 import { notificationUrl } from "utils/helper";
 import Reaction from "./Reaction";
+import { useRemirror } from "@remirror/react";
+
+import { extensions } from "components/Remirror/extensions";
+
+import { htmlToProsemirrorNode } from "remirror";
+import { parseContent } from "utils/helper";
 
 interface IProps {
   comment: IComment;
@@ -57,6 +63,10 @@ interface INotifiedOption {
 
 const NOTIFICATION_API = notificationUrl;
 
+interface EditorRef {
+  setContent: (content: any) => void;
+}
+
 const Comment: React.FC<IProps> = ({
   comment,
   listRef,
@@ -73,6 +83,7 @@ const Comment: React.FC<IProps> = ({
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
   const [isReplyEditorVisible, setIsShowReplyEditorVisible] = useState(false);
+  const editorRef = useRef<EditorRef | null>(null);
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [editorState, setEditorState] = useState<string>("");
@@ -86,6 +97,12 @@ const Comment: React.FC<IProps> = ({
 
   const [reactions, setReactions] = useState<IReaction[]>([]);
   const [openReaction, setOpenReaction] = useState<boolean>(false);
+
+  const { manager, state, onChange } = useRemirror({
+    extensions: () => extensions(true),
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(comment.content),
+  });
 
   useEffect(() => {
     if (memberList.length <= 0 || !auth || !comment) return;
@@ -128,7 +145,7 @@ const Comment: React.FC<IProps> = ({
 
   const discardComment = () => {
     setIsEdit(false);
-    setEditorState("");
+    editorRef.current!.setContent(parseContent(comment.content));
   };
 
   const discardSubComment = () => {
@@ -427,11 +444,11 @@ const Comment: React.FC<IProps> = ({
                 </p>
               )}
               <Preview
-                content={comment.content}
                 isEdit={isEdit}
-                setEditorState={setEditorState}
                 discardComment={discardComment}
                 handleUpdateComment={handleUpdateComment}
+                remmirorProps={{ manager, onChange, state }}
+                editorRef={editorRef}
               />
               <div className="flex items-center gap-2 flex-wrap mb-4">
                 {reactions?.map(

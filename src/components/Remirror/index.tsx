@@ -58,7 +58,9 @@ const MyEditor: React.FC<IProps> = ({
       className={`${
         readOnly && !fromComment
           ? "readonly-editor"
-          : fromComment
+          : readOnly && fromComment
+          ? "readonly-comment-editor"
+          : fromComment && !readOnly
           ? "comment-editor"
           : "thread-editor"
       } remirror-theme`}

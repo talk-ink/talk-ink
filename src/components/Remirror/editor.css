@@ -18,6 +18,13 @@
   overflow: hidden !important;
 }
 
+.readonly-comment-editor .remirror-editor {
+  min-height: 1rem !important;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+  margin-top: -1rem;
+}
+
 .comment-editor .remirror-editor {
   min-height: 6rem !important;
   margin-left: -2px !important;
