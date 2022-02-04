@@ -341,6 +341,12 @@ function Compose() {
           loading={loading}
           deleteDraft={deleteDraft}
           remmirorProps={{ manager, onChange, state }}
+          listMentions={notifiedOptions
+            ?.filter((item) => item.flag === 3)
+            ?.map((item) => ({
+              id: item.value,
+              label: item.label,
+            }))}
         />
       </div>
     </MainContentContainer>

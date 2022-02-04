@@ -118,8 +118,8 @@ const Comment: React.FC<IProps> = ({
   };
 
   return (
-    <div className="group flex items-start relative " ref={listRef}>
-      <div className=" w-8 mr-2">
+    <div className="group flex items-start relative mb-6" ref={listRef}>
+      <div className=" w-8 mr-2 ">
         {comment.createdBy?.avatar?.[0]?.url ? (
           <Avatar src={comment.createdBy?.avatar?.[0]?.url} size="small" />
         ) : (
@@ -140,7 +140,7 @@ const Comment: React.FC<IProps> = ({
             </ReactMoment>
           </p>
         </div>
-        <div className=" w-[70vw] sm:w-full min-h-[3rem] text-xs">
+        <div className=" w-[70vw] sm:w-full min-h-[3rem] text-xs pt-1">
           <Preview
             isEdit={isEdit}
             discardComment={discardComment}

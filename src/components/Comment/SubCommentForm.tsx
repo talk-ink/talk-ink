@@ -83,7 +83,16 @@ const SubCommentForm: React.FC<IProps> = ({
             }}
           />
         </div>
-        <Remirror remmirorProps={{ manager, onChange, state }} fromComment />
+        <Remirror
+          remmirorProps={{ manager, onChange, state }}
+          fromComment
+          listMentions={notifiedOptions
+            ?.filter((item) => item.flag === 3)
+            ?.map((item) => ({
+              id: item.value,
+              label: item.label,
+            }))}
+        />
       </div>
       <div className="flex justify-end ">
         <div className="flex items-center py-2">

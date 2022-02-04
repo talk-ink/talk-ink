@@ -417,10 +417,7 @@ const Comment: React.FC<IProps> = ({
           </div>
         </div>
       )}
-      <div
-        className="group flex items-start mb-4 relative text-sm"
-        ref={listRef}
-      >
+      <div className="group flex items-start relative text-sm" ref={listRef}>
         <div className="w-8">
           {comment.createdBy?.avatar?.[0]?.url ? (
             <Avatar src={comment.createdBy?.avatar?.[0]?.url} />

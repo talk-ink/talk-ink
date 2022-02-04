@@ -367,6 +367,12 @@ const Form: React.FC<IProps> = ({
           remmirorProps={{ manager, onChange, state }}
           fromComment
           editorRef={editorRef}
+          listMentions={notifiedOptions
+            ?.filter((item) => item.flag === 3)
+            ?.map((item) => ({
+              id: item.value,
+              label: item.label,
+            }))}
         />
 
         <div className="flex justify-between">

@@ -1,4 +1,4 @@
-import React, { useState, useEffect, KeyboardEvent, useRef } from "react";
+import React, { KeyboardEvent, useRef } from "react";
 
 import { FormikProps } from "formik";
 import Button from "components/Button/Button";
@@ -6,12 +6,18 @@ import { Thread } from "types";
 import { useNavigate, useParams } from "react-router";
 import Remirror from "components/Remirror";
 
+interface Mention {
+  id: string;
+  label: string;
+}
+
 type Props = React.PropsWithChildren<{
   formik: FormikProps<Thread>;
   loading: boolean;
   deleteDraft?: () => void;
   isEdit?: boolean;
   remmirorProps?: any;
+  listMentions?: Mention[];
 }>;
 
 function TextEditor({
@@ -20,6 +26,7 @@ function TextEditor({
   deleteDraft,
   isEdit,
   remmirorProps,
+  listMentions = [],
 }: Props) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const navigate = useNavigate();
@@ -51,7 +58,7 @@ function TextEditor({
           onKeyDown={handleEnter}
         />
 
-        <Remirror remmirorProps={remmirorProps} />
+        <Remirror remmirorProps={remmirorProps} listMentions={listMentions} />
       </div>
       <div className="absolute left-0 bottom-0 w-full flex justify-between items-center px-5 pb-5">
         <div></div>

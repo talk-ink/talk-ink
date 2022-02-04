@@ -15,16 +15,13 @@ import {
 } from "@remirror/react";
 import UserSuggestor from "./UserSuggestor";
 
-const ALL_USERS = [
-  { id: "joe", label: "Joe" },
-  { id: "sue", label: "Sue" },
-  { id: "pat", label: "Pat" },
-  { id: "tom", label: "Tom" },
-  { id: "jim", label: "Jim" },
-];
-
 interface EditorRef {
   setContent: (content: any) => void;
+}
+
+interface Mention {
+  id: string;
+  label: string;
 }
 
 interface IProps {
@@ -32,6 +29,7 @@ interface IProps {
   readOnly?: boolean;
   fromComment?: boolean;
   editorRef?: any;
+  listMentions?: Mention[];
 }
 
 const ImperativeHandle = forwardRef((_: unknown, ref: Ref<EditorRef>) => {
@@ -50,6 +48,7 @@ const MyEditor: React.FC<IProps> = ({
   readOnly,
   fromComment,
   editorRef,
+  listMentions = [],
 }) => {
   const { manager, onChange, state } = remmirorProps || {};
 
@@ -75,7 +74,7 @@ const MyEditor: React.FC<IProps> = ({
             state={state}
             editable={!readOnly}
           >
-            {!readOnly && <UserSuggestor allUsers={ALL_USERS} />}
+            {!readOnly && <UserSuggestor allUsers={listMentions} />}
             {!readOnly && (
               <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
             )}
