@@ -200,6 +200,9 @@ const Comment: React.FC<IProps> = ({
     emoji: string;
     unified: string;
   }) => {
+    if (reactions?.length >= 20)
+      return showToast({ message: "Reached reactions limit" });
+
     try {
       const findSameReaction = reactions.find(
         (data) => data.unified === unified || data.emoji === emoji
@@ -476,9 +479,7 @@ const Comment: React.FC<IProps> = ({
                                 <Popover.Button as={React.Fragment}>
                                   <IconButton
                                     size="medium"
-                                    className={`${
-                                      popOpen ? "flex" : "hidden"
-                                    } group-hover:flex items-center`}
+                                    className={`flex items-center`}
                                     onClick={() => {
                                       if (isMobile) {
                                         setOpenReaction(true);
