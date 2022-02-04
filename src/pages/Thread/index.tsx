@@ -2,8 +2,8 @@ import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
 import { useParams, useLocation } from "react-router";
-import Editor from "rich-markdown-editor";
 import ReactMoment from "react-moment";
+import { useRemirror } from "@remirror/react";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
@@ -11,6 +11,7 @@ import CommentList from "components/Comment/List";
 import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
+import Remirror from "components/Remirror";
 
 import { Channel, Thread, Member, ISubComment } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
@@ -28,9 +29,12 @@ import { kontenbase } from "lib/client";
 import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
-import { getNameInitial } from "utils/helper";
+import { getNameInitial, parseContent } from "utils/helper";
 import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 import ThreadBadge from "components/Thread/ThreadBadge";
+
+import { extensions } from "components/Remirror/extensions";
+import { htmlToProsemirrorNode } from "remirror";
 
 function useQuery() {
   const { search } = useLocation();
@@ -62,6 +66,12 @@ function ThreadPage() {
   const threadData: Thread = useMemo(() => {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
+
+  const { manager, state, onChange } = useRemirror({
+    extensions: () => extensions(true),
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(threadData?.content),
+  });
 
   useEffect(() => {
     let key: string;
@@ -222,17 +232,6 @@ function ThreadPage() {
     }, 1000);
 
   useEffect(() => {
-    if (threadData.comments?.length === 0) return;
-    scrollToBottom();
-
-    const timedId = scrollToBottom();
-
-    return () => {
-      clearTimeout(timedId);
-    };
-  }, [threadData.comments]);
-
-  useEffect(() => {
     const setInteractedUser = async () => {
       try {
         const { data, error }: KontenbaseSingleResponse<Thread> =
@@ -350,11 +349,16 @@ function ThreadPage() {
                   </ReactMoment>
                 </p>
               </div>
-              <Editor
-                value={threadData?.content}
-                readOnly
-                className="markdown-overrides w-[70vw] sm:w-full"
-              />
+              {threadData?.content && (
+                <Remirror
+                  remmirorProps={{
+                    manager,
+                    state,
+                    onChange,
+                  }}
+                  readOnly
+                />
+              )}
             </div>
           </div>
           <div className="border-t-[1px] border-gray-200 mb-8 mt-8" />
@@ -382,6 +386,7 @@ function ThreadPage() {
               />
             )}
           </div>
+
           {!threadData?.isClosed && (
             <CommentForm
               isShowEditor={isShowEditor}

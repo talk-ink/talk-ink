@@ -1,0 +1,240 @@
+.mention {
+  background: #7963d266;
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.thread-editor .remirror-editor {
+  height: 60vh;
+  margin-bottom: 1rem;
+  margin-top: -1rem;
+  overflow: auto !important;
+  margin-left: -2px !important;
+}
+
+.readonly-editor .remirror-editor {
+  height: 100%;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+}
+
+.readonly-comment-editor .remirror-editor {
+  min-height: 1rem !important;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+  margin-top: -1rem;
+}
+
+.comment-editor .remirror-editor {
+  min-height: 6rem !important;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+  margin-top: -1rem !important;
+}
+
+.readonly-editor .remirror-file-root a:last-child {
+  display: none !important;
+}
+
+.remirror-floating-popover {
+  z-index: 9999 !important;
+  background: white;
+}
+
+.remirror-editor img {
+  margin: 8px 0 !important;
+}
+
+.readonly-editor .ProseMirror-selectednode {
+  outline: none !important;
+}
+
+.remirror-editor a {
+  color: #1e70f5 !important;
+}
+
+.remirror-theme {
+  /* Provide sufficient space to see the popup */
+  --rmr-space-6: 400px;
+}
+.suggestions {
+  border: 1px solid darkgray;
+  border-radius: 4px;
+}
+.suggestion {
+  padding: 2px 8px;
+}
+.highlighted {
+  background: #7963d233;
+}
+.hovered {
+  background: #7963d222;
+}
+
+/* Basic editor styles */
+.ProseMirror {
+  margin-top: 0.75em;
+}
+
+.ProseMirror:focus {
+  outline: none;
+}
+
+.ProseMirror h1 {
+  margin-top: 0 !important;
+  font-size: 1.8rem !important;
+}
+
+.ProseMirror h2 {
+  margin-top: 0 !important;
+  font-size: 1.6rem !important;
+}
+
+.ProseMirror h3 {
+  margin-top: 0 !important;
+  font-size: 1.4rem !important;
+}
+
+.ProseMirror strong {
+  font-weight: bolder !important;
+}
+
+.ProseMirror mark {
+  background-color: yellow !important;
+}
+
+.ProseMirror ul {
+  list-style: initial !important;
+  padding-left: 40px !important;
+}
+
+.ProseMirror ol {
+  list-style: decimal !important;
+  padding-left: 40px !important;
+}
+
+.remirror-emoji-wrapper img {
+  display: unset !important;
+}
+
+.remirror-emoji-popup-item {
+  display: flex !important;
+  width: 300px !important;
+  max-width: 100% !important;
+}
+
+.remirror-file-root {
+  margin: 8px 0 !important;
+}
+
+.file-container {
+  border-radius: 4px;
+  padding: 8px 12px;
+  background-color: #e8ecf1;
+  color: #000;
+  margin: 8px 0;
+  min-height: 32px;
+  width: 100%;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+}
+
+.file-info {
+  color: #000;
+  min-height: 32px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  flex: none;
+}
+
+.remirror-image-loader {
+  border-top: none !important;
+  border-radius: none !important;
+  border: none !important;
+  animation: rotate 1s infinite;
+  height: 50px;
+  width: 50px;
+}
+
+.remirror-image-loader:before,
+.remirror-image-loader:after {
+  border-radius: 50%;
+  content: "";
+  display: block;
+  height: 20px;
+  width: 20px;
+}
+.remirror-image-loader:before {
+  animation: ball1 1s infinite;
+  background-color: #cb2025;
+  box-shadow: 30px 0 0 #f8b334;
+  margin-bottom: 10px;
+}
+.remirror-image-loader:after {
+  animation: ball2 1s infinite;
+  background-color: #00a096;
+  box-shadow: 30px 0 0 #97bf0d;
+}
+
+@keyframes rotate {
+  0% {
+    -webkit-transform: rotate(0deg) scale(0.8);
+    -moz-transform: rotate(0deg) scale(0.8);
+  }
+  50% {
+    -webkit-transform: rotate(360deg) scale(1.2);
+    -moz-transform: rotate(360deg) scale(1.2);
+  }
+  100% {
+    -webkit-transform: rotate(720deg) scale(0.8);
+    -moz-transform: rotate(720deg) scale(0.8);
+  }
+}
+
+@keyframes ball1 {
+  0% {
+    box-shadow: 30px 0 0 #f8b334;
+  }
+  50% {
+    box-shadow: 0 0 0 #f8b334;
+    margin-bottom: 0;
+    -webkit-transform: translate(15px, 15px);
+    -moz-transform: translate(15px, 15px);
+  }
+  100% {
+    box-shadow: 30px 0 0 #f8b334;
+    margin-bottom: 10px;
+  }
+}
+
+@keyframes ball2 {
+  0% {
+    box-shadow: 30px 0 0 #97bf0d;
+  }
+  50% {
+    box-shadow: 0 0 0 #97bf0d;
+    margin-top: -20px;
+    -webkit-transform: translate(15px, 15px);
+    -moz-transform: translate(15px, 15px);
+  }
+  100% {
+    box-shadow: 30px 0 0 #97bf0d;
+    margin-top: 0;
+  }
+}
+
+.ProseMirror,
+.ProseMirror:focus {
+  box-shadow: none !important;
+  padding: 2px !important;
+}
+
+.remirror-editor .ProseMirror-selectednode {
+  width: 100% !important;
+}
+
+.remirror-mention-atom:before {
+  content: "@";
+}

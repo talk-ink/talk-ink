@@ -2,6 +2,7 @@ import { SearchResponse, SendEmail, Thread, User } from "types";
 import axios, { AxiosResponse } from "axios";
 import FileResizer from "react-image-file-resizer";
 import { LocalStorageKey } from "types/enum";
+import { prosemirrorNodeToHtml } from "remirror";
 
 const EMAIL_API: string = process.env.REACT_APP_EMAIL_API;
 
@@ -419,3 +420,18 @@ export const draft = (type: "comment" | "reply"): DraftHandler => {
     deleteByKey,
   };
 };
+
+export const parseContent = (content: string) => {
+  try {
+    const parsedContent = JSON.parse(content).doc;
+
+    return parsedContent;
+  } catch (_e) {
+    return typeof content === "string"
+      ? content?.toString().replace(/[^a-zA-Z0-9., ]/g, " ")
+      : "";
+  }
+};
+
+export const editorToHTML = (state: any, replace = " ") =>
+  prosemirrorNodeToHtml(state.doc)?.replace(/( |<([^>]+)>)/gi, replace);

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import {
   BiDotsHorizontalRounded,
@@ -9,9 +9,7 @@ import {
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { Dialog, Menu, Popover } from "@headlessui/react";
-import Editor from "rich-markdown-editor";
 import { HiOutlineReply } from "react-icons/hi";
-import Select from "react-select";
 import { VscReactions } from "react-icons/vsc";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
 import { useMediaQuery } from "react-responsive";
@@ -23,7 +21,7 @@ import Preview from "components/Editor/Preview";
 import MenuItem from "components/Menu/MenuItem2";
 import IconButton from "components/Button/IconButton";
 import SubComment from "./SubComment";
-import Button from "components/Button/Button";
+import SubCommentForm from "./SubCommentForm";
 
 import { IComment, IReaction, Member, Thread } from "types";
 import {
@@ -37,6 +35,10 @@ import NameInitial from "components/Avatar/NameInitial";
 import { draft, getNameInitial } from "utils/helper";
 import { notificationUrl } from "utils/helper";
 import Reaction from "./Reaction";
+import { useRemirror } from "@remirror/react";
+import { extensions } from "components/Remirror/extensions";
+import { htmlToProsemirrorNode } from "remirror";
+import { parseContent } from "utils/helper";
 
 interface IProps {
   comment: IComment;
@@ -57,6 +59,10 @@ interface INotifiedOption {
 
 const NOTIFICATION_API = notificationUrl;
 
+interface EditorRef {
+  setContent: (content: any) => void;
+}
+
 const Comment: React.FC<IProps> = ({
   comment,
   listRef,
@@ -73,6 +79,7 @@ const Comment: React.FC<IProps> = ({
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
   const [isReplyEditorVisible, setIsShowReplyEditorVisible] = useState(false);
+  const editorRef = useRef<EditorRef | null>(null);
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [editorState, setEditorState] = useState<string>("");
@@ -86,6 +93,18 @@ const Comment: React.FC<IProps> = ({
 
   const [reactions, setReactions] = useState<IReaction[]>([]);
   const [openReaction, setOpenReaction] = useState<boolean>(false);
+
+  const { manager, state, onChange } = useRemirror({
+    extensions: () => extensions(false),
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(comment.content),
+    selection: "end",
+  });
+
+  useEffect(() => {
+    if (!comment.content) return;
+    editorRef.current!.setContent(parseContent(comment.content));
+  }, [comment.content]);
 
   useEffect(() => {
     if (memberList.length <= 0 || !auth || !comment) return;
@@ -118,7 +137,7 @@ const Comment: React.FC<IProps> = ({
     dispatch(
       updateComment({
         commentId: comment._id,
-        content: editorState,
+        content: JSON.stringify(state),
       })
     );
 
@@ -127,8 +146,9 @@ const Comment: React.FC<IProps> = ({
   };
 
   const discardComment = () => {
+    editorRef.current!.setContent(parseContent(comment.content));
+
     setIsEdit(false);
-    setEditorState("");
   };
 
   const discardSubComment = () => {
@@ -138,14 +158,14 @@ const Comment: React.FC<IProps> = ({
     setSubEditorState("");
   };
 
-  const handleCreateSubComment = async () => {
+  const handleCreateSubComment = async (subCommentData: any) => {
     try {
       const invitedUsers: string[] = selectedNotifiedOptions.map(
         (item) => item.value
       );
 
       const { data, error } = await kontenbase.service("SubComments").create({
-        content: subEditorState,
+        content: JSON.stringify(subCommentData),
         parent: comment._id,
       });
 
@@ -397,10 +417,7 @@ const Comment: React.FC<IProps> = ({
           </div>
         </div>
       )}
-      <div
-        className="group flex items-start mb-4 relative text-sm"
-        ref={listRef}
-      >
+      <div className="group flex items-start relative text-sm" ref={listRef}>
         <div className="w-8">
           {comment.createdBy?.avatar?.[0]?.url ? (
             <Avatar src={comment.createdBy?.avatar?.[0]?.url} />
@@ -427,11 +444,11 @@ const Comment: React.FC<IProps> = ({
                 </p>
               )}
               <Preview
-                content={comment.content}
                 isEdit={isEdit}
-                setEditorState={setEditorState}
                 discardComment={discardComment}
                 handleUpdateComment={handleUpdateComment}
+                remmirorProps={{ manager, onChange, state }}
+                editorRef={editorRef}
               />
               <div className="flex items-center gap-2 flex-wrap mb-4">
                 {reactions?.map(
@@ -605,73 +622,14 @@ const Comment: React.FC<IProps> = ({
             </div>
 
             {isReplyEditorVisible && (
-              <div className="flex flex-col justify-between px-2 border-solid border-[1px] border-light-blue-500 rounded-md mb-2">
-                <div>
-                  <div className="mt-1 flex w-full items-center">
-                    <div className="mr-2">
-                      <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
-                        Tag:
-                      </div>
-                    </div>
-                    <Select
-                      value={selectedNotifiedOptions}
-                      onChange={(e: any) => {
-                        setSelectedNotifiedOptions(e);
-                      }}
-                      isClearable={false}
-                      className="text-sm custom-select "
-                      closeMenuOnSelect={false}
-                      defaultValue={[notifiedOptions[0]]}
-                      isMulti
-                      options={notifiedOptions}
-                      placeholder="Select Tags"
-                      //@ts-ignore
-                      components={{
-                        DropdownIndicator: () => null,
-                        IndicatorSeparator: () => null,
-                      }}
-                      styles={{
-                        container: (base) => ({
-                          ...base,
-                          width: "100%",
-                        }),
-                        menuList: (base) => ({
-                          ...base,
-                          maxWidth: 300,
-                        }),
-                      }}
-                    />
-                  </div>
-                  <Editor
-                    key="edited"
-                    defaultValue={subEditorState}
-                    className="markdown-overrides"
-                    onChange={(getContent: () => string) =>
-                      setSubEditorState(getContent())
-                    }
-                    placeholder={`Reply to ${comment.createdBy?.firstName}`}
-                    autoFocus
-                  />
-                </div>
-                <div className="flex justify-end ">
-                  <div className="flex items-center py-2">
-                    <Button
-                      type="submit"
-                      className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
-                      onClick={discardSubComment}
-                    >
-                      Discard
-                    </Button>
-                    <Button
-                      type="submit"
-                      className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-                      onClick={handleCreateSubComment}
-                    >
-                      Reply
-                    </Button>
-                  </div>
-                </div>
-              </div>
+              <SubCommentForm
+                comment={comment}
+                discardSubComment={discardSubComment}
+                handleCreateSubComment={handleCreateSubComment}
+                notifiedOptions={notifiedOptions}
+                selectedNotifiedOptions={selectedNotifiedOptions}
+                setSelectedNotifiedOptions={setSelectedNotifiedOptions}
+              />
             )}
           </div>
 
@@ -763,7 +721,6 @@ const Comment: React.FC<IProps> = ({
                         }
                         onClick={() => {
                           setIsEdit(true);
-                          setEditorState(comment.content);
                         }}
                         title="Edit Comment"
                       />

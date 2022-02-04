@@ -17,7 +17,7 @@ import { useNavigate } from "react-router";
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
-import { getNameInitial } from "utils/helper";
+import { editorToHTML, getNameInitial, parseContent } from "utils/helper";
 import Divider from "components/Divider/Divider";
 import Avatar from "components/Avatar/Avatar";
 
@@ -27,6 +27,9 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { addReadThread, deleteReadThread } from "features/auth";
 import { Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
+import { useRemirror } from "@remirror/react";
+import { htmlToProsemirrorNode, prosemirrorNodeToHtml } from "remirror";
+import { extensions } from "components/Remirror/extensions";
 import { deleteThread, updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { BsArrowUpCircle } from "react-icons/bs";
@@ -83,6 +86,12 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
+  const { state } = useRemirror({
+    extensions,
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(dataSource.content),
+  });
 
   const reopenThreadHandler = async () => {
     try {
@@ -198,11 +207,8 @@ function ContentItem({
               {!dataSource.isClosed && (
                 <small className=" text-xs text-neutral-500 table-cell truncate">
                   {dataSource?.draft ? "Me: " : ""}
-                  {dataSource.comments?.length > 0
-                    ? `Latest : ${dataSource.comments?.[
-                        dataSource.comments?.length - 1
-                      ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                    : dataSource.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}
+                  {/* latest juga disini */}
+                  {editorToHTML(state)}
                 </small>
               )}
               {dataSource.isClosed && (

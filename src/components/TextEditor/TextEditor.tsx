@@ -1,44 +1,39 @@
-import React, { useState, useEffect, KeyboardEvent, useRef } from "react";
+import React, { KeyboardEvent, useRef } from "react";
 
 import { FormikProps } from "formik";
 import Button from "components/Button/Button";
 import { Thread } from "types";
 import { useNavigate, useParams } from "react-router";
-import Editor from "rich-markdown-editor";
+import Remirror from "components/Remirror";
 
-import { kontenbase } from "lib/client";
+interface Mention {
+  id: string;
+  label: string;
+}
 
 type Props = React.PropsWithChildren<{
   formik: FormikProps<Thread>;
   loading: boolean;
   deleteDraft?: () => void;
   isEdit?: boolean;
+  remmirorProps?: any;
+  listMentions?: Mention[];
 }>;
 
-type PropsDelay = React.PropsWithChildren<{
-  waitBeforeShow?: number;
-}>;
-
-const Delayed = ({ children, waitBeforeShow = 100 }: PropsDelay) => {
-  const [isShown, setIsShown] = useState(false);
-
-  useEffect(() => {
-    setTimeout(() => {
-      setIsShown(true);
-    }, waitBeforeShow);
-  }, [waitBeforeShow]);
-
-  return isShown ? <>{children}</> : null;
-};
-
-function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
+function TextEditor({
+  formik,
+  loading,
+  deleteDraft,
+  isEdit,
+  remmirorProps,
+  listMentions = [],
+}: Props) {
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [preview, setPreview] = useState(false);
   const navigate = useNavigate();
   const params = useParams();
   const textEditorRef = useRef(null);
 
-  const isDisabled = !formik.values.name || !formik.values.content || loading;
+  const isDisabled = !formik.values.name || !remmirorProps.state || loading;
 
   const handleEnter = (
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -63,48 +58,11 @@ function TextEditor({ formik, loading, deleteDraft, isEdit }: Props) {
           onKeyDown={handleEnter}
         />
 
-        {!preview && (
-          <Delayed>
-            <Editor
-              key="editor"
-              onChange={(getContent) =>
-                formik.setFieldValue("content", getContent())
-              }
-              onBlur={() => formik.handleBlur("content")}
-              defaultValue={formik.values.content}
-              uploadImage={async (file: File) => {
-                const { data } = await kontenbase.storage.upload(file);
-                return data.url;
-              }}
-              className="markdown-overrides fix-editor thread-editor"
-              ref={textEditorRef}
-            />
-          </Delayed>
-        )}
-
-        {preview && (
-          <Editor
-            key="preview"
-            value={formik.values.content}
-            readOnly
-            className="markdown-overrides"
-          />
-        )}
+        <Remirror remmirorProps={remmirorProps} listMentions={listMentions} />
       </div>
       <div className="absolute left-0 bottom-0 w-full flex justify-between items-center px-5 pb-5">
         <div></div>
         <div className="flex gap-2">
-          {/* <Button
-            className={` hover:bg-neutral-200 rounded text-xs font-medium px-5 ${
-              !preview ? "text-indigo-500" : "text-white bg-indigo-500"
-            }`}
-            onClick={() => {
-              setPreview((prev) => !prev);
-            }}
-          >
-            Preview
-          </Button> */}
-
           {!isEdit && (
             <Button
               className=" hover:bg-neutral-200 rounded text-xs font-medium px-5"

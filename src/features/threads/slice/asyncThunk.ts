@@ -107,7 +107,7 @@ export const fetchComments = createAsyncThunk(
         where: { threads: threadId },
         lookup: ["subComments"],
         skip,
-        limit: 10,
+        limit: 2,
         sort: {
           createdAt: -1,
         },

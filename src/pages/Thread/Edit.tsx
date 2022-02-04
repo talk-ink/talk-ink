@@ -3,8 +3,6 @@ import { useEffect, useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
-// import Select from "react-select";
-// import makeAnimated from "react-select/animated";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import TextEditor from "components/TextEditor/TextEditor";
@@ -17,16 +15,10 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
+import { useRemirror } from "@remirror/react";
 
-// interface INotifiedOption {
-//   value: string;
-//   label: string;
-//   color?: string;
-//   isFixed?: boolean;
-//   flag: number;
-// }
-
-// const animatedComponents = makeAnimated();
+import { extensions } from "components/Remirror/extensions";
+import { htmlToProsemirrorNode } from "remirror";
 
 moment.locale("id");
 
@@ -56,11 +48,18 @@ function EditThread() {
     content: threadData.content,
   };
 
+  const { manager, onChange, state } = useRemirror({
+    extensions,
+    stringHandler: htmlToProsemirrorNode,
+    content: JSON.parse(threadData?.content).doc,
+    selection: "start",
+  });
+
   const formik = useFormik({
     initialValues,
     validationSchema: createThreadValidation,
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({ ...values, content: JSON.stringify(state) });
     },
     enableReinitialize: true,
   });
@@ -129,7 +128,27 @@ function EditThread() {
       }
     >
       <div className="w-full sm:w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-3 mx-auto relative -mt-12 sm:mt-0">
-        <TextEditor formik={formik} loading={loading} isEdit={true} />
+        <div className="flex items-center mb-4">
+          <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm mr-2">
+            Post In:
+          </div>
+          <p
+            className="text-sm text-blue-500 cursor-pointer"
+            onClick={() =>
+              navigate(`/a/${params.workspaceId}/ch/${params.channelId}`)
+            }
+          >
+            #{channelData?.name}
+          </p>
+        </div>
+        {threadData?.content && (
+          <TextEditor
+            formik={formik}
+            loading={loading}
+            remmirorProps={{ manager, onChange, state }}
+            isEdit
+          />
+        )}
       </div>
     </MainContentContainer>
   );

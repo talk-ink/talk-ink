@@ -9,6 +9,8 @@ import Select from "react-select";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import TextEditor from "components/TextEditor/TextEditor";
+import { extensions } from "components/Remirror/extensions";
+
 import { useFormik } from "formik";
 import { Channel, Thread, Member } from "types";
 import { createThreadValidation } from "utils/validators";
@@ -20,6 +22,8 @@ import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import { fetchChannels } from "features/channels/slice";
 import { notificationUrl } from "utils/helper";
+import { htmlToProsemirrorNode } from "remirror";
+import { useRemirror } from "@remirror/react";
 
 const initialValues: Thread = {
   name: "",
@@ -56,11 +60,29 @@ function Compose() {
 
   const [apiLoading, setApiLoading] = useState(false);
 
+  const getCurrentDraft = () => {
+    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
+    const selectedDraft = parsedThreadDraft[+params.composeId];
+
+    if (selectedDraft) {
+      return selectedDraft?.content?.doc;
+    }
+
+    return "";
+  };
+
+  const { manager, onChange, state } = useRemirror({
+    extensions: () => extensions(false, "Write Something Nice..."),
+    stringHandler: htmlToProsemirrorNode,
+    content: getCurrentDraft(),
+    selection: "end",
+  });
+
   const formik = useFormik({
     initialValues,
     validationSchema: createThreadValidation,
     onSubmit: (values) => {
-      onSubmit(values);
+      onSubmit({ ...values, content: JSON.stringify(state) });
     },
     enableReinitialize: true,
   });
@@ -71,7 +93,6 @@ function Compose() {
 
     if (selectedDraft) {
       formik.setFieldValue("name", selectedDraft?.name);
-      formik.setFieldValue("content", selectedDraft?.content);
     }
   };
 
@@ -80,6 +101,7 @@ function Compose() {
   }, [params.channelId, channel.channels]);
 
   useEffect(() => {
+    if (!params.composeId) return;
     checkDraftAvailable();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.composeId]);
@@ -99,6 +121,7 @@ function Compose() {
       [+params.composeId]: {
         ...parsedThreadsDraft[+params.composeId],
         ...formik.values,
+        content: state,
         lastChange: moment.tz("Asia/Jakarta").toISOString(),
       },
     };
@@ -317,6 +340,13 @@ function Compose() {
           formik={formik}
           loading={loading}
           deleteDraft={deleteDraft}
+          remmirorProps={{ manager, onChange, state }}
+          listMentions={notifiedOptions
+            ?.filter((item) => item.flag === 3)
+            ?.map((item) => ({
+              id: item.value,
+              label: item.label,
+            }))}
         />
       </div>
     </MainContentContainer>

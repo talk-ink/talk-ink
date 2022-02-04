@@ -1,11 +1,13 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useRef } from "react";
 
 import axios from "axios";
+import Select from "react-select";
+
 import Avatar from "components/Avatar/Avatar";
 import Button from "components/Button/Button";
-import Editor from "rich-markdown-editor";
-import { kontenbase } from "lib/client";
-import Select from "react-select";
+import NameInitial from "components/Avatar/NameInitial";
+import CommentBadge from "./CommentBadge";
+import Remirror from "components/Remirror";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -15,13 +17,17 @@ import { useParams } from "react-router";
 import {
   createUniqueArray,
   draft,
+  editorToHTML,
   getNameInitial,
   notificationUrl,
 } from "utils/helper";
-import NameInitial from "components/Avatar/NameInitial";
-import CommentBadge from "./CommentBadge";
+import { kontenbase } from "lib/client";
+
 import { updateChannel } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
+import { useRemirror } from "@remirror/react";
+import { htmlToProsemirrorNode } from "remirror";
+import { extensions } from "components/Remirror/extensions";
 
 interface IProps {
   isShowEditor: boolean;
@@ -42,6 +48,10 @@ interface INotifiedOption {
   invited?: boolean;
 }
 
+interface EditorRef {
+  setContent: (content: any) => void;
+}
+
 const NOTIFICATION_API = notificationUrl;
 
 const Form: React.FC<IProps> = ({
@@ -56,13 +66,21 @@ const Form: React.FC<IProps> = ({
   const [showToast] = useToast();
   const params = useParams();
   const dispatch = useAppDispatch();
-  const [editorState, setEditorState] = useState<string>("");
   const [notifiedOptions, setNotifiedOptions] = useState<INotifiedOption[]>();
   const [selectedNotifiedOptions, setSelectedNotifiedOptions] = useState<
     INotifiedOption[]
   >([]);
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
+
+  const editorRef = useRef<EditorRef | null>(null);
+
+  const { manager, onChange, state } = useRemirror({
+    extensions: () => extensions(false, "Write Something Nice..."),
+    stringHandler: htmlToProsemirrorNode,
+    content: "",
+    selection: "start",
+  });
 
   const [invitedUser, setInvitedUser] = useState<
     INotifiedOption | null | undefined
@@ -104,7 +122,6 @@ const Form: React.FC<IProps> = ({
     draft("comment").deleteByKey(params.threadId);
 
     setIsShowEditor(false);
-    setEditorState("");
   };
 
   const handleCreateComment = async () => {
@@ -138,7 +155,7 @@ const Form: React.FC<IProps> = ({
 
     dispatch(
       createComment({
-        content: editorState,
+        content: JSON.stringify(state),
         threadId,
         tagedUsers: _invitedUsers,
       })
@@ -174,7 +191,7 @@ const Form: React.FC<IProps> = ({
     if (_invitedUsers.length > 0) {
       axios.post(NOTIFICATION_API, {
         title: `${auth?.user.firstName} comment on ${threadName}`,
-        description: editorState.replace(/(<([^>]+)>)/gi, ""),
+        description: editorToHTML(state, ""),
         externalUserIds: _invitedUsers,
       });
     }
@@ -188,24 +205,30 @@ const Form: React.FC<IProps> = ({
   };
 
   useEffect(() => {
-    if (editorState) {
+    if (editorToHTML(state).length > 0) {
       draft("comment").set(params.threadId, {
-        content: editorState,
+        content: JSON.stringify(state),
         createdById: auth.user._id,
         threadId: params.threadId,
       });
     }
-  }, [editorState, auth.user._id, params.threadId]);
+  }, [state, auth.user._id, params.threadId]);
 
   useEffect(() => {
+    if (!isShowEditor) return;
     const getCommentDraft = draft("comment").get(params.threadId);
     if (
       getCommentDraft.content &&
       getCommentDraft.createdById === auth.user._id
     ) {
-      setEditorState(getCommentDraft.content);
+      try {
+        const parsedText = JSON.parse(getCommentDraft.content);
+        editorRef.current!.setContent(parsedText.doc);
+      } catch (error) {
+        console.log(error);
+      }
     }
-  }, [auth.user._id, params.threadId]);
+  }, [isShowEditor, auth.user._id, params.threadId]);
 
   return (
     <div className=" bg-white">
@@ -232,146 +255,147 @@ const Form: React.FC<IProps> = ({
         </div>
       )}
 
-      {isShowEditor && (
-        <div className="px-2 border-solid border-[1px] border-light-blue-500 rounded-xl mb-5">
-          <div className="mt-1 flex w-full items-center">
-            <div className="mr-2">
-              <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
-                Tag:
-              </div>
+      <div
+        className={`px-2 border-solid border-[1px] border-light-blue-500 rounded-xl mb-5 ${
+          isShowEditor ? "block" : "hidden"
+        }`}
+      >
+        <div className="mt-1 flex w-full items-center">
+          <div className="mr-2">
+            <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
+              Tag:
             </div>
-            <Select
-              value={selectedNotifiedOptions}
-              onChange={(e: any) => {
-                const ids: string[] = e?.map(
-                  (data: INotifiedOption) => data?.value
-                );
-                const dataIndex = selectedNotifiedOptions.findIndex(
-                  (data) => !ids.includes(data.value)
-                );
+          </div>
+          <Select
+            value={selectedNotifiedOptions}
+            onChange={(e: any) => {
+              const ids: string[] = e?.map(
+                (data: INotifiedOption) => data?.value
+              );
+              const dataIndex = selectedNotifiedOptions.findIndex(
+                (data) => !ids.includes(data.value)
+              );
 
-                const isInteractedUsersSelected =
-                  !!selectedNotifiedOptions.find(
-                    (item) => item.value === "INTERACTEDUSERS"
-                  );
-                const isCurrInteractedUsersSelected = !!e.find(
-                  (item: any) => item.value === "INTERACTEDUSERS"
-                );
+              const isInteractedUsersSelected = !!selectedNotifiedOptions.find(
+                (item) => item.value === "INTERACTEDUSERS"
+              );
+              const isCurrInteractedUsersSelected = !!e.find(
+                (item: any) => item.value === "INTERACTEDUSERS"
+              );
 
-                const isAllChannelSelected = !!selectedNotifiedOptions.find(
-                  (item) => item.value === "ALLUSERSINCHANNEL"
-                );
-                const isCurrAllChannelSelected = !!e.find(
-                  (item: any) => item.value === "ALLUSERSINCHANNEL"
-                );
+              const isAllChannelSelected = !!selectedNotifiedOptions.find(
+                (item) => item.value === "ALLUSERSINCHANNEL"
+              );
+              const isCurrAllChannelSelected = !!e.find(
+                (item: any) => item.value === "ALLUSERSINCHANNEL"
+              );
 
-                const isMemberSelected = !!selectedNotifiedOptions.find(
-                  (item) => item.flag === 3
-                );
-                const isCurrMemberSelected = !!e.find(
-                  (item: any) => item.flag === 3
-                );
+              const isMemberSelected = !!selectedNotifiedOptions.find(
+                (item) => item.flag === 3
+              );
+              const isCurrMemberSelected = !!e.find(
+                (item: any) => item.flag === 3
+              );
 
-                if (
-                  e.length > 0 &&
-                  dataIndex < 0 &&
-                  !channelData.members.includes(e?.[e?.length - 1]?.value) &&
-                  !["INTERACTEDUSERS", "ALLUSERSINCHANNEL"].includes(
-                    e?.[e?.length - 1]?.value
-                  )
-                ) {
-                  return setInvitedUser(e?.[e?.length - 1]);
-                }
+              if (
+                e.length > 0 &&
+                dataIndex < 0 &&
+                !channelData.members.includes(e?.[e?.length - 1]?.value) &&
+                !["INTERACTEDUSERS", "ALLUSERSINCHANNEL"].includes(
+                  e?.[e?.length - 1]?.value
+                )
+              ) {
+                return setInvitedUser(e?.[e?.length - 1]);
+              }
 
-                const currSelectedOptions = e.filter((item: any) => {
-                  if (isAllChannelSelected) {
-                    if (isCurrMemberSelected) {
-                      return item.flag === 3;
-                    } else {
-                      return item.flag === 1;
-                    }
-                  }
-
-                  if (isInteractedUsersSelected) {
-                    if (isCurrMemberSelected) {
-                      return item.flag === 3;
-                    } else {
-                      return item.flag === 2;
-                    }
-                  }
-
-                  if (isMemberSelected && isCurrInteractedUsersSelected) {
+              const currSelectedOptions = e.filter((item: any) => {
+                if (isAllChannelSelected) {
+                  if (isCurrMemberSelected) {
+                    return item.flag === 3;
+                  } else {
                     return item.flag === 1;
                   }
+                }
 
-                  if (isMemberSelected && isCurrAllChannelSelected) {
+                if (isInteractedUsersSelected) {
+                  if (isCurrMemberSelected) {
+                    return item.flag === 3;
+                  } else {
                     return item.flag === 2;
                   }
+                }
 
-                  return item;
-                });
+                if (isMemberSelected && isCurrInteractedUsersSelected) {
+                  return item.flag === 1;
+                }
 
-                setSelectedNotifiedOptions(currSelectedOptions);
-              }}
-              isClearable={false}
-              className="text-sm custom-select"
-              closeMenuOnSelect={false}
-              defaultValue={[notifiedOptions[0]]}
-              isMulti
-              options={notifiedOptions}
-              placeholder="Select Tags"
-              //@ts-ignore
-              components={{
-                DropdownIndicator: () => null,
-                IndicatorSeparator: () => null,
-              }}
-              styles={{
-                container: (base) => ({
-                  ...base,
-                  width: "100%",
-                }),
-                menuList: (base) => ({
-                  ...base,
-                  maxWidth: 300,
-                }),
-              }}
-            />
-          </div>
-          <Editor
-            key="editor"
-            defaultValue={editorState}
-            onChange={(getContent: () => string) =>
-              setEditorState(getContent())
-            }
-            autoFocus
-            uploadImage={async (file: File) => {
-              const { data } = await kontenbase.storage.upload(file);
-              return data.url;
+                if (isMemberSelected && isCurrAllChannelSelected) {
+                  return item.flag === 2;
+                }
+
+                return item;
+              });
+
+              setSelectedNotifiedOptions(currSelectedOptions);
             }}
-            className="markdown-overrides"
+            isClearable={false}
+            className="text-sm custom-select"
+            closeMenuOnSelect={false}
+            defaultValue={[notifiedOptions?.[0]]}
+            isMulti
+            options={notifiedOptions}
+            placeholder="Select Tags"
+            //@ts-ignore
+            components={{
+              DropdownIndicator: () => null,
+              IndicatorSeparator: () => null,
+            }}
+            styles={{
+              container: (base) => ({
+                ...base,
+                width: "100%",
+              }),
+              menuList: (base) => ({
+                ...base,
+                maxWidth: 300,
+              }),
+            }}
           />
+        </div>
 
-          <div className="flex justify-between">
-            <div />
-            <div className="flex items-center py-2">
-              <Button
-                type="submit"
-                className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
-                onClick={discardComment}
-              >
-                Discard
-              </Button>
-              <Button
-                type="submit"
-                className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-                onClick={handleCreateComment}
-              >
-                Post
-              </Button>
-            </div>
+        <Remirror
+          remmirorProps={{ manager, onChange, state }}
+          fromComment
+          editorRef={editorRef}
+          listMentions={notifiedOptions
+            ?.filter((item) => item.flag === 3)
+            ?.map((item) => ({
+              id: item.value,
+              label: item.label,
+            }))}
+        />
+
+        <div className="flex justify-between">
+          <div />
+          <div className="flex items-center py-2">
+            <Button
+              type="submit"
+              className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
+              onClick={discardComment}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
+              onClick={handleCreateComment}
+            >
+              Post
+            </Button>
           </div>
         </div>
-      )}
+      </div>
+
       {!!invitedUser && (
         <CommentBadge
           name={invitedUser?.label}
