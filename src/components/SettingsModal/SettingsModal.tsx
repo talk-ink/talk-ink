@@ -80,8 +80,8 @@ function SettingsModal({
         }
       }}
     >
-      <div className="w-screen h-screen md:w-7/12 md:h-[75vh] bg-white md:rounded-lg md:mt-20 overflow-hidden">
-        <div className="md:grid md:grid-cols-[250px_1fr] h-full max-h-full overflow-auto">
+      <div className="w-screen md:w-7/12 h-screen md:h-[75vh] bg-white md:rounded-lg md:mt-20 overflow-hidden">
+        <div className="md:grid md:grid-cols-[250px_1fr] h-full max-h-full overflow-hidden">
           <SettingsSidebar
             currentActive={currentRoute.route}
             setCurrentActive={(value) => {
@@ -94,7 +94,7 @@ function SettingsModal({
             isSidebarOpen={isSidebarOpen}
             setIsSidebarOpen={setIsSidebarOpen}
           />
-          <div className="overflow-auto">
+          <div className="overflow-auto h-screen md:max-h-[75vh]">
             <header className="flex items-center justify-between p-3 border-b border-neutral-100">
               <div className="flex gap-2 items-center">
                 {currentRoute.route !== currentRoute.current && (
@@ -124,8 +124,8 @@ function SettingsModal({
                 <GrClose size={18} />
               </button>
             </header>
-            <div className="h-full md:h-auto">
-              <div className="p-3 h-full ">
+            <div className="h-full">
+              <div className="p-3 h-full">
                 {settingsRender(currentRoute.route)}
               </div>
               {isMobile && (

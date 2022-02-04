@@ -1,23 +1,24 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
+  BiArchive,
+  BiCheckCircle,
   BiDotsHorizontalRounded,
+  BiDotsVerticalRounded,
   BiEdit,
   BiEditAlt,
+  BiFilter,
   BiInfoCircle,
   BiLogOut,
   BiUserPlus,
 } from "react-icons/bi";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams, Outlet } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
 import { Menu } from "@headlessui/react";
 
 import Button from "components/Button/Button";
-import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
 import IconButton from "components/Button/IconButton";
-import ContentItem from "components/ContentItem/ContentItem";
-import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MenuItem from "components/Menu/MenuItem2";
 import Modal from "components/Modal/Modal";
@@ -32,18 +33,23 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 
-import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { deleteChannel, updateChannelCount } from "features/channels/slice";
+import { deleteChannel } from "features/channels/slice";
 
 import { kontenbase } from "lib/client";
-import { Channel, Member, Thread } from "types";
-import { getNameInitial } from "utils/helper";
-import CloseThreadForm from "components/Thread/CloseThreadForm";
+import { Channel, Member } from "types";
+import { createUniqueArray, getNameInitial } from "utils/helper";
+import Badge from "components/Badge/Badge";
+import { useMediaQuery } from "react-responsive";
+import MobileHeader from "components/Header/Mobile";
 
 moment.locale("id");
 
 function ChannelPage() {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const { pathname } = useLocation();
   const [showToast] = useToast();
 
@@ -58,9 +64,6 @@ function ChannelPage() {
   const userId: string = auth.user._id;
 
   const dispatch = useAppDispatch();
-
-  const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [channelInfoModal, setChannelInfoModal] = useState<boolean>(false);
@@ -110,15 +113,6 @@ function ChannelPage() {
     return false;
   }, [channelData, userId]);
 
-  const threadData = useMemo(() => {
-    return thread.threads;
-  }, [thread.threads]);
-
-  const readedThreads: string[] = useMemo(() => {
-    if (!auth.user.readedThreads) return [];
-    return auth.user.readedThreads;
-  }, [auth.user]);
-
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
@@ -130,45 +124,9 @@ function ChannelPage() {
     );
   }, [workspaceData, channelData, auth.user._id]);
 
-  const deleteDraft = (id: string) => {
-    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
-    delete parsedThreadDraft[+id];
-
-    localStorage.setItem("threadsDraft", JSON.stringify(parsedThreadDraft));
-  };
-
-  const threadDeleteHandler = async () => {
-    try {
-      if (!selectedThread?.thread.draft) {
-        const now = moment().tz("Asia/Jakarta").toDate();
-
-        const deletedThread = await kontenbase
-          .service("Threads")
-          .updateById(selectedThread?.thread._id, {
-            isDeleted: true,
-            deletedAt: now,
-          });
-
-        if (deletedThread?.data) {
-          setSelectedThread(null);
-        }
-        dispatch(deleteThread(deletedThread.data));
-        dispatch(
-          updateChannelCount({
-            chanelId: deletedThread.data?.channel?.[0],
-            threadId: selectedThread?.thread._id,
-          })
-        );
-      } else {
-        deleteDraft(selectedThread.thread.id);
-        dispatch(deleteThread(selectedThread.thread));
-        setSelectedThread(null);
-      }
-    } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
-    }
-  };
+  const isClosedThread = useMemo(() => {
+    return pathname.includes(`ch/${params.channelId}/close`);
+  }, [pathname, params.channelId]);
 
   const leaveChannelHandler = async () => {
     try {
@@ -214,302 +172,384 @@ function ChannelPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.channelId, auth.user._id]);
 
+  const uniqueMemberId = useMemo(() => {
+    return createUniqueArray(channelData?.members ?? []);
+  }, [channelData?.members]);
+
   const loading = channel.loading || thread.loading;
 
   return (
-    <MainContentContainer>
-      <header
-        className={`mb-8 flex items-end justify-between "border-b-2 border-neutral-100 pb-8"
-            `}
-      >
-        <div>
-          <h1 className="font-bold text-3xl">{channelData?.name}</h1>
-          <p className="text-neutral-500 font-body capitalize">
-            {channelData?.privacy ?? "Public"}
-          </p>
-        </div>
-        <div className="flex items-center gap-3">
-          <div className="flex flex-row mr-2">
-            {memberList.map(
-              (member, idx) =>
-                idx <= 3 && (
-                  <div key={idx}>
-                    {member._id === auth.user._id && (
-                      <>
-                        {!auth.user.avatar && (
-                          <NameInitial
-                            key={member._id}
-                            name={getNameInitial(auth.user.firstName)}
-                            className="border-2 border-white -mr-2 bg-red-400"
+    <>
+      <MobileHeader
+        header={channelData?.name}
+        subHeader={`${uniqueMemberId.length || 0} ${
+          (uniqueMemberId.length || 0) > 1 ? "Members" : "Member"
+        }`}
+        privacy={channelData?.privacy}
+        type="channel"
+        menu={
+          <div className="flex items-center gap-2">
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiFilter size={24} className="text-slate-800" />
+                    </IconButton>
+                  </Menu.Button>
+
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      <MenuItem
+                        icon={
+                          <BiArchive size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          navigate(
+                            `/a/${params.workspaceId}/ch/${params.channelId}`
+                          );
+                        }}
+                        title="Open threads"
+                        active={!isClosedThread}
+                      />
+                      <MenuItem
+                        icon={
+                          <BiCheckCircle
+                            size={20}
+                            className="text-neutral-400"
                           />
-                        )}
-                        {auth.user.avatar && (
-                          <ProfileImage
-                            key={member._id}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                            source={auth.user.avatar}
+                        }
+                        onClick={() => {
+                          navigate(
+                            `/a/${params.workspaceId}/ch/${params.channelId}/close`
+                          );
+                        }}
+                        title="Closed threads"
+                        active={isClosedThread}
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiDotsVerticalRounded
+                        size={24}
+                        className="text-slate-800"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiUserPlus
+                              size={20}
+                              className="text-neutral-400"
+                            />
+                          }
+                          onClick={() => {
+                            setAddMemberModal(true);
+                          }}
+                          title="Add members"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiInfoCircle
+                            size={20}
+                            className="text-neutral-400"
                           />
-                        )}
-                      </>
-                    )}
-                    {member._id !== auth.user._id && (
-                      <>
-                        {!member.avatar && (
-                          <NameInitial
-                            key={member._id}
-                            name={getNameInitial(member.firstName)}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                          />
-                        )}
-                        {member.avatar && (
-                          <ProfileImage
-                            key={member._id}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                            source={member.avatar[0].url}
-                          />
-                        )}
-                      </>
-                    )}
-                  </div>
-                )
-            )}
-            {memberList.length > 3 && (
-              <div
-                className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
-              >
-                +{memberList.length - 3 > 99 ? "99" : memberList.length - 3}
-              </div>
-            )}
+                        }
+                        onClick={() => {
+                          setChannelInfoModal(true);
+                        }}
+                        title="Channel information"
+                      />
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiEditAlt size={20} className="text-neutral-400" />
+                          }
+                          onClick={() => {
+                            setEditChannelModal(true);
+                          }}
+                          title="Edit channel"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiLogOut size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setLeaveChannelModal(true);
+                        }}
+                        title="Leave channel"
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+          </div>
+        }
+      />
+      <MainContentContainer>
+        <header
+          className={`mb-8 md:mb-0 ${
+            isMobile ? "hidden" : "flex"
+          } items-end justify-between "border-b-2 border-neutral-100 pb-8`}
+        >
+          <div>
+            <h1 className="font-bold text-3xl">{channelData?.name}</h1>
+            <p className="text-neutral-500 font-body capitalize">
+              {channelData?.privacy ?? "Public"}
+            </p>
           </div>
 
-          {isChannelMember && (
-            <Button
-              className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
-              onClick={() => {
-                createThreadDraft();
-              }}
-            >
-              <BiEdit size={18} className="text-white md:mr-2" />
-              <p className="hidden md:block text-sm text-white font-medium -mb-1">
-                New Thread
-              </p>
-            </Button>
-          )}
-          <Menu as="div" className="relative">
-            {({ open }) => (
-              <>
-                <Menu.Button as={React.Fragment}>
-                  <IconButton size="medium">
-                    <BiDotsHorizontalRounded
-                      size={24}
-                      className="text-neutral-400"
-                    />
-                  </IconButton>
-                </Menu.Button>
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex flex-row mr-2">
+              {memberList.map(
+                (member, idx) =>
+                  idx <= 3 && (
+                    <div key={idx}>
+                      {member._id === auth.user._id && (
+                        <>
+                          {!auth.user.avatar && (
+                            <NameInitial
+                              key={member._id}
+                              name={getNameInitial(auth.user.firstName)}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                            />
+                          )}
+                          {auth.user.avatar && (
+                            <ProfileImage
+                              key={member._id}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                              source={auth.user.avatar}
+                            />
+                          )}
+                        </>
+                      )}
+                      {member._id !== auth.user._id && (
+                        <>
+                          {!member.avatar && (
+                            <NameInitial
+                              key={member._id}
+                              name={getNameInitial(member.firstName)}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                            />
+                          )}
+                          {member.avatar && (
+                            <ProfileImage
+                              key={member._id}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                              source={member.avatar[0].url}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )
+              )}
+              {memberList.length > 3 && (
+                <div
+                  className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
+                >
+                  +{memberList.length - 3 > 99 ? "99" : memberList.length - 3}
+                </div>
+              )}
+            </div>
 
-                {open && (
-                  <Menu.Items static className="menu-container right-0">
-                    {isAdmin && (
-                      <MenuItem
-                        icon={
-                          <BiUserPlus size={20} className="text-neutral-400" />
-                        }
-                        onClick={() => {
-                          setAddMemberModal(true);
-                        }}
-                        title="Add members"
-                      />
-                    )}
-                    <MenuItem
-                      icon={
-                        <BiInfoCircle size={20} className="text-neutral-400" />
-                      }
-                      onClick={() => {
-                        setChannelInfoModal(true);
-                      }}
-                      title="Channel information"
-                    />
-                    {isAdmin && (
-                      <MenuItem
-                        icon={
-                          <BiEditAlt size={20} className="text-neutral-400" />
-                        }
-                        onClick={() => {
-                          setEditChannelModal(true);
-                        }}
-                        title="Edit channel"
-                      />
-                    )}
-                    <MenuItem
-                      icon={<BiLogOut size={20} className="text-neutral-400" />}
-                      onClick={() => {
-                        setLeaveChannelModal(true);
-                      }}
-                      title="Leave channel"
-                    />
-                  </Menu.Items>
-                )}
-              </>
+            {isChannelMember && (
+              <Button
+                className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
+                onClick={() => {
+                  createThreadDraft();
+                }}
+              >
+                <BiEdit size={18} className="text-white md:mr-2" />
+                <p className="hidden md:block text-sm text-white font-medium -mb-1">
+                  New Thread
+                </p>
+              </Button>
             )}
-          </Menu>
-        </div>
-      </header>
-      {threadData?.length > 0 ? (
-        <ul>
-          {loading ? (
-            <ContentSkeleton />
-          ) : (
-            <>
-              {threadData?.map((thread, idx) => (
-                <ContentItem
-                  key={idx}
-                  dataSource={thread}
-                  onClick={() => {
-                    if (thread.draft) {
-                      navigate(`${pathname}/compose/${thread?.id}`);
-                    } else {
-                      navigate(`${pathname}/t/${thread?._id}`);
-                    }
-                  }}
-                  setSelectedThread={setSelectedThread}
-                  isRead={
-                    readedThreads.includes(thread._id) ||
-                    (readedThreads.includes(thread._id) &&
-                      thread.createdBy?._id === auth.user._id)
-                  }
-                />
-              ))}
-            </>
-          )}
-        </ul>
-      ) : (
-        <>
-          <ChannelEmpty />
-        </>
-      )}
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiDotsHorizontalRounded
+                        size={24}
+                        className="text-neutral-400"
+                      />
+                    </IconButton>
+                  </Menu.Button>
 
-      <Modal
-        header="Delete Thread"
-        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
-        onClose={() => {
-          setSelectedThread(null);
-        }}
-        onCancel={() => {
-          setSelectedThread(null);
-        }}
-        onConfirm={() => {
-          threadDeleteHandler();
-        }}
-        okButtonText="Confirm"
-        size="xs"
-      >
-        Are you sure you want to delete this thread? It will be moved into
-        trash.
-      </Modal>
-      <Modal
-        header="Close Thread"
-        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
-        footer={null}
-        onClose={() => {
-          setSelectedThread(null);
-        }}
-        onCancel={() => {
-          setSelectedThread(null);
-        }}
-      >
-        <CloseThreadForm
-          data={selectedThread?.thread}
-          onClose={() => {
-            setSelectedThread(null);
-          }}
-        />
-      </Modal>
-      <Modal
-        header="Edit channel"
-        visible={editChannelModal}
-        onClose={() => {
-          setEditChannelModal(false);
-        }}
-        onCancel={() => {
-          setEditChannelModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <EditChannelForm
-          data={channelData}
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiUserPlus
+                              size={20}
+                              className="text-neutral-400"
+                            />
+                          }
+                          onClick={() => {
+                            setAddMemberModal(true);
+                          }}
+                          title="Add members"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiInfoCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        onClick={() => {
+                          setChannelInfoModal(true);
+                        }}
+                        title="Channel information"
+                      />
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiEditAlt size={20} className="text-neutral-400" />
+                          }
+                          onClick={() => {
+                            setEditChannelModal(true);
+                          }}
+                          title="Edit channel"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiLogOut size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setLeaveChannelModal(true);
+                        }}
+                        title="Leave channel"
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+          </div>
+        </header>
+        <div className={`hidden md:flex mb-3 `}>
+          <nav className={`flex gap-2 items-center`}>
+            <Badge
+              active={!pathname.includes("/close")}
+              title="Open"
+              link={`/a/${params.workspaceId}/ch/${params.channelId}`}
+            />
+            <Badge
+              active={pathname.includes("/close")}
+              title="Close"
+              link={`/a/${params.workspaceId}/ch/${params.channelId}/close`}
+            />
+          </nav>
+        </div>
+        <Outlet />
+
+        <Modal
+          header="Edit channel"
+          visible={editChannelModal}
           onClose={() => {
             setEditChannelModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Channel information"
-        visible={channelInfoModal}
-        onClose={() => {
-          setChannelInfoModal(false);
-        }}
-        onCancel={() => {
-          setChannelInfoModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <ChannelInfo
-          data={channelData}
+          onCancel={() => {
+            setEditChannelModal(false);
+          }}
+          footer={null}
+          size="small"
+        >
+          <EditChannelForm
+            data={channelData}
+            onClose={() => {
+              setEditChannelModal(false);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Channel information"
+          visible={channelInfoModal}
           onClose={() => {
             setChannelInfoModal(false);
           }}
-          showManageMemberModal={() => {
-            setAddMemberModal(true);
+          onCancel={() => {
+            setChannelInfoModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Manage members"
-        visible={addMemberModal}
-        onClose={() => {
-          setAddMemberModal(false);
-        }}
-        onCancel={() => {
-          setAddMemberModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <AddChannelMember
-          data={channelData}
+          footer={null}
+          size="small"
+        >
+          <ChannelInfo
+            data={channelData}
+            onClose={() => {
+              setChannelInfoModal(false);
+            }}
+            showManageMemberModal={() => {
+              setAddMemberModal(true);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Manage members"
+          visible={addMemberModal}
           onClose={() => {
             setAddMemberModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header={`Leave ${
-          channelData?.privacy === "private" ? "private" : "public"
-        } channel?`}
-        okButtonText="Leave channel"
-        visible={!!channelData && leaveChannelModal}
-        onCancel={() => {
-          setLeaveChannelModal(false);
-        }}
-        onClose={() => {
-          setLeaveChannelModal(false);
-        }}
-        onConfirm={() => {
-          leaveChannelHandler();
-        }}
-        size="xs"
-      >
-        <p className="text-sm">
-          Are you sure you want to leave this channel? You can always join it
-          again later.
-        </p>
-      </Modal>
-      {!isChannelMember && !loading && (
-        <ChannelBadge type="channel" data={channelData} userId={userId} />
-      )}
-    </MainContentContainer>
+          onCancel={() => {
+            setAddMemberModal(false);
+          }}
+          footer={null}
+          size="small"
+        >
+          <AddChannelMember
+            data={channelData}
+            onClose={() => {
+              setAddMemberModal(false);
+            }}
+          />
+        </Modal>
+        <Modal
+          header={`Leave ${
+            channelData?.privacy === "private" ? "private" : "public"
+          } channel?`}
+          okButtonText="Leave channel"
+          visible={!!channelData && leaveChannelModal}
+          onCancel={() => {
+            setLeaveChannelModal(false);
+          }}
+          onClose={() => {
+            setLeaveChannelModal(false);
+          }}
+          onConfirm={() => {
+            leaveChannelHandler();
+          }}
+          size="xs"
+        >
+          <p className="text-sm">
+            Are you sure you want to leave this channel? You can always join it
+            again later.
+          </p>
+        </Modal>
+        {!isChannelMember && !loading && (
+          <ChannelBadge type="channel" data={channelData} userId={userId} />
+        )}
+      </MainContentContainer>
+    </>
   );
 }
 

@@ -126,26 +126,6 @@ function SidebarComponent({
         const { data, error } = await kontenbase.service("Threads").find({
           where: {
             workspace: params.workspaceId,
-            createdBy: userId,
-            isDeleted: true,
-          },
-        });
-
-        if (error) throw new Error(error.message);
-
-        setTrashData(data.map((item) => item._id));
-      } catch (error) {
-        if (error instanceof Error) {
-          showToast({ message: `${JSON.stringify(error?.message)}` });
-        }
-      }
-    })();
-
-    (async () => {
-      try {
-        const { data, error } = await kontenbase.service("Threads").find({
-          where: {
-            workspace: params.workspaceId,
             tagedUsers: { $in: [userId] },
           },
         });
@@ -163,6 +143,31 @@ function SidebarComponent({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, userId, runOnce]);
+
+  useEffect(() => {
+    if (!userId || !params.workspaceId) return;
+    (async () => {
+      try {
+        const { data, error } = await kontenbase.service("Threads").find({
+          where: {
+            workspace: params.workspaceId,
+            createdBy: userId,
+            isDeleted: true,
+          },
+        });
+
+        if (error) throw new Error(error.message);
+
+        setTrashData(data.map((item) => item._id));
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast({ message: `${JSON.stringify(error?.message)}` });
+        }
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId, userId]);
 
   const handleLogout = async () => {
     try {
@@ -436,7 +441,6 @@ function SidebarComponent({
                 updateUserStore();
                 break;
               case "DELETE_RECORD":
-                console.log("awee");
                 dispatch(deleteThread(payload));
                 setTrashData((prev) =>
                   prev.filter((item) => item !== payload?._id)
@@ -554,7 +558,7 @@ function SidebarComponent({
       id="modal-container"
       className={
         isSidebarOpen &&
-        `w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+        `w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
       }
       onClick={(e: any) => {
         if (e?.target?.id === "modal-container") {
@@ -723,7 +727,7 @@ function SidebarComponent({
                       showManageMemberModal(channel);
                     }}
                     isAdmin={
-                      workspaceData.createdBy?._id === auth.user?._id ||
+                      workspaceData?.createdBy?._id === auth.user?._id ||
                       channel?.createdBy?._id === auth.user?._id
                     }
                   />

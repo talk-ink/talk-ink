@@ -22,6 +22,7 @@ function TextInput({
   placeholder,
   defaultValue,
   onClick,
+  ...rest
 }: Props) {
   return (
     <input
@@ -35,6 +36,7 @@ function TextInput({
       placeholder={placeholder}
       defaultValue={defaultValue}
       onClick={onClick}
+      {...rest}
     />
   );
 }

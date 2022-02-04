@@ -119,7 +119,7 @@ function ContentItem({
   };
 
   const closedBy: Member = useMemo(() => {
-    return member.members.find(
+    return member?.members?.find(
       (data) => data._id === dataSource?.closedBy?.[0]
     );
   }, [dataSource?.closedBy, member.members]);
@@ -138,6 +138,7 @@ function ContentItem({
     last:after:w-full
     last:after:h-[1px]
     last:after:bg-neutral-200
+    first:before:hidden
     "
     >
       <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
@@ -154,7 +155,7 @@ function ContentItem({
                   : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
-            <div className="mr-4">
+            <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
               {isFromTalkink && <Avatar src={logoImage} />}
               {!isFromTalkink && (
                 <>
@@ -166,6 +167,11 @@ function ContentItem({
                     />
                   )}
                 </>
+              )}
+              {dataSource?.isClosed && (
+                <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border border-white rounded-full flex items-center justify-center">
+                  <BiCheck size={10} className="text-white font-bold" />
+                </div>
               )}
             </div>
           </div>
@@ -208,11 +214,6 @@ function ContentItem({
           </div>
         </button>
         <div className="flex active:flex group-hover:flex gap-2 items-center">
-          {dataSource?.isClosed && (
-            <div className="bg-indigo-500 p-1 px-2 rounded-full">
-              <p className="text-xs text-white font-semibold">Closed</p>
-            </div>
-          )}
           {otherButton}
           <Menu as="div" className="relative">
             {({ open }) => (

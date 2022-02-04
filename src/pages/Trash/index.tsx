@@ -16,6 +16,7 @@ import { deleteThread } from "features/threads";
 import { updateChannelCount } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 import TrashEmpty from "components/EmptyContent/TrashEmpty";
+import MobileHeader from "components/Header/Mobile";
 
 function TrashPage() {
   const [showToast] = useToast();
@@ -63,54 +64,63 @@ function TrashPage() {
   };
 
   return (
-    <MainContentContainer>
-      <header className="mb-2">
-        <div className="mb-7">
-          <h1 className="font-bold text-3xl">Trash</h1>
+    <>
+      <MobileHeader
+        header="Trash"
+        subHeader="Your deleted thread will come here"
+        type="trash"
+      />
+      <MainContentContainer>
+        <header className="mb-2 hidden md:block">
+          <div className="mb-7">
+            <h1 className="font-bold text-3xl">Trash</h1>
+          </div>
+        </header>
+        <div>
+          {thread?.loading ? (
+            <ContentSkeleton />
+          ) : thread.threads.length > 0 ? (
+            <>
+              {thread.threads.map((data) => (
+                <ContentItem
+                  key={data._id}
+                  dataSource={data}
+                  onClick={() => {
+                    navigate(
+                      `/a/${params.workspaceId}/ch/${data?.channel?.[0]}/t/${data?._id}`
+                    );
+                  }}
+                  isRead
+                  from="trash"
+                  setSelectedThread={setSelectedThread}
+                />
+              ))}
+            </>
+          ) : (
+            <TrashEmpty />
+          )}
         </div>
-      </header>
-      <div>
-        {thread?.loading ? (
-          <ContentSkeleton />
-        ) : thread.threads.length > 0 ? (
-          <>
-            {thread.threads.map((data) => (
-              <ContentItem
-                key={data._id}
-                dataSource={data}
-                onClick={() => {
-                  navigate(
-                    `/a/${params.workspaceId}/ch/${data?.channel?.[0]}/t/${data?._id}`
-                  );
-                }}
-                isRead
-                from="trash"
-                setSelectedThread={setSelectedThread}
-              />
-            ))}
-          </>
-        ) : (
-          <TrashEmpty />
-        )}
-      </div>
-      <Modal
-        header="Remove from trash"
-        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
-        onClose={() => {
-          setSelectedThread(null);
-        }}
-        onCancel={() => {
-          setSelectedThread(null);
-        }}
-        onConfirm={() => {
-          threadDeleteHandler();
-        }}
-        okButtonText="Confirm"
-        size="xs"
-      >
-        Are you sure you want to remove this thread from trash?
-      </Modal>
-    </MainContentContainer>
+        <Modal
+          header="Remove from trash"
+          visible={
+            !!selectedThread?.thread && selectedThread?.type === "delete"
+          }
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+          onCancel={() => {
+            setSelectedThread(null);
+          }}
+          onConfirm={() => {
+            threadDeleteHandler();
+          }}
+          okButtonText="Confirm"
+          size="xs"
+        >
+          Are you sure you want to remove this thread from trash?
+        </Modal>
+      </MainContentContainer>
+    </>
   );
 }
 

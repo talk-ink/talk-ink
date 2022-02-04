@@ -15,7 +15,7 @@ import { pageStatusReducer } from "features/pageStatus";
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["thread", "toast", "auth", "pageStatus"],
+  whitelist: ["thread", "toast", "auth"],
 };
 
 const appReducer = combineReducers({

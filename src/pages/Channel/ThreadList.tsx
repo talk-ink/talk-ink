@@ -1,0 +1,176 @@
+import { useMemo, useState } from "react";
+
+import { useNavigate, useParams } from "react-router-dom";
+import moment from "moment-timezone";
+import { kontenbase } from "lib/client";
+
+import ContentItem from "components/ContentItem/ContentItem";
+import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
+import ContentSkeleton from "components/Loading/ContentSkeleton";
+import Modal from "components/Modal/Modal";
+import CloseThreadForm from "components/Thread/CloseThreadForm";
+
+import { updateChannelCount } from "features/channels/slice";
+import { deleteThread } from "features/threads";
+
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { useAppSelector } from "hooks/useAppSelector";
+import { useToast } from "hooks/useToast";
+
+import { Thread } from "types";
+
+type Props = {
+  type?: "open" | "close";
+};
+
+const ThreadList = ({ type = "open" }: Props) => {
+  const [showToast] = useToast();
+
+  const params = useParams();
+  const navigate = useNavigate();
+
+  const auth = useAppSelector((state) => state.auth);
+  const thread = useAppSelector((state) => state.thread);
+
+  const dispatch = useAppDispatch();
+
+  const [selectedThread, setSelectedThread] =
+    useState<{ thread: Thread; type: "delete" | "close" }>();
+
+  const isClosedThread = useMemo(() => {
+    return type === "close";
+  }, [type]);
+
+  const threadData = useMemo(() => {
+    return thread.threads.filter((data) =>
+      isClosedThread ? data?.isClosed : !data?.isClosed
+    );
+  }, [thread.threads, isClosedThread]);
+
+  const readedThreads: string[] = useMemo(() => {
+    if (!auth.user.readedThreads) return [];
+    return auth.user.readedThreads;
+  }, [auth.user]);
+
+  const deleteDraft = (id: string) => {
+    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
+    delete parsedThreadDraft[+id];
+
+    localStorage.setItem("threadsDraft", JSON.stringify(parsedThreadDraft));
+  };
+
+  const threadDeleteHandler = async () => {
+    try {
+      if (!selectedThread?.thread.draft) {
+        const now = moment().tz("Asia/Jakarta").toDate();
+
+        const deletedThread = await kontenbase
+          .service("Threads")
+          .updateById(selectedThread?.thread._id, {
+            isDeleted: true,
+            deletedAt: now,
+          });
+
+        if (deletedThread?.data) {
+          setSelectedThread(null);
+        }
+        dispatch(deleteThread(deletedThread.data));
+        dispatch(
+          updateChannelCount({
+            chanelId: deletedThread.data?.channel?.[0],
+            threadId: selectedThread?.thread._id,
+          })
+        );
+      } else {
+        deleteDraft(selectedThread.thread.id);
+        dispatch(deleteThread(selectedThread.thread));
+        setSelectedThread(null);
+      }
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${error}` });
+    }
+  };
+
+  const loading = thread.loading;
+
+  return (
+    <div>
+      {threadData?.length > 0 ? (
+        <ul>
+          {loading ? (
+            <ContentSkeleton />
+          ) : (
+            <>
+              {threadData?.map((thread, idx) => (
+                <ContentItem
+                  key={idx}
+                  dataSource={thread}
+                  onClick={() => {
+                    if (thread.draft) {
+                      navigate(
+                        `/a/${params.workspaceId}/ch/${params.channelId}/compose/${thread?.id}`
+                      );
+                    } else {
+                      navigate(
+                        `/a/${params.workspaceId}/ch/${params.channelId}/t/${thread?._id}`
+                      );
+                    }
+                  }}
+                  setSelectedThread={setSelectedThread}
+                  isRead={
+                    readedThreads.includes(thread._id) ||
+                    (readedThreads.includes(thread._id) &&
+                      thread.createdBy?._id === auth.user._id)
+                  }
+                />
+              ))}
+            </>
+          )}
+        </ul>
+      ) : (
+        <>
+          <ChannelEmpty />
+        </>
+      )}
+      <Modal
+        header="Delete Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+        onConfirm={() => {
+          threadDeleteHandler();
+        }}
+        okButtonText="Confirm"
+        size="xs"
+      >
+        Are you sure you want to delete this thread? It will be moved into
+        trash.
+      </Modal>
+      <Modal
+        header="Close Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
+        footer={null}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+      >
+        <CloseThreadForm
+          data={selectedThread?.thread}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+        />
+      </Modal>
+    </div>
+  );
+};
+
+export default ThreadList;
