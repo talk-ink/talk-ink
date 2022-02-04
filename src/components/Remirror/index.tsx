@@ -27,7 +27,11 @@ const MyEditor: React.FC<IProps> = ({ remmirorProps, readOnly }) => {
   const { manager, onChange, state } = remmirorProps || {};
 
   return (
-    <div className="remirror-theme thread-editor ">
+    <div
+      className={`${
+        readOnly ? "readonly-editor" : "thread-editor"
+      } remirror-theme`}
+    >
       <AllStyledComponent>
         <ThemeProvider>
           <Remirror

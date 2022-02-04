@@ -29,7 +29,7 @@ import { kontenbase } from "lib/client";
 import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
-import { getNameInitial } from "utils/helper";
+import { getNameInitial, parseContent } from "utils/helper";
 import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 
 import { extensions } from "components/Remirror/extensions";
@@ -66,10 +66,10 @@ function ThreadPage() {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
 
-  const { manager, state, onChange, setState } = useRemirror({
+  const { manager, state, onChange } = useRemirror({
     extensions: () => extensions(true),
     stringHandler: htmlToProsemirrorNode,
-    content: JSON.parse(threadData?.content).doc,
+    content: parseContent(threadData?.content),
   });
 
   useEffect(() => {
@@ -345,7 +345,7 @@ function ThreadPage() {
                   </ReactMoment>
                 </p>
               </div>
-              {threadData?.content && manager && (
+              {threadData?.content && (
                 <Remirror
                   remmirorProps={{
                     manager,

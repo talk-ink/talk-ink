@@ -287,3 +287,11 @@ export const sendSearch = async ({
   );
   return searchData;
 };
+
+export const parseContent = (content: string) => {
+  try {
+    return JSON.parse(content).doc;
+  } catch (_e) {
+    return "";
+  }
+};

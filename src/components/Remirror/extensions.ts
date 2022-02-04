@@ -43,6 +43,7 @@ import {
   DropCursorExtension,
   MentionAtomExtension,
 } from "remirror/extensions";
+import { resizeFile } from "utils/helper";
 
 interface FileWithProgress {
   file: File;
@@ -68,7 +69,9 @@ function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
   for (const { file, progress } of files) {
     // eslint-disable-next-line no-loop-func
     promises.push(async () => {
-      const { data } = await kontenbase.storage.upload(file);
+      const resized = await resizeFile(file, 1000);
+
+      const { data } = await kontenbase.storage.upload(resized);
 
       return new Promise<ImageAttributes>((resolve) => {
         const reader = new FileReader();
@@ -95,11 +98,11 @@ function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
 }
 
 export const extensions = (readonly = false) => [
+  new LinkExtension({ autoLink: true, extraAttributes: { target: "_blank" } }),
   new MentionAtomExtension({
     extraAttributes: { type: "user" },
     matchers: [{ name: "at", char: "@", appendText: " ", matchOffset: 0 }],
   }),
-  new LinkExtension({ autoLink: true }),
   new BoldExtension({}),
   new StrikeExtension(),
   new ItalicExtension(),

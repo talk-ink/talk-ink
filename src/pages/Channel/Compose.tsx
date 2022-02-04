@@ -9,6 +9,8 @@ import Select from "react-select";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import TextEditor from "components/TextEditor/TextEditor";
+import { extensions } from "components/Remirror/extensions";
+
 import { useFormik } from "formik";
 import { Channel, Thread, Member } from "types";
 import { createThreadValidation } from "utils/validators";
@@ -21,7 +23,6 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { fetchChannels } from "features/channels/slice";
 import { notificationUrl } from "utils/helper";
 import { htmlToProsemirrorNode } from "remirror";
-import { extensions } from "components/Remirror/extensions";
 import { useRemirror } from "@remirror/react";
 
 const initialValues: Thread = {
@@ -70,7 +71,7 @@ function Compose() {
     return "";
   };
 
-  const { manager, onChange, state, setState } = useRemirror({
+  const { manager, onChange, state } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
     content: getCurrentDraft(),

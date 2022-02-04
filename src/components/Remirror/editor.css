@@ -9,6 +9,17 @@
   margin-bottom: 1rem;
   margin-top: -1rem;
   overflow: auto !important;
+  margin-left: -2px !important;
+}
+
+.readonly-editor .remirror-editor {
+  min-height: 10rem;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+}
+
+.readonly-editor .remirror-file-root a:last-child {
+  display: none !important;
 }
 
 .remirror-floating-popover {
@@ -18,6 +29,14 @@
 
 .remirror-editor img {
   margin: 8px 0 !important;
+}
+
+.readonly-editor .ProseMirror-selectednode {
+  outline: none !important;
+}
+
+.remirror-editor a {
+  color: #1e70f5 !important;
 }
 
 .remirror-theme {
@@ -195,5 +214,13 @@
 .ProseMirror,
 .ProseMirror:focus {
   box-shadow: none !important;
-  padding: 0 !important;
+  padding: 2px !important;
+}
+
+.remirror-editor .ProseMirror-selectednode {
+  width: 100% !important;
+}
+
+.remirror-mention-atom:before {
+  content: "@";
 }
