@@ -56,6 +56,10 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
     return currentRoute.current === "deleteWorkspace";
   }, [currentRoute]);
 
+  const isAdmin = useMemo(() => {
+    return workspaceData.createdBy?._id === auth.user?._id;
+  }, [workspaceData, auth.user._id]);
+
   const initialValues: TypeInitialValues = {
     name: workspaceData.name,
   };
@@ -142,7 +146,10 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
     }
   };
   const isDisabled: boolean =
-    !formik.values.name || !!formik.errors.name || !!formik.errors.logo;
+    !formik.values.name ||
+    !!formik.errors.name ||
+    !!formik.errors.logo ||
+    !isAdmin;
 
   return (
     <div className="min-h-[50vh]">
@@ -167,7 +174,7 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
                   )}
                 </div>
                 <div className="ml-5 ">
-                  <Upload onChange={uploadFile}>
+                  <Upload onChange={uploadFile} disabled={!isAdmin}>
                     <span className="text-sm font-semibold">Upload logo</span>
                   </Upload>
                   <p className="text-sm text-neutral-500 my-3">
@@ -190,6 +197,7 @@ function GeneralSettings({ currentRoute, setCurrentRoute }: TProps) {
                 onBlur={formik.handleBlur("name")}
                 onChange={formik.handleChange("name")}
                 value={formik.values.name}
+                disabled={!isAdmin}
               />
               <small className="text-neutral-500 text-xs mt-2">
                 The name of your group or company. Keep it simple.
