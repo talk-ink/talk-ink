@@ -138,6 +138,7 @@ function ContentItem({
     last:after:w-full
     last:after:h-[1px]
     last:after:bg-neutral-200
+    first:before:hidden
     "
     >
       <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
