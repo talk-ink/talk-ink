@@ -722,7 +722,7 @@ function SidebarComponent({
                       showManageMemberModal(channel);
                     }}
                     isAdmin={
-                      workspaceData.createdBy?._id === auth.user?._id ||
+                      workspaceData?.createdBy?._id === auth.user?._id ||
                       channel?.createdBy?._id === auth.user?._id
                     }
                   />
