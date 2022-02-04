@@ -153,7 +153,7 @@ function ContentItem({
     hover:after:bg-transparent"
       {...threadBind}
     >
-      <div className="flex items-center justify-between pr-5 md:pr-0 md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group ">
+      <div className="flex items-center justify-between pr-5 md:pr-3 md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group ">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
@@ -187,7 +187,7 @@ function ContentItem({
               )}
             </div>
           </div>
-          <div>
+          <div className="w-full md:w-auto">
             <div className="flex flex-row items-center justify-between md:justify-start">
               <p
                 className={`font-body md:text-sm max-w-[12rem] mr-2 md:max-w-xs overflow-hidden text-left text-ellipsis whitespace-nowrap ${
@@ -206,9 +206,9 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="text-left table table-fixed w-full md:text-xs text-neutral-500 pr-2">
+            <div className="text-left md:table md:table-fixed w-full md:text-xs text-neutral-500 pr-2">
               {!dataSource.isClosed && (
-                <small className="text-sm md:text-xs text-neutral-500 table-cell truncate">
+                <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
                   {dataSource?.draft ? "Me: " : ""}
                   {/* latest juga disini */}
                   {editorToHTML(state)}

@@ -30,5 +30,8 @@ module.exports = {
       montserrat: ["montserrat"],
     },
   },
-  plugins: [require("@tailwindcss/typography")],
+  plugins: [
+    require("@tailwindcss/typography"),
+    require("@tailwindcss/line-clamp"),
+  ],
 };
