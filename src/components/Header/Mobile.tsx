@@ -78,9 +78,13 @@ function MobileHeader({
             {privacy === "private" && (
               <Icon size={18} className="text-slate-400" />
             )}
-            <h1 className="text-lg font-semibold ">{header}</h1>
+            <h1 className="text-lg font-semibold whitespace-nowrap max-w-[10rem] overflow-hidden text-ellipsis">
+              {header}aweoakweoawkeoawkeoakweoakweoakweokaweokawe
+            </h1>
           </div>
-          <p className="text-sm text-indigo-500">{subHeader}</p>
+          <p className="text-sm text-indigo-500 whitespace-nowrap max-w-[15rem] overflow-hidden text-ellipsis">
+            {subHeader}
+          </p>
         </div>
       </div>
       <div>{menu}</div>
