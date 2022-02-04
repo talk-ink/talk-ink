@@ -79,7 +79,7 @@ function MobileHeader({
               <Icon size={18} className="text-slate-400" />
             )}
             <h1 className="text-lg font-semibold whitespace-nowrap max-w-[10rem] overflow-hidden text-ellipsis">
-              {header}aweoakweoawkeoawkeoakweoakweoakweokaweokawe
+              {header}
             </h1>
           </div>
           <p className="text-sm text-indigo-500 whitespace-nowrap max-w-[15rem] overflow-hidden text-ellipsis">
