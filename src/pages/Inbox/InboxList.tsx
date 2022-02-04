@@ -142,6 +142,7 @@ function InboxList({ type = "open" }: TProps) {
                         onClick={() => {
                           setSelectedThread({ thread: inbox, type: "close" });
                         }}
+                        className="hidden md:flex"
                       >
                         <BiCheckCircle size={24} className="text-neutral-400" />
                       </IconButton>
