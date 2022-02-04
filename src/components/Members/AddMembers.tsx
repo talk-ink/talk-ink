@@ -52,7 +52,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
   }, [params.workspaceId, member.members]);
 
   const invitedEmails = useMemo(() => {
-    const memberEmails = member.members.map((data) => data.email);
+    const memberEmails = member.members?.map((data) => data.email);
     return workspaceData.invitedEmails.filter(
       (data) => !memberEmails.includes(data)
     );
