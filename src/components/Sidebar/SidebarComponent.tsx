@@ -436,7 +436,6 @@ function SidebarComponent({
                 updateUserStore();
                 break;
               case "DELETE_RECORD":
-                console.log("awee");
                 dispatch(deleteThread(payload));
                 setTrashData((prev) =>
                   prev.filter((item) => item !== payload?._id)
