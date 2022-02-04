@@ -34,6 +34,7 @@ import { extensions } from "components/Remirror/extensions";
 import { deleteThread, updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { BsArrowUpCircle } from "react-icons/bs";
+import { useMediaQuery } from "react-responsive";
 
 export type SelectedThreadTypes = "delete" | "close" | "menu";
 
@@ -59,6 +60,10 @@ function ContentItem({
   isRead,
   from = "regular",
 }: Props) {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const [showToast] = useToast();
   const dispatch = useAppDispatch();
 
@@ -165,17 +170,23 @@ function ContentItem({
                 !isRead && !dataSource?.draft
                   ? "bg-indigo-500"
                   : "bg-transparent"
-              } rounded-full mr-2`}
+              } rounded-full mr-2 ${isMobile ? "-ml-1" : ""}`}
             ></div>
             <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
-              {isFromTalkink && <Avatar src={logoImage} />}
+              {isFromTalkink && (
+                <Avatar src={logoImage} size={isMobile ? "large" : "medium"} />
+              )}
               {!isFromTalkink && (
                 <>
                   {dataSource.createdBy?.avatar?.[0]?.url ? (
-                    <Avatar src={dataSource.createdBy?.avatar?.[0]?.url} />
+                    <Avatar
+                      src={dataSource.createdBy?.avatar?.[0]?.url}
+                      size={isMobile ? "large" : "medium"}
+                    />
                   ) : (
                     <NameInitial
                       name={getNameInitial(dataSource.createdBy?.firstName)}
+                      size={isMobile ? "large" : "medium"}
                     />
                   )}
                 </>
