@@ -21,6 +21,7 @@ import { useToast } from "hooks/useToast";
 import { deleteThread } from "features/threads";
 import { updateChannelCount } from "features/channels/slice";
 import { Thread } from "types";
+import MobileMenuThread from "components/Thread/MobileMenu";
 
 type TProps = {
   type?: "open" | "close";
@@ -148,6 +149,9 @@ function InboxList({ type = "open" }: TProps) {
                   }
                   setSelectedThread={setSelectedThread}
                   isRead={readedThreads.includes(inbox._id)}
+                  onHold={() => {
+                    setSelectedThread({ thread: inbox, type: "menu" });
+                  }}
                 />
               ))}
             </ul>
@@ -158,6 +162,20 @@ function InboxList({ type = "open" }: TProps) {
           )}
         </>
       )}
+
+      <MobileMenuThread
+        openMenu={!!selectedThread?.thread && selectedThread?.type === "menu"}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        dataSource={selectedThread?.thread}
+        setSelectedThread={setSelectedThread}
+        isRead={
+          readedThreads.includes(selectedThread?.thread?._id) ||
+          (readedThreads.includes(selectedThread?.thread?._id) &&
+            selectedThread?.thread?.createdBy?._id === auth.user._id)
+        }
+      />
 
       <Modal
         header="Delete Thread"
