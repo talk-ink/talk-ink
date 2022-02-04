@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useParams, useLocation } from "react-router";
 import Editor from "rich-markdown-editor";
 import ReactMoment from "react-moment";
+import { useRemirror } from "@remirror/react";
 
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MainContentHeader from "components/MainContentContainer/MainContentHeader";
@@ -11,6 +12,7 @@ import CommentList from "components/Comment/List";
 import CommentForm from "components/Comment/Form";
 import Avatar from "components/Avatar/Avatar";
 import LoadingSkeleton from "components/Loading/ContentSkeleton";
+import Remirror from "components/Remirror";
 
 import { Channel, Thread, Member, ISubComment } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
@@ -29,6 +31,9 @@ import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
+
+import { extensions } from "components/Remirror/extensions";
+import { htmlToProsemirrorNode } from "remirror";
 
 function useQuery() {
   const { search } = useLocation();
@@ -60,6 +65,12 @@ function ThreadPage() {
   const threadData: Thread = useMemo(() => {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
+
+  const { manager, state, onChange, setState } = useRemirror({
+    extensions: () => extensions(true),
+    stringHandler: htmlToProsemirrorNode,
+    content: JSON.parse(threadData?.content).doc,
+  });
 
   useEffect(() => {
     let key: string;
@@ -334,11 +345,16 @@ function ThreadPage() {
                   </ReactMoment>
                 </p>
               </div>
-              <Editor
-                value={threadData?.content}
-                readOnly
-                className="markdown-overrides w-[70vw] sm:w-full"
-              />
+              {threadData?.content && manager && (
+                <Remirror
+                  remmirorProps={{
+                    manager,
+                    state,
+                    onChange,
+                  }}
+                  readOnly
+                />
+              )}
             </div>
           </div>
           <div className="border-t-[1px] border-gray-200 mb-8 mt-8" />
@@ -352,7 +368,7 @@ function ThreadPage() {
             </p>
           )}
 
-          <div className="mb-10 ">
+          {/* <div className="mb-10 ">
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
@@ -373,7 +389,7 @@ function ThreadPage() {
             interactedUsers={[...new Set(threadData?.interactedUsers)]}
             scrollToBottom={scrollToBottom}
             memberList={memberList}
-          />
+          /> */}
         </div>
       </div>
     </MainContentContainer>

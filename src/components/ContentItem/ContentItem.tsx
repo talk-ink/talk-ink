@@ -140,7 +140,7 @@ function ContentItem({
                   ? `Latest : ${dataSource.comments?.[
                       dataSource.comments?.length - 1
                     ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                  : dataSource.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}
+                  : "HAHAHAH"}
               </small>
             </div>
           </div>

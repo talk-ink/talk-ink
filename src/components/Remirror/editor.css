@@ -4,6 +4,22 @@
   border-radius: 4px;
 }
 
+.thread-editor .remirror-editor {
+  height: 60vh;
+  margin-bottom: 1rem;
+  margin-top: -1rem;
+  overflow: auto !important;
+}
+
+.remirror-floating-popover {
+  z-index: 9999 !important;
+  background: white;
+}
+
+.remirror-editor img {
+  margin: 8px 0 !important;
+}
+
 .remirror-theme {
   /* Provide sufficient space to see the popup */
   --rmr-space-6: 400px;
@@ -74,6 +90,10 @@
   max-width: 100% !important;
 }
 
+.remirror-file-root {
+  margin: 8px 0 !important;
+}
+
 .file-container {
   border-radius: 4px;
   padding: 8px 12px;
@@ -97,9 +117,9 @@
 }
 
 .remirror-image-loader {
-  border-top: none;
-  border-radius: none;
-  border: none;
+  border-top: none !important;
+  border-radius: none !important;
+  border: none !important;
   animation: rotate 1s infinite;
   height: 50px;
   width: 50px;
@@ -170,4 +190,10 @@
     box-shadow: 30px 0 0 #97bf0d;
     margin-top: 0;
   }
+}
+
+.ProseMirror,
+.ProseMirror:focus {
+  box-shadow: none !important;
+  padding: 0 !important;
 }
