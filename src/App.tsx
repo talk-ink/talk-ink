@@ -1,35 +1,37 @@
-import { useEffect } from "react";
+import { lazy, Suspense, useEffect } from "react";
 import { Route, Routes } from "react-router";
 import cookies from "js-cookie";
 import OneSignal from "react-onesignal";
 
-import ChannelPage from "pages/Channel";
-import DashboardPage from "pages/Dashboard";
-import InboxPage from "pages/Inbox";
-import Compose from "pages/Channel/Compose";
 import RestrictedRoute from "routes/RestrictedRoute";
-import LoginPage from "pages/Login";
-import RegisterPage from "pages/Register";
 import LandingPage from "pages/Landing";
-import CreateWorkspacePage from "pages/CreateWorkspace";
 
+import ToastProvider from "components/ToastProvider/ToastProvider";
 import NotFound from "components/NotFound/NotFound";
 
+import { useToast } from "hooks/useToast";
+import FullscreenLoading from "components/Loading/FullscreenLoading";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, TUserProfile } from "types";
-import ThreadPage from "pages/Thread";
-import EditThreadPage from "pages/Thread/Edit";
-import ToastProvider from "components/ToastProvider/ToastProvider";
-import { useToast } from "hooks/useToast";
-import JoinChannelPage from "pages/JoinChannel";
-import InboxList from "pages/Inbox/InboxList";
-import InvitedWorkspacePage from "pages/InvitedWorkspace";
 import { oneSignalId } from "utils/helper";
-import SearchPage from "pages/Search";
-import TrashPage from "pages/Trash";
-import ThreadList from "pages/Channel/ThreadList";
+
+const ChannelPage = lazy(() => import("pages/Channel"));
+const DashboardPage = lazy(() => import("pages/Dashboard"));
+const InboxPage = lazy(() => import("pages/Inbox"));
+const Compose = lazy(() => import("pages/Channel/Compose"));
+const LoginPage = lazy(() => import("pages/Login"));
+const RegisterPage = lazy(() => import("pages/Register"));
+const CreateWorkspacePage = lazy(() => import("pages/CreateWorkspace"));
+const ThreadPage = lazy(() => import("pages/Thread"));
+const EditThreadPage = lazy(() => import("pages/Thread/Edit"));
+const JoinChannelPage = lazy(() => import("pages/JoinChannel"));
+const InboxList = lazy(() => import("pages/Inbox/InboxList"));
+const InvitedWorkspacePage = lazy(() => import("pages/InvitedWorkspace"));
+const SearchPage = lazy(() => import("pages/Search"));
+const TrashPage = lazy(() => import("pages/Trash"));
+const ThreadList = lazy(() => import("pages/Channel/ThreadList"));
 
 function App() {
   const dispatch = useAppDispatch();
@@ -90,108 +92,110 @@ function App() {
 
   return (
     <ToastProvider>
-      <Routes>
-        <Route
-          caseSensitive
-          path="/"
-          element={
-            <RestrictedRoute type="public" from="landing">
-              <LandingPage />
-            </RestrictedRoute>
-          }
-        />
-        <Route
-          caseSensitive
-          path="/a/create_workspace"
-          element={
-            <RestrictedRoute>
-              <CreateWorkspacePage />
-            </RestrictedRoute>
-          }
-        />
-        <Route
-          caseSensitive
-          path="/a/:workspaceId/"
-          element={
-            <RestrictedRoute>
-              <DashboardPage />
-            </RestrictedRoute>
-          }
-        >
-          <Route path="search" element={<SearchPage />} />
-          <Route path="inbox/" element={<InboxPage />}>
-            <Route path="" element={<InboxList />} />
-            <Route path="close" element={<InboxList type="close" />} />
-          </Route>
-          <Route path="trash" element={<TrashPage />} />
+      <Suspense fallback={<FullscreenLoading />}>
+        <Routes>
+          <Route
+            caseSensitive
+            path="/"
+            element={
+              <RestrictedRoute type="public" from="landing">
+                <LandingPage />
+              </RestrictedRoute>
+            }
+          />
+          <Route
+            caseSensitive
+            path="/a/create_workspace"
+            element={
+              <RestrictedRoute>
+                <CreateWorkspacePage />
+              </RestrictedRoute>
+            }
+          />
+          <Route
+            caseSensitive
+            path="/a/:workspaceId/"
+            element={
+              <RestrictedRoute>
+                <DashboardPage />
+              </RestrictedRoute>
+            }
+          >
+            <Route path="search" element={<SearchPage />} />
+            <Route path="inbox/" element={<InboxPage />}>
+              <Route path="" element={<InboxList />} />
+              <Route path="close" element={<InboxList type="close" />} />
+            </Route>
+            <Route path="trash" element={<TrashPage />} />
 
-          <Route path="saved" element={<>saved</>} />
-          <Route path="messages" element={<>messages</>} />
-          <Route path="ch/:channelId/" element={<ChannelPage />}>
-            <Route path="" element={<ThreadList />} />
-            <Route path="close" element={<ThreadList type="close" />} />
+            <Route path="saved" element={<>saved</>} />
+            <Route path="messages" element={<>messages</>} />
+            <Route path="ch/:channelId/" element={<ChannelPage />}>
+              <Route path="" element={<ThreadList />} />
+              <Route path="close" element={<ThreadList type="close" />} />
+            </Route>
+            <Route path="ch/:channelId/t/:threadId" element={<ThreadPage />} />
+            <Route
+              path="ch/:channelId/te/:threadId"
+              element={<EditThreadPage />}
+            />
+            <Route
+              path="ch/:channelId/compose/:composeId"
+              element={<Compose />}
+            />
           </Route>
-          <Route path="ch/:channelId/t/:threadId" element={<ThreadPage />} />
           <Route
-            path="ch/:channelId/te/:threadId"
-            element={<EditThreadPage />}
+            path="/a/:workspaceId/join_channels"
+            element={
+              <RestrictedRoute>
+                <JoinChannelPage />
+              </RestrictedRoute>
+            }
           />
           <Route
-            path="ch/:channelId/compose/:composeId"
-            element={<Compose />}
+            caseSensitive
+            path="/login"
+            element={
+              <RestrictedRoute type="public" from="login">
+                <LoginPage />
+              </RestrictedRoute>
+            }
           />
-        </Route>
-        <Route
-          path="/a/:workspaceId/join_channels"
-          element={
-            <RestrictedRoute>
-              <JoinChannelPage />
-            </RestrictedRoute>
-          }
-        />
-        <Route
-          caseSensitive
-          path="/login"
-          element={
-            <RestrictedRoute type="public" from="login">
-              <LoginPage />
-            </RestrictedRoute>
-          }
-        />
-        <Route
-          caseSensitive
-          path="/register"
-          element={
-            <RestrictedRoute type="public" from="register">
-              <RegisterPage />
-            </RestrictedRoute>
-          }
-        />
-        <Route
-          caseSensitive
-          path="/j/:inviteId"
-          element={<InvitedWorkspacePage />}
-        />
-        <Route
-          caseSensitive
-          path="/j/:inviteId/login"
-          element={
-            <RestrictedRoute type="public" from="inviteLogin">
-              <LoginPage />
-            </RestrictedRoute>
-          }
-        />
-        <Route
-          caseSensitive
-          path="/j/:inviteId/register"
-          element={
-            <RestrictedRoute type="public" from="inviteRegister">
-              <RegisterPage />
-            </RestrictedRoute>
-          }
-        />
-        <Route path="*" element={<NotFound />} />
-      </Routes>
+          <Route
+            caseSensitive
+            path="/register"
+            element={
+              <RestrictedRoute type="public" from="register">
+                <RegisterPage />
+              </RestrictedRoute>
+            }
+          />
+          <Route
+            caseSensitive
+            path="/j/:inviteId"
+            element={<InvitedWorkspacePage />}
+          />
+          <Route
+            caseSensitive
+            path="/j/:inviteId/login"
+            element={
+              <RestrictedRoute type="public" from="inviteLogin">
+                <LoginPage />
+              </RestrictedRoute>
+            }
+          />
+          <Route
+            caseSensitive
+            path="/j/:inviteId/register"
+            element={
+              <RestrictedRoute type="public" from="inviteRegister">
+                <RegisterPage />
+              </RestrictedRoute>
+            }
+          />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </Suspense>
     </ToastProvider>
   );
 }
