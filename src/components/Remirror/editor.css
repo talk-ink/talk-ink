@@ -34,7 +34,8 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .remirror-editor {
+  .readonly-comment-editor .remirror-editor,
+  .readonly-editor .remirror-editor {
     width: 80vw !important;
   }
 }

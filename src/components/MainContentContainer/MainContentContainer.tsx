@@ -23,7 +23,7 @@ function MainContentContainer({
     >
       {header}
       <div
-        className={`max-w-4xl px-4 md:px-5 md:ml-auto md:mr-auto py-20 ${className}`}
+        className={`max-w-4xl md:px-5 md:ml-auto md:mr-auto py-20 ${className}`}
       >
         {children}
       </div>

@@ -12,7 +12,7 @@ import {
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
-import { useNavigate } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useLongPress, LongPressDetectEvents } from "use-long-press";
 
 import IconButton from "components/Button/IconButton";
@@ -66,6 +66,7 @@ function ContentItem({
 
   const [showToast] = useToast();
   const dispatch = useAppDispatch();
+  const params = useParams();
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
@@ -299,7 +300,9 @@ function ContentItem({
                                 }
                                 title="Edit thread..."
                                 onClick={() => {
-                                  navigate(`te/${dataSource?._id}`);
+                                  navigate(
+                                    `/a/${params.workspaceId}/ch/${dataSource.channel?.[0]}/te/${dataSource?._id}`
+                                  );
                                 }}
                               />
                               <MenuItem
