@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { kontenbase } from "lib/client";
 
-import ContentItem from "components/ContentItem/ContentItem";
+import ContentItem, {
+  SelectedThreadTypes,
+} from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import Modal from "components/Modal/Modal";
@@ -17,6 +19,7 @@ import { updateChannelCount } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 import TrashEmpty from "components/EmptyContent/TrashEmpty";
 import MobileHeader from "components/Header/Mobile";
+import MobileMenuThread from "components/Thread/MobileMenu";
 
 function TrashPage() {
   const [showToast] = useToast();
@@ -32,7 +35,7 @@ function TrashPage() {
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
+    useState<{ thread: Thread; type: SelectedThreadTypes }>();
 
   useEffect(() => {
     dispatch(
@@ -100,6 +103,17 @@ function TrashPage() {
             <TrashEmpty />
           )}
         </div>
+
+        <MobileMenuThread
+          openMenu={!!selectedThread?.thread && selectedThread?.type === "menu"}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+          dataSource={selectedThread?.thread}
+          setSelectedThread={setSelectedThread}
+          isRead={true}
+          from="trash"
+        />
         <Modal
           header="Remove from trash"
           visible={

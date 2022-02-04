@@ -13,6 +13,7 @@ import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
 import { useNavigate } from "react-router";
+import { useLongPress, LongPressDetectEvents } from "use-long-press";
 
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
@@ -33,6 +34,9 @@ import { extensions } from "components/Remirror/extensions";
 import { deleteThread, updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { BsArrowUpCircle } from "react-icons/bs";
+import { useMediaQuery } from "react-responsive";
+
+export type SelectedThreadTypes = "delete" | "close" | "menu";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -40,7 +44,7 @@ type Props = React.PropsWithChildren<{
   setSelectedThread?: React.Dispatch<
     React.SetStateAction<{
       thread: Thread;
-      type: "delete" | "close";
+      type: SelectedThreadTypes;
     }>
   >;
   otherButton?: React.ReactNode;
@@ -56,6 +60,10 @@ function ContentItem({
   isRead,
   from = "regular",
 }: Props) {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const [showToast] = useToast();
   const dispatch = useAppDispatch();
 
@@ -133,24 +141,24 @@ function ContentItem({
     );
   }, [dataSource?.closedBy, member.members]);
 
+  const threadBind = useLongPress(
+    () => {
+      setSelectedThread({ thread: dataSource, type: "menu" });
+    },
+    {
+      detect: LongPressDetectEvents.TOUCH,
+    }
+  );
+
   return (
     <div
       className="
     cursor-pointer
     hover:before:bg-transparent
-    hover:after:bg-transparent
-    before:block
-    before:w-full
-    before:h-[1px]
-    before:bg-neutral-200
-    last:after:block
-    last:after:w-full
-    last:after:h-[1px]
-    last:after:bg-neutral-200
-    first:before:hidden
-    "
+    hover:after:bg-transparent"
+      {...threadBind}
     >
-      <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
+      <div className="flex items-center justify-between pr-5 md:pr-3 md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group ">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
@@ -162,17 +170,23 @@ function ContentItem({
                 !isRead && !dataSource?.draft
                   ? "bg-indigo-500"
                   : "bg-transparent"
-              } rounded-full mr-2`}
+              } rounded-full mr-2 ${isMobile ? "-ml-1" : ""}`}
             ></div>
             <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
-              {isFromTalkink && <Avatar src={logoImage} />}
+              {isFromTalkink && (
+                <Avatar src={logoImage} size={isMobile ? "large" : "medium"} />
+              )}
               {!isFromTalkink && (
                 <>
                   {dataSource.createdBy?.avatar?.[0]?.url ? (
-                    <Avatar src={dataSource.createdBy?.avatar?.[0]?.url} />
+                    <Avatar
+                      src={dataSource.createdBy?.avatar?.[0]?.url}
+                      size={isMobile ? "large" : "medium"}
+                    />
                   ) : (
                     <NameInitial
                       name={getNameInitial(dataSource.createdBy?.firstName)}
+                      size={isMobile ? "large" : "medium"}
                     />
                   )}
                 </>
@@ -184,10 +198,10 @@ function ContentItem({
               )}
             </div>
           </div>
-          <div>
-            <div className="flex flex-col items-start md:flex-row md:items-center">
+          <div className="w-full md:w-auto">
+            <div className="flex flex-row items-center justify-between md:justify-start">
               <p
-                className={`font-body text-sm max-w-[8rem] mr-2 md:max-w-xs overflow-hidden text-ellipsis whitespace-nowrap ${
+                className={`font-body md:text-sm max-w-[12rem] mr-2 md:max-w-xs overflow-hidden text-left text-ellipsis whitespace-nowrap ${
                   dataSource?.draft && "text-blue-500"
                 } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >
@@ -203,9 +217,9 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
+            <div className="text-left md:table md:table-fixed w-full md:text-xs text-neutral-500 pr-2">
               {!dataSource.isClosed && (
-                <small className=" text-xs text-neutral-500 table-cell truncate">
+                <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
                   {dataSource?.draft ? "Me: " : ""}
                   {/* latest juga disini */}
 
@@ -213,16 +227,16 @@ function ContentItem({
                 </small>
               )}
               {dataSource.isClosed && (
-                <small className=" text-xs text-neutral-500 table-cell truncate">
+                <small className="text-sm md:text-xs text-neutral-500 table-cell truncate">
                   {closedBy?.firstName} closed this thread.
                 </small>
               )}
             </div>
           </div>
         </button>
-        <div className="flex active:flex group-hover:flex gap-2 items-center">
+        <div className="hidden md:flex active:flex group-hover:flex gap-2 items-center">
           {otherButton}
-          <Menu as="div" className="relative">
+          <Menu as="div" className="relative hidden md:block">
             {({ open }) => (
               <>
                 {!dataSource?.draft && (

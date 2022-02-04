@@ -4,7 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment-timezone";
 import { kontenbase } from "lib/client";
 
-import ContentItem from "components/ContentItem/ContentItem";
+import ContentItem, {
+  SelectedThreadTypes,
+} from "components/ContentItem/ContentItem";
 import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import Modal from "components/Modal/Modal";
@@ -18,6 +20,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 
 import { Thread } from "types";
+import MobileMenuThread from "components/Thread/MobileMenu";
 
 type Props = {
   type?: "open" | "close";
@@ -35,7 +38,7 @@ const ThreadList = ({ type = "open" }: Props) => {
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
+    useState<{ thread: Thread; type: SelectedThreadTypes }>();
 
   const isClosedThread = useMemo(() => {
     return type === "close";
@@ -133,6 +136,19 @@ const ThreadList = ({ type = "open" }: Props) => {
           <ChannelEmpty />
         </>
       )}
+      <MobileMenuThread
+        openMenu={!!selectedThread?.thread && selectedThread?.type === "menu"}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        dataSource={selectedThread?.thread}
+        setSelectedThread={setSelectedThread}
+        isRead={
+          readedThreads.includes(selectedThread?.thread?._id) ||
+          (readedThreads.includes(selectedThread?.thread?._id) &&
+            selectedThread?.thread?.createdBy?._id === auth.user._id)
+        }
+      />
       <Modal
         header="Delete Thread"
         visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
