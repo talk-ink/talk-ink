@@ -126,26 +126,6 @@ function SidebarComponent({
         const { data, error } = await kontenbase.service("Threads").find({
           where: {
             workspace: params.workspaceId,
-            createdBy: userId,
-            isDeleted: true,
-          },
-        });
-
-        if (error) throw new Error(error.message);
-
-        setTrashData(data.map((item) => item._id));
-      } catch (error) {
-        if (error instanceof Error) {
-          showToast({ message: `${JSON.stringify(error?.message)}` });
-        }
-      }
-    })();
-
-    (async () => {
-      try {
-        const { data, error } = await kontenbase.service("Threads").find({
-          where: {
-            workspace: params.workspaceId,
             tagedUsers: { $in: [userId] },
           },
         });
@@ -163,6 +143,31 @@ function SidebarComponent({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, userId, runOnce]);
+
+  useEffect(() => {
+    if (!userId || !params.workspaceId) return;
+    (async () => {
+      try {
+        const { data, error } = await kontenbase.service("Threads").find({
+          where: {
+            workspace: params.workspaceId,
+            createdBy: userId,
+            isDeleted: true,
+          },
+        });
+
+        if (error) throw new Error(error.message);
+
+        setTrashData(data.map((item) => item._id));
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast({ message: `${JSON.stringify(error?.message)}` });
+        }
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId, userId]);
 
   const handleLogout = async () => {
     try {
