@@ -17,7 +17,7 @@ import { useNavigate } from "react-router";
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
-import { getNameInitial, parseContent } from "utils/helper";
+import { editorToHTML, getNameInitial, parseContent } from "utils/helper";
 import Divider from "components/Divider/Divider";
 import Avatar from "components/Avatar/Avatar";
 
@@ -87,11 +87,14 @@ function ContentItem({
     }
   };
 
+  console.log(parseContent(dataSource.content));
+
   const { state } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(dataSource.content),
   });
+
   const reopenThreadHandler = async () => {
     try {
       const { data, error } = await kontenbase
@@ -206,13 +209,8 @@ function ContentItem({
               {!dataSource.isClosed && (
                 <small className=" text-xs text-neutral-500 table-cell truncate">
                   {dataSource?.draft ? "Me: " : ""}
-                  {/* {dataSource.comments?.length > 0
-                    ? `Latest : ${parseContent(
-                        dataSource.comments?.[dataSource.comments?.length - 1]
-                          ?.content
-                      )?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                    : editorToHTML(state)
-                      )} */}
+
+                  {editorToHTML(state)}
                 </small>
               )}
               {dataSource.isClosed && (

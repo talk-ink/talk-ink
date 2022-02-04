@@ -421,15 +421,15 @@ export const draft = (type: "comment" | "reply"): DraftHandler => {
   };
 };
 
-export const parseContent = (content: string, toHtml = false) => {
+export const parseContent = (content: string) => {
   try {
     const parsedContent = JSON.parse(content).doc;
 
     return parsedContent;
   } catch (_e) {
-    return content;
+    return content.toString().replace(/[^a-zA-Z0-9., ]/g, " ");
   }
 };
 
-export const editorToHTML = (state: any) =>
-  prosemirrorNodeToHtml(state.doc)?.replace(/( |<([^>]+)>)/gi, "");
+export const editorToHTML = (state: any, replace = " ") =>
+  prosemirrorNodeToHtml(state.doc)?.replace(/( |<([^>]+)>)/gi, replace);
