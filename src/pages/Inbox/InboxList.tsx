@@ -149,9 +149,6 @@ function InboxList({ type = "open" }: TProps) {
                   }
                   setSelectedThread={setSelectedThread}
                   isRead={readedThreads.includes(inbox._id)}
-                  onHold={() => {
-                    setSelectedThread({ thread: inbox, type: "menu" });
-                  }}
                 />
               ))}
             </ul>

@@ -49,7 +49,6 @@ type Props = React.PropsWithChildren<{
   otherButton?: React.ReactNode;
   isRead?: boolean;
   from?: "regular" | "trash";
-  onHold?: () => void;
 }>;
 
 function ContentItem({
@@ -59,7 +58,6 @@ function ContentItem({
   otherButton,
   isRead,
   from = "regular",
-  onHold,
 }: Props) {
   const [showToast] = useToast();
   const dispatch = useAppDispatch();
@@ -140,7 +138,7 @@ function ContentItem({
 
   const threadBind = useLongPress(
     () => {
-      onHold();
+      setSelectedThread({ thread: dataSource, type: "menu" });
     },
     {
       detect: LongPressDetectEvents.TOUCH,

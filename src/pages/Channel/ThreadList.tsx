@@ -126,9 +126,6 @@ const ThreadList = ({ type = "open" }: Props) => {
                     (readedThreads.includes(thread._id) &&
                       thread.createdBy?._id === auth.user._id)
                   }
-                  onHold={() => {
-                    setSelectedThread({ thread, type: "menu" });
-                  }}
                 />
               ))}
             </>

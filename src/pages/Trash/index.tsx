@@ -19,6 +19,7 @@ import { updateChannelCount } from "features/channels/slice";
 import { useToast } from "hooks/useToast";
 import TrashEmpty from "components/EmptyContent/TrashEmpty";
 import MobileHeader from "components/Header/Mobile";
+import MobileMenuThread from "components/Thread/MobileMenu";
 
 function TrashPage() {
   const [showToast] = useToast();
@@ -102,6 +103,17 @@ function TrashPage() {
             <TrashEmpty />
           )}
         </div>
+
+        <MobileMenuThread
+          openMenu={!!selectedThread?.thread && selectedThread?.type === "menu"}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+          dataSource={selectedThread?.thread}
+          setSelectedThread={setSelectedThread}
+          isRead={true}
+          from="trash"
+        />
         <Modal
           header="Remove from trash"
           visible={

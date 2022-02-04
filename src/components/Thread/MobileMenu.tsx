@@ -73,6 +73,8 @@ const MobileMenuThread = ({
       }
     } catch (error: any) {
       console.log("err", error);
+    } finally {
+      onClose();
     }
   };
   const reopenThreadHandler = async () => {
@@ -91,6 +93,8 @@ const MobileMenuThread = ({
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
+    } finally {
+      onClose();
     }
   };
 
@@ -110,6 +114,8 @@ const MobileMenuThread = ({
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
+    } finally {
+      onClose();
     }
   };
 
