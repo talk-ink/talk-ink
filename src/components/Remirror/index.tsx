@@ -1,4 +1,4 @@
-import React, { forwardRef, Ref, useImperativeHandle } from "react";
+import React, { forwardRef, Ref, useImperativeHandle, useMemo } from "react";
 import "remirror/styles/all.css";
 import "remirror/styles/extension-file.css";
 import "./editor.css";
@@ -51,6 +51,7 @@ const MyEditor: React.FC<IProps> = ({
   listMentions = [],
 }) => {
   const { manager, onChange, state } = remmirorProps || {};
+  const toolbarItemsData = useMemo(() => toolbarItems, []);
 
   return (
     <div
@@ -76,7 +77,11 @@ const MyEditor: React.FC<IProps> = ({
           >
             {!readOnly && <UserSuggestor allUsers={listMentions} />}
             {!readOnly && (
-              <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
+              <Toolbar
+                items={toolbarItemsData}
+                refocusEditor
+                label="Top Toolbar"
+              />
             )}
             {editorRef && <ImperativeHandle ref={editorRef} />}
           </Remirror>
