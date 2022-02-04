@@ -8,12 +8,15 @@ import {
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Menu, Popover } from "@headlessui/react";
+import { Dialog, Menu, Popover } from "@headlessui/react";
 import Editor from "rich-markdown-editor";
 import { HiOutlineReply } from "react-icons/hi";
 import Select from "react-select";
 import { VscReactions } from "react-icons/vsc";
 import Picker, { SKIN_TONE_NEUTRAL } from "emoji-picker-react";
+import { useMediaQuery } from "react-responsive";
+import { kontenbase } from "lib/client";
+import axios from "axios";
 
 import Avatar from "components/Avatar/Avatar";
 import Preview from "components/Editor/Preview";
@@ -32,8 +35,6 @@ import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
 import { draft, getNameInitial } from "utils/helper";
-import { kontenbase } from "lib/client";
-import axios from "axios";
 import { notificationUrl } from "utils/helper";
 import Reaction from "./Reaction";
 
@@ -64,6 +65,10 @@ const Comment: React.FC<IProps> = ({
   threadName,
   threadData,
 }) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
@@ -80,6 +85,7 @@ const Comment: React.FC<IProps> = ({
   >([]);
 
   const [reactions, setReactions] = useState<IReaction[]>([]);
+  const [openReaction, setOpenReaction] = useState<boolean>(false);
 
   useEffect(() => {
     if (memberList.length <= 0 || !auth || !comment) return;
@@ -428,7 +434,10 @@ const Comment: React.FC<IProps> = ({
                 {reactions?.map(
                   (reaction, idx, arr) =>
                     reaction.users.length > 0 && (
-                      <div key={idx + reaction.unified}>
+                      <div
+                        key={idx + reaction.unified}
+                        className="flex items-center gap-2"
+                      >
                         <Reaction
                           data={reaction}
                           active={
@@ -470,6 +479,11 @@ const Comment: React.FC<IProps> = ({
                                     className={`${
                                       popOpen ? "flex" : "hidden"
                                     } group-hover:flex items-center`}
+                                    onClick={() => {
+                                      if (isMobile) {
+                                        setOpenReaction(true);
+                                      }
+                                    }}
                                   >
                                     <VscReactions
                                       size={18}
@@ -477,22 +491,24 @@ const Comment: React.FC<IProps> = ({
                                     />
                                   </IconButton>
                                 </Popover.Button>
-                                <Popover.Panel className="absolute z-40 right-full top-1/2 transform -translate-y-1/2 mr-2">
-                                  <Picker
-                                    onEmojiClick={(_, emojiObject) => {
-                                      addReactionToCommentHandler({
-                                        commentId: comment._id,
-                                        emoji: emojiObject.emoji,
-                                        unified: emojiObject.unified,
-                                      });
+                                {!isMobile && (
+                                  <Popover.Panel className="absolute z-40 right-full top-1/2 transform -translate-y-1/2 mr-2">
+                                    <Picker
+                                      onEmojiClick={(_, emojiObject) => {
+                                        addReactionToCommentHandler({
+                                          commentId: comment._id,
+                                          emoji: emojiObject.emoji,
+                                          unified: emojiObject.unified,
+                                        });
 
-                                      close();
-                                    }}
-                                    skinTone={SKIN_TONE_NEUTRAL}
-                                    disableSkinTonePicker
-                                    native
-                                  />
-                                </Popover.Panel>
+                                        close();
+                                      }}
+                                      skinTone={SKIN_TONE_NEUTRAL}
+                                      disableSkinTonePicker
+                                      native
+                                    />
+                                  </Popover.Panel>
+                                )}
                               </>
                             )}
                           </Popover>
@@ -659,7 +675,7 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           <div
-            className={`absolute -top-3 right-0 z-50 ${
+            className={`absolute -top-3 right-0 z-10 bg-white rounded px-1 shadow ${
               threadData?.isClosed ? "hidden" : ""
             }`}
           >
@@ -675,6 +691,11 @@ const Comment: React.FC<IProps> = ({
                             className={`${
                               open || popOpen ? "flex" : "hidden"
                             } group-hover:flex items-center`}
+                            onClick={() => {
+                              if (isMobile) {
+                                setOpenReaction(true);
+                              }
+                            }}
                           >
                             <VscReactions
                               size={24}
@@ -682,22 +703,24 @@ const Comment: React.FC<IProps> = ({
                             />
                           </IconButton>
                         </Popover.Button>
-                        <Popover.Panel className="absolute z-10 right-full top-0 mr-2">
-                          <Picker
-                            onEmojiClick={(_, emojiObject) => {
-                              addReactionToCommentHandler({
-                                commentId: comment._id,
-                                emoji: emojiObject.emoji,
-                                unified: emojiObject.unified,
-                              });
+                        {!isMobile && (
+                          <Popover.Panel className="absolute z-10 right-full top-0 mr-2">
+                            <Picker
+                              onEmojiClick={(_, emojiObject) => {
+                                addReactionToCommentHandler({
+                                  commentId: comment._id,
+                                  emoji: emojiObject.emoji,
+                                  unified: emojiObject.unified,
+                                });
 
-                              close();
-                            }}
-                            skinTone={SKIN_TONE_NEUTRAL}
-                            disableSkinTonePicker
-                            native
-                          />
-                        </Popover.Panel>
+                                close();
+                              }}
+                              skinTone={SKIN_TONE_NEUTRAL}
+                              disableSkinTonePicker
+                              native
+                            />
+                          </Popover.Panel>
+                        )}
                       </>
                     )}
                   </Popover>
@@ -758,6 +781,42 @@ const Comment: React.FC<IProps> = ({
           </div>
         </div>
       </div>
+      <Dialog
+        open={openReaction}
+        onClose={() => setOpenReaction(false)}
+        className="fixed z-50 inset-0 "
+      >
+        <div className="flex items-center justify-center min-h-screen">
+          <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
+
+          <div className="relative bg-white rounded w-screen mt-auto h-[55vh] p-3">
+            <Dialog.Title className="font-semibold text-lg">
+              Add reactions
+            </Dialog.Title>
+            <div>
+              <Picker
+                onEmojiClick={(_, emojiObject) => {
+                  addReactionToCommentHandler({
+                    commentId: comment._id,
+                    emoji: emojiObject.emoji,
+                    unified: emojiObject.unified,
+                  });
+                  setOpenReaction(false);
+                }}
+                skinTone={SKIN_TONE_NEUTRAL}
+                disableSkinTonePicker
+                disableSearchBar
+                native
+                pickerStyle={{
+                  width: "100%",
+                  boxShadow: "none",
+                  border: "none",
+                }}
+              />
+            </div>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 };

@@ -41,7 +41,7 @@ function Modal({
   return visible ? (
     <div
       id="modal-container"
-      className="w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]"
+      className="w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]"
       onClick={(e: any) => {
         if (e?.target?.id === "modal-container") {
           onClose();
@@ -49,7 +49,7 @@ function Modal({
       }}
     >
       <div
-        className={`w-[90vw] ${modalContentSize[size]} h-auto bg-white rounded-lg mt-20`}
+        className={`w-full ${modalContentSize[size]} h-screen md:h-auto bg-white md:rounded-lg md:mt-20`}
       >
         <header className="flex items-center justify-between p-3">
           <h2 className="text-lg font-bold -mb-1">{header}</h2>
