@@ -28,11 +28,17 @@ import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
 import { parseContent } from "utils/helper";
 
+interface Mention {
+  id: string;
+  label: string;
+}
+
 interface IProps {
   comment: IComment | ISubComment;
   listRef?: React.LegacyRef<HTMLDivElement>;
   parentId: string;
   threadId: string;
+  listMentions: Mention[];
 }
 
 interface EditorRef {
@@ -44,6 +50,7 @@ const Comment: React.FC<IProps> = ({
   listRef,
   parentId,
   threadId,
+  listMentions,
 }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
@@ -147,6 +154,7 @@ const Comment: React.FC<IProps> = ({
             handleUpdateComment={handleUpdateComment}
             remmirorProps={{ manager, onChange, state }}
             editorRef={editorRef}
+            listMentions={listMentions}
           />
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (

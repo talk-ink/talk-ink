@@ -100,11 +100,11 @@ export const toolbarItems: ToolbarItemUnion[] = [
     type: ComponentItem.ToolbarGroup,
     label: "Simple Formatting",
     items: [
-      // {
-      //   type: ComponentItem.ToolbarCommandButton,
-      //   commandName: "toggleBlockquote",
-      //   display: "icon",
-      // },
+      {
+        type: ComponentItem.ToolbarCommandButton,
+        commandName: "toggleBlockquote",
+        display: "icon",
+      },
       {
         type: ComponentItem.ToolbarCommandButton,
         commandName: "toggleCodeBlock",

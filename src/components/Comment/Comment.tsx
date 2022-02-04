@@ -573,6 +573,12 @@ const Comment: React.FC<IProps> = ({
                           }
                           parentId={comment._id}
                           threadId={threadId}
+                          listMentions={notifiedOptions
+                            ?.filter((item) => item.flag === 3)
+                            ?.map((item) => ({
+                              id: item.value,
+                              label: item.label,
+                            }))}
                         />
                       )}
                       <SubComment
@@ -595,6 +601,12 @@ const Comment: React.FC<IProps> = ({
                         }
                         parentId={comment._id}
                         threadId={threadId}
+                        listMentions={notifiedOptions
+                          ?.filter((item) => item.flag === 3)
+                          ?.map((item) => ({
+                            id: item.value,
+                            label: item.label,
+                          }))}
                       />
                     </div>
                   )}
@@ -614,6 +626,12 @@ const Comment: React.FC<IProps> = ({
                           key={subComment._id}
                           parentId={comment._id}
                           threadId={threadId}
+                          listMentions={notifiedOptions
+                            ?.filter((item) => item.flag === 3)
+                            ?.map((item) => ({
+                              id: item.value,
+                              label: item.label,
+                            }))}
                         />
                       );
                     })}
