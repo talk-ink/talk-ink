@@ -72,7 +72,7 @@ function Compose() {
   };
 
   const { manager, onChange, state } = useRemirror({
-    extensions,
+    extensions: () => extensions(false, "Write Something Nice..."),
     stringHandler: htmlToProsemirrorNode,
     content: getCurrentDraft(),
     selection: "end",

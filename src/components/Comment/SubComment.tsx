@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
@@ -23,11 +23,20 @@ import {
   deleteSubCommentToComment,
 } from "features/threads";
 
+import { useRemirror } from "@remirror/react";
+import { extensions } from "components/Remirror/extensions";
+import { htmlToProsemirrorNode } from "remirror";
+import { parseContent } from "utils/helper";
+
 interface IProps {
   comment: IComment | ISubComment;
   listRef?: React.LegacyRef<HTMLDivElement>;
   parentId: string;
   threadId: string;
+}
+
+interface EditorRef {
+  setContent: (content: any) => void;
 }
 
 const Comment: React.FC<IProps> = ({
@@ -39,9 +48,21 @@ const Comment: React.FC<IProps> = ({
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
+  const editorRef = useRef<EditorRef | null>(null);
 
   const [isEdit, setIsEdit] = useState(false);
-  const [editorState, setEditorState] = useState<string>("");
+
+  const { manager, state, onChange } = useRemirror({
+    extensions: () => extensions(true),
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(comment.content),
+    selection: "end",
+  });
+
+  useEffect(() => {
+    if (!comment.content) return;
+    editorRef.current!.setContent(parseContent(comment.content));
+  }, [comment.content]);
 
   const handleDeleteComment = async () => {
     try {
@@ -70,7 +91,7 @@ const Comment: React.FC<IProps> = ({
       const { data, error } = await kontenbase
         .service("SubComments")
         .updateById(comment._id, {
-          content: editorState,
+          content: JSON.stringify(state),
         });
 
       if (!error) {
@@ -91,7 +112,7 @@ const Comment: React.FC<IProps> = ({
 
   const discardComment = () => {
     setIsEdit(false);
-    setEditorState("");
+    editorRef.current!.setContent(parseContent(comment.content));
   };
 
   return (
@@ -119,11 +140,11 @@ const Comment: React.FC<IProps> = ({
         </div>
         <div className=" w-[70vw] sm:w-full min-h-[3rem] text-xs">
           <Preview
-            content={comment.content}
             isEdit={isEdit}
-            setEditorState={setEditorState}
             discardComment={discardComment}
             handleUpdateComment={handleUpdateComment}
+            remmirorProps={{ manager, onChange, state }}
+            editorRef={editorRef}
           />
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (
@@ -135,7 +156,6 @@ const Comment: React.FC<IProps> = ({
                     icon={<BiEditAlt size={20} className="text-neutral-400" />}
                     onClick={() => {
                       setIsEdit(true);
-                      setEditorState(comment.content);
                     }}
                     title="Edit Comment"
                   />

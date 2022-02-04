@@ -87,8 +87,6 @@ function ContentItem({
     }
   };
 
-  console.log(parseContent(dataSource.content));
-
   const { state } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
@@ -209,7 +207,7 @@ function ContentItem({
               {!dataSource.isClosed && (
                 <small className=" text-xs text-neutral-500 table-cell truncate">
                   {dataSource?.draft ? "Me: " : ""}
-
+                  {/* latest juga disini */}
                   {editorToHTML(state)}
                 </small>
               )}

@@ -76,7 +76,7 @@ const Form: React.FC<IProps> = ({
   const editorRef = useRef<EditorRef | null>(null);
 
   const { manager, onChange, state } = useRemirror({
-    extensions,
+    extensions: () => extensions(false, "Write Something Nice..."),
     stringHandler: htmlToProsemirrorNode,
     content: "",
     selection: "start",

@@ -427,7 +427,9 @@ export const parseContent = (content: string) => {
 
     return parsedContent;
   } catch (_e) {
-    return content.toString().replace(/[^a-zA-Z0-9., ]/g, " ");
+    return typeof content === "string"
+      ? content?.toString().replace(/[^a-zA-Z0-9., ]/g, " ")
+      : "";
   }
 };
 

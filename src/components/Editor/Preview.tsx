@@ -14,9 +14,7 @@ interface IProps {
 }
 
 const Preview: React.FC<IProps> = ({
-  content,
   isEdit,
-  setEditorState,
   discardComment,
   handleUpdateComment,
   remmirorProps,

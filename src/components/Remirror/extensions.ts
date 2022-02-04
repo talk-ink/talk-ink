@@ -9,7 +9,10 @@ import json from "refractor/lang/json";
 import markdown from "refractor/lang/markdown";
 import typescript from "refractor/lang/typescript";
 
-import { ImageExtensionAttributes } from "remirror/extensions";
+import {
+  ImageExtensionAttributes,
+  PlaceholderExtension,
+} from "remirror/extensions";
 
 import {
   DelayedPromiseCreator,
@@ -97,7 +100,7 @@ function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
   return promises;
 }
 
-export const extensions = (readonly = false) => [
+export const extensions = (readonly = false, placeholder = "") => [
   new LinkExtension({ autoLink: true, extraAttributes: { target: "_blank" } }),
   new MentionAtomExtension({
     extraAttributes: { type: "user" },
@@ -133,4 +136,5 @@ export const extensions = (readonly = false) => [
     uploadFileHandler: createBaseuploadFileUploader,
   }),
   new DropCursorExtension(),
+  new PlaceholderExtension({ placeholder }),
 ];

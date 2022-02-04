@@ -232,17 +232,6 @@ function ThreadPage() {
     }, 1000);
 
   useEffect(() => {
-    if (threadData.comments?.length === 0) return;
-    scrollToBottom();
-
-    const timedId = scrollToBottom();
-
-    return () => {
-      clearTimeout(timedId);
-    };
-  }, [threadData.comments]);
-
-  useEffect(() => {
     const setInteractedUser = async () => {
       try {
         const { data, error }: KontenbaseSingleResponse<Thread> =
