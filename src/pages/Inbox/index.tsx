@@ -1,11 +1,14 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
+  BiArchive,
   BiCheck,
+  BiCheckCircle,
   BiDotsHorizontalRounded,
   BiDotsVerticalRounded,
+  BiFilter,
 } from "react-icons/bi";
-import { Outlet, useLocation, useParams } from "react-router-dom";
+import { Outlet, useLocation, useNavigate, useParams } from "react-router-dom";
 import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
 import { useMediaQuery } from "react-responsive";
@@ -33,6 +36,7 @@ function InboxPage() {
 
   const { pathname } = useLocation();
   const params = useParams();
+  const navigate = useNavigate();
 
   const auth = useAppSelector((state) => state.auth);
   const thread = useAppSelector((state) => state.thread);
@@ -136,16 +140,13 @@ function InboxPage() {
         }
         type="inbox"
         menu={
-          threadData.length > 0 && (
+          <div className="flex gap-2 items-center">
             <Menu as="div" className="relative">
               {({ open }) => (
                 <>
                   <Menu.Button as={React.Fragment}>
                     <IconButton size="medium">
-                      <BiDotsVerticalRounded
-                        size={24}
-                        className="text-slate-800"
-                      />
+                      <BiFilter size={24} className="text-slate-800" />
                     </IconButton>
                   </Menu.Button>
 
@@ -153,20 +154,64 @@ function InboxPage() {
                     <Menu.Items static className="menu-container right-0">
                       <MenuItem
                         icon={
-                          <BiCheck size={20} className="text-neutral-400" />
+                          <BiArchive size={20} className="text-neutral-400" />
                         }
                         onClick={() => {
-                          setInboxModal("read");
+                          navigate(`/a/${params.workspaceId}/inbox`);
                         }}
-                        title="Mark all read"
-                        disabled={isClosedThread}
+                        title="Open threads"
+                        active={!isClosedThread}
+                      />
+                      <MenuItem
+                        icon={
+                          <BiCheckCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        onClick={() => {
+                          navigate(`/a/${params.workspaceId}/inbox/close`);
+                        }}
+                        title="Closed threads"
+                        active={isClosedThread}
                       />
                     </Menu.Items>
                   )}
                 </>
               )}
             </Menu>
-          )
+            {threadData.length > 0 && (
+              <Menu as="div" className="relative">
+                {({ open }) => (
+                  <>
+                    <Menu.Button as={React.Fragment}>
+                      <IconButton size="medium">
+                        <BiDotsVerticalRounded
+                          size={24}
+                          className="text-slate-800"
+                        />
+                      </IconButton>
+                    </Menu.Button>
+
+                    {open && (
+                      <Menu.Items static className="menu-container right-0">
+                        <MenuItem
+                          icon={
+                            <BiCheck size={20} className="text-neutral-400" />
+                          }
+                          onClick={() => {
+                            setInboxModal("read");
+                          }}
+                          title="Mark all read"
+                          disabled={isClosedThread}
+                        />
+                      </Menu.Items>
+                    )}
+                  </>
+                )}
+              </Menu>
+            )}
+          </div>
         }
       />
       <MainContentContainer>
@@ -193,7 +238,7 @@ function InboxPage() {
             )}
           </div>
         </header>
-        <div className="flex justify-center md:justify-between mb-3">
+        <div className="hidden md:flex justify-center md:justify-between mb-3">
           <nav className="flex gap-2 items-center self-center">
             <Badge
               active={!pathname.includes("/close")}
@@ -206,7 +251,7 @@ function InboxPage() {
               link={`/a/${params.workspaceId}/inbox/close`}
             />
           </nav>
-          {!isMobile && threadData.length > 0 && (
+          {threadData.length > 0 && (
             <Menu as="div" className="relative">
               {({ open }) => (
                 <>

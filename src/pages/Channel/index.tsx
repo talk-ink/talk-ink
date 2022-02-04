@@ -1,10 +1,13 @@
 import React, { useEffect, useMemo, useState } from "react";
 
 import {
+  BiArchive,
+  BiCheckCircle,
   BiDotsHorizontalRounded,
   BiDotsVerticalRounded,
   BiEdit,
   BiEditAlt,
+  BiFilter,
   BiInfoCircle,
   BiLogOut,
   BiUserPlus,
@@ -121,6 +124,10 @@ function ChannelPage() {
     );
   }, [workspaceData, channelData, auth.user._id]);
 
+  const isClosedThread = useMemo(() => {
+    return pathname.includes(`ch/${params.channelId}/close`);
+  }, [pathname, params.channelId]);
+
   const leaveChannelHandler = async () => {
     try {
       await kontenbase
@@ -181,63 +188,116 @@ function ChannelPage() {
         privacy={channelData?.privacy}
         type="channel"
         menu={
-          <Menu as="div" className="relative">
-            {({ open }) => (
-              <>
-                <Menu.Button as={React.Fragment}>
-                  <IconButton size="medium">
-                    <BiDotsVerticalRounded
-                      size={24}
-                      className="text-slate-800"
-                    />
-                  </IconButton>
-                </Menu.Button>
+          <div className="flex items-center gap-2">
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiFilter size={24} className="text-slate-800" />
+                    </IconButton>
+                  </Menu.Button>
 
-                {open && (
-                  <Menu.Items static className="menu-container right-0">
-                    {isAdmin && (
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
                       <MenuItem
                         icon={
-                          <BiUserPlus size={20} className="text-neutral-400" />
+                          <BiArchive size={20} className="text-neutral-400" />
                         }
                         onClick={() => {
-                          setAddMemberModal(true);
+                          navigate(
+                            `/a/${params.workspaceId}/ch/${params.channelId}`
+                          );
                         }}
-                        title="Add members"
+                        title="Open threads"
+                        active={!isClosedThread}
                       />
-                    )}
-                    <MenuItem
-                      icon={
-                        <BiInfoCircle size={20} className="text-neutral-400" />
-                      }
-                      onClick={() => {
-                        setChannelInfoModal(true);
-                      }}
-                      title="Channel information"
-                    />
-                    {isAdmin && (
                       <MenuItem
                         icon={
-                          <BiEditAlt size={20} className="text-neutral-400" />
+                          <BiCheckCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
                         }
                         onClick={() => {
-                          setEditChannelModal(true);
+                          navigate(
+                            `/a/${params.workspaceId}/ch/${params.channelId}/close`
+                          );
                         }}
-                        title="Edit channel"
+                        title="Closed threads"
+                        active={isClosedThread}
                       />
-                    )}
-                    <MenuItem
-                      icon={<BiLogOut size={20} className="text-neutral-400" />}
-                      onClick={() => {
-                        setLeaveChannelModal(true);
-                      }}
-                      title="Leave channel"
-                    />
-                  </Menu.Items>
-                )}
-              </>
-            )}
-          </Menu>
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiDotsVerticalRounded
+                        size={24}
+                        className="text-slate-800"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiUserPlus
+                              size={20}
+                              className="text-neutral-400"
+                            />
+                          }
+                          onClick={() => {
+                            setAddMemberModal(true);
+                          }}
+                          title="Add members"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiInfoCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        onClick={() => {
+                          setChannelInfoModal(true);
+                        }}
+                        title="Channel information"
+                      />
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiEditAlt size={20} className="text-neutral-400" />
+                          }
+                          onClick={() => {
+                            setEditChannelModal(true);
+                          }}
+                          title="Edit channel"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiLogOut size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setLeaveChannelModal(true);
+                        }}
+                        title="Leave channel"
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+          </div>
         }
       />
       <MainContentContainer>
@@ -387,7 +447,7 @@ function ChannelPage() {
             </Menu>
           </div>
         </header>
-        <div className={`flex mb-3 ${isMobile ? "justify-center" : ""}`}>
+        <div className={`hidden md:flex mb-3 `}>
           <nav className={`flex gap-2 items-center`}>
             <Badge
               active={!pathname.includes("/close")}
