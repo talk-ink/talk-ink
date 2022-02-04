@@ -206,15 +206,13 @@ function ContentItem({
               {!dataSource.isClosed && (
                 <small className=" text-xs text-neutral-500 table-cell truncate">
                   {dataSource?.draft ? "Me: " : ""}
-                  {dataSource.comments?.length > 0
+                  {/* {dataSource.comments?.length > 0
                     ? `Latest : ${parseContent(
                         dataSource.comments?.[dataSource.comments?.length - 1]
                           ?.content
                       )?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                    : prosemirrorNodeToHtml(state.doc)?.replace(
-                        /( |<([^>]+)>)/gi,
-                        " "
-                      )}
+                    : editorToHTML(state)
+                      )} */}
                 </small>
               )}
               {dataSource.isClosed && (

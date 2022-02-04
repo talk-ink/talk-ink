@@ -13,9 +13,16 @@
 }
 
 .readonly-editor .remirror-editor {
-  min-height: 10rem;
+  height: 100%;
   margin-left: -2px !important;
   overflow: hidden !important;
+}
+
+.comment-editor .remirror-editor {
+  min-height: 6rem !important;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+  margin-top: -1rem !important;
 }
 
 .readonly-editor .remirror-file-root a:last-child {

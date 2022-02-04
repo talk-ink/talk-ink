@@ -362,7 +362,7 @@ function ChannelPage() {
                 <div
                   className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
                 >
-                  +{memberList.length - 3 > 99 ? "99" : memberList.length - 3}
+                  +{memberList.length - 4 > 99 ? "99" : memberList.length - 4}
                 </div>
               )}
             </div>

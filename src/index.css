@@ -125,10 +125,6 @@
   fill: rgb(37, 56, 228) !important;
 }
 
-.comment-editor {
-  height: 12rem !important;
-}
-
 .thread-editor .ProseMirror {
   min-height: 55vh !important;
 }

@@ -20,11 +20,6 @@ export const toolbarItems: ToolbarItemUnion[] = [
         commandName: "toggleStrike",
         display: "icon",
       },
-      {
-        type: ComponentItem.ToolbarCommandButton,
-        commandName: "toggleCode",
-        display: "icon",
-      },
     ],
     separator: "end",
   },

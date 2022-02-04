@@ -2,6 +2,7 @@ import { SearchResponse, SendEmail, Thread, User } from "types";
 import axios, { AxiosResponse } from "axios";
 import FileResizer from "react-image-file-resizer";
 import { LocalStorageKey } from "types/enum";
+import { prosemirrorNodeToHtml } from "remirror";
 
 const EMAIL_API: string = process.env.REACT_APP_EMAIL_API;
 
@@ -429,3 +430,6 @@ export const parseContent = (content: string, toHtml = false) => {
     return content;
   }
 };
+
+export const editorToHTML = (state: any) =>
+  prosemirrorNodeToHtml(state.doc)?.replace(/( |<([^>]+)>)/gi, "");

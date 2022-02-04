@@ -383,7 +383,7 @@ function ThreadPage() {
             </p>
           )}
 
-          {/* <div className="mb-10 ">
+          <div className="mb-10 ">
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
@@ -397,15 +397,7 @@ function ThreadPage() {
               />
             )}
           </div>
-          <CommentForm
-            isShowEditor={isShowEditor}
-            setIsShowEditor={setIsShowEditor}
-            threadId={threadId}
-            threadName={threadData?.name}
-            interactedUsers={[...new Set(threadData?.interactedUsers)]}
-            scrollToBottom={scrollToBottom}
-            memberList={memberList}
-          /> */}
+
           {!threadData?.isClosed && (
             <CommentForm
               isShowEditor={isShowEditor}
