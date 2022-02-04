@@ -87,3 +87,5 @@ const MyEditor: React.FC<IProps> = ({
 };
 
 export default React.memo(MyEditor);
+
+//support file upload
