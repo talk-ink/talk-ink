@@ -8,7 +8,6 @@ import { Channel } from "types";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchWorkspaces } from "features/workspaces/slice";
 import { useMediaQuery } from "react-responsive";
-import { FcMenu } from "react-icons/fc";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { KontenbaseResponse } from "@kontenbase/sdk";
@@ -18,6 +17,8 @@ import { setPageStatus } from "features/pageStatus";
 import { addChannel } from "features/channels/slice";
 import { fetchMembers } from "features/members";
 import { updateUser } from "features/auth";
+import { BiMenu } from "react-icons/bi";
+import MobileHeader from "components/Header/Mobile";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -155,10 +156,9 @@ function DashboardPage() {
     <FullscreenLoading />
   ) : (
     <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-auto md:overflow-hidden text-slightGray relative">
-      <FcMenu
-        className="absolute top-2 left-2"
-        size={"2rem"}
-        onClick={() => setIsSidebarOpen((prev) => !prev)}
+      <MobileHeader
+        isSidebarOpen={isSidebarOpen}
+        setIsSidebarOpen={setIsSidebarOpen}
       />
       <SidebarComponent
         isMobile={isMobile}

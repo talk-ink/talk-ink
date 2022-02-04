@@ -34,12 +34,18 @@ import { deleteChannel } from "features/channels/slice";
 
 import { kontenbase } from "lib/client";
 import { Channel, Member } from "types";
-import { getNameInitial } from "utils/helper";
+import { createUniqueArray, getNameInitial } from "utils/helper";
 import Badge from "components/Badge/Badge";
+import { useMediaQuery } from "react-responsive";
+import { setPageHeader } from "features/pageHeader";
 
 moment.locale("id");
 
 function ChannelPage() {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const { pathname } = useLocation();
   const [showToast] = useToast();
 
@@ -158,13 +164,28 @@ function ChannelPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.channelId, auth.user._id]);
 
+  useEffect(() => {
+    const uniqueMemberId = createUniqueArray(channelData?.members ?? []);
+    dispatch(
+      setPageHeader({
+        header: channelData?.name,
+        subHeader: `${uniqueMemberId.length || 0} ${
+          (uniqueMemberId.length || 0) > 1 ? "Members" : "Member"
+        }`,
+        privacy: channelData?.privacy,
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channelData?.name, channelData?.members, channelData?.privacy]);
+
   const loading = channel.loading || thread.loading;
 
   return (
     <MainContentContainer>
       <header
-        className={`mb-8 flex items-end justify-between "border-b-2 border-neutral-100 pb-8"
-            `}
+        className={`mb-8 ${
+          isMobile ? "hidden" : "flex"
+        } items-end justify-between "border-b-2 border-neutral-100 pb-8`}
       >
         <div>
           <h1 className="font-bold text-3xl">{channelData?.name}</h1>
@@ -299,8 +320,8 @@ function ChannelPage() {
           </Menu>
         </div>
       </header>
-      <div className="flex mb-3">
-        <nav className="flex gap-2 items-center">
+      <div className={`flex mb-3 ${isMobile ? "justify-center" : ""}`}>
+        <nav className={`flex gap-2 items-center`}>
           <Badge
             active={!pathname.includes("/close")}
             title="Open"
@@ -314,39 +335,6 @@ function ChannelPage() {
         </nav>
       </div>
       <Outlet />
-      {/* {threadData?.length > 0 ? (
-        <ul>
-          {loading ? (
-            <ContentSkeleton />
-          ) : (
-            <>
-              {threadData?.map((thread, idx) => (
-                <ContentItem
-                  key={idx}
-                  dataSource={thread}
-                  onClick={() => {
-                    if (thread.draft) {
-                      navigate(`${pathname}/compose/${thread?.id}`);
-                    } else {
-                      navigate(`${pathname}/t/${thread?._id}`);
-                    }
-                  }}
-                  setSelectedThread={setSelectedThread}
-                  isRead={
-                    readedThreads.includes(thread._id) ||
-                    (readedThreads.includes(thread._id) &&
-                      thread.createdBy?._id === auth.user._id)
-                  }
-                />
-              ))}
-            </>
-          )}
-        </ul>
-      ) : (
-        <>
-          <ChannelEmpty />
-        </>
-      )} */}
 
       <Modal
         header="Edit channel"
