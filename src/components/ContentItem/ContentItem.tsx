@@ -208,11 +208,6 @@ function ContentItem({
           </div>
         </button>
         <div className="flex active:flex group-hover:flex gap-2 items-center">
-          {dataSource?.isClosed && (
-            <div className="bg-indigo-500 p-1 px-2 rounded-full">
-              <p className="text-xs text-white font-semibold">Closed</p>
-            </div>
-          )}
           {otherButton}
           <Menu as="div" className="relative">
             {({ open }) => (

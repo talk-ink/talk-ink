@@ -8,16 +8,13 @@ import {
   BiLogOut,
   BiUserPlus,
 } from "react-icons/bi";
-import { useLocation, useNavigate, useParams } from "react-router";
+import { useLocation, useNavigate, useParams, Outlet } from "react-router";
 import moment from "moment-timezone";
 import "moment/locale/id";
 import { Menu } from "@headlessui/react";
 
 import Button from "components/Button/Button";
-import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
 import IconButton from "components/Button/IconButton";
-import ContentItem from "components/ContentItem/ContentItem";
-import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import MenuItem from "components/Menu/MenuItem2";
 import Modal from "components/Modal/Modal";
@@ -32,14 +29,13 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 
-import { deleteThread } from "features/threads";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
-import { deleteChannel, updateChannelCount } from "features/channels/slice";
+import { deleteChannel } from "features/channels/slice";
 
 import { kontenbase } from "lib/client";
-import { Channel, Member, Thread } from "types";
+import { Channel, Member } from "types";
 import { getNameInitial } from "utils/helper";
-import CloseThreadForm from "components/Thread/CloseThreadForm";
+import Badge from "components/Badge/Badge";
 
 moment.locale("id");
 
@@ -58,9 +54,6 @@ function ChannelPage() {
   const userId: string = auth.user._id;
 
   const dispatch = useAppDispatch();
-
-  const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
 
   const [editChannelModal, setEditChannelModal] = useState<boolean>();
   const [channelInfoModal, setChannelInfoModal] = useState<boolean>(false);
@@ -110,15 +103,6 @@ function ChannelPage() {
     return false;
   }, [channelData, userId]);
 
-  const threadData = useMemo(() => {
-    return thread.threads;
-  }, [thread.threads]);
-
-  const readedThreads: string[] = useMemo(() => {
-    if (!auth.user.readedThreads) return [];
-    return auth.user.readedThreads;
-  }, [auth.user]);
-
   const workspaceData = useMemo(() => {
     return workspace.workspaces.find((data) => data._id === params.workspaceId);
   }, [workspace.workspaces, params.workspaceId]);
@@ -129,46 +113,6 @@ function ChannelPage() {
       channelData?.createdBy?._id === auth.user._id
     );
   }, [workspaceData, channelData, auth.user._id]);
-
-  const deleteDraft = (id: string) => {
-    const parsedThreadDraft = JSON.parse(localStorage.getItem("threadsDraft"));
-    delete parsedThreadDraft[+id];
-
-    localStorage.setItem("threadsDraft", JSON.stringify(parsedThreadDraft));
-  };
-
-  const threadDeleteHandler = async () => {
-    try {
-      if (!selectedThread?.thread.draft) {
-        const now = moment().tz("Asia/Jakarta").toDate();
-
-        const deletedThread = await kontenbase
-          .service("Threads")
-          .updateById(selectedThread?.thread._id, {
-            isDeleted: true,
-            deletedAt: now,
-          });
-
-        if (deletedThread?.data) {
-          setSelectedThread(null);
-        }
-        dispatch(deleteThread(deletedThread.data));
-        dispatch(
-          updateChannelCount({
-            chanelId: deletedThread.data?.channel?.[0],
-            threadId: selectedThread?.thread._id,
-          })
-        );
-      } else {
-        deleteDraft(selectedThread.thread.id);
-        dispatch(deleteThread(selectedThread.thread));
-        setSelectedThread(null);
-      }
-    } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${error}` });
-    }
-  };
 
   const leaveChannelHandler = async () => {
     try {
@@ -228,6 +172,7 @@ function ChannelPage() {
             {channelData?.privacy ?? "Public"}
           </p>
         </div>
+
         <div className="flex items-center gap-3">
           <div className="hidden md:flex flex-row mr-2">
             {memberList.map(
@@ -354,7 +299,22 @@ function ChannelPage() {
           </Menu>
         </div>
       </header>
-      {threadData?.length > 0 ? (
+      <div className="flex mb-3">
+        <nav className="flex gap-2 items-center">
+          <Badge
+            active={!pathname.includes("/close")}
+            title="Open"
+            link={`/a/${params.workspaceId}/ch/${params.channelId}`}
+          />
+          <Badge
+            active={pathname.includes("/close")}
+            title="Close"
+            link={`/a/${params.workspaceId}/ch/${params.channelId}/close`}
+          />
+        </nav>
+      </div>
+      <Outlet />
+      {/* {threadData?.length > 0 ? (
         <ul>
           {loading ? (
             <ContentSkeleton />
@@ -386,44 +346,8 @@ function ChannelPage() {
         <>
           <ChannelEmpty />
         </>
-      )}
+      )} */}
 
-      <Modal
-        header="Delete Thread"
-        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
-        onClose={() => {
-          setSelectedThread(null);
-        }}
-        onCancel={() => {
-          setSelectedThread(null);
-        }}
-        onConfirm={() => {
-          threadDeleteHandler();
-        }}
-        okButtonText="Confirm"
-        size="xs"
-      >
-        Are you sure you want to delete this thread? It will be moved into
-        trash.
-      </Modal>
-      <Modal
-        header="Close Thread"
-        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
-        footer={null}
-        onClose={() => {
-          setSelectedThread(null);
-        }}
-        onCancel={() => {
-          setSelectedThread(null);
-        }}
-      >
-        <CloseThreadForm
-          data={selectedThread?.thread}
-          onClose={() => {
-            setSelectedThread(null);
-          }}
-        />
-      </Modal>
       <Modal
         header="Edit channel"
         visible={editChannelModal}
