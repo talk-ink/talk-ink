@@ -51,11 +51,12 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
             <Navigate to={`/a/create_workspace`} state={{ from: location }} />
           );
         }
+
         if (
           ["login", "register"].includes(from) &&
           auth.user?.workspaces?.length > 0
         ) {
-          const getLastWorkspaceId = auth.user.lastWorkspace?.[0] ?? "";
+          const getLastWorkspaceId = auth?.user?.lastWorkspace?.[0] ?? "";
 
           if (auth?.user?.workspaces?.includes(getLastWorkspaceId)) {
             return (
@@ -74,7 +75,12 @@ function RestrictedRoute({ children, type = "private", from }: Props) {
           );
         }
         if (from === "landing") {
-          const getLastWorkspaceId = auth.user.lastWorkspace?.[0] ?? "";
+          if (!auth.user?.workspaces || auth.user?.workspaces?.length === 0) {
+            return (
+              <Navigate to={`/a/create_workspace`} state={{ from: location }} />
+            );
+          }
+          const getLastWorkspaceId = auth?.user?.lastWorkspace?.[0] ?? "";
 
           if (auth?.user?.workspaces?.includes(getLastWorkspaceId)) {
             return (

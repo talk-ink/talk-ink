@@ -13,6 +13,7 @@ import { bulkAddThread } from "features/threads";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import SearchEmpty from "components/EmptyContent/SearchEmpty";
 import { sendSearch } from "utils/helper";
+import MobileHeader from "components/Header/Mobile";
 
 function SearchPage() {
   const navigate = useNavigate();
@@ -59,48 +60,51 @@ function SearchPage() {
   };
 
   return (
-    <MainContentContainer>
-      <header className="mb-2">
-        <div className="mb-7">
-          <h1 className="font-bold text-3xl">Search</h1>
-          <div>
-            <SearchInput
-              onSubmit={() => {
-                handleSubmit();
-              }}
-              onChange={(e) => {
-                onChange(e);
-              }}
-              onClear={() => {
-                setSearch("");
-              }}
-              value={search}
-            />
+    <>
+      <MobileHeader header="Search" subHeader="Search anything" type="search" />
+      <MainContentContainer>
+        <header className="mb-2">
+          <div className="mb-7">
+            <h1 className="font-bold text-3xl hidden md:inline">Search</h1>
+            <div>
+              <SearchInput
+                onSubmit={() => {
+                  handleSubmit();
+                }}
+                onChange={(e) => {
+                  onChange(e);
+                }}
+                onClear={() => {
+                  setSearch("");
+                }}
+                value={search}
+              />
+            </div>
           </div>
-        </div>
-      </header>
-      {searchLoading ? (
-        <ContentSkeleton />
-      ) : searchResult.length > 0 ? (
-        <div>
-          {searchResult?.map((data, idx) => (
-            <SearchItem
-              key={idx}
-              dataSource={data}
-              onClick={() => {
-                navigate(
-                  `/a/${params.workspaceId}/ch/${data.channelId}/t/${data.threadId}`,
-                  { state: { from: "search" } }
-                );
-              }}
-              search={search}
-            />
-          ))}
-        </div>
-      ) : (
-        <SearchEmpty />
-      )}
-    </MainContentContainer>
+        </header>
+        {searchLoading ? (
+          <ContentSkeleton />
+        ) : searchResult.length > 0 ? (
+          <div>
+            {searchResult?.map((data, idx) => (
+              <SearchItem
+                key={idx}
+                dataSource={data}
+                onClick={() => {
+                  navigate(
+                    `/a/${params.workspaceId}/ch/${data.channelId}/t/${data.threadId}`,
+                    { state: { from: "search" } }
+                  );
+                }}
+                search={search}
+              />
+            ))}
+          </div>
+        ) : (
+          <SearchEmpty />
+        )}
+      </MainContentContainer>
+    </>
   );
 }
 

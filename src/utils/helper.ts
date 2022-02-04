@@ -1,6 +1,7 @@
 import { SearchResponse, SendEmail, Thread, User } from "types";
 import axios, { AxiosResponse } from "axios";
 import FileResizer from "react-image-file-resizer";
+import { LocalStorageKey } from "types/enum";
 
 const EMAIL_API: string = process.env.REACT_APP_EMAIL_API;
 
@@ -219,18 +220,18 @@ export const inboxFilter = ({
   thread,
   channelIds,
   userData,
-  isDoneThread,
+  isClosedThread,
 }: {
   thread: Thread;
   channelIds: string[];
   userData: User;
-  isDoneThread: boolean;
+  isClosedThread: boolean;
 }) => {
   if (thread.draft) return false;
   if (!channelIds.includes(thread.channel[0])) return false;
 
   if (!userData.doneThreads) return true;
-  if (isDoneThread) return userData.doneThreads.includes(thread._id);
+  if (isClosedThread) return userData.doneThreads.includes(thread._id);
   return !userData.doneThreads.includes(thread._id);
 };
 
@@ -286,6 +287,137 @@ export const sendSearch = async ({
     { auth: basicAuth }
   );
   return searchData;
+};
+
+type Draft = {
+  content: string;
+  createdById: string;
+  threadId: string;
+};
+
+type DraftHandler = {
+  get: (key: string) => Draft;
+  set: (key: string, payload: Draft) => Draft;
+  deleteByKey: (key: string) => string | null;
+};
+
+export const draft = (type: "comment" | "reply"): DraftHandler => {
+  const commentDraft = localStorage.getItem(LocalStorageKey.CommentDraft);
+  const replyDraft = localStorage.getItem(LocalStorageKey.ReplyDraft);
+
+  if (!commentDraft)
+    localStorage.setItem(LocalStorageKey.CommentDraft, JSON.stringify({}));
+  if (!replyDraft)
+    localStorage.setItem(LocalStorageKey.ReplyDraft, JSON.stringify({}));
+
+  const emptyDraft: Draft = {
+    content: "",
+    createdById: "",
+    threadId: "",
+  };
+
+  const get = (key: string): Draft => {
+    switch (type) {
+      case "comment":
+        let parsedCommentDraft: { [key: string]: Draft } = JSON.parse(
+          localStorage.getItem(LocalStorageKey.CommentDraft)
+        );
+        return parsedCommentDraft[key] ?? emptyDraft;
+      case "reply":
+        let parsedReplyDraft: { [key: string]: Draft } = JSON.parse(
+          localStorage.getItem(LocalStorageKey.ReplyDraft)
+        );
+        return parsedReplyDraft[key] ?? emptyDraft;
+      default:
+        break;
+    }
+  };
+
+  const set = (key: string, payload: Draft): Draft => {
+    switch (type) {
+      case "comment":
+        let parsedCommentDraft: { [key: string]: Draft } = JSON.parse(
+          localStorage.getItem(LocalStorageKey.CommentDraft)
+        );
+
+        let newCommentDraft = payload ?? emptyDraft;
+        if (!parsedCommentDraft[key]) {
+          localStorage.setItem(
+            LocalStorageKey.CommentDraft,
+            JSON.stringify({ ...parsedCommentDraft, [key]: newCommentDraft })
+          );
+        } else {
+          parsedCommentDraft[key] = payload;
+          localStorage.setItem(
+            LocalStorageKey.CommentDraft,
+            JSON.stringify(parsedCommentDraft)
+          );
+        }
+        return newCommentDraft ?? emptyDraft;
+      case "reply":
+        let parsedReplyDraft: { [key: string]: Draft } = JSON.parse(
+          localStorage.getItem(LocalStorageKey.ReplyDraft)
+        );
+
+        let newReplyDraft = payload ?? emptyDraft;
+        if (!parsedReplyDraft[key]) {
+          localStorage.setItem(
+            LocalStorageKey.ReplyDraft,
+            JSON.stringify({ ...parsedReplyDraft, [key]: newReplyDraft })
+          );
+        } else {
+          parsedReplyDraft[key] = payload;
+          localStorage.setItem(
+            LocalStorageKey.ReplyDraft,
+            JSON.stringify(parsedReplyDraft)
+          );
+        }
+        return newReplyDraft ?? emptyDraft;
+      default:
+        break;
+    }
+  };
+
+  const deleteByKey = (key: string): string | null => {
+    switch (type) {
+      case "comment":
+        let parsedCommentDraft: { [key: string]: Draft } = JSON.parse(
+          localStorage.getItem(LocalStorageKey.CommentDraft)
+        );
+
+        if (parsedCommentDraft[key]) {
+          delete parsedCommentDraft[key];
+          localStorage.setItem(
+            LocalStorageKey.CommentDraft,
+            JSON.stringify(parsedCommentDraft)
+          );
+          return key;
+        }
+        return null;
+      case "reply":
+        let parsedReplyDraft: { [key: string]: Draft } = JSON.parse(
+          localStorage.getItem(LocalStorageKey.ReplyDraft)
+        );
+
+        if (parsedReplyDraft[key]) {
+          delete parsedReplyDraft[key];
+          localStorage.setItem(
+            LocalStorageKey.ReplyDraft,
+            JSON.stringify(parsedReplyDraft)
+          );
+          return key;
+        }
+        return null;
+      default:
+        break;
+    }
+  };
+
+  return {
+    get,
+    set,
+    deleteByKey,
+  };
 };
 
 export const parseContent = (content: string, toHtml = false) => {

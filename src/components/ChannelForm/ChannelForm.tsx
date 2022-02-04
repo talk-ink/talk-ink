@@ -58,11 +58,6 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
     return !!editedData;
   }, [editedData]);
 
-  const privacyStr = {
-    public: "Public",
-    private: "Private",
-  };
-
   const isDisabled: boolean =
     !formik.values.name ||
     !formik.values.privacy ||
@@ -102,7 +97,7 @@ function ChannelForm({ onSubmit, loading, onCancel, editedData }: TProps) {
           <FormControl>
             <FormLabel required>Make private</FormLabel>
             <div className="flex items-center justify-between gap-3 w-full">
-              <p className="text-sm text-indigo-500">
+              <p className="text-sm text-indigo-500 max-w-[15rem] md:max-w-none">
                 When a channel is set to private, it can only be viewed or
                 joined by invitation.
               </p>

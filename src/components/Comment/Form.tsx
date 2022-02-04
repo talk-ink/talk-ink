@@ -16,6 +16,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
 import {
   createUniqueArray,
+  draft,
   getNameInitial,
   notificationUrl,
 } from "utils/helper";
@@ -102,6 +103,8 @@ const Form: React.FC<IProps> = ({
   }, [params.channelId, channel.channels]);
 
   const discardComment = () => {
+    draft("comment").deleteByKey(params.threadId);
+
     setIsShowEditor(false);
     setEditorState("");
   };
@@ -178,14 +181,36 @@ const Form: React.FC<IProps> = ({
       });
     }
 
+    draft("comment").deleteByKey(params.threadId);
+
     discardComment();
     setTimeout(() => {
       scrollToBottom();
     }, 500);
   };
 
+  useEffect(() => {
+    if (editorState) {
+      draft("comment").set(params.threadId, {
+        content: editorState,
+        createdById: auth.user._id,
+        threadId: params.threadId,
+      });
+    }
+  }, [editorState, auth.user._id, params.threadId]);
+
+  useEffect(() => {
+    const getCommentDraft = draft("comment").get(params.threadId);
+    if (
+      getCommentDraft.content &&
+      getCommentDraft.createdById === auth.user._id
+    ) {
+      setEditorState(getCommentDraft.content);
+    }
+  }, [auth.user._id, params.threadId]);
+
   return (
-    <div className="sticky bottom-0 left-0 z-30  bg-white" id="comment-form">
+    <div className=" bg-white">
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
           {auth.user.avatar ? (
@@ -198,7 +223,7 @@ const Form: React.FC<IProps> = ({
           )}
 
           <input
-            className="ml-4  appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
+            className="ml-4 appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
             placeholder="Input Your Message"
             readOnly

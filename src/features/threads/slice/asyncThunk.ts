@@ -4,7 +4,7 @@ import { kontenbase } from "lib/client";
 import { Thread } from "types";
 
 type FetchThreadsProps = {
-  type: "inbox" | "threads";
+  type: "inbox" | "threads" | "trash";
   channelId?: string;
   workspaceId?: string;
   userId?: string;
@@ -21,9 +21,10 @@ export const fetchThreads = createAsyncThunk(
     switch (type) {
       case "threads":
         try {
-          const threadResponse = await kontenbase
-            .service("Threads")
-            .find({ where: { channel: channelId }, lookup: ["comments"] });
+          const threadResponse = await kontenbase.service("Threads").find({
+            where: { channel: channelId, isDeleted: { $ne: true } },
+            lookup: ["comments"],
+          });
 
           const parsedThreadsDraft: object = JSON.parse(
             localStorage.getItem("threadsDraft")
@@ -56,6 +57,7 @@ export const fetchThreads = createAsyncThunk(
             where: {
               workspace: workspaceId,
               tagedUsers: { $in: [userId] },
+              isDeleted: { $ne: true },
             },
             lookup: ["comments"],
           });
@@ -70,6 +72,26 @@ export const fetchThreads = createAsyncThunk(
           return [];
         }
 
+      case "trash":
+        try {
+          const trashResponse = await kontenbase.service("Threads").find({
+            where: {
+              workspace: workspaceId,
+              createdBy: userId,
+              isDeleted: true,
+            },
+            lookup: ["comments"],
+          });
+
+          if (trashResponse.error) throw new Error(trashResponse.error.message);
+
+          const threadData: Thread[] = trashResponse.data;
+
+          return threadData;
+        } catch (error) {
+          console.log(error);
+          return [];
+        }
       default:
         break;
     }
@@ -116,14 +138,17 @@ export const createComment = createAsyncThunk(
     content,
     threadId,
     tagedUsers,
+    isClosedComment,
   }: {
     content: any;
     threadId: string;
     tagedUsers: string[];
+    isClosedComment?: boolean;
   }) => {
     const { data } = await kontenbase.service("Comments").create({
       content,
       threads: [threadId],
+      isClosedComment: isClosedComment,
     });
 
     if (tagedUsers.length > 0) {

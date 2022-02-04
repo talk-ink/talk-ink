@@ -7,15 +7,22 @@ type TProps = React.PropsWithChildren<{
   onClick?: () => void;
   icon?: React.ReactNode;
   disabled?: boolean;
+  active?: boolean;
 }>;
 
-function MenuItem({ title, onClick = () => {}, icon, disabled }: TProps) {
+function MenuItem({
+  title,
+  onClick = () => {},
+  icon,
+  disabled,
+  active,
+}: TProps) {
   return (
     <Menu.Item disabled={disabled}>
-      {({ active, disabled }) => (
+      {({ active: menuActive, disabled }) => (
         <button
           className={`rounded-md ${
-            disabled ? "opacity-50" : active ? "bg-indigo-50" : ""
+            disabled ? "opacity-50" : active || menuActive ? "bg-indigo-50" : ""
           } flex justify-between p-2 w-full`}
           onClick={onClick}
           disabled={disabled}

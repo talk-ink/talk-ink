@@ -114,7 +114,7 @@ function AddMembers({ currentRoute, setCurrentRoute }: TProps) {
               </span>
             </p>
             <div
-              className={`w-6/12 rounded border border-neutral-100 p-2 flex justify-between ${
+              className={`w-full md:w-6/12 rounded border border-neutral-100 p-2 flex justify-between ${
                 apiLoading && "opacity-30"
               }`}
             >

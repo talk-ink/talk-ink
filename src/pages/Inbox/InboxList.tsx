@@ -1,29 +1,30 @@
 import { useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
-import { BiCheckCircle, BiCircle } from "react-icons/bi";
+import { BiCheckCircle } from "react-icons/bi";
+import moment from "moment-timezone";
+import { kontenbase } from "lib/client";
 
 import InboxEmpty from "components/EmptyContent/InboxEmpty";
 import ContentItem from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import IconButton from "components/Button/IconButton";
+import Modal from "components/Modal/Modal";
+import CloseThreadForm from "components/Thread/CloseThreadForm";
 
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { addDoneThread, deleteDoneThread } from "features/auth";
-import Modal from "components/Modal/Modal";
-import { kontenbase } from "lib/client";
+
 import { deleteThread } from "features/threads";
-import { inboxFilter } from "utils/helper";
 import { updateChannelCount } from "features/channels/slice";
-import moment from "moment-timezone";
+import { Thread } from "types";
 
 type TProps = {
-  type?: "active" | "done";
+  type?: "open" | "close";
 };
 
-function InboxList({ type = "active" }: TProps) {
+function InboxList({ type = "open" }: TProps) {
   const [showToast] = useToast();
 
   const params = useParams();
@@ -34,10 +35,11 @@ function InboxList({ type = "active" }: TProps) {
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
-  const [selectedThread, setSelectedThread] = useState(null);
+  const [selectedThread, setSelectedThread] =
+    useState<{ thread: Thread; type: "delete" | "close" }>();
 
-  const isDoneThread = useMemo(() => {
-    return type === "done";
+  const isClosedThread = useMemo(() => {
+    return type === "close";
   }, [type]);
 
   const channelData: string[] = useMemo(
@@ -47,18 +49,15 @@ function InboxList({ type = "active" }: TProps) {
 
   const threadData = useMemo(() => {
     return thread.threads
-      .filter((data) =>
-        inboxFilter({
-          thread: data,
-          channelIds: channelData,
-          userData: auth.user,
-          isDoneThread,
-        })
+      .filter((item) =>
+        item.tagedUsers?.includes(auth.user._id) && isClosedThread
+          ? item.isClosed
+          : !item.isClosed
       )
-      .filter((item) => item.tagedUsers?.includes(auth.user._id))
       .sort(
         (a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
       );
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [thread.threads, auth.user, params, channelData]);
 
@@ -67,35 +66,35 @@ function InboxList({ type = "active" }: TProps) {
     return auth.user.readedThreads;
   }, [auth.user]);
 
-  const markHandler = async (threadId: string) => {
-    try {
-      if (isDoneThread) {
-        const { error } = await kontenbase
-          .service("Threads")
-          .unlink(threadId, { doneUsers: auth.user._id });
+  // const markHandler = async (threadId: string) => {
+  //   try {
+  //     if (isClosedThread) {
+  //       const { error } = await kontenbase
+  //         .service("Threads")
+  //         .unlink(threadId, { doneUsers: auth.user._id });
 
-        if (error) throw new Error(error.message);
-        dispatch(deleteDoneThread(threadId));
-      } else {
-        const { error } = await kontenbase
-          .service("Threads")
-          .link(threadId, { doneUsers: auth.user._id });
+  //       if (error) throw new Error(error.message);
+  //       dispatch(deleteDoneThread(threadId));
+  //     } else {
+  //       const { error } = await kontenbase
+  //         .service("Threads")
+  //         .link(threadId, { doneUsers: auth.user._id });
 
-        if (error) throw new Error(error.message);
-        dispatch(addDoneThread(threadId));
-      }
-    } catch (error) {
-      if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
-      }
-    }
-  };
+  //       if (error) throw new Error(error.message);
+  //       dispatch(addDoneThread(threadId));
+  //     }
+  //   } catch (error) {
+  //     if (error instanceof Error) {
+  //       showToast({ message: `${JSON.stringify(error?.message)}` });
+  //     }
+  //   }
+  // };
 
   const threadDeleteHandler = async () => {
     try {
       const deletedThread = await kontenbase
         .service("Threads")
-        .deleteById(selectedThread?._id);
+        .deleteById(selectedThread?.thread?._id);
 
       if (deletedThread.error) throw new Error(deletedThread.error.message);
 
@@ -106,7 +105,7 @@ function InboxList({ type = "active" }: TProps) {
       dispatch(
         updateChannelCount({
           chanelId: deletedThread.data?.channel?.[0],
-          threadId: selectedThread?._id,
+          threadId: selectedThread?.thread?._id,
         })
       );
     } catch (error) {
@@ -135,18 +134,15 @@ function InboxList({ type = "active" }: TProps) {
                     );
                   }}
                   otherButton={
-                    <IconButton
-                      onClick={() => {
-                        markHandler(inbox._id);
-                      }}
-                    >
-                      {isDoneThread && (
-                        <BiCircle size={24} className="text-neutral-400" />
-                      )}
-                      {!isDoneThread && (
+                    !isClosedThread && (
+                      <IconButton
+                        onClick={() => {
+                          setSelectedThread({ thread: inbox, type: "close" });
+                        }}
+                      >
                         <BiCheckCircle size={24} className="text-neutral-400" />
-                      )}
-                    </IconButton>
+                      </IconButton>
+                    )
                   }
                   setSelectedThread={setSelectedThread}
                   isRead={readedThreads.includes(inbox._id)}
@@ -163,7 +159,7 @@ function InboxList({ type = "active" }: TProps) {
 
       <Modal
         header="Delete Thread"
-        visible={!!selectedThread}
+        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
         onClose={() => {
           setSelectedThread(null);
         }}
@@ -176,6 +172,25 @@ function InboxList({ type = "active" }: TProps) {
         okButtonText="Confirm"
       >
         Are you sure you want to delete this thread?
+      </Modal>
+      <Modal
+        header="Close Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
+        footer={null}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+      >
+        <CloseThreadForm
+          data={selectedThread?.thread}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+          from="inbox"
+        />
       </Modal>
     </div>
   );

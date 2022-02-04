@@ -2,7 +2,6 @@ import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
 import { useParams, useLocation } from "react-router";
-import Editor from "rich-markdown-editor";
 import ReactMoment from "react-moment";
 import { useRemirror } from "@remirror/react";
 
@@ -21,6 +20,7 @@ import {
   deleteComment,
   updateComment,
   addInteractedUser,
+  updateThread,
 } from "features/threads";
 
 import { fetchComments } from "features/threads/slice/asyncThunk";
@@ -31,6 +31,7 @@ import { updateUser } from "features/auth";
 import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial, parseContent } from "utils/helper";
 import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
+import ThreadBadge from "components/Thread/ThreadBadge";
 
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
@@ -194,6 +195,20 @@ function ThreadPage() {
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error.message)}` });
+    }
+  };
+
+  const reopenThreadHandler = async () => {
+    try {
+      const { error } = await kontenbase
+        .service("Threads")
+        .updateById(threadData._id, { isClosed: false });
+      if (error) throw new Error(error?.message);
+
+      dispatch(updateThread({ ...threadData, isClosed: false }));
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
 
@@ -363,7 +378,7 @@ function ThreadPage() {
               className="text-sm mb-8 -mt-4 hover:opacity-80 hover:cursor-pointer"
               onClick={loadMoreComment}
             >
-              View More {thread?.commentCount - threadData?.comments?.length}{" "}
+              Show {thread?.commentCount - threadData?.comments?.length} More
               Comments
             </p>
           )}
@@ -378,6 +393,7 @@ function ThreadPage() {
                 memberList={memberList}
                 threadId={threadId}
                 threadName={threadData?.name}
+                threadData={threadData}
               />
             )}
           </div>
@@ -390,6 +406,24 @@ function ThreadPage() {
             scrollToBottom={scrollToBottom}
             memberList={memberList}
           /> */}
+          {!threadData?.isClosed && (
+            <CommentForm
+              isShowEditor={isShowEditor}
+              setIsShowEditor={setIsShowEditor}
+              threadId={threadId}
+              threadName={threadData?.name}
+              interactedUsers={[...new Set(threadData?.interactedUsers)]}
+              scrollToBottom={scrollToBottom}
+              memberList={memberList}
+            />
+          )}
+          {threadData?.isClosed && (
+            <ThreadBadge.Reopen
+              onReopen={() => {
+                reopenThreadHandler();
+              }}
+            />
+          )}
         </div>
       </div>
     </MainContentContainer>

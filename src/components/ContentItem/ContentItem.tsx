@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction } from "react";
+import React, { useMemo } from "react";
 
 import {
   BiCheck,
@@ -6,6 +6,8 @@ import {
   BiDotsHorizontalRounded,
   BiTrash,
   BiEdit,
+  BiCheckCircle,
+  BiRecycle,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
@@ -23,18 +25,27 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 
 import { addReadThread, deleteReadThread } from "features/auth";
-import { Thread } from "types";
+import { Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
 import { useRemirror } from "@remirror/react";
 import { htmlToProsemirrorNode, prosemirrorNodeToHtml } from "remirror";
 import { extensions } from "components/Remirror/extensions";
+import { deleteThread, updateThread } from "features/threads";
+import { useToast } from "hooks/useToast";
+import { BsArrowUpCircle } from "react-icons/bs";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
-  setSelectedThread?: Dispatch<SetStateAction<Thread | null | undefined>>;
+  setSelectedThread?: React.Dispatch<
+    React.SetStateAction<{
+      thread: Thread;
+      type: "delete" | "close";
+    }>
+  >;
   otherButton?: React.ReactNode;
   isRead?: boolean;
+  from?: "regular" | "trash";
 }>;
 
 function ContentItem({
@@ -43,9 +54,13 @@ function ContentItem({
   setSelectedThread,
   otherButton,
   isRead,
+  from = "regular",
 }: Props) {
+  const [showToast] = useToast();
   const dispatch = useAppDispatch();
+
   const auth = useAppSelector((state) => state.auth);
+  const member = useAppSelector((state) => state.member);
   const navigate = useNavigate();
   const isFromTalkink = dataSource.name === "Welcome to Talk.ink";
 
@@ -77,6 +92,45 @@ function ContentItem({
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(dataSource.content),
   });
+  const reopenThreadHandler = async () => {
+    try {
+      const { data, error } = await kontenbase
+        .service("Threads")
+        .updateById(dataSource._id, { isClosed: false });
+      if (error) throw new Error(error?.message);
+
+      if (data) {
+        dispatch(updateThread({ ...dataSource, isClosed: false }));
+        onClick();
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const restoreThreadHandler = async () => {
+    try {
+      const { data, error } = await kontenbase
+        .service("Threads")
+        .updateById(dataSource._id, { isDeleted: false });
+      if (error) throw new Error(error?.message);
+
+      if (data) {
+        dispatch(deleteThread(dataSource));
+        showToast({ message: `"${dataSource.name}" thread has been restored` });
+      }
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const closedBy: Member = useMemo(() => {
+    return member?.members?.find(
+      (data) => data._id === dataSource?.closedBy?.[0]
+    );
+  }, [dataSource?.closedBy, member.members]);
 
   return (
     <div
@@ -92,6 +146,7 @@ function ContentItem({
     last:after:w-full
     last:after:h-[1px]
     last:after:bg-neutral-200
+    first:before:hidden
     "
     >
       <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
@@ -108,7 +163,7 @@ function ContentItem({
                   : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
-            <div className="mr-4">
+            <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
               {isFromTalkink && <Avatar src={logoImage} />}
               {!isFromTalkink && (
                 <>
@@ -121,12 +176,17 @@ function ContentItem({
                   )}
                 </>
               )}
+              {dataSource?.isClosed && (
+                <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border border-white rounded-full flex items-center justify-center">
+                  <BiCheck size={10} className="text-white font-bold" />
+                </div>
+              )}
             </div>
           </div>
           <div>
             <div className="flex flex-col items-start md:flex-row md:items-center">
               <p
-                className={`font-body text-sm mr-2 max-w-xs overflow-hidden text-ellipsis whitespace-nowrap ${
+                className={`font-body text-sm max-w-[8rem] mr-2 md:max-w-xs overflow-hidden text-ellipsis whitespace-nowrap ${
                   dataSource?.draft && "text-blue-500"
                 } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >
@@ -143,22 +203,29 @@ function ContentItem({
               </span>
             </div>
             <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
-              <small className=" text-xs text-neutral-500 table-cell truncate">
-                {dataSource?.draft ? "Me: " : ""}
-                {dataSource.comments?.length > 0
-                  ? `Latest : ${parseContent(
-                      dataSource.comments?.[dataSource.comments?.length - 1]
-                        ?.content
-                    )?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                  : prosemirrorNodeToHtml(state.doc)?.replace(
-                      /( |<([^>]+)>)/gi,
-                      " "
-                    )}
-              </small>
+              {!dataSource.isClosed && (
+                <small className=" text-xs text-neutral-500 table-cell truncate">
+                  {dataSource?.draft ? "Me: " : ""}
+                  {dataSource.comments?.length > 0
+                    ? `Latest : ${parseContent(
+                        dataSource.comments?.[dataSource.comments?.length - 1]
+                          ?.content
+                      )?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
+                    : prosemirrorNodeToHtml(state.doc)?.replace(
+                        /( |<([^>]+)>)/gi,
+                        " "
+                      )}
+                </small>
+              )}
+              {dataSource.isClosed && (
+                <small className=" text-xs text-neutral-500 table-cell truncate">
+                  {closedBy?.firstName} closed this thread.
+                </small>
+              )}
             </div>
           </div>
         </button>
-        <div className="flex active:flex group-hover:flex gap-2">
+        <div className="flex active:flex group-hover:flex gap-2 items-center">
           {otherButton}
           <Menu as="div" className="relative">
             {({ open }) => (
@@ -178,57 +245,129 @@ function ContentItem({
 
                 {open && (
                   <Menu.Items static className="menu-container right-0">
-                    {isRead && (
+                    {from === "regular" && (
+                      <>
+                        {isRead && (
+                          <MenuItem
+                            icon={
+                              <BiCircle
+                                size={20}
+                                className="text-neutral-400"
+                              />
+                            }
+                            title="Mark unread"
+                            onClick={() => {
+                              handleReadUnread({ type: "unread" });
+                            }}
+                          />
+                        )}
+                        {!isRead && (
+                          <MenuItem
+                            icon={
+                              <BiCheck size={20} className="text-neutral-400" />
+                            }
+                            title="Mark read"
+                            onClick={() => {
+                              handleReadUnread({ type: "read" });
+                            }}
+                          />
+                        )}
+                        {(dataSource.createdBy._id === auth.user._id ||
+                          dataSource?.draft) &&
+                          !isFromTalkink &&
+                          !dataSource?.draft && <Divider />}
+                        {(dataSource.createdBy._id === auth.user._id ||
+                          dataSource?.draft) &&
+                          !isFromTalkink &&
+                          !dataSource?.draft && (
+                            <>
+                              <MenuItem
+                                icon={
+                                  <BiEdit
+                                    size={20}
+                                    className="text-neutral-400"
+                                  />
+                                }
+                                title="Edit thread..."
+                                onClick={() => {
+                                  navigate(`te/${dataSource?._id}`);
+                                }}
+                              />
+                              <MenuItem
+                                icon={
+                                  <BiTrash
+                                    size={20}
+                                    className="text-neutral-400"
+                                  />
+                                }
+                                title="Delete thread..."
+                                onClick={() => {
+                                  setSelectedThread({
+                                    thread: dataSource,
+                                    type: "delete",
+                                  });
+                                }}
+                              />
+                            </>
+                          )}
+                        {!dataSource?.isClosed && (
+                          <MenuItem
+                            icon={
+                              <BiCheckCircle
+                                size={20}
+                                className="text-neutral-400"
+                              />
+                            }
+                            title="Close thread"
+                            onClick={() => {
+                              setSelectedThread({
+                                thread: dataSource,
+                                type: "close",
+                              });
+                            }}
+                          />
+                        )}
+                        {dataSource?.isClosed && (
+                          <MenuItem
+                            icon={
+                              <BsArrowUpCircle
+                                size={20}
+                                className="text-neutral-400"
+                              />
+                            }
+                            title="Reopen thread"
+                            onClick={() => {
+                              reopenThreadHandler();
+                            }}
+                          />
+                        )}
+                      </>
+                    )}
+                    {from === "trash" && (
                       <MenuItem
                         icon={
-                          <BiCircle size={20} className="text-neutral-400" />
+                          <BiRecycle size={20} className="text-neutral-400" />
                         }
-                        title="Mark unread"
+                        title="Restore thread"
                         onClick={() => {
-                          handleReadUnread({ type: "unread" });
+                          restoreThreadHandler();
                         }}
                       />
                     )}
-                    {!isRead && (
+                    {from === "trash" && (
                       <MenuItem
                         icon={
-                          <BiCheck size={20} className="text-neutral-400" />
+                          <BiTrash size={20} className="text-neutral-400" />
                         }
-                        title="Mark read"
+                        title="Remove from trash"
                         onClick={() => {
-                          handleReadUnread({ type: "read" });
+                          setSelectedThread({
+                            thread: dataSource,
+                            type: "delete",
+                          });
                         }}
                       />
                     )}
-                    {(dataSource.createdBy._id === auth.user._id ||
-                      dataSource?.draft) &&
-                      !isFromTalkink &&
-                      !dataSource?.draft && <Divider />}
-                    {(dataSource.createdBy._id === auth.user._id ||
-                      dataSource?.draft) &&
-                      !isFromTalkink &&
-                      !dataSource?.draft && (
-                        <>
-                          <MenuItem
-                            icon={
-                              <BiEdit size={20} className="text-neutral-400" />
-                            }
-                            title="Edit thread..."
-                            onClick={() => {
-                              navigate(`te/${dataSource?._id}`);
-                            }}
-                          />
-                          <MenuItem
-                            icon={
-                              <BiTrash size={20} className="text-neutral-400" />
-                            }
-                            title="Delete thread..."
-                            onClick={() => {
-                              setSelectedThread(dataSource);
-                            }}
-                          />
-                        </>
-                      )}
                   </Menu.Items>
                 )}
               </>

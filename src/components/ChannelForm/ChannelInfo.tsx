@@ -90,14 +90,16 @@ function ChannelInfo({ data, onClose, showManageMemberModal }: TProps) {
               </p>
             </div>
             <div>
-              <Button
-                className="text-sm font-semibold bg-neutral-100 hover:bg-neutral-200"
-                onClick={() => {
-                  setEdit(true);
-                }}
-              >
-                Edit Channel
-              </Button>
+              {isAdmin && (
+                <Button
+                  className="text-sm font-semibold bg-neutral-100 hover:bg-neutral-200"
+                  onClick={() => {
+                    setEdit(true);
+                  }}
+                >
+                  Edit Channel
+                </Button>
+              )}
             </div>
           </div>
           <div>

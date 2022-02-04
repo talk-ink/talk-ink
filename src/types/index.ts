@@ -18,6 +18,14 @@ export interface ISubComment {
   parent: string[];
 }
 
+export interface IReaction {
+  _id?: string;
+  emoji: string;
+  comment?: string[];
+  users?: Member[];
+  unified?: string;
+}
+
 export interface IComment {
   id?: string;
   _id?: string;
@@ -28,6 +36,8 @@ export interface IComment {
   updatedAt?: string | null;
   tagedUsers?: string[];
   subComments?: ISubComment[];
+  reactions?: IReaction[];
+  isClosedComment?: boolean;
 }
 export interface Thread {
   id?: string;
@@ -44,6 +54,12 @@ export interface Thread {
   interactedUsers?: string[];
   channelId?: string;
   tagedUsers?: string[];
+  isClosed?: boolean;
+  closedBy?: string[];
+  closedAt?: string;
+  closeDescription?: string;
+  isDeleted?: boolean;
+  deletedAt?: string;
 }
 export interface Channel {
   id?: string;
@@ -78,7 +94,7 @@ export interface Workspace {
 }
 
 export interface Avatar {
-  fileName: string;
+  fileName?: string;
   url: string;
 }
 

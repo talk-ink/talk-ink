@@ -108,7 +108,7 @@ function ProfileSettings({ currentRoute, setCurrentRoute }: TProps) {
           edit your other workspace profiles.
         </p>
         <p className="text-sm font-semibold mb-2">Display email</p>
-        <div className="w-96 p-2 border border-neutral-300 rounded">
+        <div className="w-full md:w-96 p-2 border border-neutral-300 rounded">
           <p className="text-sm">{auth.user.email}</p>
         </div>
         <p className="text-xs text-neutral-500 mt-2">

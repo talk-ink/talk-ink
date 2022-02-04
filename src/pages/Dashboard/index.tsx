@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Outlet, useParams, useNavigate } from "react-router";
+import React, { useEffect, useState } from "react";
+import { Outlet, useParams, useNavigate, useOutletContext } from "react-router";
 
 import SidebarComponent from "components/Sidebar/SidebarComponent";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
@@ -8,7 +8,6 @@ import { Channel } from "types";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { fetchWorkspaces } from "features/workspaces/slice";
 import { useMediaQuery } from "react-responsive";
-import { FcMenu } from "react-icons/fc";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { KontenbaseResponse } from "@kontenbase/sdk";
@@ -155,21 +154,27 @@ function DashboardPage() {
     <FullscreenLoading />
   ) : (
     <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-auto md:overflow-hidden text-slightGray relative">
-      <FcMenu
-        className="absolute top-2 left-2"
-        size={"2rem"}
-        onClick={() => setIsSidebarOpen((prev) => !prev)}
-      />
       <SidebarComponent
         isMobile={isMobile}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      {!pageStatus.status && <Outlet />}
+      {!pageStatus.status && (
+        <Outlet context={[isSidebarOpen, setIsSidebarOpen]} />
+      )}
       {pageStatus.status === "channel-notFound" && <NotFoundChannelPage />}
       {pageStatus.status === "channel-restricted" && <RestrictedChannelPage />}
     </div>
   );
+}
+
+type UseSidebarOpenType = [
+  boolean,
+  React.Dispatch<React.SetStateAction<boolean>>
+];
+
+export function useSidebar() {
+  return useOutletContext<UseSidebarOpenType>();
 }
 
 export default DashboardPage;

@@ -41,6 +41,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 import { addThread, deleteThread, updateThread } from "features/threads";
 import { updateUser } from "features/auth";
+import { createUniqueArray } from "utils/helper";
 
 import { Channel, CreateChannel, Thread, User } from "types";
 
@@ -75,6 +76,7 @@ function SidebarComponent({
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
   const [inboxData, setInboxData] = useState<Thread[]>([]);
+  const [trashData, setTrashData] = useState<string[]>([]);
   const [isWorkspaceLimitModalVisible, setIsWorkspaceLimitModalVisible] =
     useState(false);
   const [runOnce, setRunOnce] = useState(false);
@@ -141,6 +143,31 @@ function SidebarComponent({
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, userId, runOnce]);
+
+  useEffect(() => {
+    if (!userId || !params.workspaceId) return;
+    (async () => {
+      try {
+        const { data, error } = await kontenbase.service("Threads").find({
+          where: {
+            workspace: params.workspaceId,
+            createdBy: userId,
+            isDeleted: true,
+          },
+        });
+
+        if (error) throw new Error(error.message);
+
+        setTrashData(data.map((item) => item._id));
+      } catch (error) {
+        if (error instanceof Error) {
+          showToast({ message: `${JSON.stringify(error?.message)}` });
+        }
+      }
+    })();
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.workspaceId, userId]);
 
   const handleLogout = async () => {
     try {
@@ -209,7 +236,6 @@ function SidebarComponent({
 
       if (error) throw new Error(error.message);
 
-      dispatch(deleteChannel(selectedChannel));
       setSelectedChannel(null);
       setLeaveChannelModal(false);
       navigate(`/a/${params.workspaceId}/inbox`);
@@ -256,6 +282,7 @@ function SidebarComponent({
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
         const isUpdate = event === "UPDATE_RECORD";
+        const isDelete = event === "DELETE_RECORD";
 
         const isCurrentWorkspace = isUpdate
           ? payload?.before?.workspace?.includes(params.workspaceId)
@@ -282,7 +309,10 @@ function SidebarComponent({
 
           _createdBy = data?.[0];
 
-          if (isCurrentWorkspace && isThreadInJoinedChannel) {
+          if (
+            (!isDelete ? isCurrentWorkspace : true) &&
+            (!isDelete ? isThreadInJoinedChannel : true)
+          ) {
             switch (event) {
               case "UPDATE_RECORD":
                 if (payload.before.tagedUsers.includes(userId)) {
@@ -381,6 +411,18 @@ function SidebarComponent({
 
                   updateUserStore();
                 }
+
+                if (payload.after?.createdBy === auth.user._id) {
+                  if (payload?.after?.isDeleted) {
+                    setTrashData((prev) =>
+                      createUniqueArray([...prev, payload.after?._id])
+                    );
+                  } else {
+                    setTrashData((prev) =>
+                      prev.filter((item) => item !== payload?.after?._id)
+                    );
+                  }
+                }
                 break;
               case "CREATE_RECORD":
                 if (
@@ -400,6 +442,9 @@ function SidebarComponent({
                 break;
               case "DELETE_RECORD":
                 dispatch(deleteThread(payload));
+                setTrashData((prev) =>
+                  prev.filter((item) => item !== payload?._id)
+                );
                 break;
 
               default:
@@ -513,7 +558,7 @@ function SidebarComponent({
       id="modal-container"
       className={
         isSidebarOpen &&
-        `w-screen min-h-screen absolute bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+        `w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
       }
       onClick={(e: any) => {
         if (e?.target?.id === "modal-container") {
@@ -530,7 +575,7 @@ function SidebarComponent({
                     ? "translate-x-0 w-[80vw] "
                     : "-translate-x-full w-full"
                 } md:block`
-              : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51] `
+              : `bg-[#F7FAFB] h-screen hidden md:block relative z-[51]`
           }
         >
           <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 fixed: md:sticky top-0 z-[51]">
@@ -629,6 +674,15 @@ function SidebarComponent({
                   setIsSidebarOpen={setIsSidebarOpen}
                   count={inboxLeft || 0}
                 />
+                <SidebarList
+                  type="trash"
+                  name="Trash"
+                  link={`/a/${workspaceData?._id}/trash`}
+                  setIsSidebarOpen={setIsSidebarOpen}
+                  count={
+                    (trashData.length > 10 ? "10+" : trashData.length) || 0
+                  }
+                />
                 {/* <SidebarList
                 type="saved"
                 name="Saved"
@@ -673,7 +727,7 @@ function SidebarComponent({
                       showManageMemberModal(channel);
                     }}
                     isAdmin={
-                      workspaceData.createdBy?._id === auth.user?._id ||
+                      workspaceData?.createdBy?._id === auth.user?._id ||
                       channel?.createdBy?._id === auth.user?._id
                     }
                   />
@@ -837,7 +891,6 @@ function SidebarComponent({
           </p>
         </Modal>
         <SettingsModal
-          footer={null}
           visible={settingsModal}
           onClose={() => {
             setSettingsModal(false);

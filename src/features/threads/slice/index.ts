@@ -51,6 +51,10 @@ const initialState: InitThreadState = {
   commentCount: 0,
 };
 
+interface IUpdateThreadPayload extends Omit<Thread, "closedAt"> {
+  closedAt?: string;
+}
+
 const threadSlice = createSlice({
   name: "thread",
   initialState,
@@ -73,9 +77,11 @@ const threadSlice = createSlice({
       let deletedIndex = state.threads.findIndex(
         (data) => data._id === action.payload._id
       );
-      state.threads.splice(deletedIndex, 1);
+      if (deletedIndex >= 0) {
+        state.threads.splice(deletedIndex, 1);
+      }
     },
-    updateThread: (state, action: PayloadAction<Thread>) => {
+    updateThread: (state, action: PayloadAction<IUpdateThreadPayload>) => {
       const updatedThread = state.threads.map((item) =>
         item._id === action.payload._id ? action.payload : item
       );
