@@ -13,6 +13,7 @@ import ReactMoment from "react-moment";
 import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
 import { useNavigate } from "react-router";
+import { useLongPress, LongPressDetectEvents } from "use-long-press";
 
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
@@ -48,6 +49,7 @@ type Props = React.PropsWithChildren<{
   otherButton?: React.ReactNode;
   isRead?: boolean;
   from?: "regular" | "trash";
+  onHold?: () => void;
 }>;
 
 function ContentItem({
@@ -57,6 +59,7 @@ function ContentItem({
   otherButton,
   isRead,
   from = "regular",
+  onHold,
 }: Props) {
   const [showToast] = useToast();
   const dispatch = useAppDispatch();
@@ -135,14 +138,24 @@ function ContentItem({
     );
   }, [dataSource?.closedBy, member.members]);
 
+  const threadBind = useLongPress(
+    () => {
+      onHold();
+    },
+    {
+      detect: LongPressDetectEvents.TOUCH,
+    }
+  );
+
   return (
     <div
       className="
     cursor-pointer
     hover:before:bg-transparent
     hover:after:bg-transparent"
+      {...threadBind}
     >
-      <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
+      <div className="flex items-center justify-between pr-5 md:pr-0 md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group ">
         <button
           className="flex items-start md:items-center w-full py-5 relative z-0 "
           onClick={onClick}
@@ -177,7 +190,7 @@ function ContentItem({
             </div>
           </div>
           <div>
-            <div className="flex flex-row items-center">
+            <div className="flex flex-row items-center justify-between md:justify-start">
               <p
                 className={`font-body md:text-sm max-w-[12rem] mr-2 md:max-w-xs overflow-hidden text-left text-ellipsis whitespace-nowrap ${
                   dataSource?.draft && "text-blue-500"
@@ -213,7 +226,7 @@ function ContentItem({
         </button>
         <div className="hidden md:flex active:flex group-hover:flex gap-2 items-center">
           {otherButton}
-          <Menu as="div" className="relative">
+          <Menu as="div" className="relative hidden md:block">
             {({ open }) => (
               <>
                 {!dataSource?.draft && (

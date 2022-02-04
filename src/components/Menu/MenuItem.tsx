@@ -5,14 +5,21 @@ type TProps = React.PropsWithChildren<{
   onClick?: () => void;
   icon?: React.ReactNode;
   disabled?: boolean;
+  className?: string;
 }>;
 
-function MenuItem({ title, onClick = () => {}, icon, disabled }: TProps) {
+function MenuItem({
+  title,
+  onClick = () => {},
+  icon,
+  disabled,
+  className,
+}: TProps) {
   return (
     <button
       className={`rounded-md ${
         !disabled ? "hover:bg-indigo-50" : "opacity-50"
-      } flex justify-between p-2`}
+      } flex justify-between p-2 outline-none ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

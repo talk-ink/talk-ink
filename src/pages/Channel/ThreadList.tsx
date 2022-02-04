@@ -20,6 +20,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 
 import { Thread } from "types";
+import MobileMenuThread from "components/Thread/MobileMenu";
 
 type Props = {
   type?: "open" | "close";
@@ -125,6 +126,9 @@ const ThreadList = ({ type = "open" }: Props) => {
                     (readedThreads.includes(thread._id) &&
                       thread.createdBy?._id === auth.user._id)
                   }
+                  onHold={() => {
+                    setSelectedThread({ thread, type: "menu" });
+                  }}
                 />
               ))}
             </>
@@ -135,6 +139,19 @@ const ThreadList = ({ type = "open" }: Props) => {
           <ChannelEmpty />
         </>
       )}
+      <MobileMenuThread
+        openMenu={!!selectedThread?.thread && selectedThread?.type === "menu"}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        dataSource={selectedThread?.thread}
+        setSelectedThread={setSelectedThread}
+        isRead={
+          readedThreads.includes(selectedThread?.thread?._id) ||
+          (readedThreads.includes(selectedThread?.thread?._id) &&
+            selectedThread?.thread?.createdBy?._id === auth.user._id)
+        }
+      />
       <Modal
         header="Delete Thread"
         visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
