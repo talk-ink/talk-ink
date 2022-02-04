@@ -21,7 +21,7 @@ import { addThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import { fetchChannels } from "features/channels/slice";
-import { notificationUrl } from "utils/helper";
+import { frontendUrl, notificationUrl } from "utils/helper";
 import { htmlToProsemirrorNode } from "remirror";
 import { useRemirror } from "@remirror/react";
 
@@ -167,6 +167,7 @@ function Compose() {
           title: `New Thread - ${channelData?.name}`,
           description: values.name,
           externalUserIds: _invitedUsers,
+          url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`,
         });
       }
 

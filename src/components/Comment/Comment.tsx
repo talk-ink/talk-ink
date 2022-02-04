@@ -32,13 +32,14 @@ import { addSubCommentToComment } from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
-import { draft, getNameInitial } from "utils/helper";
+import { draft, frontendUrl, getNameInitial } from "utils/helper";
 import { notificationUrl } from "utils/helper";
 import Reaction from "./Reaction";
 import { useRemirror } from "@remirror/react";
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
 import { parseContent } from "utils/helper";
+import { useParams } from "react-router";
 
 interface IProps {
   comment: IComment;
@@ -74,6 +75,7 @@ const Comment: React.FC<IProps> = ({
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
+  const params = useParams();
 
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
@@ -187,8 +189,9 @@ const Comment: React.FC<IProps> = ({
 
         axios.post(NOTIFICATION_API, {
           title: `${auth?.user.firstName} reply comment on ${threadName}`,
-          description: editorState.replace(/(<([^>]+)>)/gi, ""),
+          description: "",
           externalUserIds: invitedUsers,
+          url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${params.threadId}`,
         });
       }
 

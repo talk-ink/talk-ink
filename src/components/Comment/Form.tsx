@@ -28,6 +28,7 @@ import { useToast } from "hooks/useToast";
 import { useRemirror } from "@remirror/react";
 import { htmlToProsemirrorNode } from "remirror";
 import { extensions } from "components/Remirror/extensions";
+import { frontendUrl } from "utils/helper";
 
 interface IProps {
   isShowEditor: boolean;
@@ -120,6 +121,10 @@ const Form: React.FC<IProps> = ({
 
   const discardComment = () => {
     draft("comment").deleteByKey(params.threadId);
+    editorRef.current!.setContent({
+      type: "doc",
+      content: [],
+    });
 
     setIsShowEditor(false);
   };
@@ -193,6 +198,7 @@ const Form: React.FC<IProps> = ({
         title: `${auth?.user.firstName} comment on ${threadName}`,
         description: editorToHTML(state, " "),
         externalUserIds: _invitedUsers,
+        url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${params.threadId}`,
       });
     }
 
@@ -204,7 +210,7 @@ const Form: React.FC<IProps> = ({
   };
 
   useEffect(() => {
-    if (editorToHTML(state).length > 0) {
+    if (editorToHTML(state, "").length > 0) {
       draft("comment").set(params.threadId, {
         content: JSON.stringify(state),
         createdById: auth.user._id,
@@ -222,6 +228,8 @@ const Form: React.FC<IProps> = ({
     ) {
       try {
         const parsedText = JSON.parse(getCommentDraft.content);
+        console.log("jalan", parsedText);
+
         editorRef.current!.setContent(parsedText.doc);
       } catch (error) {
         console.log(error);

@@ -13,7 +13,7 @@ import { Channel, Thread } from "types";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { updateThread } from "features/threads";
 import { createComment } from "features/threads/slice/asyncThunk";
-import { notificationUrl } from "utils/helper";
+import { frontendUrl, notificationUrl } from "utils/helper";
 
 type Props = {
   data: Thread;
@@ -87,6 +87,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
           title: `${auth?.user.firstName} closed "${data.name}" thread`,
           description: values.closeDescription.replace(/(<([^>]+)>)/gi, ""),
           externalUserIds: _invitedUsers,
+          url: `${frontendUrl}`,
         });
       }
 
