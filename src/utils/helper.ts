@@ -288,10 +288,12 @@ export const sendSearch = async ({
   return searchData;
 };
 
-export const parseContent = (content: string) => {
+export const parseContent = (content: string, toHtml = false) => {
   try {
-    return JSON.parse(content).doc;
+    const parsedContent = JSON.parse(content).doc;
+
+    return parsedContent;
   } catch (_e) {
-    return "";
+    return content;
   }
 };

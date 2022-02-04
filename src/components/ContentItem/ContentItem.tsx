@@ -15,7 +15,7 @@ import { useNavigate } from "react-router";
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
-import { getNameInitial } from "utils/helper";
+import { getNameInitial, parseContent } from "utils/helper";
 import Divider from "components/Divider/Divider";
 import Avatar from "components/Avatar/Avatar";
 
@@ -25,6 +25,9 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { addReadThread, deleteReadThread } from "features/auth";
 import { Thread } from "types";
 import logoImage from "assets/image/logo512.png";
+import { useRemirror } from "@remirror/react";
+import { htmlToProsemirrorNode, prosemirrorNodeToHtml } from "remirror";
+import { extensions } from "components/Remirror/extensions";
 
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
@@ -68,6 +71,12 @@ function ContentItem({
       console.log("err", error);
     }
   };
+
+  const { state } = useRemirror({
+    extensions,
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(dataSource.content),
+  });
 
   return (
     <div
@@ -137,10 +146,14 @@ function ContentItem({
               <small className=" text-xs text-neutral-500 table-cell truncate">
                 {dataSource?.draft ? "Me: " : ""}
                 {dataSource.comments?.length > 0
-                  ? `Latest : ${dataSource.comments?.[
-                      dataSource.comments?.length - 1
-                    ]?.content?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
-                  : "HAHAHAH"}
+                  ? `Latest : ${parseContent(
+                      dataSource.comments?.[dataSource.comments?.length - 1]
+                        ?.content
+                    )?.replace(/[^a-zA-Z0-9., ]/g, " ")}`
+                  : prosemirrorNodeToHtml(state.doc)?.replace(
+                      /( |<([^>]+)>)/gi,
+                      " "
+                    )}
               </small>
             </div>
           </div>
