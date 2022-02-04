@@ -191,11 +191,9 @@ const Form: React.FC<IProps> = ({
     if (_invitedUsers.length > 0) {
       axios.post(NOTIFICATION_API, {
         title: `${auth?.user.firstName} comment on ${threadName}`,
-        description: "",
+        description: editorToHTML(state),
         externalUserIds: _invitedUsers,
       });
-
-      //editorState.replace(/(<([^>]+)>)/gi, "")
     }
 
     draft("comment").deleteByKey(params.threadId);
@@ -207,10 +205,7 @@ const Form: React.FC<IProps> = ({
   };
 
   useEffect(() => {
-    //@ts-ignore
     if (editorToHTML(state).length > 0) {
-      console.log("run");
-
       draft("comment").set(params.threadId, {
         content: JSON.stringify(state),
         createdById: auth.user._id,
@@ -226,10 +221,8 @@ const Form: React.FC<IProps> = ({
       getCommentDraft.content &&
       getCommentDraft.createdById === auth.user._id
     ) {
-      //@ts-ignore
       try {
         const parsedText = JSON.parse(getCommentDraft.content);
-
         editorRef.current!.setContent(parsedText.doc);
       } catch (error) {
         console.log(error);
