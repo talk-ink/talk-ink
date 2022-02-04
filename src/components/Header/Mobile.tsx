@@ -71,9 +71,9 @@ function MobileHeader({
           onClick={() => setIsSidebarOpen((prev) => !prev)}
         />
         <div className="flex flex-col">
-          <div className="flex gap-1 items-center">
+          <div className="flex gap-1 items-center -ml-[3px]">
             {privacy === "public" && (
-              <Icon size={18} className="text-slate-400" />
+              <Icon size={18} className="text-slate-700" />
             )}
             {privacy === "private" && (
               <Icon size={18} className="text-slate-400" />
@@ -82,7 +82,7 @@ function MobileHeader({
               {header}
             </h1>
           </div>
-          <p className="text-sm text-indigo-500 whitespace-nowrap max-w-[15rem] overflow-hidden text-ellipsis">
+          <p className="text-sm text-slate-500 whitespace-nowrap max-w-[15rem] overflow-hidden text-ellipsis">
             {subHeader}
           </p>
         </div>
