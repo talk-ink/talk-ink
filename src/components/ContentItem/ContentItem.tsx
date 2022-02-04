@@ -154,7 +154,7 @@ function ContentItem({
                   : "bg-transparent"
               } rounded-full mr-2`}
             ></div>
-            <div className="mr-4">
+            <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
               {isFromTalkink && <Avatar src={logoImage} />}
               {!isFromTalkink && (
                 <>
@@ -166,6 +166,11 @@ function ContentItem({
                     />
                   )}
                 </>
+              )}
+              {dataSource?.isClosed && (
+                <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 border border-white rounded-full flex items-center justify-center">
+                  <BiCheck size={10} className="text-white font-bold" />
+                </div>
               )}
             </div>
           </div>
