@@ -102,7 +102,13 @@ const Comment: React.FC<IProps> = ({
     extensions: () => extensions(true),
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(comment.content),
+    selection: "end",
   });
+
+  useEffect(() => {
+    if (!comment.content) return;
+    editorRef.current!.setContent(parseContent(comment.content));
+  }, [comment.content]);
 
   useEffect(() => {
     if (memberList.length <= 0 || !auth || !comment) return;
@@ -135,7 +141,7 @@ const Comment: React.FC<IProps> = ({
     dispatch(
       updateComment({
         commentId: comment._id,
-        content: editorState,
+        content: JSON.stringify(state),
       })
     );
 
