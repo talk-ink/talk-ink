@@ -26,7 +26,7 @@ interface IProps {
   >;
   notifiedOptions: INotifiedOption[];
   discardSubComment: () => void;
-  handleCreateSubComment: () => void;
+  handleCreateSubComment: (subCommentData: any) => void;
 }
 
 const SubCommentForm: React.FC<IProps> = ({
@@ -97,7 +97,7 @@ const SubCommentForm: React.FC<IProps> = ({
           <Button
             type="submit"
             className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-            onClick={handleCreateSubComment}
+            onClick={() => handleCreateSubComment(state)}
           >
             Reply
           </Button>

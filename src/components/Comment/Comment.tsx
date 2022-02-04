@@ -95,7 +95,7 @@ const Comment: React.FC<IProps> = ({
   const [openReaction, setOpenReaction] = useState<boolean>(false);
 
   const { manager, state, onChange } = useRemirror({
-    extensions: () => extensions(true),
+    extensions: () => extensions(false),
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(comment.content),
     selection: "end",
@@ -146,8 +146,9 @@ const Comment: React.FC<IProps> = ({
   };
 
   const discardComment = () => {
-    setIsEdit(false);
     editorRef.current!.setContent(parseContent(comment.content));
+
+    setIsEdit(false);
   };
 
   const discardSubComment = () => {
@@ -157,14 +158,14 @@ const Comment: React.FC<IProps> = ({
     setSubEditorState("");
   };
 
-  const handleCreateSubComment = async () => {
+  const handleCreateSubComment = async (subCommentData: any) => {
     try {
       const invitedUsers: string[] = selectedNotifiedOptions.map(
         (item) => item.value
       );
 
       const { data, error } = await kontenbase.service("SubComments").create({
-        content: subEditorState,
+        content: JSON.stringify(subCommentData),
         parent: comment._id,
       });
 

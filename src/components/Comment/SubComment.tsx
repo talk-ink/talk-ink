@@ -53,7 +53,7 @@ const Comment: React.FC<IProps> = ({
   const [isEdit, setIsEdit] = useState(false);
 
   const { manager, state, onChange } = useRemirror({
-    extensions: () => extensions(true),
+    extensions: () => extensions(false),
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(comment.content),
     selection: "end",
@@ -61,6 +61,7 @@ const Comment: React.FC<IProps> = ({
 
   useEffect(() => {
     if (!comment.content) return;
+
     editorRef.current!.setContent(parseContent(comment.content));
   }, [comment.content]);
 
@@ -111,8 +112,9 @@ const Comment: React.FC<IProps> = ({
   };
 
   const discardComment = () => {
-    setIsEdit(false);
     editorRef.current!.setContent(parseContent(comment.content));
+
+    setIsEdit(false);
   };
 
   return (

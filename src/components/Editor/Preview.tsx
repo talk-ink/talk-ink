@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 
 import Button from "components/Button/Button";
 import Remirror from "components/Remirror";
@@ -21,7 +21,6 @@ const Preview: React.FC<IProps> = ({
   editorRef,
 }) => {
   const { manager, onChange, state } = remmirorProps || {};
-  const [imageLoading, setImageLoading] = useState<boolean>(false);
 
   return !isEdit ? (
     <Remirror
@@ -52,7 +51,6 @@ const Preview: React.FC<IProps> = ({
             type="submit"
             className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
             onClick={handleUpdateComment}
-            disabled={imageLoading}
           >
             Save
           </Button>
