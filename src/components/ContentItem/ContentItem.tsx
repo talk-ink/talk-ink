@@ -29,7 +29,7 @@ import { addReadThread, deleteReadThread } from "features/auth";
 import { Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
 import { useRemirror } from "@remirror/react";
-import { htmlToProsemirrorNode, prosemirrorNodeToHtml } from "remirror";
+import { htmlToProsemirrorNode } from "remirror";
 import { extensions } from "components/Remirror/extensions";
 import { deleteThread, updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
@@ -222,6 +222,7 @@ function ContentItem({
                 <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
                   {dataSource?.draft ? "Me: " : ""}
                   {/* latest juga disini */}
+
                   {editorToHTML(state)}
                 </small>
               )}

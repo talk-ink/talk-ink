@@ -1,7 +1,12 @@
-import React, { useState } from "react";
+import React from "react";
 
 import Button from "components/Button/Button";
 import Remirror from "components/Remirror";
+
+interface Mention {
+  id: string;
+  label: string;
+}
 
 interface IProps {
   content?: string;
@@ -11,6 +16,7 @@ interface IProps {
   handleUpdateComment?: () => void;
   remmirorProps?: any;
   editorRef?: any;
+  listMentions?: Mention[];
 }
 
 const Preview: React.FC<IProps> = ({
@@ -19,6 +25,7 @@ const Preview: React.FC<IProps> = ({
   handleUpdateComment,
   remmirorProps,
   editorRef,
+  listMentions,
 }) => {
   const { manager, onChange, state } = remmirorProps || {};
 
@@ -28,6 +35,7 @@ const Preview: React.FC<IProps> = ({
       fromComment
       readOnly
       editorRef={editorRef}
+      listMentions={listMentions}
     />
   ) : (
     <div className="px-2 border-solid border-2 border-light-blue-500 rounded-md mb-4 mt-2  ">
@@ -35,6 +43,7 @@ const Preview: React.FC<IProps> = ({
         remmirorProps={{ manager, onChange, state }}
         fromComment
         editorRef={editorRef}
+        listMentions={listMentions}
       />
 
       <div className="flex justify-between ">

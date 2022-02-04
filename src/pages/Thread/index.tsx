@@ -226,10 +226,11 @@ function ThreadPage() {
     updateReadedThreads(); // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [threadId]);
 
-  const scrollToBottom = () =>
+  const scrollToBottom = () => {
     setTimeout(() => {
       listRef?.current?.scrollIntoView({ behavior: "smooth" });
     }, 1000);
+  };
 
   useEffect(() => {
     const setInteractedUser = async () => {

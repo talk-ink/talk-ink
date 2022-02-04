@@ -16,6 +16,7 @@
   height: 100%;
   margin-left: -2px !important;
   overflow: hidden !important;
+  margin-top: -1rem !important;
 }
 
 .readonly-comment-editor .remirror-editor {

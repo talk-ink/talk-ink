@@ -191,7 +191,7 @@ const Form: React.FC<IProps> = ({
     if (_invitedUsers.length > 0) {
       axios.post(NOTIFICATION_API, {
         title: `${auth?.user.firstName} comment on ${threadName}`,
-        description: editorToHTML(state, ""),
+        description: editorToHTML(state, " "),
         externalUserIds: _invitedUsers,
       });
     }
@@ -199,9 +199,8 @@ const Form: React.FC<IProps> = ({
     draft("comment").deleteByKey(params.threadId);
 
     discardComment();
-    setTimeout(() => {
-      scrollToBottom();
-    }, 500);
+
+    scrollToBottom();
   };
 
   useEffect(() => {

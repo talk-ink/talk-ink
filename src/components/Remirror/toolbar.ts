@@ -39,38 +39,38 @@ export const toolbarItems: ToolbarItemUnion[] = [
         display: "icon",
         attrs: { level: 2 },
       },
-      {
-        type: ComponentItem.ToolbarMenu,
+      // {
+      //   type: ComponentItem.ToolbarMenu,
 
-        items: [
-          {
-            type: ComponentItem.MenuGroup,
-            role: "radio",
-            items: [
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: "toggleHeading",
-                attrs: { level: 3 },
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: "toggleHeading",
-                attrs: { level: 4 },
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: "toggleHeading",
-                attrs: { level: 5 },
-              },
-              {
-                type: ComponentItem.MenuCommandPane,
-                commandName: "toggleHeading",
-                attrs: { level: 6 },
-              },
-            ],
-          },
-        ],
-      },
+      //   items: [
+      //     {
+      //       type: ComponentItem.MenuGroup,
+      //       role: "radio",
+      //       items: [
+      //         {
+      //           type: ComponentItem.MenuCommandPane,
+      //           commandName: "toggleHeading",
+      //           attrs: { level: 3 },
+      //         },
+      //         {
+      //           type: ComponentItem.MenuCommandPane,
+      //           commandName: "toggleHeading",
+      //           attrs: { level: 4 },
+      //         },
+      //         {
+      //           type: ComponentItem.MenuCommandPane,
+      //           commandName: "toggleHeading",
+      //           attrs: { level: 5 },
+      //         },
+      //         {
+      //           type: ComponentItem.MenuCommandPane,
+      //           commandName: "toggleHeading",
+      //           attrs: { level: 6 },
+      //         },
+      //       ],
+      //     },
+      //   ],
+      // },
     ],
     separator: "end",
   },
@@ -111,29 +111,28 @@ export const toolbarItems: ToolbarItemUnion[] = [
         display: "icon",
       },
     ],
-    separator: "end",
   },
-  {
-    type: ComponentItem.ToolbarGroup,
-    label: "History",
-    items: [
-      {
-        type: ComponentItem.ToolbarCommandButton,
-        commandName: "undo",
-        display: "icon",
-      },
-      {
-        type: ComponentItem.ToolbarCommandButton,
-        commandName: "redo",
-        display: "icon",
-      },
-      {
-        type: ComponentItem.ToolbarCommandButton,
-        commandName: "toggleColumns",
-        display: "icon",
-        attrs: { count: 2 },
-      },
-    ],
-    separator: "none",
-  },
+  // {
+  //   type: ComponentItem.ToolbarGroup,
+  //   label: "History",
+  //   items: [
+  //     {
+  //       type: ComponentItem.ToolbarCommandButton,
+  //       commandName: "undo",
+  //       display: "icon",
+  //     },
+  //     {
+  //       type: ComponentItem.ToolbarCommandButton,
+  //       commandName: "redo",
+  //       display: "icon",
+  //     },
+  //     {
+  //       type: ComponentItem.ToolbarCommandButton,
+  //       commandName: "toggleColumns",
+  //       display: "icon",
+  //       attrs: { count: 2 },
+  //     },
+  //   ],
+  //   separator: "none",
+  // },
 ];

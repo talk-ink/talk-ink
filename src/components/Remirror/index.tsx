@@ -72,7 +72,7 @@ const MyEditor: React.FC<IProps> = ({
             autoRender="start"
             onChange={onChange}
             state={state}
-            editable={!readOnly}
+            editable={!readOnly} //conba uncontroled
           >
             {!readOnly && <UserSuggestor allUsers={listMentions} />}
             {!readOnly && (

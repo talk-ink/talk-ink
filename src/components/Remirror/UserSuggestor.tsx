@@ -29,18 +29,14 @@ const UserSuggestor: React.FC<IProps> = ({ allUsers }) => {
     const filteredUsers = allUsers
       .filter((user) => user.label.toLowerCase().includes(searchTerm))
       .sort()
-      .slice(0, 5);
+      .slice(0, 3);
     setUsers(filteredUsers);
   }, [state]);
 
   const enabled = !!state;
 
   return (
-    <FloatingWrapper
-      positioner="cursor"
-      enabled={enabled}
-      placement="bottom-start"
-    >
+    <FloatingWrapper positioner="cursor" enabled={enabled} placement="auto">
       <div {...getMenuProps()} className="suggestions">
         {enabled &&
           users.map((user, index) => {

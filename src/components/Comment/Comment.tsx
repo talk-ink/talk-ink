@@ -542,10 +542,10 @@ const Comment: React.FC<IProps> = ({
                 <>
                   <div className="border-t-[1px] border-gray-200 mb-8" />
                   {!isShowMoreSubComment && (
-                    <div className="text-sm -mt-3">
+                    <div className="text-sm -mt-4">
                       {comment.subComments?.length > 2 && (
                         <p
-                          className="mb-3  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
+                          className="mb-4  hover:border-b-[1px] border-gray-400 w-fit hover:cursor-pointer"
                           onClick={() => setIsShowMoreSubComment(true)}
                         >
                           Show {comment.subComments?.length - 2} More Comments
@@ -573,6 +573,15 @@ const Comment: React.FC<IProps> = ({
                           }
                           parentId={comment._id}
                           threadId={threadId}
+                          listMentions={notifiedOptions
+                            ?.filter(
+                              (item) =>
+                                item.flag === 3 && item.label !== "Your Self"
+                            )
+                            ?.map((item) => ({
+                              id: item.value,
+                              label: item.label,
+                            }))}
                         />
                       )}
                       <SubComment
@@ -595,6 +604,15 @@ const Comment: React.FC<IProps> = ({
                         }
                         parentId={comment._id}
                         threadId={threadId}
+                        listMentions={notifiedOptions
+                          ?.filter(
+                            (item) =>
+                              item.flag === 3 && item.label !== "Your Self"
+                          )
+                          ?.map((item) => ({
+                            id: item.value,
+                            label: item.label,
+                          }))}
                       />
                     </div>
                   )}
@@ -614,6 +632,15 @@ const Comment: React.FC<IProps> = ({
                           key={subComment._id}
                           parentId={comment._id}
                           threadId={threadId}
+                          listMentions={notifiedOptions
+                            ?.filter(
+                              (item) =>
+                                item.flag === 3 && item.label !== "Your Self"
+                            )
+                            ?.map((item) => ({
+                              id: item.value,
+                              label: item.label,
+                            }))}
                         />
                       );
                     })}
