@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Outlet, useParams, useNavigate } from "react-router";
+import React, { useEffect, useState } from "react";
+import { Outlet, useParams, useNavigate, useOutletContext } from "react-router";
 
 import SidebarComponent from "components/Sidebar/SidebarComponent";
 import FullscreenLoading from "components/Loading/FullscreenLoading";
@@ -17,8 +17,6 @@ import { setPageStatus } from "features/pageStatus";
 import { addChannel } from "features/channels/slice";
 import { fetchMembers } from "features/members";
 import { updateUser } from "features/auth";
-import { BiMenu } from "react-icons/bi";
-import MobileHeader from "components/Header/Mobile";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -156,20 +154,27 @@ function DashboardPage() {
     <FullscreenLoading />
   ) : (
     <div className="w-full min-h-screen md:grid md:grid-cols-[280px_1fr] overflow-auto md:overflow-hidden text-slightGray relative">
-      <MobileHeader
-        isSidebarOpen={isSidebarOpen}
-        setIsSidebarOpen={setIsSidebarOpen}
-      />
       <SidebarComponent
         isMobile={isMobile}
         isSidebarOpen={isSidebarOpen}
         setIsSidebarOpen={setIsSidebarOpen}
       />
-      {!pageStatus.status && <Outlet />}
+      {!pageStatus.status && (
+        <Outlet context={[isSidebarOpen, setIsSidebarOpen]} />
+      )}
       {pageStatus.status === "channel-notFound" && <NotFoundChannelPage />}
       {pageStatus.status === "channel-restricted" && <RestrictedChannelPage />}
     </div>
   );
+}
+
+type UseSidebarOpenType = [
+  boolean,
+  React.Dispatch<React.SetStateAction<boolean>>
+];
+
+export function useSidebar() {
+  return useOutletContext<UseSidebarOpenType>();
 }
 
 export default DashboardPage;

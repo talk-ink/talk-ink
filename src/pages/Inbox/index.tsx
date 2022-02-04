@@ -1,25 +1,34 @@
-import { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 
-import { BiCheck, BiDotsHorizontalRounded } from "react-icons/bi";
+import {
+  BiCheck,
+  BiDotsHorizontalRounded,
+  BiDotsVerticalRounded,
+} from "react-icons/bi";
 import { Outlet, useLocation, useParams } from "react-router-dom";
+import { Menu } from "@headlessui/react";
+import { kontenbase } from "lib/client";
+import { useMediaQuery } from "react-responsive";
 
 import Badge from "components/Badge/Badge";
 import IconButton from "components/Button/IconButton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
-import Popup from "components/Popup/Popup";
-import Menu from "components/Menu/Menu";
-import MenuItem from "components/Menu/MenuItem";
 import Modal from "components/Modal/Modal";
+import MobileHeader from "components/Header/Mobile";
+import MenuItem from "components/Menu/MenuItem2";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 
-import { kontenbase } from "lib/client";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
 
 function InboxPage() {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const [showToast] = useToast();
 
   const { pathname } = useLocation();
@@ -113,31 +122,79 @@ function InboxPage() {
   // }
 
   return (
-    <MainContentContainer>
-      <header className="mb-2">
-        <div className="mb-7">
-          <h1 className="font-bold text-3xl">Inbox</h1>
-          {!isClosedThread && (
-            <>
-              {threadData.length > 0 ? (
-                <p className="text-neutral-500 font-body">
-                  {threadData.length} thread to Inbox Zero
-                </p>
-              ) : (
-                <p className="text-neutral-500 font-body">
-                  You’ve hit Inbox Zero!
-                </p>
+    <>
+      <MobileHeader
+        header="Inbox"
+        subHeader={
+          !isClosedThread
+            ? `${
+                threadData?.length > 0
+                  ? `${threadData?.length} thread to Inbox Zero`
+                  : "You’ve hit Inbox Zero!"
+              }`
+            : `Done is better than perfect.`
+        }
+        type="inbox"
+        menu={
+          threadData.length > 0 && (
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiDotsVerticalRounded
+                        size={24}
+                        className="text-slate-800"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      <MenuItem
+                        icon={
+                          <BiCheck size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setInboxModal("read");
+                        }}
+                        title="Mark all read"
+                        disabled={isClosedThread}
+                      />
+                    </Menu.Items>
+                  )}
+                </>
               )}
-            </>
-          )}
-          {isClosedThread && (
-            <p className="text-neutral-500 font-body">
-              Done is better than perfect.
-            </p>
-          )}
-        </div>
-        <div className="flex justify-between">
-          <nav className="flex gap-2 items-center">
+            </Menu>
+          )
+        }
+      />
+      <MainContentContainer>
+        <header className={`mb-2 ${isMobile ? "hidden" : ""}`}>
+          <div className="mb-7">
+            <h1 className="font-bold text-3xl">Inbox</h1>
+            {!isClosedThread && (
+              <>
+                {threadData.length > 0 ? (
+                  <p className="text-neutral-500 font-body">
+                    {threadData.length} thread to Inbox Zero
+                  </p>
+                ) : (
+                  <p className="text-neutral-500 font-body">
+                    You’ve hit Inbox Zero!
+                  </p>
+                )}
+              </>
+            )}
+            {isClosedThread && (
+              <p className="text-neutral-500 font-body">
+                Done is better than perfect.
+              </p>
+            )}
+          </div>
+        </header>
+        <div className="flex justify-center md:justify-between mb-3">
+          <nav className="flex gap-2 items-center self-center">
             <Badge
               active={!pathname.includes("/close")}
               title="Open"
@@ -149,68 +206,63 @@ function InboxPage() {
               link={`/a/${params.workspaceId}/inbox/close`}
             />
           </nav>
-          {threadData.length > 0 && (
-            <Popup
-              content={
-                <div>
-                  <Menu>
-                    {/* <MenuItem
-                      icon={
-                        <BiCheckCircle size={20} className="text-neutral-400" />
-                      }
-                      onClick={() => {
-                        setInboxModal("done");
-                      }}
-                      title="Mark all done"
-                      disabled={isClosedThread}
-                    /> */}
-                    <MenuItem
-                      icon={<BiCheck size={20} className="text-neutral-400" />}
-                      onClick={() => {
-                        setInboxModal("read");
-                      }}
-                      title="Mark all read"
-                      disabled={isClosedThread}
-                    />
-                  </Menu>
-                </div>
-              }
-              position="left"
-            >
-              <IconButton>
-                <BiDotsHorizontalRounded
-                  size={24}
-                  className="text-neutral-400"
-                />
-              </IconButton>
-            </Popup>
+          {!isMobile && threadData.length > 0 && (
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiDotsHorizontalRounded
+                        size={24}
+                        className="text-neutral-400"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      <MenuItem
+                        icon={
+                          <BiCheck size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setInboxModal("read");
+                        }}
+                        title="Mark all read"
+                        disabled={isClosedThread}
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
           )}
         </div>
-      </header>
-      <Modal
-        visible={!!inboxModal}
-        header={`Are you sure you want to mark all Inbox threads as ${inboxModal}?`}
-        onCancel={() => {
-          setInboxModal(null);
-        }}
-        onClose={() => {
-          setInboxModal(null);
-        }}
-        okButtonText={`Mark all ${inboxModal}`}
-        onConfirm={() => {
-          if (inboxModal === "done") {
-            doneAllHandler();
-          }
-          if (inboxModal === "read") {
-            readAllHandler();
-          }
-          setInboxModal(null);
-        }}
-      >
-        <p className="text-sm">This action cannot be undone</p>
-      </Modal>
-      <Outlet />
-    </MainContentContainer>
+        <Modal
+          visible={!!inboxModal}
+          header={`Are you sure you want to mark all Inbox threads as ${inboxModal}?`}
+          onCancel={() => {
+            setInboxModal(null);
+          }}
+          onClose={() => {
+            setInboxModal(null);
+          }}
+          okButtonText={`Mark all ${inboxModal}`}
+          onConfirm={() => {
+            if (inboxModal === "done") {
+              doneAllHandler();
+            }
+            if (inboxModal === "read") {
+              readAllHandler();
+            }
+            setInboxModal(null);
+          }}
+        >
+          <p className="text-sm">This action cannot be undone</p>
+        </Modal>
+        <Outlet />
+      </MainContentContainer>
+    </>
   );
 }
 

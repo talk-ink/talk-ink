@@ -2,6 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 
 import {
   BiDotsHorizontalRounded,
+  BiDotsVerticalRounded,
   BiEdit,
   BiEditAlt,
   BiInfoCircle,
@@ -37,7 +38,7 @@ import { Channel, Member } from "types";
 import { createUniqueArray, getNameInitial } from "utils/helper";
 import Badge from "components/Badge/Badge";
 import { useMediaQuery } from "react-responsive";
-import { setPageHeader } from "features/pageHeader";
+import MobileHeader from "components/Header/Mobile";
 
 moment.locale("id");
 
@@ -164,111 +165,30 @@ function ChannelPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.channelId, auth.user._id]);
 
-  useEffect(() => {
-    const uniqueMemberId = createUniqueArray(channelData?.members ?? []);
-    dispatch(
-      setPageHeader({
-        header: channelData?.name,
-        subHeader: `${uniqueMemberId.length || 0} ${
-          (uniqueMemberId.length || 0) > 1 ? "Members" : "Member"
-        }`,
-        privacy: channelData?.privacy,
-      })
-    );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelData?.name, channelData?.members, channelData?.privacy]);
+  const uniqueMemberId = useMemo(() => {
+    return createUniqueArray(channelData?.members ?? []);
+  }, [channelData?.members]);
 
   const loading = channel.loading || thread.loading;
 
   return (
-    <MainContentContainer>
-      <header
-        className={`mb-8 ${
-          isMobile ? "hidden" : "flex"
-        } items-end justify-between "border-b-2 border-neutral-100 pb-8`}
-      >
-        <div>
-          <h1 className="font-bold text-3xl">{channelData?.name}</h1>
-          <p className="text-neutral-500 font-body capitalize">
-            {channelData?.privacy ?? "Public"}
-          </p>
-        </div>
-
-        <div className="flex items-center gap-3">
-          <div className="hidden md:flex flex-row mr-2">
-            {memberList.map(
-              (member, idx) =>
-                idx <= 3 && (
-                  <div key={idx}>
-                    {member._id === auth.user._id && (
-                      <>
-                        {!auth.user.avatar && (
-                          <NameInitial
-                            key={member._id}
-                            name={getNameInitial(auth.user.firstName)}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                          />
-                        )}
-                        {auth.user.avatar && (
-                          <ProfileImage
-                            key={member._id}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                            source={auth.user.avatar}
-                          />
-                        )}
-                      </>
-                    )}
-                    {member._id !== auth.user._id && (
-                      <>
-                        {!member.avatar && (
-                          <NameInitial
-                            key={member._id}
-                            name={getNameInitial(member.firstName)}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                          />
-                        )}
-                        {member.avatar && (
-                          <ProfileImage
-                            key={member._id}
-                            className="border-2 border-white -mr-2 bg-red-400"
-                            source={member.avatar[0].url}
-                          />
-                        )}
-                      </>
-                    )}
-                  </div>
-                )
-            )}
-            {memberList.length > 3 && (
-              <div
-                className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
-              >
-                +{memberList.length - 3 > 99 ? "99" : memberList.length - 3}
-              </div>
-            )}
-          </div>
-
-          {isChannelMember && (
-            <Button
-              className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
-              onClick={() => {
-                createThreadDraft();
-              }}
-            >
-              <BiEdit size={18} className="text-white md:mr-2" />
-              <p className="hidden md:block text-sm text-white font-medium -mb-1">
-                New Thread
-              </p>
-            </Button>
-          )}
+    <>
+      <MobileHeader
+        header={channelData?.name}
+        subHeader={`${uniqueMemberId.length || 0} ${
+          (uniqueMemberId.length || 0) > 1 ? "Members" : "Member"
+        }`}
+        privacy={channelData?.privacy}
+        type="channel"
+        menu={
           <Menu as="div" className="relative">
             {({ open }) => (
               <>
                 <Menu.Button as={React.Fragment}>
                   <IconButton size="medium">
-                    <BiDotsHorizontalRounded
+                    <BiDotsVerticalRounded
                       size={24}
-                      className="text-neutral-400"
+                      className="text-slate-800"
                     />
                   </IconButton>
                 </Menu.Button>
@@ -318,110 +238,258 @@ function ChannelPage() {
               </>
             )}
           </Menu>
-        </div>
-      </header>
-      <div className={`flex mb-3 ${isMobile ? "justify-center" : ""}`}>
-        <nav className={`flex gap-2 items-center`}>
-          <Badge
-            active={!pathname.includes("/close")}
-            title="Open"
-            link={`/a/${params.workspaceId}/ch/${params.channelId}`}
-          />
-          <Badge
-            active={pathname.includes("/close")}
-            title="Close"
-            link={`/a/${params.workspaceId}/ch/${params.channelId}/close`}
-          />
-        </nav>
-      </div>
-      <Outlet />
+        }
+      />
+      <MainContentContainer>
+        <header
+          className={`mb-8 md:mb-0 ${
+            isMobile ? "hidden" : "flex"
+          } items-end justify-between "border-b-2 border-neutral-100 pb-8`}
+        >
+          <div>
+            <h1 className="font-bold text-3xl">{channelData?.name}</h1>
+            <p className="text-neutral-500 font-body capitalize">
+              {channelData?.privacy ?? "Public"}
+            </p>
+          </div>
 
-      <Modal
-        header="Edit channel"
-        visible={editChannelModal}
-        onClose={() => {
-          setEditChannelModal(false);
-        }}
-        onCancel={() => {
-          setEditChannelModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <EditChannelForm
-          data={channelData}
+          <div className="flex items-center gap-3">
+            <div className="hidden md:flex flex-row mr-2">
+              {memberList.map(
+                (member, idx) =>
+                  idx <= 3 && (
+                    <div key={idx}>
+                      {member._id === auth.user._id && (
+                        <>
+                          {!auth.user.avatar && (
+                            <NameInitial
+                              key={member._id}
+                              name={getNameInitial(auth.user.firstName)}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                            />
+                          )}
+                          {auth.user.avatar && (
+                            <ProfileImage
+                              key={member._id}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                              source={auth.user.avatar}
+                            />
+                          )}
+                        </>
+                      )}
+                      {member._id !== auth.user._id && (
+                        <>
+                          {!member.avatar && (
+                            <NameInitial
+                              key={member._id}
+                              name={getNameInitial(member.firstName)}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                            />
+                          )}
+                          {member.avatar && (
+                            <ProfileImage
+                              key={member._id}
+                              className="border-2 border-white -mr-2 bg-red-400"
+                              source={member.avatar[0].url}
+                            />
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )
+              )}
+              {memberList.length > 3 && (
+                <div
+                  className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
+                >
+                  +{memberList.length - 3 > 99 ? "99" : memberList.length - 3}
+                </div>
+              )}
+            </div>
+
+            {isChannelMember && (
+              <Button
+                className="bg-indigo-500 hover:bg-indigo-500 flex items-center"
+                onClick={() => {
+                  createThreadDraft();
+                }}
+              >
+                <BiEdit size={18} className="text-white md:mr-2" />
+                <p className="hidden md:block text-sm text-white font-medium -mb-1">
+                  New Thread
+                </p>
+              </Button>
+            )}
+            <Menu as="div" className="relative">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton size="medium">
+                      <BiDotsHorizontalRounded
+                        size={24}
+                        className="text-neutral-400"
+                      />
+                    </IconButton>
+                  </Menu.Button>
+
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiUserPlus
+                              size={20}
+                              className="text-neutral-400"
+                            />
+                          }
+                          onClick={() => {
+                            setAddMemberModal(true);
+                          }}
+                          title="Add members"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiInfoCircle
+                            size={20}
+                            className="text-neutral-400"
+                          />
+                        }
+                        onClick={() => {
+                          setChannelInfoModal(true);
+                        }}
+                        title="Channel information"
+                      />
+                      {isAdmin && (
+                        <MenuItem
+                          icon={
+                            <BiEditAlt size={20} className="text-neutral-400" />
+                          }
+                          onClick={() => {
+                            setEditChannelModal(true);
+                          }}
+                          title="Edit channel"
+                        />
+                      )}
+                      <MenuItem
+                        icon={
+                          <BiLogOut size={20} className="text-neutral-400" />
+                        }
+                        onClick={() => {
+                          setLeaveChannelModal(true);
+                        }}
+                        title="Leave channel"
+                      />
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+          </div>
+        </header>
+        <div className={`flex mb-3 ${isMobile ? "justify-center" : ""}`}>
+          <nav className={`flex gap-2 items-center`}>
+            <Badge
+              active={!pathname.includes("/close")}
+              title="Open"
+              link={`/a/${params.workspaceId}/ch/${params.channelId}`}
+            />
+            <Badge
+              active={pathname.includes("/close")}
+              title="Close"
+              link={`/a/${params.workspaceId}/ch/${params.channelId}/close`}
+            />
+          </nav>
+        </div>
+        <Outlet />
+
+        <Modal
+          header="Edit channel"
+          visible={editChannelModal}
           onClose={() => {
             setEditChannelModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Channel information"
-        visible={channelInfoModal}
-        onClose={() => {
-          setChannelInfoModal(false);
-        }}
-        onCancel={() => {
-          setChannelInfoModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <ChannelInfo
-          data={channelData}
+          onCancel={() => {
+            setEditChannelModal(false);
+          }}
+          footer={null}
+          size="small"
+        >
+          <EditChannelForm
+            data={channelData}
+            onClose={() => {
+              setEditChannelModal(false);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Channel information"
+          visible={channelInfoModal}
           onClose={() => {
             setChannelInfoModal(false);
           }}
-          showManageMemberModal={() => {
-            setAddMemberModal(true);
+          onCancel={() => {
+            setChannelInfoModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header="Manage members"
-        visible={addMemberModal}
-        onClose={() => {
-          setAddMemberModal(false);
-        }}
-        onCancel={() => {
-          setAddMemberModal(false);
-        }}
-        footer={null}
-        size="small"
-      >
-        <AddChannelMember
-          data={channelData}
+          footer={null}
+          size="small"
+        >
+          <ChannelInfo
+            data={channelData}
+            onClose={() => {
+              setChannelInfoModal(false);
+            }}
+            showManageMemberModal={() => {
+              setAddMemberModal(true);
+            }}
+          />
+        </Modal>
+        <Modal
+          header="Manage members"
+          visible={addMemberModal}
           onClose={() => {
             setAddMemberModal(false);
           }}
-        />
-      </Modal>
-      <Modal
-        header={`Leave ${
-          channelData?.privacy === "private" ? "private" : "public"
-        } channel?`}
-        okButtonText="Leave channel"
-        visible={!!channelData && leaveChannelModal}
-        onCancel={() => {
-          setLeaveChannelModal(false);
-        }}
-        onClose={() => {
-          setLeaveChannelModal(false);
-        }}
-        onConfirm={() => {
-          leaveChannelHandler();
-        }}
-        size="xs"
-      >
-        <p className="text-sm">
-          Are you sure you want to leave this channel? You can always join it
-          again later.
-        </p>
-      </Modal>
-      {!isChannelMember && !loading && (
-        <ChannelBadge type="channel" data={channelData} userId={userId} />
-      )}
-    </MainContentContainer>
+          onCancel={() => {
+            setAddMemberModal(false);
+          }}
+          footer={null}
+          size="small"
+        >
+          <AddChannelMember
+            data={channelData}
+            onClose={() => {
+              setAddMemberModal(false);
+            }}
+          />
+        </Modal>
+        <Modal
+          header={`Leave ${
+            channelData?.privacy === "private" ? "private" : "public"
+          } channel?`}
+          okButtonText="Leave channel"
+          visible={!!channelData && leaveChannelModal}
+          onCancel={() => {
+            setLeaveChannelModal(false);
+          }}
+          onClose={() => {
+            setLeaveChannelModal(false);
+          }}
+          onConfirm={() => {
+            leaveChannelHandler();
+          }}
+          size="xs"
+        >
+          <p className="text-sm">
+            Are you sure you want to leave this channel? You can always join it
+            again later.
+          </p>
+        </Modal>
+        {!isChannelMember && !loading && (
+          <ChannelBadge type="channel" data={channelData} userId={userId} />
+        )}
+      </MainContentContainer>
+    </>
   );
 }
 

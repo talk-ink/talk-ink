@@ -1,20 +1,67 @@
 import React from "react";
 
-import { BiDotsVerticalRounded, BiHash, BiLock, BiMenu } from "react-icons/bi";
+import { BiHash, BiLock, BiMenu, BiTrash } from "react-icons/bi";
 
-import { useAppSelector } from "hooks/useAppSelector";
+import { AiOutlineInbox, AiOutlineSearch } from "react-icons/ai";
+import { useSidebar } from "pages/Dashboard";
+import { useMediaQuery } from "react-responsive";
 
 type Props = {
-  isSidebarOpen: boolean;
-  setIsSidebarOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  menu?: React.ReactNode;
+  header?: string;
+  subHeader?: string;
+  privacy?: "public" | "private";
+  type?: "inbox" | "search" | "channel" | "trash";
 };
 
-function MobileHeader({ isSidebarOpen, setIsSidebarOpen }: Props) {
-  const pageHeader = useAppSelector((state) => state.pageHeader);
+function MobileHeader({
+  menu,
+  header,
+  subHeader,
+  privacy = "public",
+  type,
+}: Props) {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [isSidebarOpen, setIsSidebarOpen] = useSidebar();
+
+  let Icon = BiHash;
+
+  switch (privacy) {
+    case "public":
+      if (type) {
+        switch (type) {
+          case "inbox":
+            Icon = AiOutlineInbox;
+            break;
+          case "search":
+            Icon = AiOutlineSearch;
+            break;
+          case "trash":
+            Icon = BiTrash;
+            break;
+
+          default:
+            break;
+        }
+      }
+      break;
+
+    case "private":
+      Icon = BiLock;
+      break;
+
+    default:
+      break;
+  }
+
   return (
     <div
       className={`fixed h-16 w-full border-b border-neutral-200 ${
-        pageHeader.show ? "flex" : "hidden"
+        isMobile ? "flex" : "hidden"
       } items-center justify-between px-4 bg-white z-30`}
     >
       <div className="flex items-center gap-4">
@@ -25,20 +72,18 @@ function MobileHeader({ isSidebarOpen, setIsSidebarOpen }: Props) {
         />
         <div className="flex flex-col">
           <div className="flex gap-1 items-center">
-            {pageHeader?.privacy === "public" && (
-              <BiHash size={18} className="text-slate-400" />
+            {privacy === "public" && (
+              <Icon size={18} className="text-slate-400" />
             )}
-            {pageHeader?.privacy === "private" && (
-              <BiLock size={18} className="text-slate-400" />
+            {privacy === "private" && (
+              <Icon size={18} className="text-slate-400" />
             )}
-            <h1 className="text-lg font-semibold ">{pageHeader.header}</h1>
+            <h1 className="text-lg font-semibold ">{header}</h1>
           </div>
-          <p className="text-sm text-indigo-500">{pageHeader.subHeader}</p>
+          <p className="text-sm text-indigo-500">{subHeader}</p>
         </div>
       </div>
-      <div>
-        <BiDotsVerticalRounded size={28} className="text-slate-800" />
-      </div>
+      <div>{menu}</div>
     </div>
   );
 }

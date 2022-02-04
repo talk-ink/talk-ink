@@ -31,7 +31,6 @@ import NameInitial from "components/Avatar/NameInitial";
 import { getNameInitial } from "utils/helper";
 import { KontenbaseResponse, KontenbaseSingleResponse } from "@kontenbase/sdk";
 import ThreadBadge from "components/Thread/ThreadBadge";
-import { setPageHeader } from "features/pageHeader";
 
 function useQuery() {
   const { search } = useLocation();
@@ -289,15 +288,6 @@ function ThreadPage() {
     setMemberList(member.members);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [member.members]);
-
-  useEffect(() => {
-    dispatch(setPageHeader({ show: false }));
-
-    return () => {
-      dispatch(setPageHeader({ show: true }));
-    };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // useEffect(() => {
   //   dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));

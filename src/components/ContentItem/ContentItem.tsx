@@ -119,7 +119,7 @@ function ContentItem({
   };
 
   const closedBy: Member = useMemo(() => {
-    return member.members.find(
+    return member?.members?.find(
       (data) => data._id === dataSource?.closedBy?.[0]
     );
   }, [dataSource?.closedBy, member.members]);
