@@ -34,13 +34,15 @@ import { deleteThread, updateThread } from "features/threads";
 import { useToast } from "hooks/useToast";
 import { BsArrowUpCircle } from "react-icons/bs";
 
+export type SelectedThreadTypes = "delete" | "close" | "menu";
+
 type Props = React.PropsWithChildren<{
   onClick?: () => void;
   dataSource: Thread | null | undefined;
   setSelectedThread?: React.Dispatch<
     React.SetStateAction<{
       thread: Thread;
-      type: "delete" | "close";
+      type: SelectedThreadTypes;
     }>
   >;
   otherButton?: React.ReactNode;
@@ -138,17 +140,7 @@ function ContentItem({
       className="
     cursor-pointer
     hover:before:bg-transparent
-    hover:after:bg-transparent
-    before:block
-    before:w-full
-    before:h-[1px]
-    before:bg-neutral-200
-    last:after:block
-    last:after:w-full
-    last:after:h-[1px]
-    last:after:bg-neutral-200
-    first:before:hidden
-    "
+    hover:after:bg-transparent"
     >
       <div className="flex items-center justify-between md:px-3 hover:bg-indigo-50 rounded-xl border-transparent group">
         <button
@@ -185,9 +177,9 @@ function ContentItem({
             </div>
           </div>
           <div>
-            <div className="flex flex-col items-start md:flex-row md:items-center">
+            <div className="flex flex-row items-center">
               <p
-                className={`font-body text-sm max-w-[8rem] mr-2 md:max-w-xs overflow-hidden text-ellipsis whitespace-nowrap ${
+                className={`font-body md:text-sm max-w-[12rem] mr-2 md:max-w-xs overflow-hidden text-left text-ellipsis whitespace-nowrap ${
                   dataSource?.draft && "text-blue-500"
                 } ${!dataSource?.draft && !isRead && "font-semibold"}`}
               >
@@ -203,23 +195,23 @@ function ContentItem({
                 </ReactMoment>
               </span>
             </div>
-            <div className="text-left table table-fixed w-full  text-xs text-neutral-500 pr-2">
+            <div className="text-left table table-fixed w-full md:text-xs text-neutral-500 pr-2">
               {!dataSource.isClosed && (
-                <small className=" text-xs text-neutral-500 table-cell truncate">
+                <small className="text-sm md:text-xs text-neutral-500 table-cell truncate">
                   {dataSource?.draft ? "Me: " : ""}
                   {/* latest juga disini */}
                   {editorToHTML(state)}
                 </small>
               )}
               {dataSource.isClosed && (
-                <small className=" text-xs text-neutral-500 table-cell truncate">
+                <small className="text-sm md:text-xs text-neutral-500 table-cell truncate">
                   {closedBy?.firstName} closed this thread.
                 </small>
               )}
             </div>
           </div>
         </button>
-        <div className="flex active:flex group-hover:flex gap-2 items-center">
+        <div className="hidden md:flex active:flex group-hover:flex gap-2 items-center">
           {otherButton}
           <Menu as="div" className="relative">
             {({ open }) => (

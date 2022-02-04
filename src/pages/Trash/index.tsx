@@ -3,7 +3,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { kontenbase } from "lib/client";
 
-import ContentItem from "components/ContentItem/ContentItem";
+import ContentItem, {
+  SelectedThreadTypes,
+} from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import Modal from "components/Modal/Modal";
@@ -32,7 +34,7 @@ function TrashPage() {
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
+    useState<{ thread: Thread; type: SelectedThreadTypes }>();
 
   useEffect(() => {
     dispatch(

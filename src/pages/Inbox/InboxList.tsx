@@ -6,7 +6,9 @@ import moment from "moment-timezone";
 import { kontenbase } from "lib/client";
 
 import InboxEmpty from "components/EmptyContent/InboxEmpty";
-import ContentItem from "components/ContentItem/ContentItem";
+import ContentItem, {
+  SelectedThreadTypes,
+} from "components/ContentItem/ContentItem";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import IconButton from "components/Button/IconButton";
 import Modal from "components/Modal/Modal";
@@ -36,7 +38,7 @@ function InboxList({ type = "open" }: TProps) {
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
+    useState<{ thread: Thread; type: SelectedThreadTypes }>();
 
   const isClosedThread = useMemo(() => {
     return type === "close";

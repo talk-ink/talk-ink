@@ -4,7 +4,9 @@ import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment-timezone";
 import { kontenbase } from "lib/client";
 
-import ContentItem from "components/ContentItem/ContentItem";
+import ContentItem, {
+  SelectedThreadTypes,
+} from "components/ContentItem/ContentItem";
 import ChannelEmpty from "components/EmptyContent/ChannelEmpty";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
 import Modal from "components/Modal/Modal";
@@ -35,7 +37,7 @@ const ThreadList = ({ type = "open" }: Props) => {
   const dispatch = useAppDispatch();
 
   const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: "delete" | "close" }>();
+    useState<{ thread: Thread; type: SelectedThreadTypes }>();
 
   const isClosedThread = useMemo(() => {
     return type === "close";
