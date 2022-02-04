@@ -44,6 +44,11 @@ type TSubCommentsDeletePayload = {
   threadId: string;
 };
 
+type IUpdateThreadCommentPayload = {
+  thread: Thread;
+  comments: Comment[];
+};
+
 const initialState: InitThreadState = {
   threads: [],
   loading: true,
@@ -87,6 +92,35 @@ const threadSlice = createSlice({
       );
       state.threads = updatedThread;
     },
+    updateThreadComment: (
+      state,
+      action: PayloadAction<IUpdateThreadCommentPayload>
+    ) => {
+      const updatedThread = state.threads.map((item) => {
+        if (item._id === action.payload.thread._id) {
+          const newComment =
+            item.comments?.length > 0
+              ? [...action.payload.comments, ...item.comments]
+              : action.payload.comments;
+
+          const distinctComments = filterDistinct(newComment, "_id");
+
+          return {
+            ...item,
+            comments: distinctComments
+              .filter((item) => item.createdBy._id)
+              .sort(
+                (a, b) =>
+                  moment(a.createdAt).valueOf() - moment(b.createdAt).valueOf()
+              ),
+          };
+        } else {
+          return item;
+        }
+      });
+
+      state.threads = updatedThread;
+    },
     addComment: (state, action: PayloadAction<TCommentPayload>) => {
       const newThread = state.threads.map((item) =>
         item._id === action.payload.threadId
@@ -101,8 +135,6 @@ const threadSlice = createSlice({
       state.commentCount = state.commentCount + 1;
     },
     updateComment: (state, action: PayloadAction<TCommentPayload>) => {
-      console.log(action.payload);
-
       const updatedThread = state.threads.map((item) =>
         item._id === action.payload.threadId
           ? {
@@ -310,5 +342,6 @@ export const {
   addSubCommentToComment,
   updateSubCommentToComment,
   deleteSubCommentToComment,
+  updateThreadComment,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

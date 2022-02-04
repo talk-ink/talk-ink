@@ -19,6 +19,7 @@ import { useRemirror } from "@remirror/react";
 
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
+import { parseContent } from "utils/helper";
 
 moment.locale("id");
 
@@ -51,7 +52,7 @@ function EditThread() {
   const { manager, onChange, state } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
-    content: JSON.parse(threadData?.content).doc,
+    content: parseContent(threadData.content),
     selection: "start",
   });
 

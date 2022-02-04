@@ -87,7 +87,7 @@ const SubCommentForm: React.FC<IProps> = ({
           remmirorProps={{ manager, onChange, state }}
           fromComment
           listMentions={notifiedOptions
-            ?.filter((item) => item.flag === 3)
+            ?.filter((item) => item.flag === 3 && item.label !== "Your Self")
             ?.map((item) => ({
               id: item.value,
               label: item.label,

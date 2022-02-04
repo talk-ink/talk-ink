@@ -39,7 +39,7 @@ import limitImage from "assets/image/limit.svg";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { addThread, deleteThread, updateThread } from "features/threads";
+import { addThread, deleteThread, updateThreadComment } from "features/threads";
 import { updateUser } from "features/auth";
 import { createUniqueArray } from "utils/helper";
 
@@ -355,15 +355,21 @@ function SidebarComponent({
                             threads: payload.before._id,
                           },
                           lookup: ["subComments"],
+                          sort: {
+                            createdAt: -1,
+                          },
+                          limit: 2,
                         });
 
                       if (error) throw new Error(error.message);
 
                       dispatch(
-                        updateThread({
-                          ...payload.before,
-                          ...payload.after,
-                          createdBy: _createdBy,
+                        updateThreadComment({
+                          thread: {
+                            ...payload.before,
+                            ...payload.after,
+                            createdBy: _createdBy,
+                          },
                           comments: data,
                         })
                       );
