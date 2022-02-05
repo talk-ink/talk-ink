@@ -73,6 +73,12 @@ const Form: React.FC<IProps> = ({
   >([]);
   const auth = useAppSelector((state) => state.auth);
   const channel = useAppSelector((state) => state.channel);
+  const workspace = useAppSelector((state) => state.workspace);
+
+  const currentWorkspace = useMemo(
+    () => workspace.workspaces.find((item) => item._id === params.workspaceId),
+    [params.workspaceId, workspace.workspaces]
+  );
 
   const editorRef = useRef<EditorRef | null>(null);
 
@@ -195,8 +201,8 @@ const Form: React.FC<IProps> = ({
 
     if (_invitedUsers.length > 0) {
       axios.post(NOTIFICATION_API, {
-        title: `${auth?.user.firstName} comment on ${threadName}`,
-        description: editorToHTML(state, " "),
+        title: `${currentWorkspace.name} - #${channelData?.name}`,
+        description: `${auth?.user.firstName} comment on ${threadName}`,
         externalUserIds: _invitedUsers,
         url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${params.threadId}`,
       });
