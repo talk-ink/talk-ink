@@ -113,9 +113,11 @@
   padding-right: 0.5em;
 }
 
-/* .onesignal-bell-launcher-button {
-  display: none !important;
-} */
+@media only screen and (max-width: 600px) {
+  .onesignal-bell-launcher-button {
+    display: none !important;
+  }
+}
 
 #onesignal-bell-container.onesignal-reset
   .onesignal-bell-launcher.onesignal-bell-launcher-theme-default

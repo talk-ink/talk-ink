@@ -13,7 +13,7 @@
 }
 
 .readonly-editor .remirror-editor {
-  height: 100%;
+  min-height: 1rem !important;
   margin-left: -2px !important;
   overflow: hidden !important;
   margin-top: -1rem !important;
@@ -34,9 +34,15 @@
 }
 
 @media only screen and (max-width: 600px) {
+  .comment-editor .remirror-editor {
+    min-height: 1rem !important;
+  }
+}
+
+@media only screen and (max-width: 600px) {
   .readonly-comment-editor .remirror-editor,
   .readonly-editor .remirror-editor {
-    width: 80vw !important;
+    width: 79vw !important;
   }
 }
 
