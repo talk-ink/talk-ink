@@ -35,7 +35,6 @@ import ThreadBadge from "components/Thread/ThreadBadge";
 
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
-import { useMediaQuery } from "react-responsive";
 
 function useQuery() {
   const { search } = useLocation();
