@@ -14,10 +14,6 @@ const authSlice = createSlice({
   initialState,
   reducers: {
     setAuthToken: (state, action: PayloadAction<Token>) => {
-      const cookiesToken = cookies.get("token");
-      if (!cookiesToken) {
-        cookies.set("token", `${action.payload.token}`);
-      }
       state.token = action.payload.token;
     },
     setAuthUser: (state, action: PayloadAction<TUserProfile>) => {
@@ -40,8 +36,8 @@ const authSlice = createSlice({
       state.loading = action.payload;
     },
     login: (state, action: PayloadAction<AuthState>) => {
-      const cookiesToken = cookies.get("token");
-      if (!cookiesToken) {
+      const localStorageToken = localStorage.getItem("token");
+      if (!localStorageToken) {
         cookies.set("token", `${action.payload.token}`);
       }
       state.loading = false;

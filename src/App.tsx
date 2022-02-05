@@ -1,6 +1,5 @@
 import { useEffect } from "react";
 import { Route, Routes } from "react-router";
-import cookies from "js-cookie";
 import OneSignal from "react-onesignal";
 
 import ChannelPage from "pages/Channel";
@@ -36,8 +35,8 @@ function App() {
   const [showToast] = useToast();
   const checkUser = async () => {
     try {
-      const cookiesToken = cookies.get("token");
-      if (!cookiesToken) return;
+      const localStorageToken = localStorage.getItem("token");
+      if (!localStorageToken) return;
 
       const { user: userData, error } = await kontenbase.auth.user();
 
@@ -69,7 +68,7 @@ function App() {
         }
       }
 
-      const token: Token = { token: cookiesToken };
+      const token: Token = { token: localStorageToken };
       const user: TUserProfile = userData;
 
       dispatch(setAuthToken(token));
