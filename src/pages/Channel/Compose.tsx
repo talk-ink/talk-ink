@@ -38,8 +38,6 @@ interface INotifiedOption {
   flag: number;
 }
 
-// const animatedComponents = makeAnimated();
-
 moment.locale("id");
 
 const NOTIFICATION_API = notificationUrl;
@@ -50,6 +48,8 @@ function Compose() {
   const [showToast] = useToast();
 
   const auth = useAppSelector((state) => state.auth);
+  const workspace = useAppSelector((state) => state.workspace);
+
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
   const [notifiedOptions, setNotifiedOptions] = useState<INotifiedOption[]>([]);
@@ -70,6 +70,11 @@ function Compose() {
 
     return "";
   };
+
+  const currentWorkspace = useMemo(
+    () => workspace.workspaces.find((item) => item._id === params.workspaceId),
+    [params.workspaceId, workspace.workspaces]
+  );
 
   const { manager, onChange, state } = useRemirror({
     extensions: () => extensions(false, "Write Something Nice..."),
@@ -164,8 +169,8 @@ function Compose() {
 
       if (_invitedUsers.length > 0) {
         axios.post(NOTIFICATION_API, {
-          title: `New Thread - ${channelData?.name}`,
-          description: values.name,
+          title: `${currentWorkspace.name} - #${channelData?.name}`,
+          description: `New Thread - ${values.name}`,
           externalUserIds: _invitedUsers,
           url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`,
         });

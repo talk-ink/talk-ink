@@ -312,7 +312,7 @@ function ThreadPage() {
         }
       }}
     >
-      <div className="max-w-4xl ml-auto mr-auto -mt-4">
+      <div className="px-4 max-w-4xl ml-auto mr-auto -mt-16 md:-mt-4">
         <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl max-w-3xl break-words">

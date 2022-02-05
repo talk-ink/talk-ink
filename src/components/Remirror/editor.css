@@ -33,6 +33,13 @@
   margin-top: -1rem !important;
 }
 
+@media only screen and (max-width: 600px) {
+  .readonly-comment-editor .remirror-editor,
+  .readonly-editor .remirror-editor {
+    width: 80vw !important;
+  }
+}
+
 .readonly-editor .remirror-file-root a:last-child {
   display: none !important;
 }

@@ -139,6 +139,7 @@ function App() {
               path="ch/:channelId/te/:threadId"
               element={<EditThreadPage />}
             />
+
             <Route
               path="ch/:channelId/compose/:composeId"
               element={<Compose />}

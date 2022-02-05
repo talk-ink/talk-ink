@@ -53,7 +53,7 @@ function EditThread() {
     extensions,
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(threadData.content),
-    selection: "start",
+    selection: "end",
   });
 
   const formik = useFormik({

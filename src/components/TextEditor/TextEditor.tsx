@@ -47,7 +47,7 @@ function TextEditor({
   return (
     <div className="flex flex-col h-full mb-10">
       <div></div>
-      <div className="flex flex-col h-full min-h-0">
+      <div className="flex flex-col h-full min-h-0 mb-2">
         <input
           className="w-full h-auto outline-none text-3xl font-bold mb-4"
           placeholder="Thread title"
@@ -60,7 +60,7 @@ function TextEditor({
 
         <Remirror remmirorProps={remmirorProps} listMentions={listMentions} />
       </div>
-      <div className="absolute left-0 bottom-0 w-full flex justify-between items-center px-5 pb-5">
+      <div className="absolute left-0 bottom-0 w-full flex justify-between items-center px-5 pb-5 ">
         <div></div>
         <div className="flex gap-2">
           {!isEdit && (
@@ -76,7 +76,7 @@ function TextEditor({
           )}
           <Button
             type="submit"
-            className=" bg-indigo-500 hover:bg-indigo-500 rounded text-xs font-medium px-5 text-white"
+            className=" bg-indigo-500 hover:bg-indigo-500 rounded text-xs font-medium px-5 text-white "
             disabled={isDisabled}
             onClick={formik.handleSubmit}
           >

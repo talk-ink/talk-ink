@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import {
   BiDotsHorizontalRounded,
@@ -79,12 +79,24 @@ const Comment: React.FC<IProps> = ({
 
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
+
   const auth = useAppSelector((state) => state.auth);
+  const workspace = useAppSelector((state) => state.workspace);
+  const channel = useAppSelector((state) => state.channel);
+
+  const currentWorkspace = useMemo(
+    () => workspace.workspaces.find((item) => item._id === params.workspaceId),
+    [params.workspaceId, workspace.workspaces]
+  );
+
+  const channelData = useMemo(() => {
+    return channel.channels.find((data) => data._id === params.channelId);
+  }, [params.channelId, channel.channels]);
+
   const [isReplyEditorVisible, setIsShowReplyEditorVisible] = useState(false);
   const editorRef = useRef<EditorRef | null>(null);
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [editorState, setEditorState] = useState<string>("");
   const [subEditorState, setSubEditorState] = useState<string>("");
   const [isShowMoreSubComment, setIsShowMoreSubComment] =
     useState<boolean>(false);
@@ -188,8 +200,8 @@ const Comment: React.FC<IProps> = ({
         );
 
         axios.post(NOTIFICATION_API, {
-          title: `${auth?.user.firstName} reply comment on ${threadName}`,
-          description: "",
+          title: `${currentWorkspace.name} - #${channelData?.name}`,
+          description: `${auth?.user.firstName} reply comment on ${threadName}`,
           externalUserIds: invitedUsers,
           url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${params.threadId}`,
         });
