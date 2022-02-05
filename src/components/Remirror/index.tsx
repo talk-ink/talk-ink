@@ -71,7 +71,7 @@ const MyEditor: React.FC<IProps> = ({
       <AllStyledComponent>
         <ThemeProvider>
           <Remirror
-            autoFocus
+            autoFocus={!readOnly}
             manager={manager}
             autoRender="start"
             onChange={onChange}
