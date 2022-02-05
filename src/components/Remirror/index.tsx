@@ -4,6 +4,7 @@ import "remirror/styles/extension-file.css";
 import "./editor.css";
 
 import { AllStyledComponent } from "@remirror/styles/emotion";
+import { useMediaQuery } from "react-responsive";
 
 import { toolbarItems } from "./toolbar";
 
@@ -51,6 +52,9 @@ const MyEditor: React.FC<IProps> = ({
   listMentions = [],
 }) => {
   const { manager, onChange, state } = remmirorProps || {};
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
 
   return (
     <div
@@ -75,7 +79,7 @@ const MyEditor: React.FC<IProps> = ({
             editable={!readOnly} //conba uncontroled
           >
             {!readOnly && <UserSuggestor allUsers={listMentions} />}
-            {!readOnly && (
+            {!readOnly && !isMobile && (
               <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
             )}
             {editorRef && <ImperativeHandle ref={editorRef} />}

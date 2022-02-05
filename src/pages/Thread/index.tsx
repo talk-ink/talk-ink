@@ -35,6 +35,7 @@ import ThreadBadge from "components/Thread/ThreadBadge";
 
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
+import { useMediaQuery } from "react-responsive";
 
 function useQuery() {
   const { search } = useLocation();
@@ -56,7 +57,6 @@ function ThreadPage() {
   const listRef = useRef<HTMLDivElement>(null);
   const [memberList, setMemberList] = useState<Member[]>([]);
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
-
   const [showTitle, setShowTitle] = useState<boolean>(false);
 
   const channelData: Channel = useMemo(() => {
@@ -312,7 +312,7 @@ function ThreadPage() {
         }
       }}
     >
-      <div className="px-4 max-w-4xl ml-auto mr-auto -mt-16 md:-mt-4">
+      <div className="px-4 max-w-4xl ml-auto mr-auto -mt-16 md:-mt-4 md:-mb-16">
         <div className="relative">
           <div className="mb-8">
             <h1 className="font-bold text-3xl max-w-3xl break-words">

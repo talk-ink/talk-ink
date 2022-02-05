@@ -29,6 +29,9 @@ import { useRemirror } from "@remirror/react";
 import { htmlToProsemirrorNode } from "remirror";
 import { extensions } from "components/Remirror/extensions";
 import { frontendUrl } from "utils/helper";
+import IconButton from "components/Button/IconButton";
+import { MdSend } from "react-icons/md";
+import { useMediaQuery } from "react-responsive";
 
 interface IProps {
   isShowEditor: boolean;
@@ -64,6 +67,9 @@ const Form: React.FC<IProps> = ({
   interactedUsers,
   memberList,
 }) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
   const [showToast] = useToast();
   const params = useParams();
   const dispatch = useAppDispatch();
@@ -83,7 +89,7 @@ const Form: React.FC<IProps> = ({
   const editorRef = useRef<EditorRef | null>(null);
 
   const { manager, onChange, state } = useRemirror({
-    extensions: () => extensions(false, "Write Something Nice..."),
+    extensions: () => extensions(false, "Reply"),
     stringHandler: htmlToProsemirrorNode,
     content: "",
     selection: "start",
@@ -244,7 +250,7 @@ const Form: React.FC<IProps> = ({
   }, [isShowEditor, auth.user._id, params.threadId]);
 
   return (
-    <div className=" bg-white">
+    <div className=" bg-white sticky bottom-0 max-w-4xl w-full">
       {!isShowEditor && (
         <div className="flex items-center py-3 ">
           {auth.user.avatar ? (
@@ -257,12 +263,13 @@ const Form: React.FC<IProps> = ({
           )}
 
           <input
-            className="ml-4 appearance-none border-[1px] border-light-blue-500 rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
+            className=" ml-4 appearance-none border-[1px] border-light-blue-500 rounded-[25px] w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
             placeholder="Input Your Message"
             readOnly
             onClick={() => {
               setIsShowEditor(true);
+              scrollToBottom();
             }}
           />
         </div>
@@ -275,7 +282,9 @@ const Form: React.FC<IProps> = ({
       >
         <div className="mt-1 flex w-full items-center">
           <div className="mr-2">
-            <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
+            <div
+              className={`md:bg-gray-200 w-fit md:px-2 py-[2.9px]  rounded-sm text-sm`}
+            >
               Tag:
             </div>
           </div>
@@ -364,9 +373,14 @@ const Form: React.FC<IProps> = ({
               IndicatorSeparator: () => null,
             }}
             styles={{
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: isMobile ? "white" : "#e9ecef",
+              }),
               container: (base) => ({
                 ...base,
                 width: "100%",
+                background: isMobile && "white",
               }),
               menuList: (base) => ({
                 ...base,
@@ -391,20 +405,35 @@ const Form: React.FC<IProps> = ({
         <div className="flex justify-between">
           <div />
           <div className="flex items-center py-2">
-            <Button
-              type="submit"
-              className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
-              onClick={discardComment}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-              onClick={handleCreateComment}
-            >
-              Post
-            </Button>
+            {!isMobile && (
+              <Button
+                type="submit"
+                className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
+                onClick={discardComment}
+              >
+                Cancel
+              </Button>
+            )}
+
+            {!isMobile && (
+              <Button
+                type="submit"
+                className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
+                onClick={handleCreateComment}
+              >
+                Post
+              </Button>
+            )}
+
+            {isMobile && (
+              <IconButton size="medium">
+                <MdSend
+                  size={20}
+                  className="text-indigo-500"
+                  onClick={handleCreateComment}
+                />
+              </IconButton>
+            )}
           </div>
         </div>
       </div>
