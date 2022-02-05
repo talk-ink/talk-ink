@@ -5,6 +5,7 @@ import OneSignal from "react-onesignal";
 
 import RestrictedRoute from "routes/RestrictedRoute";
 import LandingPage from "pages/Landing";
+import ThreadPage from "pages/Thread";
 
 import ToastProvider from "components/ToastProvider/ToastProvider";
 import NotFound from "components/NotFound/NotFound";
@@ -24,7 +25,6 @@ const Compose = lazy(() => import("pages/Channel/Compose"));
 const LoginPage = lazy(() => import("pages/Login"));
 const RegisterPage = lazy(() => import("pages/Register"));
 const CreateWorkspacePage = lazy(() => import("pages/CreateWorkspace"));
-const ThreadPage = lazy(() => import("pages/Thread"));
 const EditThreadPage = lazy(() => import("pages/Thread/Edit"));
 const JoinChannelPage = lazy(() => import("pages/JoinChannel"));
 const InboxList = lazy(() => import("pages/Inbox/InboxList"));
