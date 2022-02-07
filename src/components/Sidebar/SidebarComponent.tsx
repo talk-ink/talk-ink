@@ -39,7 +39,12 @@ import limitImage from "assets/image/limit.svg";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { addThread, deleteThread, updateThreadComment } from "features/threads";
+import {
+  addThread,
+  deleteThread,
+  updateThreadComment,
+  updateThread,
+} from "features/threads";
 import { updateUser } from "features/auth";
 import { createUniqueArray } from "utils/helper";
 
@@ -315,6 +320,40 @@ function SidebarComponent({
           ) {
             switch (event) {
               case "UPDATE_RECORD":
+                if (
+                  !!payload?.before?.isClosed !== !!payload?.after?.isClosed
+                ) {
+                  try {
+                    const { data, error } = await kontenbase
+                      .service("Comments")
+                      .find({
+                        where: {
+                          threads: payload.before._id,
+                        },
+                        lookup: ["subComments"],
+                        sort: {
+                          createdAt: -1,
+                        },
+                        limit: 2,
+                      });
+
+                    if (error) throw new Error(error.message);
+
+                    dispatch(
+                      updateThreadComment({
+                        thread: {
+                          ...payload.after,
+                          createdBy: _createdBy,
+                        },
+                        comments: data,
+                      })
+                    );
+                  } catch (error: any) {
+                    console.log("err", error);
+                    showToast({ message: `${JSON.stringify(error?.message)}` });
+                  }
+                  return;
+                }
                 if (payload.before.tagedUsers.includes(userId)) {
                   let _currentThread;
                   try {
@@ -385,6 +424,7 @@ function SidebarComponent({
                         )
                       );
                     } catch (error) {
+                      console.log("err", error);
                       if (error instanceof Error) {
                         showToast({
                           message: `${JSON.stringify(error?.message)}`,
