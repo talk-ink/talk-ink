@@ -95,26 +95,28 @@ function InboxList({ type = "open" }: TProps) {
 
   const threadDeleteHandler = async () => {
     try {
-      const deletedThread = await kontenbase
-        .service("Threads")
-        .deleteById(selectedThread?.thread?._id);
-
-      if (deletedThread.error) throw new Error(deletedThread.error.message);
-
-      if (deletedThread?.data) {
-        setSelectedThread(null);
+      if (!selectedThread?.thread.draft) {
+        const now = moment().tz("Asia/Jakarta").toDate();
+        const deletedThread = await kontenbase
+          .service("Threads")
+          .updateById(selectedThread?.thread._id, {
+            isDeleted: true,
+            deletedAt: now,
+          });
+        if (deletedThread?.data) {
+          dispatch(deleteThread(deletedThread.data));
+          dispatch(
+            updateChannelCount({
+              chanelId: deletedThread.data?.channel?.[0],
+              threadId: selectedThread?.thread._id,
+            })
+          );
+          setSelectedThread(null);
+        }
       }
-      dispatch(deleteThread(deletedThread.data));
-      dispatch(
-        updateChannelCount({
-          chanelId: deletedThread.data?.channel?.[0],
-          threadId: selectedThread?.thread?._id,
-        })
-      );
     } catch (error) {
-      if (error instanceof Error) {
-        showToast({ message: `${JSON.stringify(error?.message)}` });
-      }
+      console.log("err", error);
+      showToast({ message: `${error}` });
     }
   };
 
@@ -188,8 +190,10 @@ function InboxList({ type = "open" }: TProps) {
           threadDeleteHandler();
         }}
         okButtonText="Confirm"
+        size="xs"
       >
-        Are you sure you want to delete this thread?
+        Are you sure you want to delete this thread? It will be moved into
+        trash.
       </Modal>
       <Modal
         header="Close Thread"
