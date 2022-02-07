@@ -38,6 +38,7 @@ export interface IComment {
   subComments?: ISubComment[];
   reactions?: IReaction[];
   isClosedComment?: boolean;
+  isOpenedComment?: boolean;
 }
 export interface Thread {
   id?: string;

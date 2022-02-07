@@ -11,7 +11,7 @@ import Remirror from "components/Remirror";
 
 import { createComment } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
-import { Channel, Member } from "types";
+import { Channel, Member, Thread } from "types";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useParams } from "react-router";
 import {
@@ -41,6 +41,8 @@ interface IProps {
   scrollToBottom: () => void;
   interactedUsers: string[];
   memberList: Member[];
+  threadData?: Thread;
+  reopenThreadHandler?: () => Promise<void>;
 }
 
 interface INotifiedOption {
@@ -66,6 +68,8 @@ const Form: React.FC<IProps> = ({
   scrollToBottom,
   interactedUsers,
   memberList,
+  threadData,
+  reopenThreadHandler,
 }) => {
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
@@ -175,8 +179,13 @@ const Form: React.FC<IProps> = ({
         content: JSON.stringify(state),
         threadId,
         tagedUsers: _invitedUsers,
+        isOpenedComment: threadData?.isClosed ? true : undefined,
       })
     );
+
+    if (threadData?.isClosed) {
+      reopenThreadHandler();
+    }
 
     try {
       const findInvitedToChannel = selectedNotifiedOptions

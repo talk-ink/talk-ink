@@ -4,6 +4,7 @@ import {
   BiDotsHorizontalRounded,
   BiEditAlt,
   BiMessageAltCheck,
+  BiMessageAltDots,
   BiTrash,
 } from "react-icons/bi";
 import ReactMoment from "react-moment";
@@ -428,6 +429,22 @@ const Comment: React.FC<IProps> = ({
                 {comment.createdBy?.firstName}
               </span>{" "}
               closed this thread.
+            </p>
+          </div>
+        </div>
+      )}
+      {comment?.isOpenedComment && (
+        <div className="flex items-start mb-2">
+          <div className="w-8 flex flex-col items-center">
+            <BiMessageAltDots size={18} className="text-green-500" />
+            <div className="w-[2px] bg-neutral-300 h-4 my-1"></div>
+          </div>
+          <div className="ml-4 w-full">
+            <p className="text-xs text-neutral-500">
+              <span className="font-semibold">
+                {comment.createdBy?.firstName}
+              </span>{" "}
+              reopened this thread.
             </p>
           </div>
         </div>
