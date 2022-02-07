@@ -60,6 +60,7 @@ export interface Thread {
   closeDescription?: string;
   isDeleted?: boolean;
   deletedAt?: string;
+  lastActionAt?: string;
 }
 export interface Channel {
   id?: string;

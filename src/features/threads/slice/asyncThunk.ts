@@ -60,6 +60,9 @@ export const fetchThreads = createAsyncThunk(
               isDeleted: { $ne: true },
             },
             lookup: ["comments"],
+            sort: {
+              lastActionAt: -1,
+            },
           });
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);

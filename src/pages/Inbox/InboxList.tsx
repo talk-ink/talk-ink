@@ -58,7 +58,9 @@ function InboxList({ type = "open" }: TProps) {
           : !item.isClosed
       )
       .sort(
-        (a, b) => moment(b.createdAt).valueOf() - moment(a.createdAt).valueOf()
+        (a, b) =>
+          moment(b?.lastActionAt || b.createdAt).valueOf() -
+          moment(a?.lastActionAt || a.createdAt).valueOf()
       );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -152,6 +154,7 @@ function InboxList({ type = "open" }: TProps) {
                   }
                   setSelectedThread={setSelectedThread}
                   isRead={readedThreads.includes(inbox._id)}
+                  from="inbox"
                 />
               ))}
             </ul>
