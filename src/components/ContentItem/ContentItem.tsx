@@ -184,7 +184,11 @@ function ContentItem({
             ></div>
             <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
               {isFromTalkink && (
-                <Avatar src={logoImage} size={isMobile ? "large" : "medium"} />
+                <Avatar
+                  src={logoImage}
+                  size={isMobile ? "large" : "medium"}
+                  alt={getNameInitial("Talk Ink")}
+                />
               )}
               {!isFromTalkink && (
                 <>
@@ -192,6 +196,7 @@ function ContentItem({
                     <Avatar
                       src={dataSource.createdBy?.avatar?.[0]?.url}
                       size={isMobile ? "large" : "medium"}
+                      alt={getNameInitial(dataSource.createdBy?.firstName)}
                     />
                   ) : (
                     <NameInitial
