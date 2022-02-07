@@ -222,7 +222,13 @@ function ContentItem({
                   dataSource.draft && "hidden"
                 } text-xs text-neutral-500`}
               >
-                <ReactMoment fromNow locale="en">
+                <ReactMoment
+                  fromNow
+                  locale="en"
+                  format="HH:mm"
+                  titleFormat="DD MMMM YYYY, HH:mm"
+                  withTitle
+                >
                   {handleTime()}
                 </ReactMoment>
               </span>
