@@ -60,6 +60,9 @@ export const fetchThreads = createAsyncThunk(
               isDeleted: { $ne: true },
             },
             lookup: ["comments"],
+            sort: {
+              lastActionAt: -1,
+            },
           });
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
@@ -139,16 +142,19 @@ export const createComment = createAsyncThunk(
     threadId,
     tagedUsers,
     isClosedComment,
+    isOpenedComment,
   }: {
     content: any;
     threadId: string;
     tagedUsers: string[];
     isClosedComment?: boolean;
+    isOpenedComment?: boolean;
   }) => {
     const { data } = await kontenbase.service("Comments").create({
       content,
       threads: [threadId],
-      isClosedComment: isClosedComment,
+      isClosedComment,
+      isOpenedComment,
     });
 
     if (tagedUsers.length > 0) {

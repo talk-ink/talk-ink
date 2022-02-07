@@ -49,7 +49,7 @@ type Props = React.PropsWithChildren<{
   >;
   otherButton?: React.ReactNode;
   isRead?: boolean;
-  from?: "regular" | "trash";
+  from?: "regular" | "trash" | "inbox";
 }>;
 
 function ContentItem({
@@ -151,6 +151,15 @@ function ContentItem({
     }
   );
 
+  const handleTime = () => {
+    if (from === "inbox") {
+      return !dataSource?.lastActionAt
+        ? dataSource?.updatedAt || dataSource?.createdAt
+        : dataSource?.lastActionAt;
+    }
+    return dataSource?.updatedAt || dataSource?.createdAt;
+  };
+
   return (
     <div
       className="
@@ -213,8 +222,14 @@ function ContentItem({
                   dataSource.draft && "hidden"
                 } text-xs text-neutral-500`}
               >
-                <ReactMoment fromNow locale="en">
-                  {dataSource?.updatedAt || dataSource?.createdAt}
+                <ReactMoment
+                  fromNow
+                  locale="en"
+                  format="HH:mm"
+                  titleFormat="DD MMMM YYYY, HH:mm"
+                  withTitle
+                >
+                  {handleTime()}
                 </ReactMoment>
               </span>
             </div>
@@ -255,7 +270,7 @@ function ContentItem({
 
                 {open && (
                   <Menu.Items static className="menu-container right-0">
-                    {from === "regular" && (
+                    {["regular", "inbox"].includes(from) && (
                       <>
                         {isRead && (
                           <MenuItem

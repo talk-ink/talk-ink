@@ -60,7 +60,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
         closedBy: [auth.user._id],
         closeDescription: values.closeDescription,
         closedAt: now,
-        readedUsers: [],
+        readedUsers: [auth.user._id],
       };
 
       let _invitedUsers: string[] = channelData.members.filter(

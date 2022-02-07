@@ -387,7 +387,8 @@ function ThreadPage() {
             )}
           </div>
 
-          {!threadData?.isClosed && (
+          {(!threadData?.isClosed ||
+            (threadData?.isClosed && isShowEditor)) && (
             <CommentForm
               isShowEditor={isShowEditor}
               setIsShowEditor={setIsShowEditor}
@@ -396,12 +397,14 @@ function ThreadPage() {
               interactedUsers={[...new Set(threadData?.interactedUsers)]}
               scrollToBottom={scrollToBottom}
               memberList={memberList}
+              threadData={threadData}
+              reopenThreadHandler={reopenThreadHandler}
             />
           )}
-          {threadData?.isClosed && (
+          {threadData?.isClosed && !isShowEditor && (
             <ThreadBadge.Reopen
               onReopen={() => {
-                reopenThreadHandler();
+                setIsShowEditor(true);
               }}
             />
           )}

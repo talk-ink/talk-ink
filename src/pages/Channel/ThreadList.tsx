@@ -75,15 +75,15 @@ const ThreadList = ({ type = "open" }: Props) => {
           });
 
         if (deletedThread?.data) {
+          dispatch(deleteThread(deletedThread.data));
+          dispatch(
+            updateChannelCount({
+              chanelId: deletedThread.data?.channel?.[0],
+              threadId: selectedThread?.thread._id,
+            })
+          );
           setSelectedThread(null);
         }
-        dispatch(deleteThread(deletedThread.data));
-        dispatch(
-          updateChannelCount({
-            chanelId: deletedThread.data?.channel?.[0],
-            threadId: selectedThread?.thread._id,
-          })
-        );
       } else {
         deleteDraft(selectedThread.thread.id);
         dispatch(deleteThread(selectedThread.thread));
