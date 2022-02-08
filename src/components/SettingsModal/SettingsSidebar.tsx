@@ -2,8 +2,8 @@ import React, { useMemo } from "react";
 import SidebarButton from "components/SettingsModal/SidebarButton";
 import { useAppSelector } from "hooks/useAppSelector";
 import { BiUser, BiUserPlus } from "react-icons/bi";
-import { RiAccountCircleFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
+import AccountSettingsIcon from "./AccountSettings/Icon";
 
 type TProps = React.PropsWithChildren<{
   currentActive: string;
@@ -65,22 +65,7 @@ function SettingsSidebar({
             </div>
             <ul>
               <SidebarButton
-                icon={
-                  auth.user.avatar ? (
-                    <div className="h-[20px] w-[20px] rounded-full overflow-hidden">
-                      <img
-                        src={auth.user.avatar}
-                        alt="avatar"
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                  ) : (
-                    <RiAccountCircleFill
-                      size={20}
-                      className="text-neutral-400"
-                    />
-                  )
-                }
+                icon={<AccountSettingsIcon />}
                 type="account"
                 onClick={() => {
                   setCurrentActive("account");

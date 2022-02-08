@@ -27,6 +27,8 @@ import { useRemirror } from "@remirror/react";
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
 import { parseContent } from "utils/helper";
+import { LongPressDetectEvents, useLongPress } from "use-long-press";
+import { setCommentMenu } from "features/mobileMenu/slice";
 
 interface Mention {
   id: string;
@@ -54,7 +56,10 @@ const Comment: React.FC<IProps> = ({
 }) => {
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
+
   const auth = useAppSelector((state) => state.auth);
+  const mobileMenu = useAppSelector((state) => state.mobileMenu);
+
   const editorRef = useRef<EditorRef | null>(null);
 
   const [isEdit, setIsEdit] = useState(false);
@@ -120,12 +125,46 @@ const Comment: React.FC<IProps> = ({
 
   const discardComment = () => {
     editorRef.current!.setContent(parseContent(comment.content));
-
     setIsEdit(false);
   };
 
+  const replyBind = useLongPress(
+    () => {
+      if (comment?.createdBy?._id === auth.user._id && !isEdit) {
+        dispatch(
+          setCommentMenu({
+            data: comment,
+            type: "open",
+            category: "subComment",
+          })
+        );
+      }
+    },
+    { detect: LongPressDetectEvents.TOUCH, cancelOnMovement: true }
+  );
+
+  useEffect(() => {
+    if (
+      mobileMenu?.comment?.data?._id === comment?._id &&
+      !["close", "open"].includes(mobileMenu?.comment?.type)
+    ) {
+      if (mobileMenu?.comment?.type === "edit") {
+        setIsEdit(mobileMenu?.comment?.type === "edit");
+      }
+      if (mobileMenu?.comment?.type === "delete") {
+        handleDeleteComment();
+      }
+      dispatch(setCommentMenu({ data: null, type: "close" }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileMenu?.comment, comment?._id]);
+
   return (
-    <div className="group flex items-start relative " ref={listRef}>
+    <div
+      className="group flex items-start relative "
+      ref={listRef}
+      {...replyBind}
+    >
       <div className=" w-8 mr-2 ">
         {comment.createdBy?.avatar?.[0]?.url ? (
           <Avatar src={comment.createdBy?.avatar?.[0]?.url} size="small" />
@@ -158,7 +197,7 @@ const Comment: React.FC<IProps> = ({
           />
         </div>
         {auth.user._id === comment.createdBy?._id && !isEdit && (
-          <div className="absolute -top-3 right-0  hidden group-hover:block  ">
+          <div className="absolute -top-3 right-0 hidden md:group-hover:block">
             <Popup
               content={
                 <Menu>

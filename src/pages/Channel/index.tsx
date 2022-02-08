@@ -333,6 +333,7 @@ function ChannelPage() {
                               key={member._id}
                               className="border-2 border-white -mr-2 bg-red-400"
                               source={auth.user.avatar}
+                              alt={getNameInitial(auth.user.firstName)}
                             />
                           )}
                         </>
@@ -351,6 +352,7 @@ function ChannelPage() {
                               key={member._id}
                               className="border-2 border-white -mr-2 bg-red-400"
                               source={member.avatar[0].url}
+                              alt={getNameInitial(member.firstName)}
                             />
                           )}
                         </>
@@ -462,6 +464,14 @@ function ChannelPage() {
           </nav>
         </div>
         <Outlet />
+        {isChannelMember && (
+          <button
+            className="md:hidden m-5 fixed bottom-0 right-0 h-14 w-14 bg-indigo-500 rounded-full outline-none flex items-center justify-center"
+            onClick={() => createThreadDraft()}
+          >
+            <BiEdit size={24} className="text-white shadow-lg" />
+          </button>
+        )}
 
         <Modal
           header="Edit channel"
