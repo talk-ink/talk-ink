@@ -295,6 +295,13 @@ function ThreadPage() {
   //   dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
   // }, [workspaceId]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(setCommentMenu({ data: null, type: "close" }));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <MainContentContainer
       header={
