@@ -9,6 +9,9 @@ import { htmlToProsemirrorNode } from "remirror";
 import { parseContent } from "utils/helper";
 import Remirror from "components/Remirror";
 import { IComment } from "types";
+import { MdSend } from "react-icons/md";
+import IconButton from "components/Button/IconButton";
+import { useMediaQuery } from "react-responsive";
 
 interface INotifiedOption {
   value: string;
@@ -37,6 +40,9 @@ const SubCommentForm: React.FC<IProps> = ({
   handleCreateSubComment,
   discardSubComment,
 }) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
   const { manager, state, onChange } = useRemirror({
     extensions: () =>
       extensions(true, `Reply to ${comment.createdBy?.firstName}`),
@@ -50,7 +56,7 @@ const SubCommentForm: React.FC<IProps> = ({
       <div>
         <div className="mt-1 flex w-full items-center">
           <div className="mr-2">
-            <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
+            <div className="md:bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
               Tag:
             </div>
           </div>
@@ -72,6 +78,14 @@ const SubCommentForm: React.FC<IProps> = ({
               IndicatorSeparator: () => null,
             }}
             styles={{
+              valueContainer: (base) => ({
+                ...base,
+                width: "max-content",
+              }),
+              multiValue: (base) => ({
+                ...base,
+                backgroundColor: isMobile ? "white" : "#e9ecef",
+              }),
               container: (base) => ({
                 ...base,
                 width: "100%",
@@ -96,20 +110,35 @@ const SubCommentForm: React.FC<IProps> = ({
       </div>
       <div className="flex justify-end -mt-9">
         <div className="flex items-center py-2">
-          <Button
-            type="submit"
-            className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
-            onClick={discardSubComment}
-          >
-            Discard
-          </Button>
-          <Button
-            type="submit"
-            className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-            onClick={() => handleCreateSubComment(state)}
-          >
-            Reply
-          </Button>
+          {!isMobile && (
+            <Button
+              type="submit"
+              className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
+              onClick={discardSubComment}
+            >
+              Discard
+            </Button>
+          )}
+
+          {!isMobile && (
+            <Button
+              type="submit"
+              className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
+              onClick={() => handleCreateSubComment(state)}
+            >
+              Post
+            </Button>
+          )}
+
+          {isMobile && (
+            <IconButton
+              size="medium"
+              onClick={() => handleCreateSubComment(state)}
+              className="z-50"
+            >
+              <MdSend size={20} className="text-indigo-500 " />
+            </IconButton>
+          )}
         </div>
       </div>
     </div>
