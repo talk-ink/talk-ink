@@ -308,7 +308,10 @@ function ThreadPage() {
   }, []);
 
   const isMember = useMemo(() => {
-    return channelData?.members?.includes(auth.user._id);
+    return (
+      channelData?.members?.includes(auth.user._id) &&
+      (!channelData?.privacy || channelData?.privacy === "public")
+    );
   }, [channelData, auth.user._id]);
 
   return (
