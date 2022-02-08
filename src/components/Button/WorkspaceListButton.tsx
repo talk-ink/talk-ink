@@ -21,16 +21,17 @@ function WorkspaceListButton({ data, onClick = () => {} }: TProps) {
               {data.name?.[0]}
             </p>
           )}
-          {data.logo && !loading && (
-            <img
-              src={data?.logo}
-              alt="logo"
-              className="h-full w-full object-cover"
-              onLoad={() => {
-                setLoading(false);
-              }}
-            />
-          )}
+
+          <img
+            src={data?.logo}
+            alt="logo"
+            className={`h-full w-full object-cover ${
+              !data.logo || loading ? "hidden" : ""
+            }`}
+            onLoad={() => {
+              setLoading(false);
+            }}
+          />
         </div>
         <div className="flex flex-col items-start">
           <p className="text-sm">{data.name}</p>
