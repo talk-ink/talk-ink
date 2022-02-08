@@ -3,12 +3,18 @@ import React from "react";
 import { BiMessageAltCheck } from "react-icons/bi";
 
 import Button from "components/Button/Button";
+import { Channel } from "types";
 
-type TProps = {
+type TReopenProps = {
   onReopen?: () => void;
 };
 
-function Reopen({ onReopen }: TProps) {
+type TJoinChannelProps = {
+  onReply?: () => void;
+  channelData?: Channel;
+};
+
+function Reopen({ onReopen }: TReopenProps) {
   return (
     <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 p-3 bg-slate-800 rounded-md flex items-center justify-between z-30">
       <div className="flex items-center mr-5">
@@ -28,10 +34,30 @@ function Reopen({ onReopen }: TProps) {
   );
 }
 
+function JoinChannel({ onReply, channelData }: TJoinChannelProps) {
+  return (
+    <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 p-3 bg-slate-800 rounded-md flex items-center justify-between z-30">
+      <div className="flex items-center mr-5">
+        <BiMessageAltCheck className="text-white mr-2" size={18} />
+        <p className="text-sm font-semibold text-white max-w-sm whitespace-nowrap overflow-hidden text-ellipsis mr-1">
+          You're previewing #{channelData?.name}
+        </p>
+      </div>
+
+      <Button
+        className="text-xs md:text-sm text-white bg-indigo-500"
+        onClick={onReply}
+      >
+        Join to reply
+      </Button>
+    </div>
+  );
+}
 const ThreadBadge = () => {
   return <></>;
 };
 
 ThreadBadge.Reopen = Reopen;
+ThreadBadge.JoinChannel = JoinChannel;
 
 export default ThreadBadge;

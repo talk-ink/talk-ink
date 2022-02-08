@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { BiDotsHorizontalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import ReactMoment from "react-moment";
@@ -28,6 +28,7 @@ import { htmlToProsemirrorNode } from "remirror";
 import { parseContent } from "utils/helper";
 import { LongPressDetectEvents, useLongPress } from "use-long-press";
 import { setCommentMenu } from "features/mobileMenu/slice";
+import { useParams } from "react-router-dom";
 
 interface Mention {
   id: string;
@@ -53,12 +54,19 @@ const Comment: React.FC<IProps> = ({
   threadId,
   listMentions,
 }) => {
+  const params = useParams();
+
   const [showOption, setShowOption] = useState<boolean>(false);
   const dispatch = useAppDispatch();
   const [showToast] = useToast();
 
   const auth = useAppSelector((state) => state.auth);
+  const channel = useAppSelector((state) => state.channel);
   const mobileMenu = useAppSelector((state) => state.mobileMenu);
+
+  const channelData = useMemo(() => {
+    return channel.channels.find((data) => data._id === params.channelId);
+  }, [params.channelId, channel.channels]);
 
   const editorRef = useRef<EditorRef | null>(null);
 
@@ -198,47 +206,49 @@ const Comment: React.FC<IProps> = ({
             listMentions={listMentions}
           />
         </div>
-        {auth.user._id === comment.createdBy?._id && !isEdit && (
-          <Menu as="div" className="hidden md:block absolute -top-3 right-0">
-            {({ open }) => (
-              <>
-                <Menu.Button as={React.Fragment}>
-                  <IconButton
-                    size="medium"
-                    className={`${open || showOption ? "flex" : "hidden"}`}
-                  >
-                    <BiDotsHorizontalRounded
-                      size={25}
-                      className={`text-neutral-400 hover:cursor-pointer hover:text-neutral-500`}
-                    />
-                  </IconButton>
-                </Menu.Button>
-                {open && (
-                  <Menu.Items static className="menu-container right-0">
-                    <Menu>
-                      <MenuItem
-                        icon={
-                          <BiEditAlt size={20} className="text-neutral-400" />
-                        }
-                        onClick={() => {
-                          setIsEdit(true);
-                        }}
-                        title="Edit Comment"
+        {auth.user._id === comment.createdBy?._id &&
+          !isEdit &&
+          channelData?.members?.includes(auth.user._id) && (
+            <Menu as="div" className="hidden md:block absolute -top-3 right-0">
+              {({ open }) => (
+                <>
+                  <Menu.Button as={React.Fragment}>
+                    <IconButton
+                      size="medium"
+                      className={`${open || showOption ? "flex" : "hidden"}`}
+                    >
+                      <BiDotsHorizontalRounded
+                        size={25}
+                        className={`text-neutral-400 hover:cursor-pointer hover:text-neutral-500`}
                       />
-                      <MenuItem
-                        icon={
-                          <BiTrash size={20} className="text-neutral-400" />
-                        }
-                        onClick={handleDeleteComment}
-                        title="Delete Comment"
-                      />
-                    </Menu>
-                  </Menu.Items>
-                )}
-              </>
-            )}
-          </Menu>
-        )}
+                    </IconButton>
+                  </Menu.Button>
+                  {open && (
+                    <Menu.Items static className="menu-container right-0">
+                      <Menu>
+                        <MenuItem
+                          icon={
+                            <BiEditAlt size={20} className="text-neutral-400" />
+                          }
+                          onClick={() => {
+                            setIsEdit(true);
+                          }}
+                          title="Edit Comment"
+                        />
+                        <MenuItem
+                          icon={
+                            <BiTrash size={20} className="text-neutral-400" />
+                          }
+                          onClick={handleDeleteComment}
+                          title="Delete Comment"
+                        />
+                      </Menu>
+                    </Menu.Items>
+                  )}
+                </>
+              )}
+            </Menu>
+          )}
       </div>
     </div>
   );
