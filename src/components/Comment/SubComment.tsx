@@ -140,7 +140,7 @@ const Comment: React.FC<IProps> = ({
         );
       }
     },
-    { detect: LongPressDetectEvents.TOUCH }
+    { detect: LongPressDetectEvents.TOUCH, cancelOnMovement: true }
   );
 
   useEffect(() => {

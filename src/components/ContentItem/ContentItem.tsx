@@ -148,6 +148,7 @@ function ContentItem({
     },
     {
       detect: LongPressDetectEvents.TOUCH,
+      cancelOnMovement: true,
     }
   );
 

@@ -406,6 +406,7 @@ const Comment: React.FC<IProps> = ({
     },
     {
       detect: LongPressDetectEvents.TOUCH,
+      cancelOnMovement: true,
     }
   );
 
