@@ -156,6 +156,8 @@ function Compose() {
       _invitedUsers = selectedNotifiedOptions.map((item) => item.value);
     }
 
+    const now = moment().tz("Asia/Jakarta").toDate();
+
     try {
       const createThread = await kontenbase.service("Threads").create({
         name: values.name,
@@ -163,6 +165,7 @@ function Compose() {
         channel: params.channelId,
         workspace: params.workspaceId,
         tagedUsers: _invitedUsers,
+        lastActionAt: now,
       });
 
       if (createThread.error) throw new Error(createThread.error.message);
