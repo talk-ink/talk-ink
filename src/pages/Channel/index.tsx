@@ -333,6 +333,7 @@ function ChannelPage() {
                               key={member._id}
                               className="border-2 border-white -mr-2 bg-red-400"
                               source={auth.user.avatar}
+                              alt={getNameInitial(auth.user.firstName)}
                             />
                           )}
                         </>
@@ -351,6 +352,7 @@ function ChannelPage() {
                               key={member._id}
                               className="border-2 border-white -mr-2 bg-red-400"
                               source={member.avatar[0].url}
+                              alt={getNameInitial(member.firstName)}
                             />
                           )}
                         </>
