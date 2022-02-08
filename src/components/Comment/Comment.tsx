@@ -734,7 +734,7 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           <div
-            className={`hidden absolute -top-3 right-0 z-10 bg-white rounded px-1 shadow ${
+            className={`hidden md:block absolute -top-3 right-0 z-10 bg-white rounded px-1 shadow ${
               threadData?.isClosed ? "hidden" : ""
             }`}
           >
