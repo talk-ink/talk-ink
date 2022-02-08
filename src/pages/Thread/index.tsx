@@ -35,6 +35,9 @@ import ThreadBadge from "components/Thread/ThreadBadge";
 
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
+import CommentMenu from "components/Thread/CommentMenu";
+import { setCommentMenu } from "features/mobileMenu/slice";
+import { useMediaQuery } from "react-responsive";
 
 function useQuery() {
   const { search } = useLocation();
@@ -43,6 +46,10 @@ function useQuery() {
 }
 
 function ThreadPage() {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -52,6 +59,7 @@ function ThreadPage() {
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
   const member = useAppSelector((state) => state.member);
+  const mobileMenu = useAppSelector((state) => state.mobileMenu);
 
   const listRef = useRef<HTMLDivElement>(null);
   const [memberList, setMemberList] = useState<Member[]>([]);
@@ -292,6 +300,13 @@ function ThreadPage() {
   //   dispatch(fetchChannels({ userId: auth.user._id, workspaceId }));
   // }, [workspaceId]);
 
+  useEffect(() => {
+    return () => {
+      dispatch(setCommentMenu({ data: null, type: "close" }));
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   return (
     <MainContentContainer
       header={
@@ -300,7 +315,7 @@ function ThreadPage() {
           title={threadData?.name}
           thread
           from={query.get("fromInbox") === "1" && "inbox"}
-          showTitle={showTitle}
+          showTitle={isMobile ? true : showTitle}
         />
       }
       onScroll={(e: any) => {
@@ -399,6 +414,14 @@ function ThreadPage() {
               memberList={memberList}
               threadData={threadData}
               reopenThreadHandler={reopenThreadHandler}
+            />
+          )}
+          {!threadData?.isClosed && (
+            <CommentMenu
+              openMenu={mobileMenu?.comment?.type === "open"}
+              onClose={() => {
+                dispatch(setCommentMenu({ data: null, type: "close" }));
+              }}
             />
           )}
           {threadData?.isClosed && !isShowEditor && (

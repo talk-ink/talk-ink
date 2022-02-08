@@ -19,7 +19,7 @@ function MenuItem({
     <button
       className={`rounded-md ${
         !disabled ? "hover:bg-indigo-50" : "opacity-50"
-      } flex justify-between p-2 outline-none ${className}`}
+      } flex justify-between p-2 outline-none w-full ${className}`}
       onClick={onClick}
       disabled={disabled}
     >

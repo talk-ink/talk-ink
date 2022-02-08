@@ -332,9 +332,13 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div className=" bg-white sticky bottom-0 max-w-4xl w-full">
+    <div
+      className={` bg-white ${
+        !isShowEditor ? "fixed" : "static"
+      } bottom-0 max-w-4xl w-full origin-top`}
+    >
       {!isShowEditor && (
-        <div className="flex items-center py-3 ">
+        <div className="flex items-center py-3">
           {auth.user.avatar ? (
             <Avatar src={auth.user.avatar} />
           ) : (

@@ -156,6 +156,7 @@ function ContentItem({
     },
     {
       detect: LongPressDetectEvents.TOUCH,
+      cancelOnMovement: true,
     }
   );
 
@@ -188,9 +189,9 @@ function ContentItem({
                 !isRead && !dataSource?.draft
                   ? "bg-indigo-500"
                   : "bg-transparent"
-              } rounded-full mr-2 ${isMobile ? "-ml-1" : ""}`}
+              } rounded-full mr-2 ${isMobile ? "hidden" : ""}`}
             ></div>
-            <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
+            <div className={`ml-4 md:ml-0 mr-4 ${isMobile ? "relative" : ""}`}>
               {isFromTalkink && (
                 <Avatar
                   src={logoImage}
@@ -219,6 +220,12 @@ function ContentItem({
                   <BiCheck size={10} className="text-white font-bold" />
                 </div>
               )}
+              {!dataSource?.isClosed &&
+                !isRead &&
+                !dataSource?.draft &&
+                isMobile && (
+                  <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-indigo-500 border border-white rounded-full flex items-center justify-center"></div>
+                )}
             </div>
           </div>
           <div className="w-full md:w-auto">
