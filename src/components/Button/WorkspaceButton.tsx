@@ -21,16 +21,17 @@ function WorkspaceButton({ onClick = () => {}, workspaceData }: Props) {
             {workspaceData?.name?.[0]}
           </p>
         )}
-        {workspaceData?.logo && !loading && (
-          <img
-            src={workspaceData?.logo}
-            alt="logo"
-            className="h-full w-full object-cover"
-            onLoad={() => {
-              setLoading(false);
-            }}
-          />
-        )}
+
+        <img
+          src={workspaceData?.logo}
+          alt="logo"
+          className={`h-full w-full object-cover ${
+            loading || !workspaceData?.logo ? "hidden" : ""
+          }`}
+          onLoad={() => {
+            setLoading(false);
+          }}
+        />
       </div>
       <p className="font-bold px-2 text-sm">{workspaceData?.name}</p>
       <HiChevronDown className="text-neutral-400 -mb-1" />

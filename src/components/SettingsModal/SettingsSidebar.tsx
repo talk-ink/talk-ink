@@ -2,7 +2,6 @@ import React, { useMemo } from "react";
 import SidebarButton from "components/SettingsModal/SidebarButton";
 import { useAppSelector } from "hooks/useAppSelector";
 import { BiUser, BiUserPlus } from "react-icons/bi";
-import { RiAccountCircleFill } from "react-icons/ri";
 import { useParams } from "react-router-dom";
 import AccountSettingsIcon from "./AccountSettings/Icon";
 
