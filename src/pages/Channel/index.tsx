@@ -462,6 +462,14 @@ function ChannelPage() {
           </nav>
         </div>
         <Outlet />
+        {isChannelMember && (
+          <button
+            className="md:hidden m-5 absolute bottom-0 right-0 h-14 w-14 bg-indigo-500 rounded-full outline-none flex items-center justify-center"
+            onClick={() => createThreadDraft()}
+          >
+            <BiEdit size={24} className="text-white shadow-lg" />
+          </button>
+        )}
 
         <Modal
           header="Edit channel"
