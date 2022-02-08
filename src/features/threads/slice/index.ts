@@ -107,6 +107,7 @@ const threadSlice = createSlice({
 
           return {
             ...item,
+            ...action.payload.thread,
             comments: distinctComments
               .filter((item) => item.createdBy._id)
               .sort(

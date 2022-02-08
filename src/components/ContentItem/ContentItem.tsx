@@ -49,7 +49,7 @@ type Props = React.PropsWithChildren<{
   >;
   otherButton?: React.ReactNode;
   isRead?: boolean;
-  from?: "regular" | "trash";
+  from?: "regular" | "trash" | "inbox";
 }>;
 
 function ContentItem({
@@ -102,6 +102,14 @@ function ContentItem({
     content: parseContent(dataSource.content),
   });
 
+  const { state: commentState } = useRemirror({
+    extensions,
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(dataSource.comments?.[
+      dataSource.comments?.length - 1
+    ]?.content)
+  });
+
   const reopenThreadHandler = async () => {
     try {
       const { data, error } = await kontenbase
@@ -151,6 +159,15 @@ function ContentItem({
     }
   );
 
+  const handleTime = () => {
+    if (from === "inbox") {
+      return !dataSource?.lastActionAt
+        ? dataSource?.updatedAt || dataSource?.createdAt
+        : dataSource?.lastActionAt;
+    }
+    return dataSource?.updatedAt || dataSource?.createdAt;
+  };
+
   return (
     <div
       className="
@@ -175,7 +192,11 @@ function ContentItem({
             ></div>
             <div className={`mr-4 ${dataSource?.isClosed ? "relative" : ""}`}>
               {isFromTalkink && (
-                <Avatar src={logoImage} size={isMobile ? "large" : "medium"} />
+                <Avatar
+                  src={logoImage}
+                  size={isMobile ? "large" : "medium"}
+                  alt={getNameInitial("Talk Ink")}
+                />
               )}
               {!isFromTalkink && (
                 <>
@@ -183,6 +204,7 @@ function ContentItem({
                     <Avatar
                       src={dataSource.createdBy?.avatar?.[0]?.url}
                       size={isMobile ? "large" : "medium"}
+                      alt={getNameInitial(dataSource.createdBy?.firstName)}
                     />
                   ) : (
                     <NameInitial
@@ -213,8 +235,14 @@ function ContentItem({
                   dataSource.draft && "hidden"
                 } text-xs text-neutral-500`}
               >
-                <ReactMoment fromNow locale="en">
-                  {dataSource?.updatedAt || dataSource?.createdAt}
+                <ReactMoment
+                  fromNow
+                  locale="en"
+                  format="HH:mm"
+                  titleFormat="DD MMMM YYYY, HH:mm"
+                  withTitle
+                >
+                  {handleTime()}
                 </ReactMoment>
               </span>
             </div>
@@ -222,9 +250,12 @@ function ContentItem({
               {!dataSource.isClosed && (
                 <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
                   {dataSource?.draft ? "Me: " : ""}
-                  {/* latest juga disini */}
 
-                  {editorToHTML(state)}
+                  {dataSource.comments?.length > 0
+                    ? `Latest : ${editorToHTML(commentState)}`
+                    : editorToHTML(state)}
+
+                
                 </small>
               )}
               {dataSource.isClosed && (
@@ -255,7 +286,7 @@ function ContentItem({
 
                 {open && (
                   <Menu.Items static className="menu-container right-0">
-                    {from === "regular" && (
+                    {["regular", "inbox"].includes(from) && (
                       <>
                         {isRead && (
                           <MenuItem

@@ -38,6 +38,7 @@ export interface IComment {
   subComments?: ISubComment[];
   reactions?: IReaction[];
   isClosedComment?: boolean;
+  isOpenedComment?: boolean;
 }
 export interface Thread {
   id?: string;
@@ -60,6 +61,7 @@ export interface Thread {
   closeDescription?: string;
   isDeleted?: boolean;
   deletedAt?: string;
+  lastActionAt?: string;
 }
 export interface Channel {
   id?: string;

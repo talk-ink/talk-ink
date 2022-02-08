@@ -275,6 +275,39 @@ function SidebarComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
+  const updateThreadWithComment = async ({
+    _id,
+    thread,
+  }: {
+    _id: string;
+    thread: Thread;
+  }) => {
+    try {
+      const { data, error } = await kontenbase.service("Comments").find({
+        where: {
+          threads: _id,
+        },
+        lookup: ["subComments"],
+        sort: {
+          createdAt: -1,
+        },
+        limit: 2,
+      });
+
+      if (error) throw new Error(error.message);
+
+      dispatch(
+        updateThreadComment({
+          thread,
+          comments: data,
+        })
+      );
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
   useEffect(() => {
     let key: string | undefined;
 
@@ -299,15 +332,17 @@ function SidebarComponent({
         let _createdBy: User;
 
         try {
-          const { data, error } = await kontenbase.service("Users").find({
-            where: {
-              id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
-            },
-          });
+          if (!isDelete) {
+            const { data, error } = await kontenbase.service("Users").find({
+              where: {
+                id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
+              },
+            });
 
-          if (error) throw new Error(error.message);
+            if (error) throw new Error(error.message);
 
-          _createdBy = data?.[0];
+            _createdBy = data?.[0];
+          }
 
           if (
             (!isDelete ? isCurrentWorkspace : true) &&
@@ -348,31 +383,14 @@ function SidebarComponent({
                     )
                   ) {
                     try {
-                      const { data, error } = await kontenbase
-                        .service("Comments")
-                        .find({
-                          where: {
-                            threads: payload.before._id,
-                          },
-                          lookup: ["subComments"],
-                          sort: {
-                            createdAt: -1,
-                          },
-                          limit: 2,
-                        });
-
-                      if (error) throw new Error(error.message);
-
-                      dispatch(
-                        updateThreadComment({
-                          thread: {
-                            ...payload.before,
-                            ...payload.after,
-                            createdBy: _createdBy,
-                          },
-                          comments: data,
-                        })
-                      );
+                      updateThreadWithComment({
+                        _id: payload?.after?._id,
+                        thread: {
+                          ...payload?.before,
+                          ...payload?.after,
+                          createdBy: _createdBy,
+                        },
+                      });
 
                       setInboxData((prev) =>
                         prev.map((item) =>
@@ -385,6 +403,7 @@ function SidebarComponent({
                         )
                       );
                     } catch (error) {
+                      console.log("err", error);
                       if (error instanceof Error) {
                         showToast({
                           message: `${JSON.stringify(error?.message)}`,
@@ -416,6 +435,36 @@ function SidebarComponent({
                   }
 
                   updateUserStore();
+                }
+
+                if (
+                  !!payload?.before?.isClosed !== !!payload?.after?.isClosed
+                ) {
+                  try {
+                    updateThreadWithComment({
+                      _id: payload?.after?._id,
+                      thread: {
+                        ...payload.after,
+                        createdBy: _createdBy,
+                      },
+                    });
+                  } catch (error: any) {
+                    console.log("err", error);
+                    showToast({ message: `${JSON.stringify(error?.message)}` });
+                  }
+                }
+                if (
+                  !!payload?.before?.isDeleted !==
+                    !!payload?.after?.isDeleted &&
+                  payload?.after?.createdBy !== auth.user._id
+                ) {
+                  if (payload?.after?.isDeleted) {
+                    dispatch(deleteThread(payload?.after));
+                  } else {
+                    dispatch(
+                      addThread({ ...payload.after, createdBy: _createdBy })
+                    );
+                  }
                 }
 
                 if (payload.after?.createdBy === auth.user._id) {
