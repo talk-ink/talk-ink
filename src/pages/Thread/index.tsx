@@ -35,6 +35,8 @@ import ThreadBadge from "components/Thread/ThreadBadge";
 
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
+import CommentMenu from "components/Thread/CommentMenu";
+import { setCommentMenu } from "features/mobileMenu/slice";
 
 function useQuery() {
   const { search } = useLocation();
@@ -52,6 +54,7 @@ function ThreadPage() {
   const thread = useAppSelector((state) => state.thread);
   const channel = useAppSelector((state) => state.channel);
   const member = useAppSelector((state) => state.member);
+  const mobileMenu = useAppSelector((state) => state.mobileMenu);
 
   const listRef = useRef<HTMLDivElement>(null);
   const [memberList, setMemberList] = useState<Member[]>([]);
@@ -399,6 +402,14 @@ function ThreadPage() {
               memberList={memberList}
               threadData={threadData}
               reopenThreadHandler={reopenThreadHandler}
+            />
+          )}
+          {!threadData?.isClosed && (
+            <CommentMenu
+              openMenu={mobileMenu?.comment?.type === "open"}
+              onClose={() => {
+                dispatch(setCommentMenu({ data: null, type: "close" }));
+              }}
             />
           )}
           {threadData?.isClosed && !isShowEditor && (

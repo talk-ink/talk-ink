@@ -41,6 +41,8 @@ import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
 import { parseContent } from "utils/helper";
 import { useParams } from "react-router";
+import { LongPressDetectEvents, useLongPress } from "use-long-press";
+import { setCommentMenu } from "features/mobileMenu/slice";
 
 interface IProps {
   comment: IComment;
@@ -84,6 +86,7 @@ const Comment: React.FC<IProps> = ({
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const channel = useAppSelector((state) => state.channel);
+  const mobileMenu = useAppSelector((state) => state.mobileMenu);
 
   const currentWorkspace = useMemo(
     () => workspace.workspaces.find((item) => item._id === params.workspaceId),
@@ -393,6 +396,19 @@ const Comment: React.FC<IProps> = ({
     }`;
   };
 
+  const commentBind = useLongPress(
+    () => {
+      if (!isEdit) {
+        dispatch(
+          setCommentMenu({ data: comment, type: "open", category: "comment" })
+        );
+      }
+    },
+    {
+      detect: LongPressDetectEvents.TOUCH,
+    }
+  );
+
   useEffect(() => {
     fetchReactions();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -414,6 +430,28 @@ const Comment: React.FC<IProps> = ({
       setSubEditorState(getReplyDraft.content);
     }
   }, [auth.user._id, comment._id]);
+
+  useEffect(() => {
+    if (
+      mobileMenu?.comment?.data?._id === comment?._id &&
+      !["close", "open"].includes(mobileMenu?.comment?.type)
+    ) {
+      if (mobileMenu?.comment?.type === "edit") {
+        setIsEdit(mobileMenu?.comment?.type === "edit");
+      }
+      if (mobileMenu?.comment?.type === "reaction") {
+        setOpenReaction(mobileMenu?.comment?.type === "reaction");
+      }
+      if (mobileMenu?.comment?.type === "delete") {
+        handleDeleteComment();
+      }
+      if (mobileMenu?.comment?.type === "reply") {
+        setIsShowReplyEditorVisible(mobileMenu?.comment?.type === "reply");
+      }
+      dispatch(setCommentMenu({ data: null, type: "close" }));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mobileMenu?.comment, comment?._id]);
 
   return (
     <div key={comment._id}>
@@ -469,7 +507,7 @@ const Comment: React.FC<IProps> = ({
             </p>
           </div>
           <div className=" w-[70vw] sm:w-full ">
-            <div className={`min-h-[2.5rem]`}>
+            <div className={`min-h-[2.5rem]`} {...commentBind}>
               {comment?.isClosedComment && (
                 <p className="text-sm text-green-600 font-semibold mt-1">
                   Added a conclusion:
@@ -693,7 +731,7 @@ const Comment: React.FC<IProps> = ({
           </div>
 
           <div
-            className={`absolute -top-3 right-0 z-10 bg-white rounded px-1 shadow ${
+            className={`hidden absolute -top-3 right-0 z-10 bg-white rounded px-1 shadow ${
               threadData?.isClosed ? "hidden" : ""
             }`}
           >

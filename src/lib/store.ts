@@ -11,6 +11,7 @@ import { toastReducer } from "features/toast/slice";
 import { memberReducer } from "features/members/slice";
 import { inboxReducer } from "features/inbox";
 import { pageStatusReducer } from "features/pageStatus";
+import { mobileMenuReducer } from "features/mobileMenu/slice";
 
 const persistConfig = {
   key: "root",
@@ -27,6 +28,7 @@ const appReducer = combineReducers({
   member: memberReducer,
   inbox: inboxReducer,
   pageStatus: pageStatusReducer,
+  mobileMenu: mobileMenuReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appReducer);
