@@ -51,10 +51,10 @@ const Preview: React.FC<IProps> = ({
         <div className="flex items-center py-2">
           <Button
             type="submit"
-            className="mr-3 text-sm flex items-center justify-center bg-indigo-100 min-w-[5rem] text-black"
+            className="mr-3 text-sm flex items-center justify-center bg-neutral-100 min-w-[5rem] text-slate-700"
             onClick={discardComment}
           >
-            Cancel
+            Discard
           </Button>
           <Button
             type="submit"

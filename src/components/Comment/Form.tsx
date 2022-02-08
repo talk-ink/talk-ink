@@ -435,12 +435,8 @@ const Form: React.FC<IProps> = ({
             )}
 
             {isMobile && (
-              <IconButton size="medium">
-                <MdSend
-                  size={20}
-                  className="text-indigo-500"
-                  onClick={handleCreateComment}
-                />
+              <IconButton size="medium" onClick={handleCreateComment}>
+                <MdSend size={20} className="text-indigo-500" />
               </IconButton>
             )}
           </div>
