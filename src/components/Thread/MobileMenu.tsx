@@ -125,7 +125,7 @@ const MobileMenuThread = ({
         <Dialog.Overlay className="fixed inset-0 bg-black opacity-30" />
 
         {openMenu && (
-          <div className="relative bg-white rounded w-screen mt-auto p-3">
+          <div className="relative bg-white rounded w-screen mt-auto p-3 pb-20">
             {from === "regular" && (
               <>
                 {isRead && (
