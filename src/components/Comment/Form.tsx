@@ -259,7 +259,11 @@ const Form: React.FC<IProps> = ({
   }, [isShowEditor, auth.user._id, params.threadId]);
 
   return (
-    <div className=" bg-white fixed bottom-0 max-w-4xl w-full">
+    <div
+      className={` bg-white ${
+        !isShowEditor ? "fixed" : "static"
+      } bottom-0 max-w-4xl w-full origin-top`}
+    >
       {!isShowEditor && (
         <div className="flex items-center py-3">
           {auth.user.avatar ? (
