@@ -94,7 +94,7 @@ const SubCommentForm: React.FC<IProps> = ({
             }))}
         />
       </div>
-      <div className="flex justify-end ">
+      <div className="flex justify-end -mt-9">
         <div className="flex items-center py-2">
           <Button
             type="submit"

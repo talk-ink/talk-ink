@@ -46,7 +46,7 @@ const Preview: React.FC<IProps> = ({
         listMentions={listMentions}
       />
 
-      <div className="flex justify-between ">
+      <div className="flex justify-between -mt-9">
         <div />
         <div className="flex items-center py-2">
           <Button
