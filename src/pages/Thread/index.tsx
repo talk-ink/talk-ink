@@ -37,6 +37,7 @@ import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
 import CommentMenu from "components/Thread/CommentMenu";
 import { setCommentMenu } from "features/mobileMenu/slice";
+import { useMediaQuery } from "react-responsive";
 
 function useQuery() {
   const { search } = useLocation();
@@ -45,6 +46,10 @@ function useQuery() {
 }
 
 function ThreadPage() {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
   const dispatch = useAppDispatch();
@@ -310,7 +315,7 @@ function ThreadPage() {
           title={threadData?.name}
           thread
           from={query.get("fromInbox") === "1" && "inbox"}
-          showTitle={showTitle}
+          showTitle={isMobile ? true : showTitle}
         />
       }
       onScroll={(e: any) => {
