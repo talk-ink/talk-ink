@@ -33,7 +33,7 @@ import { addSubCommentToComment } from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
-import { draft, frontendUrl, getNameInitial } from "utils/helper";
+import { draft, editorToHTML, frontendUrl, getNameInitial } from "utils/helper";
 import { notificationUrl } from "utils/helper";
 import Reaction from "./Reaction";
 import { useRemirror } from "@remirror/react";
@@ -202,7 +202,9 @@ const Comment: React.FC<IProps> = ({
 
         axios.post(NOTIFICATION_API, {
           title: `${currentWorkspace.name} - #${channelData?.name}`,
-          description: `${auth?.user.firstName} reply comment on ${threadName}`,
+          description: `${
+            auth?.user.firstName
+          } reply comment on ${threadName} - ${editorToHTML(state)}`,
           externalUserIds: invitedUsers,
           url: `${frontendUrl}/a/${params.workspaceId}/ch/${params.channelId}/t/${params.threadId}`,
         });

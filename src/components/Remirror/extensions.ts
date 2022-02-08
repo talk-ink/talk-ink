@@ -59,7 +59,7 @@ export type ImageAttributes = ProsemirrorAttributes<ImageExtensionAttributes>;
 
 type DelayedImage = DelayedPromiseCreator<ImageAttributes>;
 
-function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
+export function uploadHandler(files: FileWithProgress[]): DelayedImage[] {
   invariant(files.length > 0, {
     code: ErrorConstant.EXTENSION,
     message:
@@ -105,6 +105,7 @@ export const extensions = (readonly = false, placeholder = "") => [
   new MentionAtomExtension({
     extraAttributes: { type: "user" },
     matchers: [{ name: "at", char: "@", appendText: " ", matchOffset: 0 }],
+   
   }),
   new BoldExtension({}),
   new StrikeExtension(),

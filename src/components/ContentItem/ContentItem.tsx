@@ -102,6 +102,14 @@ function ContentItem({
     content: parseContent(dataSource.content),
   });
 
+  const { state: commentState } = useRemirror({
+    extensions,
+    stringHandler: htmlToProsemirrorNode,
+    content: parseContent(dataSource.comments?.[
+      dataSource.comments?.length - 1
+    ]?.content)
+  });
+
   const reopenThreadHandler = async () => {
     try {
       const { data, error } = await kontenbase
@@ -242,9 +250,12 @@ function ContentItem({
               {!dataSource.isClosed && (
                 <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
                   {dataSource?.draft ? "Me: " : ""}
-                  {/* latest juga disini */}
 
-                  {editorToHTML(state)}
+                  {dataSource.comments?.length > 0
+                    ? `Latest : ${editorToHTML(commentState)}`
+                    : editorToHTML(state)}
+
+                
                 </small>
               )}
               {dataSource.isClosed && (

@@ -252,3 +252,7 @@
 .remirror-mention-atom:before {
   content: "@";
 }
+
+.remirror-floating-popover {
+  z-index: 10 !important;
+}

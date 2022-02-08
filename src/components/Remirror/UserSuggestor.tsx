@@ -4,16 +4,17 @@ import { cx } from "remirror";
 
 import { useMentionAtom, FloatingWrapper } from "@remirror/react";
 
-type User = {
+type Mention = {
   id: string;
   label: string;
 };
 
 interface IProps {
-  allUsers: User[];
+  allUsers: Mention[];
+  handleSelectTag?: (mention: Mention) => void;
 }
 
-const UserSuggestor: React.FC<IProps> = ({ allUsers }) => {
+const UserSuggestor: React.FC<IProps> = ({ allUsers, handleSelectTag }) => {
   const [users, setUsers] = useState([]);
   const { state, getMenuProps, getItemProps, indexIsHovered, indexIsSelected } =
     useMentionAtom({
@@ -56,7 +57,7 @@ const UserSuggestor: React.FC<IProps> = ({ allUsers }) => {
                   index,
                 })}
               >
-                {user.label}
+                <div onClick={() => handleSelectTag(user)}>{user.label}</div>
               </div>
             );
           })}
