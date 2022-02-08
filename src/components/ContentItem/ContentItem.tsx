@@ -105,9 +105,9 @@ function ContentItem({
   const { state: commentState } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
-    content: parseContent(dataSource.comments?.[
-      dataSource.comments?.length - 1
-    ]?.content)
+    content: parseContent(
+      dataSource.comments?.[dataSource.comments?.length - 1]?.content
+    ),
   });
 
   const reopenThreadHandler = async () => {
@@ -259,10 +259,8 @@ function ContentItem({
                   {dataSource?.draft ? "Me: " : ""}
 
                   {dataSource.comments?.length > 0
-                    ? `Latest : ${editorToHTML(commentState)}`
+                    ? `${editorToHTML(commentState)}`
                     : editorToHTML(state)}
-
-                
                 </small>
               )}
               {dataSource.isClosed && (
