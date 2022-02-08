@@ -105,9 +105,9 @@ function ContentItem({
   const { state: commentState } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
-    content: parseContent(dataSource.comments?.[
-      dataSource.comments?.length - 1
-    ]?.content)
+    content: parseContent(
+      dataSource.comments?.[dataSource.comments?.length - 1]?.content
+    ),
   });
 
   const reopenThreadHandler = async () => {
@@ -191,7 +191,7 @@ function ContentItem({
                   : "bg-transparent"
               } rounded-full mr-2 ${isMobile ? "hidden" : ""}`}
             ></div>
-            <div className={`ml-4 md:ml-0 mr-4 ${isMobile ? "relative" : ""}`}>
+            <div className={`ml-4 md:ml-0 mr-4 relative`}>
               {isFromTalkink && (
                 <Avatar
                   src={logoImage}
@@ -261,8 +261,6 @@ function ContentItem({
                   {dataSource.comments?.length > 0
                     ? `Latest : ${editorToHTML(commentState)}`
                     : editorToHTML(state)}
-
-                
                 </small>
               )}
               {dataSource.isClosed && (
