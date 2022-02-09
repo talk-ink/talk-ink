@@ -9,14 +9,18 @@ import { useToast } from "hooks/useToast";
 
 import { updateChannel } from "features/channels/slice";
 import { Channel } from "types";
+import { useMediaQuery } from "react-responsive";
 
 type Props = {
-  type: "channel" | "thread";
   data: Channel;
   userId: string;
 };
 
-function ChannelBadge({ type = "channel", data, userId }: Props) {
+function ChannelBadge({ data, userId }: Props) {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const [showToast] = useToast();
 
   const dispatch = useAppDispatch();
@@ -45,10 +49,10 @@ function ChannelBadge({ type = "channel", data, userId }: Props) {
         </p>
       </div>
       <Button
-        className="text-xs font-semibold md:text-sm text-white bg-indigo-500"
+        className="text-xs md:text-sm text-white bg-indigo-500"
         onClick={joinChannelHandler}
       >
-        Join {type === "channel" ? "Channel" : "to reply"}
+        {isMobile ? "Join" : ` Join Channel`}
       </Button>
     </div>
   );

@@ -566,7 +566,7 @@ function ChannelPage() {
           </p>
         </Modal>
         {!isChannelMember && !loading && (
-          <ChannelBadge type="channel" data={channelData} userId={userId} />
+          <ChannelBadge data={channelData} userId={userId} />
         )}
       </MainContentContainer>
     </>

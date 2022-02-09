@@ -5,6 +5,7 @@ import { BiMessageAltCheck } from "react-icons/bi";
 import Button from "components/Button/Button";
 import { Channel } from "types";
 import { BsEye } from "react-icons/bs";
+import { useMediaQuery } from "react-responsive";
 
 type TReopenProps = {
   onReopen?: () => void;
@@ -36,6 +37,9 @@ function Reopen({ onReopen }: TReopenProps) {
 }
 
 function JoinChannel({ onJoin, channelData }: TJoinChannelProps) {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
   return (
     <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 p-3 bg-slate-800 rounded-md flex items-center justify-between z-30">
       <div className="flex items-center mr-5">
@@ -49,7 +53,7 @@ function JoinChannel({ onJoin, channelData }: TJoinChannelProps) {
         className="text-xs md:text-sm text-white bg-indigo-500"
         onClick={onJoin}
       >
-        Join to reply
+        {isMobile ? "Join" : "Join to reply"}
       </Button>
     </div>
   );
