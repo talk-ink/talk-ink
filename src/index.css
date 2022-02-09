@@ -114,7 +114,7 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .onesignal-bell-launcher-button {
+  .onesignal-bell-container {
     display: none !important;
   }
 }
