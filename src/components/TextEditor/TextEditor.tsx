@@ -47,7 +47,7 @@ function TextEditor({
   return (
     <div className="flex flex-col h-full mb-10">
       <div></div>
-      <div className="flex flex-col h-full min-h-0 mb-2">
+      <div className="flex flex-col h-full mb-2">
         <input
           className="w-full h-auto outline-none text-3xl font-semibold mb-4"
           placeholder="Thread title"

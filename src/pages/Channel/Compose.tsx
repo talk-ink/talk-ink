@@ -263,7 +263,7 @@ function Compose() {
 
   return (
     <MainContentContainer
-      className="pt-10 h-full"
+      className="pt-10"
       header={
         <MainContentHeader
           channel={channelData?.name}
@@ -274,9 +274,10 @@ function Compose() {
           showTitle
         />
       }
+      resetPadding
     >
-      <div className="w-full sm:w-[50vw] min-h-[80vh] border-[1px] border-light-blue-500 rounded-lg p-3 mx-auto relative -mt-12 sm:mt-0">
-        <div className="flex items-center mb-4">
+      <div className="w-full sm:w-[50vw] min-h-[80vh] md:border-[1px] md:border-light-blue-500 rounded-lg p-3 mx-auto relative -mt-12 sm:mt-0 ">
+        <div className="flex items-center mb-4 ">
           <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm mr-2">
             Post In:
           </div>
@@ -289,7 +290,7 @@ function Compose() {
             #{channelData?.name}
           </p>
         </div>
-        <div className="mb-2 flex w-fit items-center">
+        <div className="mb-2 flex w-fit items-center ">
           <div className="mr-2">
             <div className="bg-gray-200 w-fit px-2 py-[2.9px]  rounded-sm  text-sm">
               Tag:
