@@ -522,7 +522,7 @@ function SidebarComponent({
 
   useEffect(() => {
     let key: string | undefined;
-    console.log("mnt");
+
     kontenbase.realtime
       .subscribe("Channels", { event: "*" }, async (message) => {
         const { event, payload } = message;
@@ -598,7 +598,6 @@ function SidebarComponent({
       .then((result) => (key = result));
 
     return () => {
-      console.log("umnt");
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
