@@ -146,7 +146,7 @@ function SidebarList({
                 >
                   <p className="text-neutral-400 text-xs">{count}</p>
                 </div>
-                <Menu.Button as={React.Fragment}>
+                <Menu.Button as="div">
                   <IconButton
                     className={`${open ? "flex" : "hidden"} group-hover:flex`}
                     size="medium"

@@ -566,7 +566,7 @@ const Comment: React.FC<IProps> = ({
                           <Popover className="relative">
                             {({ open: popOpen, close }) => (
                               <>
-                                <Popover.Button as={React.Fragment}>
+                                <Popover.Button as="div">
                                   <IconButton
                                     size="medium"
                                     className={`flex items-center`}
@@ -747,7 +747,7 @@ const Comment: React.FC<IProps> = ({
                   <Popover className="relative">
                     {({ open: popOpen, close }) => (
                       <>
-                        <Popover.Button as={React.Fragment}>
+                        <Popover.Button as="div">
                           <IconButton
                             size="medium"
                             className={`${
@@ -802,7 +802,7 @@ const Comment: React.FC<IProps> = ({
                   )}
 
                   {auth.user._id === comment.createdBy?._id && !isEdit && (
-                    <Menu.Button as={React.Fragment}>
+                    <Menu.Button as="div">
                       <IconButton
                         size="medium"
                         className={`${

@@ -144,7 +144,7 @@ function InboxPage() {
             <Menu as="div" className="relative">
               {({ open }) => (
                 <>
-                  <Menu.Button as={React.Fragment}>
+                  <Menu.Button as="div">
                     <IconButton size="medium">
                       <BiFilter size={24} className="text-slate-800" />
                     </IconButton>
@@ -184,7 +184,7 @@ function InboxPage() {
               <Menu as="div" className="relative">
                 {({ open }) => (
                   <>
-                    <Menu.Button as={React.Fragment}>
+                    <Menu.Button as="div">
                       <IconButton size="medium">
                         <BiDotsVerticalRounded
                           size={24}
@@ -255,7 +255,7 @@ function InboxPage() {
             <Menu as="div" className="relative">
               {({ open }) => (
                 <>
-                  <Menu.Button as={React.Fragment}>
+                  <Menu.Button as="div">
                     <IconButton size="medium">
                       <BiDotsHorizontalRounded
                         size={24}

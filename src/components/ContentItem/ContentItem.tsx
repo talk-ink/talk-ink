@@ -305,7 +305,7 @@ function ContentItem({
                 <>
                   {!dataSource?.draft && (
                     <div className="flex">
-                      <Menu.Button as={React.Fragment}>
+                      <Menu.Button as="div">
                         <IconButton>
                           <BiDotsHorizontalRounded
                             size={24}

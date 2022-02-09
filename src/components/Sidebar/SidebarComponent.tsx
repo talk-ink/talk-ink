@@ -612,8 +612,9 @@ function SidebarComponent({
     <div
       id="modal-container"
       className={
-        isSidebarOpen &&
-        `w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+        isSidebarOpen
+          ? `w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+          : undefined
       }
       onClick={(e: any) => {
         if (e?.target?.id === "modal-container") {
@@ -637,7 +638,7 @@ function SidebarComponent({
             <Popover className="relative">
               {({ open, close }) => (
                 <>
-                  <Popover.Button as={React.Fragment}>
+                  <Popover.Button as="div">
                     <WorkspaceButton workspaceData={workspaceData} />
                   </Popover.Button>
 

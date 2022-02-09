@@ -212,7 +212,7 @@ const Comment: React.FC<IProps> = ({
             <Menu as="div" className="hidden md:block absolute -top-3 right-0">
               {({ open }) => (
                 <>
-                  <Menu.Button as={React.Fragment}>
+                  <Menu.Button as="div">
                     <IconButton
                       size="medium"
                       className={`${open || showOption ? "flex" : "hidden"}`}

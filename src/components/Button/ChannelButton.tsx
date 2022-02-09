@@ -32,7 +32,7 @@ function ChannelButton({
         {({ open }) => (
           <>
             <div className="flex">
-              <Menu.Button as={React.Fragment}>
+              <Menu.Button as="div">
                 <IconButton
                   className={`${
                     open ? "flex" : "flex md:hidden"
