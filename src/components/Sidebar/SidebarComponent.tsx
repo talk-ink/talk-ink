@@ -522,11 +522,13 @@ function SidebarComponent({
 
   useEffect(() => {
     let key: string | undefined;
-
+    console.log("mnt");
     kontenbase.realtime
       .subscribe("Channels", { event: "*" }, async (message) => {
         const { event, payload } = message;
         const isUpdate = event === "UPDATE_RECORD";
+
+        console.log("payload1", payload);
 
         try {
           const { data, error } = await kontenbase.service("Users").find({
@@ -549,6 +551,7 @@ function SidebarComponent({
                 const dataIndex = channel.channels.findIndex(
                   (data) => data._id === payload.after?._id
                 );
+                console.log("payload2", payload);
 
                 if (dataIndex >= 0) {
                   if (payload?.after?.members?.includes(auth.user._id)) {
@@ -559,9 +562,6 @@ function SidebarComponent({
                       })
                     );
                   } else {
-                    if (params.channelId === payload.after._id) {
-                      navigate(`/a/${params.workspaceId}/inbox`);
-                    }
                     dispatch(deleteChannel(payload.after));
                   }
                 } else {
@@ -573,9 +573,6 @@ function SidebarComponent({
                       })
                     );
                   } else {
-                    if (params.channelId === payload.after._id) {
-                      navigate(`/a/${params.workspaceId}/inbox`);
-                    }
                     dispatch(deleteChannel(payload.after));
                   }
                 }
@@ -601,10 +598,11 @@ function SidebarComponent({
       .then((result) => (key = result));
 
     return () => {
+      console.log("umnt");
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.workspaceId, params.channelId]);
+  }, [params.workspaceId]);
 
   const loading = workspace.loading || channel.loading;
 
