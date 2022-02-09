@@ -150,7 +150,11 @@ function ChannelPage() {
         lookup: ["avatar"],
       });
       if (memberList.data) {
-        setMemberList(memberList.data);
+        setMemberList(
+          memberList.data?.filter((data) =>
+            channelData?.members?.includes(data?._id)
+          )
+        );
       }
     } catch (error) {
       console.log("err", error);
@@ -167,10 +171,16 @@ function ChannelPage() {
           userId: auth.user._id,
         })
       );
-      getMemberHandler();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.channelId, auth.user._id]);
+
+  useEffect(() => {
+    if (!params.channelId || !auth.user._id || !channelData) return;
+
+    getMemberHandler();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.channelId, auth.user._id, channelData]);
 
   const uniqueMemberId = useMemo(() => {
     return createUniqueArray(channelData?.members ?? []);
