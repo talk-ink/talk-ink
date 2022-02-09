@@ -191,7 +191,7 @@ function ChannelPage() {
   return (
     <>
       <MobileHeader
-        header={channelData?.name}
+        header={isClosedThread ? "Closed" : channelData?.name}
         subHeader={`${uniqueMemberId.length || 0} ${
           (uniqueMemberId.length || 0) > 1 ? "Members" : "Member"
         }`}
