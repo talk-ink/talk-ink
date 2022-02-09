@@ -18,7 +18,12 @@ import { useLongPress, LongPressDetectEvents } from "use-long-press";
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
-import { editorToHTML, getNameInitial, parseContent } from "utils/helper";
+import {
+  editorToHTML,
+  getNameInitial,
+  getShortName,
+  parseContent,
+} from "utils/helper";
 import Divider from "components/Divider/Divider";
 import Avatar from "components/Avatar/Avatar";
 
@@ -157,6 +162,10 @@ function ContentItem({
     );
   }, [dataSource?.closedBy, member.members]);
 
+  const getCreatedBy = (id: string): Member => {
+    return member?.members?.find((data) => data._id === id);
+  };
+
   const threadBind = useLongPress(
     () => {
       setSelectedThread({ thread: dataSource, type: "menu" });
@@ -266,7 +275,15 @@ function ContentItem({
                   {dataSource?.draft ? "Me: " : ""}
 
                   {dataSource.comments?.length > 0
-                    ? `Latest : ${editorToHTML(commentState)}`
+                    ? `${getShortName(
+                        getCreatedBy(
+                          `${
+                            dataSource.comments?.[
+                              dataSource.comments?.length - 1
+                            ]?.createdBy
+                          }`
+                        ).firstName
+                      )} : ${editorToHTML(commentState)}`
                     : editorToHTML(state)}
                 </small>
               )}
