@@ -185,6 +185,24 @@ function ContentItem({
     return dataSource?.updatedAt || dataSource?.createdAt;
   };
 
+  const threadListSubtitle = () => {
+    if (dataSource?.comments?.length === 0) return editorToHTML(state);
+
+    const lastComment = dataSource.comments?.[dataSource?.comments?.length - 1];
+    const commentCreatedBy = getCreatedBy(`${lastComment?.createdBy}`);
+
+    if (!commentCreatedBy) return;
+
+    if (lastComment?.isOpenedComment)
+      return `${getShortName(
+        commentCreatedBy.firstName
+      )} reopened this thread.`;
+
+    return `${getShortName(commentCreatedBy.firstName)} : ${editorToHTML(
+      commentState
+    )}`;
+  };
+
   return (
     <div
       className="
@@ -271,21 +289,13 @@ function ContentItem({
             </div>
             <div className="text-left md:table md:table-fixed w-full md:text-xs text-neutral-500 pr-2">
               {!dataSource.isClosed && (
-                <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
-                  {dataSource?.draft ? "Me: " : ""}
+                <>
+                  <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
+                    {dataSource?.draft ? "Me: " : ""}
 
-                  {dataSource.comments?.length > 0
-                    ? `${getShortName(
-                        getCreatedBy(
-                          `${
-                            dataSource.comments?.[
-                              dataSource.comments?.length - 1
-                            ]?.createdBy
-                          }`
-                        ).firstName
-                      )} : ${editorToHTML(commentState)}`
-                    : editorToHTML(state)}
-                </small>
+                    {threadListSubtitle()}
+                  </small>
+                </>
               )}
               {dataSource.isClosed && (
                 <small className="text-sm md:text-xs text-neutral-500 table-cell truncate">
