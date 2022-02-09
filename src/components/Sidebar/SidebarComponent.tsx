@@ -1,4 +1,10 @@
-import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
+import React, {
+  Dispatch,
+  SetStateAction,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 
 import { BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
@@ -11,7 +17,6 @@ import { kontenbase } from "lib/client";
 import ChannelButton from "components/Button/ChannelButton";
 import IconButton from "components/Button/IconButton";
 import WorkspaceButton from "components/Button/WorkspaceButton";
-import Popup from "components/Popup/Popup";
 import Menu from "components/Menu/Menu";
 import MenuItem from "components/Menu/MenuItem";
 import { useAppDispatch } from "hooks/useAppDispatch";
@@ -43,6 +48,7 @@ import { createUniqueArray } from "utils/helper";
 
 import { Channel, CreateChannel, Thread, User } from "types";
 import { BsPlus } from "react-icons/bs";
+import { Popover } from "@headlessui/react";
 
 type TProps = {
   isMobile: boolean;
@@ -628,69 +634,77 @@ function SidebarComponent({
           }
         >
           <div className="bg-[#F7FAFB] w-full flex justify-between py-2 px-3 fixed: md:sticky top-0 z-[51]">
-            <Popup
-              content={
-                <div>
-                  <Menu>
-                    <div className="max-h-40 overflow-auto">
-                      {workspace.workspaces.map((data, idx) => (
-                        <WorkspaceListButton
-                          key={idx}
-                          data={data}
-                          onClick={() => {
-                            navigate(`/a/${data._id}/inbox`);
-                          }}
-                        />
-                      ))}
-                    </div>
+            <Popover className="relative">
+              {({ open, close }) => (
+                <>
+                  <Popover.Button as={React.Fragment}>
+                    <WorkspaceButton workspaceData={workspaceData} />
+                  </Popover.Button>
 
-                    <Divider />
-                    <MenuItem
-                      icon={<BiPlus size={20} className="text-neutral-400" />}
-                      title="Create new workspace"
-                      onClick={() => {
-                        if (
-                          workspace.workspaces.find((item) => {
-                            if (item.createdBy?._id) {
-                              return item.createdBy?._id === auth.user?._id;
-                            }
+                  <Popover.Panel className="menu-container left-0 md:left-full md:top-0 ml-2">
+                    <Menu>
+                      <div className="max-h-40 overflow-auto">
+                        {workspace.workspaces.map((data, idx) => (
+                          <WorkspaceListButton
+                            key={idx}
+                            data={data}
+                            onClick={() => {
+                              close();
+                              navigate(`/a/${data._id}/inbox`);
+                            }}
+                          />
+                        ))}
+                      </div>
 
-                            if (!item.createdBy?._id) {
-                              return true;
-                            }
+                      <Divider />
+                      <MenuItem
+                        icon={<BiPlus size={20} className="text-neutral-400" />}
+                        title="Create new workspace"
+                        onClick={() => {
+                          if (
+                            workspace.workspaces.find((item) => {
+                              if (item.createdBy?._id) {
+                                return item.createdBy?._id === auth.user?._id;
+                              }
 
-                            return false;
-                          })
-                        ) {
-                          return setIsWorkspaceLimitModalVisible(true);
+                              if (!item.createdBy?._id) {
+                                return true;
+                              }
+
+                              return false;
+                            })
+                          ) {
+                            return setIsWorkspaceLimitModalVisible(true);
+                          }
+                          navigate("/a/create_workspace");
+                        }}
+                      />
+
+                      <Divider />
+
+                      <MenuItem
+                        icon={
+                          <FiSettings size={20} className="text-neutral-400" />
                         }
-                        navigate("/a/create_workspace");
-                      }}
-                    />
+                        title="Settings & members"
+                        onClick={() => {
+                          setSettingsModal(true);
+                          close();
+                        }}
+                      />
+                      <MenuItem
+                        icon={
+                          <BiLogOut size={20} className="text-neutral-400" />
+                        }
+                        title="Log Out"
+                        onClick={handleLogout}
+                      />
+                    </Menu>
+                  </Popover.Panel>
+                </>
+              )}
+            </Popover>
 
-                    <Divider />
-
-                    <MenuItem
-                      icon={
-                        <FiSettings size={20} className="text-neutral-400" />
-                      }
-                      title="Settings & members"
-                      onClick={() => {
-                        setSettingsModal(true);
-                      }}
-                    />
-                    <MenuItem
-                      icon={<BiLogOut size={20} className="text-neutral-400" />}
-                      title="Log Out"
-                      onClick={handleLogout}
-                    />
-                  </Menu>
-                </div>
-              }
-              position={isMobile ? "bottom" : "right"}
-            >
-              {!loading && <WorkspaceButton workspaceData={workspaceData} />}
-            </Popup>
             {isMobile ? (
               <IconButton>
                 <MdClose
