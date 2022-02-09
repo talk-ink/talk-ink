@@ -140,13 +140,6 @@ const Form: React.FC<IProps> = ({
     return channel.channels.find((data) => data._id === params.channelId);
   }, [params.channelId, channel.channels]);
 
-  const isMember = useMemo(() => {
-    return (
-      channelData?.members?.includes(auth.user._id) &&
-      (!channelData?.privacy || channelData?.privacy === "public")
-    );
-  }, [channelData, auth.user._id]);
-
   const discardComment = () => {
     draft("comment").deleteByKey(params.threadId);
     editorRef.current!.setContent({
@@ -155,19 +148,6 @@ const Form: React.FC<IProps> = ({
     });
 
     setIsShowEditor(false);
-  };
-
-  const joinChannelHandler = async () => {
-    try {
-      const joinChannel = await kontenbase
-        .service("Channels")
-        .link(params.channelId, { members: auth.user._id });
-
-      dispatch(updateChannel({ _id: params.channelId, ...joinChannel.data }));
-    } catch (error) {
-      console.log("err", error);
-      showToast({ message: `${JSON.stringify(error)}` });
-    }
   };
 
   const handleCreateComment = async () => {
@@ -197,10 +177,6 @@ const Form: React.FC<IProps> = ({
 
     if (isMemberSelected) {
       _invitedUsers = selectedNotifiedOptions.map((item) => item.value);
-    }
-
-    if (!isMember) {
-      joinChannelHandler();
     }
 
     dispatch(

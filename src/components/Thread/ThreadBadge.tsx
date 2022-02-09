@@ -11,7 +11,7 @@ type TReopenProps = {
 };
 
 type TJoinChannelProps = {
-  onReply?: () => void;
+  onJoin?: () => void;
   channelData?: Channel;
 };
 
@@ -35,7 +35,7 @@ function Reopen({ onReopen }: TReopenProps) {
   );
 }
 
-function JoinChannel({ onReply, channelData }: TJoinChannelProps) {
+function JoinChannel({ onJoin, channelData }: TJoinChannelProps) {
   return (
     <div className="fixed bottom-10 left-1/2 transform -translate-x-1/2 p-3 bg-slate-800 rounded-md flex items-center justify-between z-30">
       <div className="flex items-center mr-5">
@@ -47,7 +47,7 @@ function JoinChannel({ onReply, channelData }: TJoinChannelProps) {
 
       <Button
         className="text-xs md:text-sm text-white bg-indigo-500"
-        onClick={onReply}
+        onClick={onJoin}
       >
         Join to reply
       </Button>

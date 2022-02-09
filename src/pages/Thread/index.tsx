@@ -38,6 +38,7 @@ import { htmlToProsemirrorNode } from "remirror";
 import CommentMenu from "components/Thread/CommentMenu";
 import { setCommentMenu } from "features/mobileMenu/slice";
 import { useMediaQuery } from "react-responsive";
+import { updateChannel } from "features/channels/slice";
 
 function useQuery() {
   const { search } = useLocation();
@@ -216,6 +217,19 @@ function ThreadPage() {
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
+    }
+  };
+
+  const joinChannelHandler = async () => {
+    try {
+      const joinChannel = await kontenbase
+        .service("Channels")
+        .link(channelId, { members: auth.user._id });
+
+      dispatch(updateChannel({ _id: channelId, ...joinChannel.data }));
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error)}` });
     }
   };
 
@@ -440,8 +454,8 @@ function ThreadPage() {
           )}
           {!isMember && !isShowEditor && (
             <ThreadBadge.JoinChannel
-              onReply={() => {
-                setIsShowEditor(true);
+              onJoin={() => {
+                joinChannelHandler();
               }}
               channelData={channelData}
             />
