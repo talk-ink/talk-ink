@@ -30,7 +30,6 @@ import BrowseChannels from "components/BrowseChannels";
 import { logout } from "features/auth";
 import {
   addChannel,
-  deleteChannel,
   fetchChannels,
   updateChannel,
 } from "features/channels/slice";
@@ -528,8 +527,6 @@ function SidebarComponent({
         const { event, payload } = message;
         const isUpdate = event === "UPDATE_RECORD";
 
-        console.log("payload1", payload);
-
         try {
           const { data, error } = await kontenbase.service("Users").find({
             where: {
@@ -551,19 +548,14 @@ function SidebarComponent({
                 const dataIndex = channel.channels.findIndex(
                   (data) => data._id === payload.after?._id
                 );
-                console.log("payload2", payload);
 
                 if (dataIndex >= 0) {
-                  if (payload?.after?.members?.includes(auth.user._id)) {
-                    dispatch(
-                      updateChannel({
-                        ...payload.before,
-                        ...payload.after,
-                      })
-                    );
-                  } else {
-                    dispatch(deleteChannel(payload.after));
-                  }
+                  dispatch(
+                    updateChannel({
+                      ...payload.before,
+                      ...payload.after,
+                    })
+                  );
                 } else {
                   if (payload?.after?.members?.includes(auth.user._id)) {
                     dispatch(
@@ -573,7 +565,12 @@ function SidebarComponent({
                       })
                     );
                   } else {
-                    dispatch(deleteChannel(payload.after));
+                    dispatch(
+                      updateChannel({
+                        ...payload.before,
+                        ...payload.after,
+                      })
+                    );
                   }
                 }
                 break;
