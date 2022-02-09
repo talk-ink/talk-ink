@@ -40,10 +40,12 @@ function ChannelBadge({ type = "channel", data, userId }: Props) {
         <p className="text-sm text-white font-semibold max-w-xs whitespace-nowrap overflow-hidden text-ellipsis mr-1">
           You’re previewing #{data?.name}.
         </p>
-        <p className="text-sm text-white">Join to reply and compose.</p>
+        <p className="text-sm text-white hidden md:inline">
+          Join to reply and compose.
+        </p>
       </div>
       <Button
-        className="text-sm text-white bg-indigo-500"
+        className="text-xs font-semibold md:text-sm text-white bg-indigo-500"
         onClick={joinChannelHandler}
       >
         Join {type === "channel" ? "Channel" : "to reply"}
