@@ -408,7 +408,7 @@ function ThreadPage() {
             </p>
           )}
 
-          <div className="mb-10 ">
+          <div className={`${!isShowEditor ? "mb-10" : "mb-52"}`}>
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
@@ -422,7 +422,6 @@ function ThreadPage() {
               />
             )}
           </div>
-
           {(!threadData?.isClosed || (threadData?.isClosed && isShowEditor)) &&
             (isMember || (!isMember && isShowEditor)) && (
               <CommentForm
@@ -437,6 +436,7 @@ function ThreadPage() {
                 reopenThreadHandler={reopenThreadHandler}
               />
             )}
+
           {!threadData?.isClosed && (
             <CommentMenu
               openMenu={mobileMenu?.comment?.type === "open"}

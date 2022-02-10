@@ -114,7 +114,7 @@
 }
 
 @media only screen and (max-width: 600px) {
-  .onesignal-bell-launcher-button {
+  .onesignal-bell-container {
     display: none !important;
   }
 }
@@ -129,6 +129,12 @@
 
 .thread-editor .ProseMirror {
   min-height: 55vh !important;
+}
+
+@media only screen and (max-height: 900px) {
+  .thread-editor .ProseMirror {
+    min-height: 45vh !important;
+  }
 }
 
 .comment-editor .ProseMirror {

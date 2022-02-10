@@ -42,9 +42,14 @@ import limitImage from "assets/image/limit.svg";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { addThread, deleteThread, updateThreadComment } from "features/threads";
+import {
+  addThread,
+  deleteThread,
+  updatePartialThread,
+  updateThreadComment,
+} from "features/threads";
 import { updateUser } from "features/auth";
-import { createUniqueArray } from "utils/helper";
+// import { createUniqueArray } from "utils/helper";
 
 import { Channel, CreateChannel, Thread, User } from "types";
 import { BsPlus } from "react-icons/bs";
@@ -102,7 +107,8 @@ function SidebarComponent({
 
   const channelDataAll: string[] = useMemo(
     () => channel.channels.map((data) => data._id),
-    [channel.channels]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [channel.channels?.length]
   );
 
   const readedThreads: string[] = useMemo(() => {
@@ -119,8 +125,9 @@ function SidebarComponent({
   }, [inboxData, auth.user, params, channelData]);
 
   const inboxLeft: number = useMemo(() => {
-    return threadData.filter((item) => !readedThreads.includes(item._id))
-      .length;
+    return threadData.filter(
+      (item) => !readedThreads.includes(item._id) && !item.isDeleted
+    ).length;
   }, [threadData, readedThreads]);
 
   useEffect(() => {
@@ -316,6 +323,8 @@ function SidebarComponent({
   useEffect(() => {
     let key: string | undefined;
 
+    console.log("mnt");
+
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
@@ -357,6 +366,7 @@ function SidebarComponent({
               case "UPDATE_RECORD":
                 if (payload.before.tagedUsers.includes(userId)) {
                   let _currentThread;
+
                   try {
                     const { data, error } = await kontenbase
                       .service("Threads")
@@ -446,49 +456,83 @@ function SidebarComponent({
                   !!payload?.before?.isClosed !== !!payload?.after?.isClosed
                 ) {
                   try {
-                    updateThreadWithComment({
-                      _id: payload?.after?._id,
-                      thread: {
-                        ...payload.after,
+                    dispatch(
+                      updatePartialThread({
+                        _id: payload?.after?._id,
+                        isClosed: payload?.after?.isClosed,
                         createdBy: _createdBy,
-                      },
-                    });
+                      })
+                    );
                   } catch (error: any) {
                     console.log("err", error);
                     showToast({ message: `${JSON.stringify(error?.message)}` });
                   }
                 }
-                if (
-                  !!payload?.before?.isDeleted !==
-                    !!payload?.after?.isDeleted &&
-                  payload?.after?.createdBy !== auth.user._id
-                ) {
-                  if (payload?.after?.isDeleted) {
-                    dispatch(deleteThread(payload?.after));
-                  } else {
-                    dispatch(
-                      addThread({ ...payload.after, createdBy: _createdBy })
-                    );
-                  }
-                }
 
-                if (payload.after?.createdBy === auth.user._id) {
-                  if (payload?.after?.isDeleted) {
-                    setTrashData((prev) =>
-                      createUniqueArray([...prev, payload.after?._id])
-                    );
-                  } else {
-                    setTrashData((prev) =>
-                      prev.filter((item) => item !== payload?.after?._id)
-                    );
-                  }
-                }
+                // if (
+                //   !!payload?.before?.isDeleted !== !!payload?.after?.isDeleted
+                // ) {
+                //   if (payload?.after?.createdBy !== auth.user._id) {
+                //     if (payload?.after?.isDeleted) {
+                //       dispatch(
+                //         updatePartialThread({
+                //           _id: payload?.after?._id,
+                //           isDeleted: payload?.after?.isDeleted,
+                //           createdBy: _createdBy,
+                //         })
+                //       );
+                //     } else {
+                //       const { data, error } = await kontenbase
+                //         .service("Comments")
+                //         .find({
+                //           where: {
+                //             threads: payload?.after?._id,
+                //           },
+                //           lookup: ["subComments"],
+                //           sort: {
+                //             createdAt: -1,
+                //           },
+                //           limit: 2,
+                //         });
+
+                //       if (error) throw new Error(error?.message);
+                //       dispatch(
+                //         addThread({
+                //           ...payload.after,
+                //           comments: data,
+                //           createdBy: _createdBy,
+                //         })
+                //       );
+                //     }
+                //   }
+
+                //   if (payload.after?.createdBy === auth.user._id) {
+                //     if (payload?.after?.isDeleted) {
+                //       setTrashData((prev) =>
+                //         createUniqueArray([...prev, payload.after?._id])
+                //       );
+                //       setInboxData((prev) =>
+                //         prev.filter((item) => item._id !== payload?.after?._id)
+                //       );
+                //     } else {
+                //       setTrashData((prev) =>
+                //         prev.filter((item) => item !== payload?.after?._id)
+                //       );
+                //       setInboxData((prev) => [
+                //         ...prev.filter(
+                //           (item) => item._id !== payload?.after?._id
+                //         ),
+                //         payload?.after,
+                //       ]);
+                //     }
+                //   }
+                // }
+
                 break;
               case "CREATE_RECORD":
                 if (
-                  (params.channelId &&
-                    payload?.channel?.includes(params.channelId)) ||
-                  pathname.includes(`/a/${params.workspaceId}/inbox`)
+                  !params.channelId ||
+                  payload?.channel?.includes(params.channelId)
                 ) {
                   dispatch(addThread({ ...payload, createdBy: _createdBy }));
                 }
@@ -520,10 +564,11 @@ function SidebarComponent({
       .then((result) => (key = result));
 
     return () => {
+      console.log("umnt");
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [channelDataAll]);
+  }, [channelDataAll, params.channelId]);
 
   useEffect(() => {
     let key: string | undefined;
@@ -612,8 +657,9 @@ function SidebarComponent({
     <div
       id="modal-container"
       className={
-        isSidebarOpen &&
-        `w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+        isSidebarOpen
+          ? `w-screen min-h-screen fixed bg-[rgba(0,0,0,0.5)] top-0 left-0 flex justify-center items-start z-[9999]`
+          : undefined
       }
       onClick={(e: any) => {
         if (e?.target?.id === "modal-container") {
@@ -637,7 +683,7 @@ function SidebarComponent({
             <Popover className="relative">
               {({ open, close }) => (
                 <>
-                  <Popover.Button as={React.Fragment}>
+                  <Popover.Button as="div">
                     <WorkspaceButton workspaceData={workspaceData} />
                   </Popover.Button>
 
@@ -743,7 +789,8 @@ function SidebarComponent({
                   link={`/a/${workspaceData?._id}/trash`}
                   setIsSidebarOpen={setIsSidebarOpen}
                   count={
-                    (trashData.length > 10 ? "10+" : trashData.length) || 0
+                    // (trashData.length > 10 ? "10+" : trashData.length) || 0
+                    0
                   }
                 />
                 {/* <SidebarList

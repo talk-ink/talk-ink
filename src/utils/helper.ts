@@ -435,3 +435,11 @@ export const parseContent = (content: string) => {
 
 export const editorToHTML = (state: any, replace = " ") =>
   prosemirrorNodeToHtml(state.doc)?.replace(/( |<([^>]+)>)/gi, replace);
+
+export const getShortName = (name: string): string => {
+  if (name) {
+    const splitted = name.split(" ");
+    if (splitted[1]) return splitted[0] + " " + splitted[1][0];
+    return name;
+  }
+};

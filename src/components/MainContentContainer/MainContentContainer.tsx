@@ -5,6 +5,7 @@ type Props = React.PropsWithChildren<{
   className?: string;
   listRef?: React.LegacyRef<HTMLDivElement>;
   onScroll?: React.UIEventHandler<HTMLDivElement>;
+  resetPadding?: boolean;
 }>;
 
 function MainContentContainer({
@@ -13,6 +14,7 @@ function MainContentContainer({
   header,
   listRef,
   onScroll,
+  resetPadding,
 }: Props) {
   return (
     <div
@@ -23,7 +25,9 @@ function MainContentContainer({
     >
       {header}
       <div
-        className={`max-w-4xl md:px-5 md:ml-auto md:mr-auto pt-20 pb-1 md:py-20 ${className}`}
+        className={`max-w-4xl md:ml-auto md:mr-auto ${
+          !resetPadding ? "md:px-5 pt-20 pb-1 md:py-20" : ""
+        } ${className}`}
       >
         {children}
       </div>

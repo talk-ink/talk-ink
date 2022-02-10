@@ -1,3 +1,6 @@
+* {
+  font-family: "Rubik", sans-serif;
+}
 .mention {
   background: #7963d266;
   padding: 2px 4px;
@@ -10,6 +13,12 @@
   margin-top: -1rem;
   overflow: auto !important;
   margin-left: -2px !important;
+}
+
+@media only screen and (max-height: 900px) {
+  .thread-editor .remirror-editor {
+    height: 50vh;
+  }
 }
 
 .readonly-editor .remirror-editor {

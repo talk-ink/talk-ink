@@ -20,6 +20,7 @@ import {
   editorToHTML,
   getNameInitial,
   notificationUrl,
+  parseContent,
 } from "utils/helper";
 import { kontenbase } from "lib/client";
 
@@ -97,7 +98,12 @@ const Form: React.FC<IProps> = ({
 
   const editorRef = useRef<EditorRef | null>(null);
 
-  const { manager, onChange, state } = useRemirror({
+  const {
+    manager,
+    onChange,
+    state,
+    setState: setRemirrorState,
+  } = useRemirror({
     extensions: () => extensions(false, "Reply..."),
     stringHandler: htmlToProsemirrorNode,
     content: "",
@@ -142,10 +148,12 @@ const Form: React.FC<IProps> = ({
 
   const discardComment = () => {
     draft("comment").deleteByKey(params.threadId);
-    editorRef.current!.setContent({
-      type: "doc",
-      content: [],
-    });
+    setRemirrorState(
+      manager.createState({
+        stringHandler: htmlToProsemirrorNode,
+        content: "",
+      })
+    );
 
     setIsShowEditor(false);
   };
@@ -258,10 +266,12 @@ const Form: React.FC<IProps> = ({
       getCommentDraft.createdById === auth.user._id
     ) {
       try {
-        const parsedText = JSON.parse(getCommentDraft.content);
-
-        await timeout(1);
-        editorRef.current!.setContent(parsedText.doc);
+        setRemirrorState(
+          manager.createState({
+            stringHandler: htmlToProsemirrorNode,
+            content: parseContent(getCommentDraft?.content),
+          })
+        );
       } catch (error) {
         await timeout(1);
         editorRef.current!.setContent({
@@ -350,24 +360,22 @@ const Form: React.FC<IProps> = ({
   }
 
   return (
-    <div
-      className={` bg-white ${
-        !isShowEditor ? "fixed" : "static"
-      } bottom-0 max-w-4xl w-full origin-top`}
-    >
+    <div className={`bg-white fixed pr-8 bottom-0 w-full max-w-4xl origin-top`}>
       {!isShowEditor && (
         <div className="flex items-center py-3">
-          {auth.user.avatar ? (
-            <Avatar src={auth.user.avatar} />
-          ) : (
-            <NameInitial
-              name={getNameInitial(auth.user.firstName)}
-              className="mr-4"
-            />
-          )}
+          <div className="hidden md:block">
+            {auth.user.avatar ? (
+              <Avatar src={auth.user.avatar} />
+            ) : (
+              <NameInitial
+                name={getNameInitial(auth.user.firstName)}
+                className="mr-4"
+              />
+            )}
+          </div>
 
           <input
-            className=" ml-4 appearance-none border-[1px] border-light-blue-500 rounded-[25px] w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
+            className="md:ml-4 appearance-none border-[1px] border-light-blue-500 rounded-[25px] w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline hover:cursor-pointer"
             type="text"
             placeholder="Input Your Message"
             readOnly

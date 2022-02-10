@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import {
   BiCheck,
@@ -18,7 +18,12 @@ import { useLongPress, LongPressDetectEvents } from "use-long-press";
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
 import NameInitial from "components/Avatar/NameInitial";
-import { editorToHTML, getNameInitial, parseContent } from "utils/helper";
+import {
+  editorToHTML,
+  getNameInitial,
+  getShortName,
+  parseContent,
+} from "utils/helper";
 import Divider from "components/Divider/Divider";
 import Avatar from "components/Avatar/Avatar";
 
@@ -109,7 +114,11 @@ function ContentItem({
     content: parseContent(dataSource.content),
   });
 
-  const { state: commentState } = useRemirror({
+  const {
+    state: commentState,
+    setState: setCommentState,
+    manager,
+  } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(
@@ -157,6 +166,10 @@ function ContentItem({
     );
   }, [dataSource?.closedBy, member.members]);
 
+  const getCreatedBy = (id: string): Member => {
+    return member?.members?.find((data) => data._id === id);
+  };
+
   const threadBind = useLongPress(
     () => {
       setSelectedThread({ thread: dataSource, type: "menu" });
@@ -175,6 +188,43 @@ function ContentItem({
     }
     return dataSource?.updatedAt || dataSource?.createdAt;
   };
+
+  const threadListSubtitle = () => {
+    if (dataSource?.comments?.length === 0) return editorToHTML(state);
+
+    const lastComment = dataSource.comments?.[dataSource?.comments?.length - 1];
+    const commentCreatedBy = lastComment?.createdBy?._id
+      ? lastComment.createdBy
+      : getCreatedBy(`${lastComment?.createdBy}`);
+
+    if (dataSource?._id === "61fa35291fb5d50e29211f28") {
+    }
+
+    if (!commentCreatedBy) return;
+
+    if (lastComment?.isOpenedComment)
+      return `${getShortName(
+        commentCreatedBy.firstName
+      )} reopened this thread.`;
+
+    return `${getShortName(commentCreatedBy.firstName)} : ${editorToHTML(
+      commentState
+    )}`;
+  };
+
+  useEffect(() => {
+    if (dataSource?.comments?.length > 0) {
+      setCommentState(
+        manager.createState({
+          stringHandler: htmlToProsemirrorNode,
+          content: parseContent(
+            dataSource.comments?.[dataSource.comments?.length - 1]?.content
+          ),
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataSource.comments]);
 
   return (
     <div
@@ -262,13 +312,24 @@ function ContentItem({
             </div>
             <div className="text-left md:table md:table-fixed w-full md:text-xs text-neutral-500 pr-2">
               {!dataSource.isClosed && (
-                <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
-                  {dataSource?.draft ? "Me: " : ""}
+                <>
+                  <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
+                    {dataSource?.draft ? "Me: " : ""}
 
-                  {dataSource.comments?.length > 0
-                    ? `${editorToHTML(commentState)}`
-                    : editorToHTML(state)}
-                </small>
+                    {/* {dataSource.comments?.length > 0
+                      ? `${getShortName(
+                          getCreatedBy(
+                            `${
+                              dataSource.comments?.[
+                                dataSource.comments?.length - 1
+                              ]?.createdBy
+                            }`
+                          ).firstName
+                        )} : ${editorToHTML(commentState)}`
+                      : editorToHTML(state)} */}
+                    {threadListSubtitle()}
+                  </small>
+                </>
               )}
               {dataSource.isClosed && (
                 <small className="text-sm md:text-xs text-neutral-500 table-cell truncate">
@@ -305,7 +366,7 @@ function ContentItem({
                 <>
                   {!dataSource?.draft && (
                     <div className="flex">
-                      <Menu.Button as={React.Fragment}>
+                      <Menu.Button as="div">
                         <IconButton>
                           <BiDotsHorizontalRounded
                             size={24}

@@ -187,7 +187,7 @@ function AddChannelMember({ data, onClose }: TProps) {
             leftContent={
               <div className="pr-2">
                 <Popover className="relative">
-                  <Popover.Button as={React.Fragment}>
+                  <Popover.Button as="div">
                     <span className="text-indigo-500 hover:underline cursor-pointer text-sm">
                       {auth.user._id === data._id ? "Leave" : "Remove"}
                     </span>
