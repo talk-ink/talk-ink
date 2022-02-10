@@ -128,7 +128,7 @@ function InboxPage() {
   return (
     <>
       <MobileHeader
-        header="Inbox"
+        header={isClosedThread ? "Closed" : "Inbox"}
         subHeader={
           !isClosedThread
             ? `${

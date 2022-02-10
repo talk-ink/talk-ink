@@ -191,7 +191,7 @@ function ChannelPage() {
   return (
     <>
       <MobileHeader
-        header={channelData?.name}
+        header={isClosedThread ? "Closed" : channelData?.name}
         subHeader={`${uniqueMemberId.length || 0} ${
           (uniqueMemberId.length || 0) > 1 ? "Members" : "Member"
         }`}
@@ -324,7 +324,14 @@ function ChannelPage() {
           </div>
 
           <div className="flex items-center gap-3">
-            <div className="hidden md:flex flex-row mr-2">
+            <button
+              className="hidden md:flex flex-row mr-2 outline-none"
+              onClick={() => {
+                if (isAdmin) {
+                  setAddMemberModal(true);
+                }
+              }}
+            >
               {memberList.map(
                 (member, idx) =>
                   idx <= 3 && (
@@ -377,7 +384,7 @@ function ChannelPage() {
                   +{memberList.length - 4 > 99 ? "99" : memberList.length - 4}
                 </div>
               )}
-            </div>
+            </button>
 
             {isChannelMember && (
               <Button

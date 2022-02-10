@@ -26,7 +26,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 
 import { addReadThread, deleteReadThread } from "features/auth";
-import { Member, Thread } from "types";
+import { Channel, Member, Thread } from "types";
 import logoImage from "assets/image/logo512.png";
 import { useRemirror } from "@remirror/react";
 import { htmlToProsemirrorNode } from "remirror";
@@ -70,8 +70,15 @@ function ContentItem({
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
+  const channel = useAppSelector((state) => state.channel);
   const navigate = useNavigate();
   const isFromTalkink = dataSource.name === "Welcome to Talk.ink";
+
+  const channelData: Channel = useMemo(() => {
+    return channel.channels.find(
+      (data) => data._id === dataSource?.channel?.[0]
+    );
+  }, [channel.channels, dataSource?.channel]);
 
   const handleReadUnread = async ({ type }: { type: "read" | "unread" }) => {
     try {
@@ -271,157 +278,184 @@ function ContentItem({
             </div>
           </div>
         </button>
-        <div className="hidden md:flex active:flex group-hover:flex gap-2 items-center">
-          {otherButton}
-          <Menu as="div" className="relative hidden md:block">
-            {({ open }) => (
-              <>
-                {!dataSource?.draft && (
-                  <div className="flex">
-                    <Menu.Button as={React.Fragment}>
-                      <IconButton>
-                        <BiDotsHorizontalRounded
-                          size={24}
-                          className="text-neutral-400"
-                        />
-                      </IconButton>
-                    </Menu.Button>
-                  </div>
-                )}
 
-                {open && (
-                  <Menu.Items static className="menu-container right-0">
-                    {["regular", "inbox"].includes(from) && (
-                      <>
-                        {isRead && (
-                          <MenuItem
-                            icon={
-                              <BiCircle
-                                size={20}
-                                className="text-neutral-400"
-                              />
-                            }
-                            title="Mark unread"
-                            onClick={() => {
-                              handleReadUnread({ type: "unread" });
-                            }}
+        <Menu as="div" className="relative hidden md:block">
+          {({ open }) => (
+            <>
+              <div
+                className={`hidden ${
+                  from !== "inbox" || open ? "md:hidden" : "md:flex"
+                } md:group-hover:hidden items-center justify-end`}
+              >
+                <div className="rounded-full border border-indigo-200 px-2 py-0.5">
+                  <p className="text-xs text-slate-600">
+                    {channelData?.name}
+                    <span className="ml-1 font-semibold text-indigo-500">
+                      #
+                    </span>
+                  </p>
+                </div>
+              </div>
+              <div
+                className={`hidden ${
+                  open ? "md:flex" : ""
+                } group-hover:flex gap-2 items-center`}
+              >
+                {otherButton}
+                <>
+                  {!dataSource?.draft && (
+                    <div className="flex">
+                      <Menu.Button as={React.Fragment}>
+                        <IconButton>
+                          <BiDotsHorizontalRounded
+                            size={24}
+                            className="text-neutral-400"
                           />
-                        )}
-                        {!isRead && (
-                          <MenuItem
-                            icon={
-                              <BiCheck size={20} className="text-neutral-400" />
-                            }
-                            title="Mark read"
-                            onClick={() => {
-                              handleReadUnread({ type: "read" });
-                            }}
-                          />
-                        )}
-                        {(dataSource.createdBy._id === auth.user._id ||
-                          dataSource?.draft) &&
-                          !isFromTalkink &&
-                          !dataSource?.draft && <Divider />}
-                        {(dataSource.createdBy._id === auth.user._id ||
-                          dataSource?.draft) &&
-                          !isFromTalkink &&
-                          !dataSource?.draft && (
-                            <>
-                              <MenuItem
-                                icon={
-                                  <BiEdit
-                                    size={20}
-                                    className="text-neutral-400"
-                                  />
-                                }
-                                title="Edit thread..."
-                                onClick={() => {
-                                  navigate(
-                                    `/a/${params.workspaceId}/ch/${dataSource.channel?.[0]}/te/${dataSource?._id}`
-                                  );
-                                }}
-                              />
-                              <MenuItem
-                                icon={
-                                  <BiTrash
-                                    size={20}
-                                    className="text-neutral-400"
-                                  />
-                                }
-                                title="Delete thread..."
-                                onClick={() => {
-                                  setSelectedThread({
-                                    thread: dataSource,
-                                    type: "delete",
-                                  });
-                                }}
-                              />
-                            </>
+                        </IconButton>
+                      </Menu.Button>
+                    </div>
+                  )}
+
+                  {open && (
+                    <Menu.Items
+                      static
+                      className="menu-container right-0 top-full"
+                    >
+                      {["regular", "inbox"].includes(from) && (
+                        <>
+                          {isRead && (
+                            <MenuItem
+                              icon={
+                                <BiCircle
+                                  size={20}
+                                  className="text-neutral-400"
+                                />
+                              }
+                              title="Mark unread"
+                              onClick={() => {
+                                handleReadUnread({ type: "unread" });
+                              }}
+                            />
                           )}
-                        {!dataSource?.isClosed && (
-                          <MenuItem
-                            icon={
-                              <BiCheckCircle
-                                size={20}
-                                className="text-neutral-400"
-                              />
-                            }
-                            title="Close thread"
-                            onClick={() => {
-                              setSelectedThread({
-                                thread: dataSource,
-                                type: "close",
-                              });
-                            }}
-                          />
-                        )}
-                        {dataSource?.isClosed && (
-                          <MenuItem
-                            icon={
-                              <BsArrowUpCircle
-                                size={20}
-                                className="text-neutral-400"
-                              />
-                            }
-                            title="Reopen thread"
-                            onClick={() => {
-                              reopenThreadHandler();
-                            }}
-                          />
-                        )}
-                      </>
-                    )}
-                    {from === "trash" && (
-                      <MenuItem
-                        icon={
-                          <BiRecycle size={20} className="text-neutral-400" />
-                        }
-                        title="Restore thread"
-                        onClick={() => {
-                          restoreThreadHandler();
-                        }}
-                      />
-                    )}
-                    {from === "trash" && (
-                      <MenuItem
-                        icon={
-                          <BiTrash size={20} className="text-neutral-400" />
-                        }
-                        title="Remove from trash"
-                        onClick={() => {
-                          setSelectedThread({
-                            thread: dataSource,
-                            type: "delete",
-                          });
-                        }}
-                      />
-                    )}
-                  </Menu.Items>
-                )}
-              </>
-            )}
-          </Menu>
-        </div>
+                          {!isRead && (
+                            <MenuItem
+                              icon={
+                                <BiCheck
+                                  size={20}
+                                  className="text-neutral-400"
+                                />
+                              }
+                              title="Mark read"
+                              onClick={() => {
+                                handleReadUnread({ type: "read" });
+                              }}
+                            />
+                          )}
+                          {(dataSource.createdBy._id === auth.user._id ||
+                            dataSource?.draft) &&
+                            !isFromTalkink &&
+                            !dataSource?.draft && <Divider />}
+                          {(dataSource.createdBy._id === auth.user._id ||
+                            dataSource?.draft) &&
+                            !isFromTalkink &&
+                            !dataSource?.draft && (
+                              <>
+                                <MenuItem
+                                  icon={
+                                    <BiEdit
+                                      size={20}
+                                      className="text-neutral-400"
+                                    />
+                                  }
+                                  title="Edit thread..."
+                                  onClick={() => {
+                                    navigate(
+                                      `/a/${params.workspaceId}/ch/${dataSource.channel?.[0]}/te/${dataSource?._id}`
+                                    );
+                                  }}
+                                />
+                                <MenuItem
+                                  icon={
+                                    <BiTrash
+                                      size={20}
+                                      className="text-neutral-400"
+                                    />
+                                  }
+                                  title="Delete thread..."
+                                  onClick={() => {
+                                    setSelectedThread({
+                                      thread: dataSource,
+                                      type: "delete",
+                                    });
+                                  }}
+                                />
+                              </>
+                            )}
+                          {!dataSource?.isClosed && (
+                            <MenuItem
+                              icon={
+                                <BiCheckCircle
+                                  size={20}
+                                  className="text-neutral-400"
+                                />
+                              }
+                              title="Close thread"
+                              onClick={() => {
+                                setSelectedThread({
+                                  thread: dataSource,
+                                  type: "close",
+                                });
+                              }}
+                            />
+                          )}
+                          {dataSource?.isClosed && (
+                            <MenuItem
+                              icon={
+                                <BsArrowUpCircle
+                                  size={20}
+                                  className="text-neutral-400"
+                                />
+                              }
+                              title="Reopen thread"
+                              onClick={() => {
+                                reopenThreadHandler();
+                              }}
+                            />
+                          )}
+                        </>
+                      )}
+                      {from === "trash" && (
+                        <MenuItem
+                          icon={
+                            <BiRecycle size={20} className="text-neutral-400" />
+                          }
+                          title="Restore thread"
+                          onClick={() => {
+                            restoreThreadHandler();
+                          }}
+                        />
+                      )}
+                      {from === "trash" && (
+                        <MenuItem
+                          icon={
+                            <BiTrash size={20} className="text-neutral-400" />
+                          }
+                          title="Remove from trash"
+                          onClick={() => {
+                            setSelectedThread({
+                              thread: dataSource,
+                              type: "delete",
+                            });
+                          }}
+                        />
+                      )}
+                    </Menu.Items>
+                  )}
+                </>
+              </div>
+            </>
+          )}
+        </Menu>
       </div>
     </div>
   );

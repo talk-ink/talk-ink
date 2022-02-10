@@ -12,7 +12,7 @@ function WorkspaceButton({ onClick = () => {}, workspaceData }: Props) {
 
   return (
     <button
-      className="flex items-center hover:bg-neutral-200 px-2 h-10 rounded-md"
+      className="flex items-center hover:bg-neutral-200 px-2 h-10 rounded-md outline-none"
       onClick={onClick}
     >
       <div className="w-6 h-6 bg-[#a8a8a8] rounded-md flex items-center justify-center overflow-hidden">
