@@ -97,7 +97,12 @@ const Form: React.FC<IProps> = ({
 
   const editorRef = useRef<EditorRef | null>(null);
 
-  const { manager, onChange, state } = useRemirror({
+  const {
+    manager,
+    onChange,
+    state,
+    setState: setRemirrorState,
+  } = useRemirror({
     extensions: () => extensions(false, "Reply..."),
     stringHandler: htmlToProsemirrorNode,
     content: "",
@@ -142,10 +147,12 @@ const Form: React.FC<IProps> = ({
 
   const discardComment = () => {
     draft("comment").deleteByKey(params.threadId);
-    editorRef.current!.setContent({
-      type: "doc",
-      content: [],
-    });
+    setRemirrorState(
+      manager.createState({
+        stringHandler: htmlToProsemirrorNode,
+        content: "",
+      })
+    );
 
     setIsShowEditor(false);
   };
@@ -187,7 +194,6 @@ const Form: React.FC<IProps> = ({
         isOpenedComment: threadData?.isClosed ? true : undefined,
       })
     );
-    draft("comment").deleteByKey(params.threadId);
 
     if (threadData?.isClosed) {
       reopenThreadHandler();
