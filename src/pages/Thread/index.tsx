@@ -408,7 +408,7 @@ function ThreadPage() {
             </p>
           )}
 
-          <div className="mb-10 ">
+          <div className={`${!isShowEditor ? "mb-10" : "mb-52"}`}>
             {thread.commentLoading ? (
               <LoadingSkeleton />
             ) : (
