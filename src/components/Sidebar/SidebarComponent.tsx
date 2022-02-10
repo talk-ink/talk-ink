@@ -42,7 +42,12 @@ import limitImage from "assets/image/limit.svg";
 
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
-import { addThread, deleteThread, updateThreadComment } from "features/threads";
+import {
+  addThread,
+  deleteThread,
+  updatePartialThread,
+  updateThreadComment,
+} from "features/threads";
 import { updateUser } from "features/auth";
 import { createUniqueArray } from "utils/helper";
 
@@ -102,7 +107,8 @@ function SidebarComponent({
 
   const channelDataAll: string[] = useMemo(
     () => channel.channels.map((data) => data._id),
-    [channel.channels]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [channel.channels?.length]
   );
 
   const readedThreads: string[] = useMemo(() => {
@@ -317,6 +323,8 @@ function SidebarComponent({
   useEffect(() => {
     let key: string | undefined;
 
+    console.log("mnt");
+
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
@@ -448,43 +456,78 @@ function SidebarComponent({
                   !!payload?.before?.isClosed !== !!payload?.after?.isClosed
                 ) {
                   try {
-                    updateThreadWithComment({
-                      _id: payload?.after?._id,
-                      thread: {
-                        ...payload.after,
+                    dispatch(
+                      updatePartialThread({
+                        _id: payload?.after?._id,
+                        isClosed: payload?.after?.isClosed,
                         createdBy: _createdBy,
-                      },
-                    });
+                      })
+                    );
                   } catch (error: any) {
                     console.log("err", error);
                     showToast({ message: `${JSON.stringify(error?.message)}` });
                   }
                 }
+
                 if (
-                  !!payload?.before?.isDeleted !==
-                    !!payload?.after?.isDeleted &&
-                  payload?.after?.createdBy !== auth.user._id
+                  !!payload?.before?.isDeleted !== !!payload?.after?.isDeleted
                 ) {
-                  if (payload?.after?.isDeleted) {
-                    dispatch(deleteThread(payload?.after));
-                  } else {
-                    dispatch(
-                      addThread({ ...payload.after, createdBy: _createdBy })
-                    );
+                  if (payload?.after?.createdBy !== auth.user._id) {
+                    if (payload?.after?.isDeleted) {
+                      dispatch(
+                        updatePartialThread({
+                          _id: payload?.after?._id,
+                          isDeleted: payload?.after?.isDeleted,
+                          createdBy: _createdBy,
+                        })
+                      );
+                    } else {
+                      const { data, error } = await kontenbase
+                        .service("Comments")
+                        .find({
+                          where: {
+                            threads: payload?.after?._id,
+                          },
+                          lookup: ["subComments"],
+                          sort: {
+                            createdAt: -1,
+                          },
+                          limit: 2,
+                        });
+
+                      if (error) throw new Error(error?.message);
+                      dispatch(
+                        addThread({
+                          ...payload.after,
+                          comments: data,
+                          createdBy: _createdBy,
+                        })
+                      );
+                    }
+                  }
+
+                  if (payload.after?.createdBy === auth.user._id) {
+                    if (payload?.after?.isDeleted) {
+                      setTrashData((prev) =>
+                        createUniqueArray([...prev, payload.after?._id])
+                      );
+                      setInboxData((prev) =>
+                        prev.filter((item) => item._id !== payload?.after?._id)
+                      );
+                    } else {
+                      setTrashData((prev) =>
+                        prev.filter((item) => item !== payload?.after?._id)
+                      );
+                      setInboxData((prev) => [
+                        ...prev.filter(
+                          (item) => item._id !== payload?.after?._id
+                        ),
+                        payload?.after,
+                      ]);
+                    }
                   }
                 }
 
-                if (payload.after?.createdBy === auth.user._id) {
-                  if (payload?.after?.isDeleted) {
-                    setTrashData((prev) =>
-                      createUniqueArray([...prev, payload.after?._id])
-                    );
-                  } else {
-                    setTrashData((prev) =>
-                      prev.filter((item) => item !== payload?.after?._id)
-                    );
-                  }
-                }
                 break;
               case "CREATE_RECORD":
                 if (
@@ -522,9 +565,14 @@ function SidebarComponent({
       .then((result) => (key = result));
 
     return () => {
+      console.log("umnt");
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channelDataAll]);
+
+  useEffect(() => {
+    console.log("first", channelDataAll);
   }, [channelDataAll]);
 
   useEffect(() => {

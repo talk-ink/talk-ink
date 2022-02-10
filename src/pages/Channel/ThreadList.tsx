@@ -46,7 +46,7 @@ const ThreadList = ({ type = "open" }: Props) => {
 
   const threadData = useMemo(() => {
     return thread.threads.filter((data) =>
-      isClosedThread ? data?.isClosed : !data?.isClosed
+      isClosedThread ? data?.isClosed : !data?.isClosed && !data?.isDeleted
     );
   }, [thread.threads, isClosedThread]);
 

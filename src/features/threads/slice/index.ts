@@ -60,6 +60,11 @@ interface IUpdateThreadPayload extends Omit<Thread, "closedAt"> {
   closedAt?: string;
 }
 
+interface IPartialUpdateThreadPayload extends Omit<Thread, "name" | "content"> {
+  name?: string;
+  content?: string;
+}
+
 const threadSlice = createSlice({
   name: "thread",
   initialState,
@@ -90,6 +95,19 @@ const threadSlice = createSlice({
       const updatedThread = state.threads.map((item) =>
         item._id === action.payload._id ? action.payload : item
       );
+      state.threads = updatedThread;
+    },
+    updatePartialThread: (
+      state,
+      action: PayloadAction<IPartialUpdateThreadPayload>
+    ) => {
+      const updatedThread = state.threads.map((item) => {
+        if (item?._id !== action.payload?._id) return item;
+        return {
+          ...item,
+          ...action.payload,
+        };
+      });
       state.threads = updatedThread;
     },
     updateThreadComment: (
@@ -344,5 +362,6 @@ export const {
   updateSubCommentToComment,
   deleteSubCommentToComment,
   updateThreadComment,
+  updatePartialThread,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

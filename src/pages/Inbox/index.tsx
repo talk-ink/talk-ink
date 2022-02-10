@@ -62,7 +62,7 @@ function InboxPage() {
     return thread.threads.filter((item) =>
       item.tagedUsers?.includes(auth.user._id) && isClosedThread
         ? item.isClosed
-        : !item.isClosed
+        : !item.isClosed && !item?.isDeleted
     );
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
