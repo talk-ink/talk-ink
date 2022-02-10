@@ -124,6 +124,7 @@ const MyEditor: React.FC<IProps> = ({
       <AllStyledComponent>
         <ThemeProvider>
           <Remirror
+            autoFocus={fromComment}
             manager={manager}
             autoRender="start"
             onChange={onChange}

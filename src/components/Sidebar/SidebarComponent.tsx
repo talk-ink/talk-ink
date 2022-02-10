@@ -1,6 +1,7 @@
 import React, {
   Dispatch,
   SetStateAction,
+  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -69,6 +70,8 @@ function SidebarComponent({
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const channel = useAppSelector((state) => state.channel);
+  const thread = useAppSelector((state) => state.thread);
+
   const [showToast] = useToast();
 
   const { pathname } = useLocation();
@@ -129,6 +132,10 @@ function SidebarComponent({
       (item) => !readedThreads.includes(item._id) && !item.isDeleted
     ).length;
   }, [threadData, readedThreads]);
+
+  const getThreads = useCallback((): Thread[] => {
+    return thread.threads;
+  }, [thread.threads]);
 
   useEffect(() => {
     if (!userId || !params.workspaceId || runOnce) return;
@@ -364,8 +371,15 @@ function SidebarComponent({
           ) {
             switch (event) {
               case "UPDATE_RECORD":
-                if (payload.before.tagedUsers.includes(userId)) {
+                console.log("upd", payload);
+                if (
+                  payload.before.tagedUsers.includes(userId) ||
+                  (!payload.before.tagedUsers.includes(userId) &&
+                    payload.after.tagedUsers.includes(userId))
+                ) {
                   let _currentThread;
+
+                  console.log(getThreads(), "aa");
 
                   try {
                     const { data, error } = await kontenbase
@@ -397,6 +411,7 @@ function SidebarComponent({
                       (item) => item._id === payload.before?._id
                     )
                   ) {
+                    console.log("wryy");
                     try {
                       updateThreadWithComment({
                         _id: payload?.after?._id,
@@ -426,10 +441,10 @@ function SidebarComponent({
                       }
                     }
                   } else {
+                    console.log("wee");
                     if (
-                      (params.channelId &&
-                        payload?.after?.channel?.includes(params.channelId)) ||
-                      pathname.includes(`/a/${params.workspaceId}/inbox`)
+                      !params.channelId ||
+                      payload?.after?.channel?.includes(params.channelId)
                     ) {
                       dispatch(
                         addThread({
@@ -530,6 +545,7 @@ function SidebarComponent({
 
                 break;
               case "CREATE_RECORD":
+                console.log("crt");
                 if (
                   !params.channelId ||
                   payload?.channel?.includes(params.channelId)
@@ -545,6 +561,7 @@ function SidebarComponent({
                 updateUserStore();
                 break;
               case "DELETE_RECORD":
+                console.log("del");
                 dispatch(deleteThread(payload));
                 setTrashData((prev) =>
                   prev.filter((item) => item !== payload?._id)
@@ -650,6 +667,10 @@ function SidebarComponent({
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
+
+  useEffect(() => {
+    console.log(thread.threads, "tdd");
+  }, [thread.threads]);
 
   const loading = workspace.loading || channel.loading;
 
