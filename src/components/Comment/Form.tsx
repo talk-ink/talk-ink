@@ -258,8 +258,6 @@ const Form: React.FC<IProps> = ({
   const handleShowEditor = async () => {
     setIsShowEditor(true);
 
-    scrollToBottom();
-
     const getCommentDraft = draft("comment").get(params.threadId);
     if (
       getCommentDraft.content &&
