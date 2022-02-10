@@ -789,7 +789,8 @@ function SidebarComponent({
                   link={`/a/${workspaceData?._id}/trash`}
                   setIsSidebarOpen={setIsSidebarOpen}
                   count={
-                    (trashData.length > 10 ? "10+" : trashData.length) || 0
+                    // (trashData.length > 10 ? "10+" : trashData.length) || 0
+                    0
                   }
                 />
                 {/* <SidebarList
