@@ -255,8 +255,11 @@ const Form: React.FC<IProps> = ({
     }
   }, [state, auth.user._id, params.threadId]);
 
-  useEffect(() => {
-    if (!isShowEditor) return;
+  const handleShowEditor = async () => {
+    setIsShowEditor(true);
+
+    scrollToBottom();
+
     const getCommentDraft = draft("comment").get(params.threadId);
     if (
       getCommentDraft.content &&
@@ -270,11 +273,20 @@ const Form: React.FC<IProps> = ({
           })
         );
       } catch (error) {
-        console.log(error);
+        await timeout(1);
+        editorRef.current!.setContent({
+          type: "doc",
+          content: [],
+        });
       }
+    } else {
+      await timeout(1);
+      editorRef.current!.setContent({
+        type: "doc",
+        content: [],
+      });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [isShowEditor, auth.user._id, params.threadId]);
+  };
 
   const handleChangeTag = (e: MultiValue<INotifiedOption>): void => {
     const ids: string[] = e?.map((data: INotifiedOption) => data?.value);
@@ -343,6 +355,10 @@ const Form: React.FC<IProps> = ({
     setSelectedNotifiedOptions(currSelectedOptions);
   };
 
+  function timeout(delay: number) {
+    return new Promise((res) => setTimeout(res, delay));
+  }
+
   return (
     <div className={`bg-white fixed pr-8 bottom-0 w-full max-w-4xl origin-top`}>
       {!isShowEditor && (
@@ -363,13 +379,11 @@ const Form: React.FC<IProps> = ({
             type="text"
             placeholder="Input Your Message"
             readOnly
-            onClick={() => {
-              setIsShowEditor(true);
-              scrollToBottom();
-            }}
+            onClick={handleShowEditor}
           />
         </div>
       )}
+
       {isShowEditor && (
         <div
           className={`px-2 border-solid border-[1px] border-light-blue-500 rounded-xl mb-5`}
