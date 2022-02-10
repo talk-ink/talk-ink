@@ -20,6 +20,7 @@ import {
   editorToHTML,
   getNameInitial,
   notificationUrl,
+  parseContent,
 } from "utils/helper";
 import { kontenbase } from "lib/client";
 
@@ -262,13 +263,17 @@ const Form: React.FC<IProps> = ({
       getCommentDraft.createdById === auth.user._id
     ) {
       try {
-        const parsedText = JSON.parse(getCommentDraft.content);
-
-        editorRef.current!.setContent(parsedText.doc);
+        setRemirrorState(
+          manager.createState({
+            stringHandler: htmlToProsemirrorNode,
+            content: parseContent(getCommentDraft?.content),
+          })
+        );
       } catch (error) {
         console.log(error);
       }
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isShowEditor, auth.user._id, params.threadId]);
 
   const handleChangeTag = (e: MultiValue<INotifiedOption>): void => {
