@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 
 import {
   BiCheck,
@@ -114,7 +114,11 @@ function ContentItem({
     content: parseContent(dataSource.content),
   });
 
-  const { state: commentState } = useRemirror({
+  const {
+    state: commentState,
+    setState: setCommentState,
+    manager,
+  } = useRemirror({
     extensions,
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(
@@ -189,7 +193,12 @@ function ContentItem({
     if (dataSource?.comments?.length === 0) return editorToHTML(state);
 
     const lastComment = dataSource.comments?.[dataSource?.comments?.length - 1];
-    const commentCreatedBy = getCreatedBy(`${lastComment?.createdBy}`);
+    const commentCreatedBy = lastComment?.createdBy?._id
+      ? lastComment.createdBy
+      : getCreatedBy(`${lastComment?.createdBy}`);
+
+    if (dataSource?._id === "61fa35291fb5d50e29211f28") {
+    }
 
     if (!commentCreatedBy) return;
 
@@ -202,6 +211,20 @@ function ContentItem({
       commentState
     )}`;
   };
+
+  useEffect(() => {
+    if (dataSource?.comments?.length > 0) {
+      setCommentState(
+        manager.createState({
+          stringHandler: htmlToProsemirrorNode,
+          content: parseContent(
+            dataSource.comments?.[dataSource.comments?.length - 1]?.content
+          ),
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataSource.comments]);
 
   return (
     <div
@@ -293,6 +316,17 @@ function ContentItem({
                   <small className="text-sm md:text-xs text-neutral-500 md:table-cell md:truncate line-clamp-2">
                     {dataSource?.draft ? "Me: " : ""}
 
+                    {/* {dataSource.comments?.length > 0
+                      ? `${getShortName(
+                          getCreatedBy(
+                            `${
+                              dataSource.comments?.[
+                                dataSource.comments?.length - 1
+                              ]?.createdBy
+                            }`
+                          ).firstName
+                        )} : ${editorToHTML(commentState)}`
+                      : editorToHTML(state)} */}
                     {threadListSubtitle()}
                   </small>
                 </>

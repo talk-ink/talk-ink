@@ -187,6 +187,7 @@ const Form: React.FC<IProps> = ({
         isOpenedComment: threadData?.isClosed ? true : undefined,
       })
     );
+    draft("comment").deleteByKey(params.threadId);
 
     if (threadData?.isClosed) {
       reopenThreadHandler();

@@ -119,8 +119,9 @@ function SidebarComponent({
   }, [inboxData, auth.user, params, channelData]);
 
   const inboxLeft: number = useMemo(() => {
-    return threadData.filter((item) => !readedThreads.includes(item._id))
-      .length;
+    return threadData.filter(
+      (item) => !readedThreads.includes(item._id) && !item.isDeleted
+    ).length;
   }, [threadData, readedThreads]);
 
   useEffect(() => {
@@ -357,6 +358,7 @@ function SidebarComponent({
               case "UPDATE_RECORD":
                 if (payload.before.tagedUsers.includes(userId)) {
                   let _currentThread;
+
                   try {
                     const { data, error } = await kontenbase
                       .service("Threads")
