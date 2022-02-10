@@ -7,7 +7,6 @@ import cookies from "js-cookie";
 import { useNavigate, useParams, useLocation } from "react-router";
 import OneSignal from "react-onesignal";
 import { kontenbase } from "lib/client";
-import { FaPlus } from "react-icons/fa";
 
 import ChannelButton from "components/Button/ChannelButton";
 import IconButton from "components/Button/IconButton";
@@ -31,7 +30,6 @@ import BrowseChannels from "components/BrowseChannels";
 import { logout } from "features/auth";
 import {
   addChannel,
-  deleteChannel,
   fetchChannels,
   updateChannel,
 } from "features/channels/slice";
@@ -44,6 +42,7 @@ import { updateUser } from "features/auth";
 import { createUniqueArray } from "utils/helper";
 
 import { Channel, CreateChannel, Thread, User } from "types";
+import { BsPlus } from "react-icons/bs";
 
 type TProps = {
   isMobile: boolean;
@@ -551,19 +550,12 @@ function SidebarComponent({
                 );
 
                 if (dataIndex >= 0) {
-                  if (payload?.after?.members?.includes(auth.user._id)) {
-                    dispatch(
-                      updateChannel({
-                        ...payload.before,
-                        ...payload.after,
-                      })
-                    );
-                  } else {
-                    if (params.channelId === payload.after._id) {
-                      navigate(`/a/${params.workspaceId}/inbox`);
-                    }
-                    dispatch(deleteChannel(payload.after));
-                  }
+                  dispatch(
+                    updateChannel({
+                      ...payload.before,
+                      ...payload.after,
+                    })
+                  );
                 } else {
                   if (payload?.after?.members?.includes(auth.user._id)) {
                     dispatch(
@@ -573,10 +565,12 @@ function SidebarComponent({
                       })
                     );
                   } else {
-                    if (params.channelId === payload.after._id) {
-                      navigate(`/a/${params.workspaceId}/inbox`);
-                    }
-                    dispatch(deleteChannel(payload.after));
+                    dispatch(
+                      updateChannel({
+                        ...payload.before,
+                        ...payload.after,
+                      })
+                    );
                   }
                 }
                 break;
@@ -604,7 +598,7 @@ function SidebarComponent({
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.workspaceId, params.channelId]);
+  }, [params.workspaceId]);
 
   const loading = workspace.loading || channel.loading;
 
@@ -791,8 +785,8 @@ function SidebarComponent({
                   className="cursor-pointer w-full rounded hover:bg-neutral-100 flex items-center justify-between group mt-1"
                   onClick={() => setCreateChannelModal(true)}
                 >
-                  <div className=" `w-full flex items-center text-sm pl-3 h-8`">
-                    <FaPlus size={15} className="mr-3 text-gray-400" />
+                  <div className={`w-full flex items-center text-sm pl-2 h-8`}>
+                    <BsPlus size={28} className="mr-1 text-gray-400" />
                     <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
                       New Channel
                     </p>

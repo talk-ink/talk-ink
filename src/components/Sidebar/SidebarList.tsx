@@ -133,7 +133,7 @@ function SidebarList({
       </NavLink>
 
       {showOption && (
-        <Menu as="div" className="relative">
+        <Menu as="div" className="relative hidden md:block">
           {({ open }) => (
             <>
               <div className="flex items-center">

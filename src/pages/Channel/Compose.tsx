@@ -271,6 +271,7 @@ function Compose() {
           onBackClick={() => {
             saveDraft();
           }}
+          showTitle
         />
       }
     >

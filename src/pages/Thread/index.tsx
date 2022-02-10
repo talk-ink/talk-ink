@@ -38,6 +38,7 @@ import { htmlToProsemirrorNode } from "remirror";
 import CommentMenu from "components/Thread/CommentMenu";
 import { setCommentMenu } from "features/mobileMenu/slice";
 import { useMediaQuery } from "react-responsive";
+import { updateChannel } from "features/channels/slice";
 
 function useQuery() {
   const { search } = useLocation();
@@ -219,6 +220,19 @@ function ThreadPage() {
     }
   };
 
+  const joinChannelHandler = async () => {
+    try {
+      const joinChannel = await kontenbase
+        .service("Channels")
+        .link(channelId, { members: auth.user._id });
+
+      dispatch(updateChannel({ _id: channelId, ...joinChannel.data }));
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error)}` });
+    }
+  };
+
   useEffect(() => {
     dispatch(fetchComments({ threadId: threadId, skip: 0 }));
   }, [dispatch, threadId]);
@@ -306,6 +320,13 @@ function ThreadPage() {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  const isMember = useMemo(() => {
+    return (
+      channelData?.members?.includes(auth.user._id) &&
+      (!channelData?.privacy || channelData?.privacy === "public")
+    );
+  }, [channelData, auth.user._id]);
 
   return (
     <MainContentContainer
@@ -402,20 +423,20 @@ function ThreadPage() {
             )}
           </div>
 
-          {(!threadData?.isClosed ||
-            (threadData?.isClosed && isShowEditor)) && (
-            <CommentForm
-              isShowEditor={isShowEditor}
-              setIsShowEditor={setIsShowEditor}
-              threadId={threadId}
-              threadName={threadData?.name}
-              interactedUsers={[...new Set(threadData?.interactedUsers)]}
-              scrollToBottom={scrollToBottom}
-              memberList={memberList}
-              threadData={threadData}
-              reopenThreadHandler={reopenThreadHandler}
-            />
-          )}
+          {(!threadData?.isClosed || (threadData?.isClosed && isShowEditor)) &&
+            (isMember || (!isMember && isShowEditor)) && (
+              <CommentForm
+                isShowEditor={isShowEditor}
+                setIsShowEditor={setIsShowEditor}
+                threadId={threadId}
+                threadName={threadData?.name}
+                interactedUsers={[...new Set(threadData?.interactedUsers)]}
+                scrollToBottom={scrollToBottom}
+                memberList={memberList}
+                threadData={threadData}
+                reopenThreadHandler={reopenThreadHandler}
+              />
+            )}
           {!threadData?.isClosed && (
             <CommentMenu
               openMenu={mobileMenu?.comment?.type === "open"}
@@ -429,6 +450,14 @@ function ThreadPage() {
               onReopen={() => {
                 setIsShowEditor(true);
               }}
+            />
+          )}
+          {!isMember && !isShowEditor && (
+            <ThreadBadge.JoinChannel
+              onJoin={() => {
+                joinChannelHandler();
+              }}
+              channelData={channelData}
             />
           )}
         </div>

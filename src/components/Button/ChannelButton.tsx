@@ -34,7 +34,9 @@ function ChannelButton({
             <div className="flex">
               <Menu.Button as={React.Fragment}>
                 <IconButton
-                  className={`${open ? "flex" : "hidden"} group-hover:flex`}
+                  className={`${
+                    open ? "flex" : "flex md:hidden"
+                  } md:group-hover:flex`}
                   size="medium"
                 >
                   <BiDotsVerticalRounded
@@ -44,7 +46,9 @@ function ChannelButton({
                 </IconButton>
               </Menu.Button>
               <IconButton
-                className={`${open ? "flex" : "hidden"} group-hover:flex`}
+                className={`${
+                  open ? "flex" : "flex md:hidden"
+                } md:group-hover:flex`}
                 size="medium"
                 onClick={onAddChannelClick}
               >

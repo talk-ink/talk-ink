@@ -191,7 +191,7 @@ function ContentItem({
                   : "bg-transparent"
               } rounded-full mr-2 ${isMobile ? "hidden" : ""}`}
             ></div>
-            <div className={`ml-4 md:ml-0 mr-4 ${isMobile ? "relative" : ""}`}>
+            <div className={`ml-4 md:ml-0 mr-4 relative`}>
               {isFromTalkink && (
                 <Avatar
                   src={logoImage}
