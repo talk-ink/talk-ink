@@ -52,10 +52,11 @@ function InboxList({ type = "open" }: TProps) {
 
   const threadData = useMemo(() => {
     return thread.threads
-      .filter((item) =>
-        item.tagedUsers?.includes(auth.user._id) && isClosedThread
-          ? item.isClosed
-          : !item.isClosed && !item?.isDeleted
+      .filter(
+        (item) =>
+          item.tagedUsers?.includes(auth.user._id) &&
+          (isClosedThread ? item.isClosed : !item.isClosed) &&
+          !item?.isDeleted
       )
       .sort(
         (a, b) =>
