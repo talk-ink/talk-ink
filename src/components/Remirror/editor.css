@@ -15,6 +15,12 @@
   margin-left: -2px !important;
 }
 
+@media only screen and (max-height: 900px) {
+  .thread-editor .remirror-editor {
+    height: 50vh;
+  }
+}
+
 .readonly-editor .remirror-editor {
   min-height: 1rem !important;
   margin-left: -2px !important;
