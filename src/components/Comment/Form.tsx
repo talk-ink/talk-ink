@@ -344,7 +344,7 @@ const Form: React.FC<IProps> = ({
   };
 
   return (
-    <div className={` bg-white fixed bottom-0 max-w-4xl w-full origin-top`}>
+    <div className={`bg-white fixed pr-9 bottom-0 w-full max-w-4xl origin-top`}>
       {!isShowEditor && (
         <div className="flex items-center py-3">
           {auth.user.avatar ? (
