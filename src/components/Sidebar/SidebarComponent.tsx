@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 
-import { BiLogOut, BiPlus } from "react-icons/bi";
+import { BiChevronDown, BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
@@ -54,7 +54,9 @@ import { updateUser } from "features/auth";
 
 import { Channel, CreateChannel, Thread, User } from "types";
 import { BsPlus } from "react-icons/bs";
-import { Popover } from "@headlessui/react";
+import { Disclosure, Popover } from "@headlessui/react";
+import Avatar from "components/Avatar/Avatar";
+import DirectMessageList from "components/DirectMessage/List";
 
 type TProps = {
   isMobile: boolean;
@@ -71,6 +73,7 @@ function SidebarComponent({
   const workspace = useAppSelector((state) => state.workspace);
   const channel = useAppSelector((state) => state.channel);
   const thread = useAppSelector((state) => state.thread);
+  const member = useAppSelector((state) => state.member);
 
   const [showToast] = useToast();
 
@@ -875,11 +878,43 @@ function SidebarComponent({
                   </div>
                 </div>
               </div>
+              <Disclosure defaultOpen>
+                {({ open }) => (
+                  <>
+                    <Disclosure.Button className="w-full rounded h-9 hover:bg-neutral-100 pl-3 flex items-center justify-between outline-none group">
+                      <div className="flex items-center">
+                        <p className="font-bold text-xs text-neutral-500 mr-1">
+                          Direct messages
+                        </p>
+                        <BiChevronDown
+                          className={`${open ? "transform rotate-180" : ""}`}
+                        />
+                      </div>
+                    </Disclosure.Button>
+                    <Disclosure.Panel className="mt-2 w-full h-10">
+                      <div>
+                        {member.members?.map((data) => (
+                          <DirectMessageList
+                            key={data?._id}
+                            data={data}
+                            active={params?.userId === data?._id}
+                            onClick={() =>
+                              navigate(
+                                `/a/${params?.workspaceId}/msg/${data?._id}`
+                              )
+                            }
+                          />
+                        ))}
+                      </div>
+                    </Disclosure.Panel>
+                  </>
+                )}
+              </Disclosure>
             </div>
           )}
         </div>
         <Modal
-          header="Wokrspace Reach Max Limit"
+          header="Workspace Reach Max Limit"
           onClose={() => {
             setIsWorkspaceLimitModalVisible(false);
           }}
