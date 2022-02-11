@@ -3,7 +3,11 @@ import Button from "components/Button/Button";
 import IconButton from "components/Button/IconButton";
 import Remirror from "components/Remirror";
 import { extensions } from "components/Remirror/extensions";
-import { addMessage, deleteMessage } from "features/messages";
+import {
+  addMessage,
+  deleteMessage,
+  updateTempMessage,
+} from "features/messages";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
@@ -81,11 +85,14 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
 
       discardComment();
 
-      const { error } = await kontenbase.service("Messages").create({
+      const { data, error } = await kontenbase.service("Messages").create({
         content: JSON.stringify(state),
         toUser: params.userId,
         workspace: params.workspaceId,
       });
+      dispatch(
+        updateTempMessage({ _tempId, toUserId: params.userId, message: data })
+      );
       if (error) throw new Error(error.message);
     } catch (error: any) {
       console.log("err", error);

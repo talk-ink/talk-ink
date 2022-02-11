@@ -30,6 +30,12 @@ interface TDeleteMessage {
   messageId: string;
 }
 
+interface TUpdateTempMessage {
+  _tempId: string;
+  toUserId: string;
+  message: Message;
+}
+
 const messageSlice = createSlice({
   name: "message",
   initialState,
@@ -79,6 +85,16 @@ const messageSlice = createSlice({
     clearAllMessage: (state, action) => {
       state.messages = action.payload;
     },
+    updateTempMessage: (
+      state,
+      { payload }: PayloadAction<TUpdateTempMessage>
+    ) => {
+      const { toUserId, _tempId, message } = payload;
+      state.messages[toUserId] = state.messages[toUserId].map((item) => {
+        if (item._tempId !== _tempId) return item;
+        return { ...item, ...message };
+      });
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchMessages.pending, (state) => {
@@ -102,5 +118,6 @@ export const {
   addMessageFromOther,
   deleteMessage,
   clearAllMessage,
+  updateTempMessage,
 } = messageSlice.actions;
 export const messageReducer = messageSlice.reducer;
