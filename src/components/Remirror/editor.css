@@ -34,6 +34,12 @@
   overflow: hidden !important;
   margin-top: -1rem;
 }
+.readonly-message .remirror-editor {
+  min-height: 1rem !important;
+  margin-left: -2px !important;
+  overflow: hidden !important;
+  margin-top: -1rem;
+}
 
 .comment-editor .remirror-editor {
   min-height: 6rem !important;
@@ -52,6 +58,9 @@
   .readonly-comment-editor .remirror-editor,
   .readonly-editor .remirror-editor {
     width: 79vw !important;
+  }
+  .readonly-message .remirror-editor {
+    width: auto !important;
   }
 }
 

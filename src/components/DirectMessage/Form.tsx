@@ -81,13 +81,11 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
 
       discardComment();
 
-      const { error } = await kontenbase
-        .service("Messages")
-        .create({
-          content: JSON.stringify(state),
-          toUser: params.userId,
-          workspace: params.workspaceId,
-        });
+      const { error } = await kontenbase.service("Messages").create({
+        content: JSON.stringify(state),
+        toUser: params.userId,
+        workspace: params.workspaceId,
+      });
       if (error) throw new Error(error.message);
     } catch (error: any) {
       console.log("err", error);
@@ -141,7 +139,7 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
               {isMobile && (
                 <IconButton
                   size="medium"
-                  //   onClick={handleCreateComment}
+                  onClick={discardComment}
                   //   className="z-50"
                 >
                   <BiTrash size={20} className="text-slate-500 " />
@@ -150,7 +148,7 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
               {isMobile && (
                 <IconButton
                   size="medium"
-                  //   onClick={handleCreateComment}
+                  onClick={handleCreateMessage}
                   //   className="z-50"
                 >
                   <MdSend size={20} className="text-indigo-500 " />

@@ -27,7 +27,7 @@ const Chat = ({ isOwn, data }: Props) => {
     >
       <Remirror
         remmirorProps={{ manager, onChange, state }}
-        fromComment
+        fromMessage
         readOnly
       />
     </li>
