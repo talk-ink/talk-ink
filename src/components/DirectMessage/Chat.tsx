@@ -8,7 +8,8 @@ import { deleteMessage } from "features/messages";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
-import React from "react";
+import { SelectedMessage } from "pages/Message";
+import React, { useEffect } from "react";
 import { BiDotsVerticalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
@@ -19,9 +20,11 @@ import { parseContent } from "utils/helper";
 type Props = {
   isOwn?: boolean;
   data?: Message;
+  selectedMessage?: SelectedMessage;
+  setSelectedMessage?: React.Dispatch<React.SetStateAction<SelectedMessage>>;
 };
 
-const Chat = ({ isOwn, data }: Props) => {
+const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
@@ -29,7 +32,12 @@ const Chat = ({ isOwn, data }: Props) => {
   const params = useParams();
   const [showToast] = useToast();
 
-  const { manager, state, onChange } = useRemirror({
+  const {
+    manager,
+    state,
+    onChange,
+    setState: setMessageState,
+  } = useRemirror({
     extensions: () => extensions(false),
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(data.content),
@@ -59,6 +67,15 @@ const Chat = ({ isOwn, data }: Props) => {
       showToast({ message: `${JSON.stringify(error?.message)}` });
     }
   };
+
+  useEffect(() => {
+    setMessageState(
+      manager.createState({
+        stringHandler: htmlToProsemirrorNode,
+        content: parseContent(data?.content),
+      })
+    );
+  }, [data?.content]);
 
   return (
     <li
@@ -94,24 +111,21 @@ const Chat = ({ isOwn, data }: Props) => {
                   />
                 </IconButton>
               </Menu.Button>
+
               {open && (
                 <Menu.Items static className="menu-container right-0">
-                  <Menu>
-                    <MenuItem
-                      icon={
-                        <BiEditAlt size={20} className="text-neutral-400" />
-                      }
-                      onClick={() => {
-                        // setIsEdit(true);
-                      }}
-                      title="Edit message"
-                    />
-                    <MenuItem
-                      icon={<BiTrash size={20} className="text-neutral-400" />}
-                      onClick={handleDeleteMessage}
-                      title="Delete message"
-                    />
-                  </Menu>
+                  <MenuItem
+                    icon={<BiEditAlt size={20} className="text-neutral-400" />}
+                    onClick={() => {
+                      setSelectedMessage({ message: data, type: "edit" });
+                    }}
+                    title="Edit message"
+                  />
+                  <MenuItem
+                    icon={<BiTrash size={20} className="text-neutral-400" />}
+                    onClick={handleDeleteMessage}
+                    title="Delete message"
+                  />
                 </Menu.Items>
               )}
             </>

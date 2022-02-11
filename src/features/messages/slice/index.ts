@@ -35,6 +35,10 @@ interface TUpdateTempMessage {
   toUserId: string;
   message: Message;
 }
+interface TUpdateMessage {
+  toUserId: string;
+  message: Message;
+}
 
 const messageSlice = createSlice({
   name: "message",
@@ -90,8 +94,17 @@ const messageSlice = createSlice({
       { payload }: PayloadAction<TUpdateTempMessage>
     ) => {
       const { toUserId, _tempId, message } = payload;
+
       state.messages[toUserId] = state.messages[toUserId].map((item) => {
         if (item._tempId !== _tempId) return item;
+        return { ...item, ...message };
+      });
+    },
+    updateMessage: (state, { payload }: PayloadAction<TUpdateMessage>) => {
+      const { toUserId, message } = payload;
+
+      state.messages[toUserId] = state.messages[toUserId].map((item) => {
+        if (item._id !== message?._id) return item;
         return { ...item, ...message };
       });
     },
@@ -119,5 +132,6 @@ export const {
   deleteMessage,
   clearAllMessage,
   updateTempMessage,
+  updateMessage,
 } = messageSlice.actions;
 export const messageReducer = messageSlice.reducer;

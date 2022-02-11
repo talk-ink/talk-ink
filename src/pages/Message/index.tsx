@@ -14,6 +14,11 @@ import { Member, Message } from "types";
 
 type Props = {};
 
+export type SelectedMessage = {
+  message: Message | null | undefined;
+  type: "edit";
+};
+
 const MessagePage = (props: Props) => {
   const params = useParams();
 
@@ -24,6 +29,7 @@ const MessagePage = (props: Props) => {
   const dispatch = useAppDispatch();
 
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
+  const [selectedMessage, setSelectedMessage] = useState<SelectedMessage>();
 
   const memberData: Member = useMemo(() => {
     return member.members?.find((item) => item._id === params?.userId);
@@ -55,8 +61,10 @@ const MessagePage = (props: Props) => {
           {messageData?.map((message, idx) => (
             <Chat
               data={message}
-              key={message?._tempId || message?._id}
+              key={`${message?._tempId || message?._id}${idx}`}
               isOwn={message._createdById === auth.user._id}
+              setSelectedMessage={setSelectedMessage}
+              selectedMessage={selectedMessage}
             />
           ))}
         </ul>
@@ -66,6 +74,8 @@ const MessagePage = (props: Props) => {
         <MessageForm
           isShowEditor={isShowEditor}
           setIsShowEditor={setIsShowEditor}
+          setSelectedMessage={setSelectedMessage}
+          selectedMessage={selectedMessage}
         />
       </div>
     </div>

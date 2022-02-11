@@ -6,30 +6,39 @@ import { extensions } from "components/Remirror/extensions";
 import {
   addMessage,
   deleteMessage,
+  updateMessage,
   updateTempMessage,
 } from "features/messages";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
-import React, { useRef } from "react";
+import { SelectedMessage } from "pages/Message";
+import React, { useEffect, useRef } from "react";
 import { BiTrash } from "react-icons/bi";
 import { MdSend } from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import { htmlToProsemirrorNode } from "remirror";
-import { randomString } from "utils/helper";
+import { parseContent, randomString } from "utils/helper";
 
 type Props = {
   isShowEditor?: boolean;
   setIsShowEditor?: React.Dispatch<React.SetStateAction<boolean>>;
+  selectedMessage?: SelectedMessage;
+  setSelectedMessage?: React.Dispatch<React.SetStateAction<SelectedMessage>>;
 };
 
 interface EditorRef {
   setContent: (content: any) => void;
 }
 
-const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
+const MessageForm = ({
+  isShowEditor,
+  setIsShowEditor,
+  setSelectedMessage,
+  selectedMessage,
+}: Props) => {
   const params = useParams();
   const [showToast] = useToast();
 
@@ -54,6 +63,9 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
   });
 
   const discardComment = () => {
+    if (selectedMessage?.type === "edit") {
+      setSelectedMessage(null);
+    }
     setRemirrorState(
       manager.createState({
         stringHandler: htmlToProsemirrorNode,
@@ -71,35 +83,67 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
   const handleCreateMessage = async () => {
     const _tempId = randomString();
     try {
-      dispatch(
-        addMessage({
-          toUserId: params.userId,
-          message: {
+      if (!selectedMessage) {
+        console.log("a");
+        dispatch(
+          addMessage({
+            toUserId: params.userId,
+            message: {
+              content: JSON.stringify(state),
+              workspace: [params.workspaceId],
+            },
+            loggedUserId: auth.user._id,
+            _tempId,
+          })
+        );
+
+        const { data, error } = await kontenbase.service("Messages").create({
+          content: JSON.stringify(state),
+          toUser: params.userId,
+          workspace: params.workspaceId,
+        });
+        dispatch(
+          updateTempMessage({ _tempId, toUserId: params.userId, message: data })
+        );
+        if (error) throw new Error(error.message);
+      }
+      if (selectedMessage?.type === "edit") {
+        dispatch(
+          updateMessage({
+            message: {
+              ...selectedMessage?.message,
+              content: JSON.stringify(state),
+            },
+            toUserId: params.userId,
+          })
+        );
+        const { error } = await kontenbase
+          .service("Messages")
+          .updateById(selectedMessage?.message?._id, {
             content: JSON.stringify(state),
-            workspace: [params.workspaceId],
-          },
-          loggedUserId: auth.user._id,
-          _tempId,
-        })
-      );
+          });
+        if (error) throw new Error(error.message);
+      }
 
       discardComment();
-
-      const { data, error } = await kontenbase.service("Messages").create({
-        content: JSON.stringify(state),
-        toUser: params.userId,
-        workspace: params.workspaceId,
-      });
-      dispatch(
-        updateTempMessage({ _tempId, toUserId: params.userId, message: data })
-      );
-      if (error) throw new Error(error.message);
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
       dispatch(deleteMessage({ messageId: _tempId, toUserId: params.userId }));
     }
   };
+
+  useEffect(() => {
+    if (selectedMessage?.type === "edit") {
+      setIsShowEditor(true);
+      setRemirrorState(
+        manager.createState({
+          stringHandler: htmlToProsemirrorNode,
+          content: parseContent(selectedMessage?.message?.content),
+        })
+      );
+    }
+  }, [selectedMessage]);
 
   return (
     <div>
