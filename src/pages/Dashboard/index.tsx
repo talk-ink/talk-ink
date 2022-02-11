@@ -22,6 +22,7 @@ import {
   addMessageFromOther,
   clearAllMessage,
   deleteMessage,
+  updateMessage,
 } from "features/messages";
 
 function DashboardPage() {
@@ -60,6 +61,15 @@ function DashboardPage() {
             addMessageFromOther({
               toUserId: payload?.createdBy,
               message: payload,
+            })
+          );
+          break;
+
+        case "UPDATE_RECORD":
+          dispatch(
+            updateMessage({
+              toUserId: payload?.after?.createdBy,
+              message: payload?.after,
             })
           );
           break;
