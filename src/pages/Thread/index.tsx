@@ -1,7 +1,7 @@
 import React, { useMemo, useEffect, useState, useRef } from "react";
 
 import { Link } from "react-router-dom";
-import { useParams, useLocation } from "react-router";
+import { useParams, useLocation, useNavigate } from "react-router";
 import ReactMoment from "react-moment";
 import { useRemirror } from "@remirror/react";
 
@@ -21,6 +21,7 @@ import {
   updateComment,
   addInteractedUser,
   updateThread,
+  deleteThread,
 } from "features/threads";
 
 import { fetchComments } from "features/threads/slice/asyncThunk";
@@ -38,7 +39,12 @@ import { htmlToProsemirrorNode } from "remirror";
 import CommentMenu from "components/Thread/CommentMenu";
 import { setCommentMenu } from "features/mobileMenu/slice";
 import { useMediaQuery } from "react-responsive";
-import { updateChannel } from "features/channels/slice";
+import { updateChannel, updateChannelCount } from "features/channels/slice";
+import ThreadMenu from "components/Thread/Menu";
+import Modal from "components/Modal/Modal";
+import { SelectedThreadTypes } from "components/ContentItem/ContentItem";
+import CloseThreadForm from "components/Thread/CloseThreadForm";
+import moment from "moment-timezone";
 
 function useQuery() {
   const { search } = useLocation();
@@ -50,6 +56,8 @@ function ThreadPage() {
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
+
+  const navigate = useNavigate();
 
   const [showToast] = useToast();
   const auth = useAppSelector((state) => state.auth);
@@ -67,6 +75,9 @@ function ThreadPage() {
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
   const [showTitle, setShowTitle] = useState<boolean>(false);
 
+  const [selectedThread, setSelectedThread] =
+    useState<{ thread: Thread; type: SelectedThreadTypes }>();
+
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === channelId);
   }, [channelId, channel.channels]);
@@ -80,6 +91,34 @@ function ThreadPage() {
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(threadData?.content),
   });
+
+  const threadDeleteHandler = async () => {
+    try {
+      if (!selectedThread?.thread.draft) {
+        const now = moment().tz("Asia/Jakarta").toDate();
+        const deletedThread = await kontenbase
+          .service("Threads")
+          .updateById(selectedThread?.thread._id, {
+            isDeleted: true,
+            deletedAt: now,
+          });
+        if (deletedThread?.data) {
+          dispatch(deleteThread(deletedThread.data));
+          dispatch(
+            updateChannelCount({
+              chanelId: deletedThread.data?.channel?.[0],
+              threadId: selectedThread?.thread._id,
+            })
+          );
+          setSelectedThread(null);
+          navigate(`/a/${workspaceId}/ch/${channelId}`);
+        }
+      }
+    } catch (error) {
+      console.log("err", error);
+      showToast({ message: `${error}` });
+    }
+  };
 
   useEffect(() => {
     let key: string;
@@ -337,6 +376,17 @@ function ThreadPage() {
           thread
           from={query.get("fromInbox") === "1" && "inbox"}
           showTitle={isMobile ? true : showTitle}
+          leftContent={
+            <div>
+              <ThreadMenu
+                dataSource={threadData}
+                setSelectedThread={setSelectedThread}
+                onReopen={() => {
+                  setIsShowEditor(true);
+                }}
+              />
+            </div>
+          }
         />
       }
       onScroll={(e: any) => {
@@ -462,6 +512,42 @@ function ThreadPage() {
           )}
         </div>
       </div>
+      <Modal
+        header="Delete Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "delete"}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+        onConfirm={() => {
+          threadDeleteHandler();
+        }}
+        okButtonText="Confirm"
+        size="xs"
+      >
+        Are you sure you want to delete this thread? It will be moved into
+        trash.
+      </Modal>
+      <Modal
+        header="Close Thread"
+        visible={!!selectedThread?.thread && selectedThread?.type === "close"}
+        footer={null}
+        onClose={() => {
+          setSelectedThread(null);
+        }}
+        onCancel={() => {
+          setSelectedThread(null);
+        }}
+      >
+        <CloseThreadForm
+          data={selectedThread?.thread}
+          onClose={() => {
+            setSelectedThread(null);
+          }}
+        />
+      </Modal>
     </MainContentContainer>
   );
 }
