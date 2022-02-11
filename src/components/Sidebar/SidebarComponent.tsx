@@ -889,18 +889,21 @@ function SidebarComponent({
                     </Disclosure.Button>
                     <Disclosure.Panel className="mt-2 w-full h-10">
                       <div>
-                        {member.members?.map((data) => (
-                          <DirectMessageList
-                            key={data?._id}
-                            data={data}
-                            active={params?.userId === data?._id}
-                            onClick={() =>
-                              navigate(
-                                `/a/${params?.workspaceId}/msg/${data?._id}`
-                              )
-                            }
-                          />
-                        ))}
+                        {member.members?.map(
+                          (data) =>
+                            data._id !== auth.user._id && (
+                              <DirectMessageList
+                                key={data?._id}
+                                data={data}
+                                active={params?.userId === data?._id}
+                                onClick={() =>
+                                  navigate(
+                                    `/a/${params?.workspaceId}/msg/${data?._id}`
+                                  )
+                                }
+                              />
+                            )
+                        )}
                       </div>
                     </Disclosure.Panel>
                   </>

@@ -377,7 +377,7 @@ function ChannelPage() {
                     </div>
                   )
               )}
-              {memberList.length > 3 && (
+              {memberList.length > 3 && memberList.length - 4 !== 0 && (
                 <div
                   className={`text-sm rounded-full flex items-center justify-center overflow-hidden bg-gray-400 text-white uppercase h-8 w-8 border-2`}
                 >
