@@ -96,6 +96,8 @@ const MessageForm = ({
   };
 
   const handleCreateMessage = async () => {
+    discardComment();
+
     const _tempId = randomString();
     try {
       if (!selectedMessage) {
@@ -146,8 +148,6 @@ const MessageForm = ({
           });
         if (error) throw new Error(error.message);
       }
-
-      discardComment();
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });

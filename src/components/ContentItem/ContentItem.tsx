@@ -303,8 +303,8 @@ function ContentItem({
                 <ReactMoment
                   fromNow
                   locale="en"
-                  format="HH:mm"
-                  titleFormat="DD MMMM YYYY, HH:mm"
+                  format="LT"
+                  titleFormat="DD MMMM YYYY, LT"
                   withTitle
                 >
                   {handleTime()}
