@@ -18,7 +18,11 @@ import { addChannel } from "features/channels/slice";
 import { fetchMembers } from "features/members";
 import { updateUser } from "features/auth";
 import { useKontenbaseRealtime } from "hooks/useKontenbaseRealtime";
-import { addMessageFromOther, clearAllMessage } from "features/messages";
+import {
+  addMessageFromOther,
+  clearAllMessage,
+  deleteMessage,
+} from "features/messages";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -33,23 +37,25 @@ function DashboardPage() {
     variables: {
       dependencies: {
         workspaceId: params.workspaceId,
+        toUserId: params.userId,
       },
       service: "Messages",
       event: "*",
     },
     onRequestSuccess: ({ event, payload }) => {
       const isUpdate = event === "UPDATE_RECORD";
-      // const isDelete = event === "DELETE_RECORD";
+      const isDelete = event === "DELETE_RECORD";
 
       const isCurrentWorkspace = isUpdate
         ? payload?.before?.workspace?.includes(params.workspaceId)
         : payload?.workspace?.includes(params.workspaceId);
 
-      if (!isCurrentWorkspace) return;
+      if (isDelete ? false : !isCurrentWorkspace) return;
+      if (isUpdate && payload?.after?.createdBy === auth.user._id) return;
+      if (payload?.createdBy === auth.user._id) return;
 
       switch (event) {
         case "CREATE_RECORD":
-          if (payload?.createdBy === auth.user._id) return;
           dispatch(
             addMessageFromOther({
               toUserId: payload?.createdBy,
@@ -58,9 +64,21 @@ function DashboardPage() {
           );
           break;
 
+        case "DELETE_RECORD":
+          dispatch(
+            deleteMessage({
+              toUserId: params.userId,
+              messageId: payload?._id,
+            })
+          );
+          break;
+
         default:
           break;
       }
+    },
+    onRequestError: (error) => {
+      showToast({ message: error });
     },
   });
 
