@@ -44,6 +44,7 @@ const MessagePage = (props: Props) => {
   }, [member.members, params?.userId]);
 
   const messageData: Message[] = useMemo(() => {
+    if (!message?.messages?.[params.userId]) return [];
     return message?.messages?.[params.userId];
   }, [message.messages, params.userId]);
 

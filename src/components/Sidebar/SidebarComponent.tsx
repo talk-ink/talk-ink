@@ -886,11 +886,12 @@ function SidebarComponent({
                                 key={data?._id}
                                 data={data}
                                 active={params?.userId === data?._id}
-                                onClick={() =>
+                                onClick={() => {
+                                  setIsSidebarOpen(false);
                                   navigate(
                                     `/a/${params?.workspaceId}/msg/${data?._id}`
-                                  )
-                                }
+                                  );
+                                }}
                               />
                             )
                         )}
