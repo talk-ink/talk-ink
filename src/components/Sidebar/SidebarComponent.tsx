@@ -11,7 +11,7 @@ import { BiChevronDown, BiLogOut, BiPlus } from "react-icons/bi";
 import { FiSettings } from "react-icons/fi";
 import { MdClose } from "react-icons/md";
 import cookies from "js-cookie";
-import { useNavigate, useParams, useLocation } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import OneSignal from "react-onesignal";
 import { kontenbase } from "lib/client";
 
@@ -55,7 +55,6 @@ import { updateUser } from "features/auth";
 import { Channel, CreateChannel, Thread, User } from "types";
 import { BsPlus } from "react-icons/bs";
 import { Disclosure, Popover } from "@headlessui/react";
-import Avatar from "components/Avatar/Avatar";
 import DirectMessageList from "components/DirectMessage/List";
 
 type TProps = {
@@ -77,7 +76,6 @@ function SidebarComponent({
 
   const [showToast] = useToast();
 
-  const { pathname } = useLocation();
   const params = useParams();
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
@@ -333,8 +331,6 @@ function SidebarComponent({
   useEffect(() => {
     let key: string | undefined;
 
-    console.log("mnt");
-
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
@@ -374,15 +370,12 @@ function SidebarComponent({
           ) {
             switch (event) {
               case "UPDATE_RECORD":
-                console.log("upd", payload);
                 if (
                   payload.before.tagedUsers.includes(userId) ||
                   (!payload.before.tagedUsers.includes(userId) &&
                     payload.after.tagedUsers.includes(userId))
                 ) {
                   let _currentThread;
-
-                  console.log(getThreads(), "aa");
 
                   try {
                     const { data, error } = await kontenbase
@@ -414,7 +407,6 @@ function SidebarComponent({
                       (item) => item._id === payload.before?._id
                     )
                   ) {
-                    console.log("wryy");
                     try {
                       updateThreadWithComment({
                         _id: payload?.after?._id,
@@ -548,7 +540,6 @@ function SidebarComponent({
 
                 break;
               case "CREATE_RECORD":
-                console.log("crt");
                 if (
                   !params.channelId ||
                   payload?.channel?.includes(params.channelId)
@@ -584,7 +575,6 @@ function SidebarComponent({
       .then((result) => (key = result));
 
     return () => {
-      console.log("umnt");
       kontenbase.realtime.unsubscribe(key);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
