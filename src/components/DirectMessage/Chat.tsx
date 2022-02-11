@@ -5,7 +5,9 @@ import MenuItem from "components/Menu/MenuItem2";
 import Remirror from "components/Remirror";
 import { extensions } from "components/Remirror/extensions";
 import { deleteMessage } from "features/messages";
+import { setMessageMenu } from "features/mobileMenu";
 import { useAppDispatch } from "hooks/useAppDispatch";
+import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { SelectedMessage } from "pages/Message";
@@ -15,6 +17,7 @@ import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import { htmlToProsemirrorNode } from "remirror";
 import { Message } from "types";
+import { LongPressDetectEvents, useLongPress } from "use-long-press";
 import { parseContent } from "utils/helper";
 
 type Props = {
@@ -44,6 +47,8 @@ const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
     selection: "end",
   });
 
+  const auth = useAppSelector((state) => state.auth);
+  const mobileMenu = useAppSelector((state) => state.mobileMenu);
   const dispatch = useAppDispatch();
 
   const handleDeleteMessage = async () => {
@@ -77,11 +82,39 @@ const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
     );
   }, [data?.content]);
 
+  const commentBind = useLongPress(
+    () => {
+      if (!isMobile || data?._createdById !== auth.user._id) return;
+      dispatch(setMessageMenu({ data, type: "open" }));
+    },
+    {
+      detect: LongPressDetectEvents.TOUCH,
+    }
+  );
+
+  useEffect(() => {
+    if (
+      mobileMenu?.message?.data?._id === data?._id &&
+      !["close", "open"].includes(mobileMenu?.message?.type)
+    ) {
+      if (mobileMenu?.message?.type === "edit") {
+        setSelectedMessage({ message: data, type: "edit" });
+      }
+      if (mobileMenu?.message?.type === "delete") {
+        handleDeleteMessage();
+      }
+      dispatch(setMessageMenu({ data: null, type: "close" }));
+    }
+  }, [mobileMenu.message]);
+
   return (
     <li
       className={`${
-        isOwn ? "bg-indigo-50 self-end" : "bg-indigo-500 text-white self-start"
+        isOwn
+          ? "bg-indigo-50 self-end"
+          : "pointer-events-none bg-indigo-500 text-white self-start"
       } py-2 px-3  rounded-lg mb-2 max-w-[280px] md:max-w-lg relative group`}
+      {...commentBind}
     >
       <Remirror
         remmirorProps={{ manager, onChange, state }}

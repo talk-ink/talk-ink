@@ -11,6 +11,9 @@ import { fetchMessages } from "features/messages/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { Member, Message } from "types";
+import { useMediaQuery } from "react-responsive";
+import MessageMenu from "components/DirectMessage/MobileMenu";
+import { setMessageMenu } from "features/mobileMenu";
 
 type Props = {};
 
@@ -20,11 +23,16 @@ export type SelectedMessage = {
 };
 
 const MessagePage = (props: Props) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const params = useParams();
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
   const message = useAppSelector((state) => state.message);
+  const mobileMenu = useAppSelector((state) => state.mobileMenu);
 
   const dispatch = useAppDispatch();
 
@@ -78,6 +86,14 @@ const MessagePage = (props: Props) => {
           selectedMessage={selectedMessage}
         />
       </div>
+      {isMobile && (
+        <MessageMenu
+          openMenu={mobileMenu?.message?.type === "open"}
+          onClose={() => {
+            dispatch(setMessageMenu({ data: null, type: "close" }));
+          }}
+        />
+      )}
     </div>
   );
 };
