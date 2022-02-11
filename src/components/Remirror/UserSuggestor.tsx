@@ -32,6 +32,7 @@ const UserSuggestor: React.FC<IProps> = ({ allUsers, handleSelectTag }) => {
       .sort()
       .slice(0, 3);
     setUsers(filteredUsers);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
   const enabled = !!state;

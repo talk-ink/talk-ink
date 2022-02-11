@@ -6,7 +6,6 @@ import Button from "components/Button/Button";
 import { useRemirror } from "@remirror/react";
 import { extensions } from "components/Remirror/extensions";
 import { htmlToProsemirrorNode } from "remirror";
-import { parseContent } from "utils/helper";
 import Remirror from "components/Remirror";
 import { IComment } from "types";
 import { MdSend } from "react-icons/md";

@@ -15,6 +15,8 @@ const MessageHeader = ({ data }: Props) => {
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isSidebarOpen, setIsSidebarOpen] = useSidebar();
 
   return (

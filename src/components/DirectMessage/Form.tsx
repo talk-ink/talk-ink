@@ -165,6 +165,7 @@ const MessageForm = ({
         })
       );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedMessage]);
 
   return (

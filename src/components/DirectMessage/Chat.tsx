@@ -80,6 +80,7 @@ const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
         content: parseContent(data?.content),
       })
     );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data?.content]);
 
   const commentBind = useLongPress(
@@ -105,7 +106,8 @@ const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
       }
       dispatch(setMessageMenu({ data: null, type: "close" }));
     }
-  }, [mobileMenu.message]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, mobileMenu.message]);
 
   return (
     <li

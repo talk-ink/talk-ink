@@ -1,7 +1,6 @@
 import React, {
   Dispatch,
   SetStateAction,
-  useCallback,
   useEffect,
   useMemo,
   useState,
@@ -71,7 +70,7 @@ function SidebarComponent({
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const channel = useAppSelector((state) => state.channel);
-  const thread = useAppSelector((state) => state.thread);
+  // const thread = useAppSelector((state) => state.thread);
   const member = useAppSelector((state) => state.member);
 
   const [showToast] = useToast();
@@ -90,6 +89,8 @@ function SidebarComponent({
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
   const [inboxData, setInboxData] = useState<Thread[]>([]);
+
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [trashData, setTrashData] = useState<string[]>([]);
   const [isWorkspaceLimitModalVisible, setIsWorkspaceLimitModalVisible] =
     useState(false);
@@ -134,9 +135,9 @@ function SidebarComponent({
     ).length;
   }, [threadData, readedThreads]);
 
-  const getThreads = useCallback((): Thread[] => {
-    return thread.threads;
-  }, [thread.threads]);
+  // const getThreads = useCallback((): Thread[] => {
+  //   return thread.threads;
+  // }, [thread.threads]);
 
   useEffect(() => {
     if (!userId || !params.workspaceId || runOnce) return;
