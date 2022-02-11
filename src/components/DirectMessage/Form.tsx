@@ -3,11 +3,18 @@ import Button from "components/Button/Button";
 import IconButton from "components/Button/IconButton";
 import Remirror from "components/Remirror";
 import { extensions } from "components/Remirror/extensions";
+import { addMessage, deleteMessage } from "features/messages";
+import { useAppDispatch } from "hooks/useAppDispatch";
+import { useAppSelector } from "hooks/useAppSelector";
+import { useToast } from "hooks/useToast";
+import { kontenbase } from "lib/client";
 import React, { useRef } from "react";
 import { BiTrash } from "react-icons/bi";
 import { MdSend } from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
+import { useParams } from "react-router-dom";
 import { htmlToProsemirrorNode } from "remirror";
+import { randomString } from "utils/helper";
 
 type Props = {
   isShowEditor?: boolean;
@@ -19,10 +26,16 @@ interface EditorRef {
 }
 
 const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
+  const params = useParams();
+  const [showToast] = useToast();
+
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
   const editorRef = useRef<EditorRef | null>(null);
+
+  const auth = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
   const {
     manager,
@@ -49,6 +62,31 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
 
   const handleShowEditor = async () => {
     setIsShowEditor(true);
+  };
+
+  const handleCreateMessage = async () => {
+    const _tempId = randomString();
+    try {
+      dispatch(
+        addMessage({
+          toUserId: params.userId,
+          message: { content: JSON.stringify(state) },
+          loggedUserId: auth.user._id,
+          _tempId,
+        })
+      );
+
+      discardComment();
+
+      const { error } = await kontenbase
+        .service("Messages")
+        .create({ content: JSON.stringify(state), toUser: params.userId });
+      if (error) throw new Error(error.message);
+    } catch (error: any) {
+      console.log("err", error);
+      showToast({ message: `${JSON.stringify(error?.message)}` });
+      dispatch(deleteMessage({ messageId: _tempId, toUserId: params.userId }));
+    }
   };
 
   return (
@@ -88,7 +126,7 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
                 <Button
                   type="submit"
                   className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
-                  //   onClick={handleCreateComment}
+                  onClick={handleCreateMessage}
                 >
                   Post
                 </Button>

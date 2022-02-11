@@ -1,10 +1,12 @@
 import Chat from "components/DirectMessage/Chat";
 import MessageForm from "components/DirectMessage/Form";
 import MessageHeader from "components/DirectMessage/Header";
+import { fetchMessages } from "features/messages/slice/asyncThunk";
+import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Member } from "types";
+import { Member, Message } from "types";
 
 type Props = {};
 
@@ -13,6 +15,9 @@ const MessagePage = ({}: Props) => {
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
+  const message = useAppSelector((state) => state.message);
+
+  const dispatch = useAppDispatch();
 
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
 
@@ -20,7 +25,21 @@ const MessagePage = ({}: Props) => {
     return member.members?.find((item) => item._id === params?.userId);
   }, [member.members, params?.userId]);
 
-  if (!memberData) return <></>;
+  const messageData: Message[] = useMemo(() => {
+    return message?.messages?.[params.userId];
+  }, [message.messages, params.userId]);
+
+  useEffect(() => {
+    dispatch(
+      fetchMessages({ loggedUserId: auth.user._id, toUserId: params.userId })
+    );
+  }, [params.userId]);
+
+  useEffect(() => {
+    console.log("awee", messageData);
+  }, [messageData]);
+
+  //   if (!memberData) return <></>;
 
   return (
     <div className="w-full h-screen flex flex-col min-h-0">
@@ -28,26 +47,13 @@ const MessagePage = ({}: Props) => {
 
       <div className="flex-grow overflow-auto min-h-0">
         <ul className="flex flex-col py-2 px-5">
-          <Chat />
-          <Chat />
-          <Chat isOwn />
-          <Chat />
-          <Chat />
-          <Chat isOwn />
-          <Chat />
-          <Chat />
-          <Chat isOwn />
-          <Chat isOwn />
-          <Chat />
-          <Chat />
-          <Chat isOwn />
-          <Chat />
-          <Chat />
-          <Chat isOwn />
-          <Chat />
-          <Chat />
-          <Chat isOwn />
-          <Chat isOwn />
+          {messageData?.map((message, idx) => (
+            <Chat
+              data={message}
+              key={idx}
+              isOwn={message._createdById === auth.user._id}
+            />
+          ))}
         </ul>
       </div>
 
