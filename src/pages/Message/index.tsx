@@ -35,10 +35,6 @@ const MessagePage = ({}: Props) => {
     );
   }, [params.userId]);
 
-  useEffect(() => {
-    console.log("awee", messageData);
-  }, [messageData]);
-
   //   if (!memberData) return <></>;
 
   return (
@@ -50,7 +46,7 @@ const MessagePage = ({}: Props) => {
           {messageData?.map((message, idx) => (
             <Chat
               data={message}
-              key={idx}
+              key={message?._tempId || message?._id}
               isOwn={message._createdById === auth.user._id}
             />
           ))}

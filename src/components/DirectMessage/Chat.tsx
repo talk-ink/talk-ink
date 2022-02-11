@@ -22,8 +22,8 @@ const Chat = ({ isOwn, data }: Props) => {
   return (
     <li
       className={`${
-        isOwn ? "self-end" : "self-start"
-      } py-2 px-3 bg-indigo-50 rounded-lg mb-2 max-w-[280px] md:max-w-lg `}
+        isOwn ? "bg-indigo-50 self-end" : "bg-indigo-500 text-white self-start"
+      } py-2 px-3  rounded-lg mb-2 max-w-[280px] md:max-w-lg`}
     >
       <Remirror
         remmirorProps={{ manager, onChange, state }}

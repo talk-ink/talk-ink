@@ -15,9 +15,6 @@ export const fetchMessages = createAsyncThunk(
       // //   { toUser: loggedUserId, createdBy: toUserId },
       // // ],
       // or: [{ toUser: loggedUserId }, { createdBy: loggedUserId }],
-      sort: {
-        createdAt: -1,
-      },
     });
 
     return {
