@@ -21,6 +21,10 @@ interface TAddMessage {
   _tempId?: string;
 }
 
+interface TAddMessageFromOther extends Omit<TAddMessage, "loggedUserId"> {
+  _createdById?: string;
+}
+
 interface TDeleteMessage {
   toUserId: string;
   messageId: string;
@@ -45,6 +49,25 @@ const messageSlice = createSlice({
         ];
       }
     },
+    addMessageFromOther: (
+      state,
+      action: PayloadAction<TAddMessageFromOther>
+    ) => {
+      const newMessage = {
+        ...action.payload.message,
+        _createdById: action.payload.toUserId,
+        _tempId: action.payload?._tempId,
+      };
+
+      if (!state.messages[action.payload.toUserId]) {
+        state.messages[action.payload.toUserId] = [newMessage];
+      } else {
+        state.messages[action.payload.toUserId] = [
+          ...state.messages[action.payload.toUserId],
+          newMessage,
+        ];
+      }
+    },
     deleteMessage: (state, action: PayloadAction<TDeleteMessage>) => {
       state.messages[action.payload.toUserId] = state.messages[
         action.payload.toUserId
@@ -52,6 +75,9 @@ const messageSlice = createSlice({
         if (item._id) return item._id !== action.payload.messageId;
         return item._tempId !== action.payload.messageId;
       });
+    },
+    clearAllMessage: (state, action) => {
+      state.messages = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -71,5 +97,10 @@ const messageSlice = createSlice({
   },
 });
 
-export const { addMessage, deleteMessage } = messageSlice.actions;
+export const {
+  addMessage,
+  addMessageFromOther,
+  deleteMessage,
+  clearAllMessage,
+} = messageSlice.actions;
 export const messageReducer = messageSlice.reducer;

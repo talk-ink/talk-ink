@@ -70,7 +70,10 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
       dispatch(
         addMessage({
           toUserId: params.userId,
-          message: { content: JSON.stringify(state) },
+          message: {
+            content: JSON.stringify(state),
+            workspace: [params.workspaceId],
+          },
           loggedUserId: auth.user._id,
           _tempId,
         })
@@ -80,7 +83,11 @@ const MessageForm = ({ isShowEditor, setIsShowEditor }: Props) => {
 
       const { error } = await kontenbase
         .service("Messages")
-        .create({ content: JSON.stringify(state), toUser: params.userId });
+        .create({
+          content: JSON.stringify(state),
+          toUser: params.userId,
+          workspace: params.workspaceId,
+        });
       if (error) throw new Error(error.message);
     } catch (error: any) {
       console.log("err", error);

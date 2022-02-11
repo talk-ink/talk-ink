@@ -671,10 +671,6 @@ function SidebarComponent({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId]);
 
-  useEffect(() => {
-    console.log(thread.threads, "tdd");
-  }, [thread.threads]);
-
   const loading = workspace.loading || channel.loading;
 
   return (

@@ -1,16 +1,20 @@
+import React, { useEffect, useMemo, useState } from "react";
+
+import { useParams } from "react-router-dom";
+
 import Chat from "components/DirectMessage/Chat";
 import MessageForm from "components/DirectMessage/Form";
 import MessageHeader from "components/DirectMessage/Header";
+
 import { fetchMessages } from "features/messages/slice/asyncThunk";
+
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
-import React, { useEffect, useMemo, useState } from "react";
-import { useParams } from "react-router-dom";
 import { Member, Message } from "types";
 
 type Props = {};
 
-const MessagePage = ({}: Props) => {
+const MessagePage = (props: Props) => {
   const params = useParams();
 
   const auth = useAppSelector((state) => state.auth);
@@ -31,9 +35,14 @@ const MessagePage = ({}: Props) => {
 
   useEffect(() => {
     dispatch(
-      fetchMessages({ loggedUserId: auth.user._id, toUserId: params.userId })
+      fetchMessages({
+        loggedUserId: auth.user._id,
+        toUserId: params.userId,
+        workspaceId: params.workspaceId,
+      })
     );
-  }, [params.userId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [params.userId, params.workspaceId, auth.user._id]);
 
   //   if (!memberData) return <></>;
 
