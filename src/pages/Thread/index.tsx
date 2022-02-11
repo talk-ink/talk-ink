@@ -95,6 +95,7 @@ function ThreadPage() {
   const threadDeleteHandler = async () => {
     try {
       if (!selectedThread?.thread.draft) {
+        navigate(`/a/${workspaceId}/ch/${channelId}`);
         const now = moment().tz("Asia/Jakarta").toDate();
         const deletedThread = await kontenbase
           .service("Threads")
@@ -111,7 +112,6 @@ function ThreadPage() {
             })
           );
           setSelectedThread(null);
-          navigate(`/a/${workspaceId}/ch/${channelId}`);
         }
       }
     } catch (error) {
