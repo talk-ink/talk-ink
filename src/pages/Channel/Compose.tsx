@@ -196,7 +196,8 @@ function Compose() {
           })
         );
         navigate(
-          `/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`
+          `/a/${params.workspaceId}/ch/${params.channelId}/t/${createThread?.data?._id}`,
+          { replace: true }
         );
       }
     } catch (error) {
