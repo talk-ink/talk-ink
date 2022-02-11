@@ -350,7 +350,7 @@ function ThreadPage() {
       <div className="px-4 max-w-4xl ml-auto mr-auto -mt-16 md:-mt-4 md:-mb-16">
         <div className="relative">
           <div className="mb-8">
-            <h1 className="font-bold text-3xl max-w-3xl break-words">
+            <h1 className="font-medium md:font-semibold  text-2xl md:text-3xl max-w-3xl break-words">
               {threadData?.name}
             </h1>
             <p className="text-neutral-500 text-sm font-body">
