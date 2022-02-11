@@ -14,6 +14,7 @@ import { Menu } from "@headlessui/react";
 import { kontenbase } from "lib/client";
 import { useNavigate, useParams } from "react-router";
 import { useLongPress, LongPressDetectEvents } from "use-long-press";
+import { decode } from "html-entities";
 
 import IconButton from "components/Button/IconButton";
 import MenuItem from "components/Menu/MenuItem2";
@@ -207,8 +208,8 @@ function ContentItem({
         commentCreatedBy.firstName
       )} reopened this thread.`;
 
-    return `${getShortName(commentCreatedBy.firstName)} : ${editorToHTML(
-      commentState
+    return `${getShortName(commentCreatedBy.firstName)} : ${decode(
+      editorToHTML(commentState)
     )}`;
   };
 
@@ -302,8 +303,8 @@ function ContentItem({
                 <ReactMoment
                   fromNow
                   locale="en"
-                  format="HH:mm"
-                  titleFormat="DD MMMM YYYY, HH:mm"
+                  format="LT"
+                  titleFormat="DD MMMM YYYY, LT"
                   withTitle
                 >
                   {handleTime()}

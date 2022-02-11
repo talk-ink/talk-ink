@@ -94,7 +94,8 @@ function EditThread() {
           })
         );
         navigate(
-          `/a/${params.workspaceId}/ch/${params.channelId}/t/${data?._id}`
+          `/a/${params.workspaceId}/ch/${params.channelId}/t/${data?._id}`,
+          { replace: true }
         );
       }
     } catch (error) {

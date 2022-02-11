@@ -17,6 +17,13 @@ import { setPageStatus } from "features/pageStatus";
 import { addChannel } from "features/channels/slice";
 import { fetchMembers } from "features/members";
 import { updateUser } from "features/auth";
+import { useKontenbaseRealtime } from "hooks/useKontenbaseRealtime";
+import {
+  addMessageFromOther,
+  clearAllMessage,
+  deleteMessage,
+  updateMessage,
+} from "features/messages";
 
 function DashboardPage() {
   const isMobile = useMediaQuery({
@@ -26,6 +33,64 @@ function DashboardPage() {
 
   const params = useParams();
   const navigate = useNavigate();
+
+  useKontenbaseRealtime({
+    variables: {
+      dependencies: {
+        workspaceId: params.workspaceId,
+        toUserId: params.userId,
+      },
+      service: "Messages",
+      event: "*",
+    },
+    onRequestSuccess: ({ event, payload }) => {
+      const isUpdate = event === "UPDATE_RECORD";
+      const isDelete = event === "DELETE_RECORD";
+
+      const isCurrentWorkspace = isUpdate
+        ? payload?.before?.workspace?.includes(params.workspaceId)
+        : payload?.workspace?.includes(params.workspaceId);
+
+      if (isDelete ? false : !isCurrentWorkspace) return;
+      if (isUpdate && payload?.after?.createdBy === auth.user._id) return;
+      if (payload?.createdBy === auth.user._id) return;
+
+      switch (event) {
+        case "CREATE_RECORD":
+          dispatch(
+            addMessageFromOther({
+              toUserId: payload?.createdBy,
+              message: payload,
+            })
+          );
+          break;
+
+        case "UPDATE_RECORD":
+          dispatch(
+            updateMessage({
+              toUserId: payload?.after?.createdBy,
+              message: payload?.after,
+            })
+          );
+          break;
+
+        case "DELETE_RECORD":
+          dispatch(
+            deleteMessage({
+              toUserId: params.userId,
+              messageId: payload?._id,
+            })
+          );
+          break;
+
+        default:
+          break;
+      }
+    },
+    onRequestError: (error) => {
+      showToast({ message: error });
+    },
+  });
 
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
@@ -141,6 +206,7 @@ function DashboardPage() {
   useEffect(() => {
     if (auth?.user?.workspaces?.includes(params.workspaceId)) {
       setLastWorkspace({ id: params.workspaceId });
+      dispatch(clearAllMessage({}));
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, auth.user.workspaces]);

@@ -504,7 +504,13 @@ const Comment: React.FC<IProps> = ({
               {comment.createdBy?.firstName}
             </p>{" "}
             <p className="mb-0 mt-0 text-xs">
-              <ReactMoment format="DD/MM/YYYY LT">
+              <ReactMoment
+                fromNow
+                locale="en"
+                format="LT"
+                titleFormat="DD MMMM YYYY, LT"
+                withTitle
+              >
                 {comment?.updatedAt || comment?.createdAt}
               </ReactMoment>
             </p>

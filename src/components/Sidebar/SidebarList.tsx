@@ -124,7 +124,7 @@ function SidebarList({
             } rounded-full mr-2`}
           ></div>
         </div>
-        <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis">
+        <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis text-slate-800">
           {name}
         </p>
         {data?.privacy === "private" && (

@@ -12,6 +12,7 @@ import { memberReducer } from "features/members/slice";
 import { inboxReducer } from "features/inbox";
 import { pageStatusReducer } from "features/pageStatus";
 import { mobileMenuReducer } from "features/mobileMenu/slice";
+import { messageReducer } from "features/messages";
 
 const persistConfig = {
   key: "root",
@@ -29,6 +30,7 @@ const appReducer = combineReducers({
   inbox: inboxReducer,
   pageStatus: pageStatusReducer,
   mobileMenu: mobileMenuReducer,
+  message: messageReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, appReducer);

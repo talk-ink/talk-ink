@@ -178,3 +178,16 @@ export interface SearchResponse {
   createdById: string;
   thread: Thread;
 }
+
+export interface Message {
+  _id?: string;
+  content?: string;
+  createdAt?: string;
+  createdBy?: Member;
+  updatedAt?: string;
+  updatedBy?: Member;
+  toUser?: string[];
+  _createdById?: string;
+  _tempId?: string;
+  workspace?: string[];
+}

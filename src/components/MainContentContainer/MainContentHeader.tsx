@@ -11,6 +11,7 @@ type Props = React.PropsWithChildren<{
   onBackClick?: () => void;
   from?: string;
   showTitle?: boolean;
+  leftContent?: React.ReactNode;
 }>;
 
 function MainContentHeader({
@@ -20,6 +21,7 @@ function MainContentHeader({
   onBackClick = () => {},
   from,
   showTitle = false,
+  leftContent,
 }: Props) {
   const navigate = useNavigate();
   const params = useParams();
@@ -55,7 +57,9 @@ function MainContentHeader({
         )}
       </div>
       {thread && (
-        <div className="grid-cols-1 flex items-center justify-end"></div>
+        <div className="grid-cols-1 flex items-center justify-end">
+          {leftContent}
+        </div>
       )}
     </div>
   );

@@ -16,6 +16,7 @@ import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, TUserProfile } from "types";
 import { oneSignalId } from "utils/helper";
+import MessagePage from "pages/Message";
 
 const ChannelPage = lazy(() => import("pages/Channel"));
 const DashboardPage = lazy(() => import("pages/Dashboard"));
@@ -143,6 +144,7 @@ function App() {
               path="ch/:channelId/compose/:composeId"
               element={<Compose />}
             />
+            <Route path="msg/:userId" element={<MessagePage />} />
           </Route>
           <Route
             path="/a/:workspaceId/join_channels"

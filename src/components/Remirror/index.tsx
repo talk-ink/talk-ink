@@ -33,6 +33,7 @@ interface IProps {
   remmirorProps?: any;
   readOnly?: boolean;
   fromComment?: boolean;
+  fromMessage?: boolean;
   editorRef?: any;
   listMentions?: Mention[];
   handleSelectTag?: (mention: Mention) => void;
@@ -53,6 +54,7 @@ const MyEditor: React.FC<IProps> = ({
   remmirorProps,
   readOnly,
   fromComment,
+  fromMessage,
   editorRef,
   listMentions = [],
   handleSelectTag,
@@ -112,7 +114,9 @@ const MyEditor: React.FC<IProps> = ({
   return (
     <div
       className={`${
-        readOnly && !fromComment
+        readOnly && fromMessage
+          ? "readonly-message"
+          : readOnly && !fromComment
           ? "readonly-editor"
           : readOnly && fromComment
           ? "readonly-comment-editor"
