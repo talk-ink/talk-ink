@@ -1,4 +1,5 @@
 import { useRemirror } from "@remirror/react";
+import axios from "axios";
 import Button from "components/Button/Button";
 import IconButton from "components/Button/IconButton";
 import Remirror from "components/Remirror";
@@ -14,13 +15,19 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import { SelectedMessage } from "pages/Message";
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useMemo, useRef } from "react";
 import { BiTrash } from "react-icons/bi";
 import { MdSend } from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import { htmlToProsemirrorNode } from "remirror";
-import { parseContent, randomString } from "utils/helper";
+import {
+  editorToHTML,
+  frontendUrl,
+  notificationUrl,
+  parseContent,
+  randomString,
+} from "utils/helper";
 
 type Props = {
   isShowEditor?: boolean;
@@ -32,6 +39,8 @@ type Props = {
 interface EditorRef {
   setContent: (content: any) => void;
 }
+
+const NOTIFICATION_API = notificationUrl;
 
 const MessageForm = ({
   isShowEditor,
@@ -48,7 +57,13 @@ const MessageForm = ({
   const editorRef = useRef<EditorRef | null>(null);
 
   const auth = useAppSelector((state) => state.auth);
+  const workspace = useAppSelector((state) => state.workspace);
   const dispatch = useAppDispatch();
+
+  const currentWorkspace = useMemo(
+    () => workspace.workspaces.find((item) => item._id === params.workspaceId),
+    [params.workspaceId, workspace.workspaces]
+  );
 
   const {
     manager,
@@ -102,10 +117,17 @@ const MessageForm = ({
           toUser: params.userId,
           workspace: params.workspaceId,
         });
+
         dispatch(
           updateTempMessage({ _tempId, toUserId: params.userId, message: data })
         );
         if (error) throw new Error(error.message);
+        axios.post(NOTIFICATION_API, {
+          title: `[${currentWorkspace.name}] - from ${auth?.user.firstName}`,
+          description: `${editorToHTML(state)}`,
+          externalUserIds: [params.userId],
+          url: `${frontendUrl}/a/${params.workspaceId}/msg/${auth.user._id}`,
+        });
       }
       if (selectedMessage?.type === "edit") {
         dispatch(
