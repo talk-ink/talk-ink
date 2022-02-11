@@ -9,7 +9,7 @@ const Chat = ({ isOwn }: Props) => {
     <li
       className={`${
         isOwn ? "self-end" : "self-start"
-      } py-2 px-3 bg-indigo-50 rounded-lg mb-2 max-w-lg `}
+      } py-2 px-3 bg-indigo-50 rounded-lg mb-2 max-w-[280px] md:max-w-lg `}
     >
       <p className="">
         mantap gan hehehee aiwejiawej awieja weiawej awie awoekaowek

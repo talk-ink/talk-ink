@@ -1,7 +1,8 @@
 import Chat from "components/DirectMessage/Chat";
+import MessageForm from "components/DirectMessage/Form";
 import MessageHeader from "components/DirectMessage/Header";
 import { useAppSelector } from "hooks/useAppSelector";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { useParams } from "react-router-dom";
 import { Member } from "types";
 
@@ -12,6 +13,8 @@ const MessagePage = ({}: Props) => {
 
   const auth = useAppSelector((state) => state.auth);
   const member = useAppSelector((state) => state.member);
+
+  const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
 
   const memberData: Member = useMemo(() => {
     return member.members?.find((item) => item._id === params?.userId);
@@ -48,10 +51,11 @@ const MessagePage = ({}: Props) => {
         </ul>
       </div>
 
-      <div className="sticky top-0 bg-white px-5 pb-2">
-        <button className="w-full p-3 px-5 flex items-start rounded-full outline-indigo-100 bg-slate-100 hover:bg-slate-200">
-          <p className="text-sm text-slate-700">Write a message...</p>
-        </button>
+      <div className="sticky top-0 bg-white px-5 py-2">
+        <MessageForm
+          isShowEditor={isShowEditor}
+          setIsShowEditor={setIsShowEditor}
+        />
       </div>
     </div>
   );
