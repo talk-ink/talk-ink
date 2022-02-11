@@ -10,6 +10,7 @@ import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import React from "react";
 import { BiDotsVerticalRounded, BiEditAlt, BiTrash } from "react-icons/bi";
+import { useMediaQuery } from "react-responsive";
 import { useParams } from "react-router-dom";
 import { htmlToProsemirrorNode } from "remirror";
 import { Message } from "types";
@@ -21,6 +22,10 @@ type Props = {
 };
 
 const Chat = ({ isOwn, data }: Props) => {
+  const isMobile = useMediaQuery({
+    query: "(max-width: 600px)",
+  });
+
   const params = useParams();
   const [showToast] = useToast();
 
@@ -59,7 +64,7 @@ const Chat = ({ isOwn, data }: Props) => {
     <li
       className={`${
         isOwn ? "bg-indigo-50 self-end" : "bg-indigo-500 text-white self-start"
-      } py-2 px-3  rounded-lg mb-2 max-w-[280px] md:max-w-lg relative`}
+      } py-2 px-3  rounded-lg mb-2 max-w-[280px] md:max-w-lg relative group`}
     >
       <Remirror
         remmirorProps={{ manager, onChange, state }}
@@ -67,7 +72,7 @@ const Chat = ({ isOwn, data }: Props) => {
         readOnly
       />
 
-      {isOwn && (
+      {isOwn && !isMobile && (
         <Menu
           as="div"
           className={`z-50 absolute top-1/2 transform -translate-y-1/2 ${
@@ -79,7 +84,9 @@ const Chat = ({ isOwn, data }: Props) => {
               <Menu.Button as="div">
                 <IconButton
                   size="medium"
-                  // className={`${open ? "flex" : "hidden"}`}
+                  className={`${
+                    open ? "flex" : "invisible group-hover:visible"
+                  }`}
                 >
                   <BiDotsVerticalRounded
                     size={18}
