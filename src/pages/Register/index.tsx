@@ -187,7 +187,7 @@ function RegisterPage() {
         <div className="mt-10">
           <button
             type="submit"
-            className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide
+            className="bg-indigo-500 text-gray-100 p-4 w-full rounded-full tracking-wide hover:bg-indigo-600 cursor-pointer
                             font-semibold font-display focus:outline-none focus:shadow-outline hover:bg-indigo-500
                             shadow-lg"
             disabled={isDisabled}
