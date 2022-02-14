@@ -12,11 +12,11 @@ export const fetchMessages = createAsyncThunk(
   async ({ toUserId, loggedUserId, workspaceId }: FetchMessagesProps) => {
     const response = await kontenbase.service("Messages").find({
       where: { workspace: workspaceId },
-      // // or: [
-      // //   { toUser: toUserId, createdBy: loggedUserId },
-      // //   { toUser: loggedUserId, createdBy: toUserId },
-      // // ],
-      // or: [{ toUser: loggedUserId }, { createdBy: loggedUserId }],
+      // or: [
+      //   { toUser: toUserId, createdBy: loggedUserId },
+      //   { toUser: loggedUserId, createdBy: toUserId },
+      // ],
+      or: [{ toUser: loggedUserId }, { createdBy: loggedUserId }],
       sort: {
         createdAt: -1,
       },

@@ -14,6 +14,8 @@ import { Member, Message } from "types";
 import { useMediaQuery } from "react-responsive";
 import MessageMenu from "components/DirectMessage/MobileMenu";
 import { setMessageMenu } from "features/mobileMenu";
+import ChatEmptyImage from "assets/image/chat_empty.svg";
+import ContentSkeleton from "components/Loading/ContentSkeleton";
 
 type Props = {};
 
@@ -59,24 +61,51 @@ const MessagePage = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.userId, params.workspaceId, auth.user._id]);
 
-  //   if (!memberData) return <></>;
+  const loading = messageData?.length === 0 && message.loading;
 
   return (
     <div className="w-full h-screen flex flex-col min-h-0">
       <MessageHeader data={memberData} />
 
       <div className="flex-grow overflow-auto min-h-0">
-        <ul className="flex flex-col py-2 px-5">
-          {messageData?.map((message, idx) => (
-            <Chat
-              data={message}
-              key={`${message?._tempId || message?._id}${idx}`}
-              isOwn={message._createdById === auth.user._id}
-              setSelectedMessage={setSelectedMessage}
-              selectedMessage={selectedMessage}
-            />
-          ))}
-        </ul>
+        {loading && <ContentSkeleton count={10} />}
+        {!loading && (
+          <>
+            {messageData?.length === 0 && (
+              <div className="h-full flex items-center justify-center">
+                <div className="text-center">
+                  <img
+                    src={ChatEmptyImage}
+                    alt="chat empty"
+                    className="h-64 w-6h-64 object-cover"
+                  />
+                  <p className="text-sm text-slate-700 font-semibold">
+                    This conversation is just between the two of you
+                  </p>
+                  <p className="text-sm text-slate-700 max-w-xs mt-2">
+                    Here you can send messages and share files with{" "}
+                    <span className="px-2 py-1 bg-indigo-100 text-indigo-500 font-semibold rounded leading-9">
+                      @{memberData?.firstName}
+                    </span>
+                  </p>
+                </div>
+              </div>
+            )}
+            {messageData?.length > 0 && (
+              <ul className="flex flex-col py-2 px-5">
+                {messageData?.map((message, idx) => (
+                  <Chat
+                    data={message}
+                    key={`${message?._tempId || message?._id}${idx}`}
+                    isOwn={message._createdById === auth.user._id}
+                    setSelectedMessage={setSelectedMessage}
+                    selectedMessage={selectedMessage}
+                  />
+                ))}
+              </ul>
+            )}
+          </>
+        )}
       </div>
 
       <div className="sticky top-0 bg-white px-5 py-2">
