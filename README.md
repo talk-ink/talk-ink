@@ -46,4 +46,6 @@ We'll open sourced it later, just be patient :D
   <img src = "https://contrib.rocks/image?repo=talk-ink/talk-ink"/>
 </a>
 
-
+## Credits
+Also Big thanks to:
+- Hartono @joearton: for Pentesting Talk.ink
