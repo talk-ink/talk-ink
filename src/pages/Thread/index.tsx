@@ -24,7 +24,7 @@ import {
   deleteThread,
 } from "features/threads";
 
-import { fetchComments } from "features/threads/slice/asyncThunk";
+import { fetchComments, fetchThreads } from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { kontenbase } from "lib/client";
 import { useToast } from "hooks/useToast";
@@ -45,6 +45,7 @@ import Modal from "components/Modal/Modal";
 import { SelectedThreadTypes } from "components/ContentItem/ContentItem";
 import CloseThreadForm from "components/Thread/CloseThreadForm";
 import moment from "moment-timezone";
+import ContentSkeleton from "components/Loading/ContentSkeleton";
 
 function useQuery() {
   const { search } = useLocation();
@@ -86,7 +87,12 @@ function ThreadPage() {
     return thread.threads.find((data) => data._id === threadId);
   }, [thread.threads, threadId]);
 
-  const { manager, state, onChange } = useRemirror({
+  const {
+    manager,
+    state,
+    onChange,
+    setState: setThreadState,
+  } = useRemirror({
     extensions: () => extensions(true),
     stringHandler: htmlToProsemirrorNode,
     content: parseContent(threadData?.content),
@@ -273,8 +279,10 @@ function ThreadPage() {
   };
 
   useEffect(() => {
+    if (!threadData) return;
     dispatch(fetchComments({ threadId: threadId, skip: 0 }));
-  }, [dispatch, threadId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dispatch, threadId, !!threadData]);
 
   const loadMoreComment = () => {
     dispatch(
@@ -360,12 +368,40 @@ function ThreadPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  useEffect(() => {
+    if (!threadData && channelId && auth.user._id) {
+      dispatch(
+        fetchThreads({
+          type: "threads",
+          channelId: channelId,
+          userId: auth.user._id,
+        })
+      );
+    }
+    if (threadData) {
+      setThreadState(
+        manager.createState({
+          stringHandler: htmlToProsemirrorNode,
+          content: parseContent(threadData?.content),
+        })
+      );
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [channelId, threadData, auth.user._id]);
+
   const isMember = useMemo(() => {
     return (
       channelData?.members?.includes(auth.user._id) &&
       (!channelData?.privacy || channelData?.privacy === "public")
     );
   }, [channelData, auth.user._id]);
+
+  if (!threadData)
+    return (
+      <div className="w-full max-w-4xl mx-auto h-full mt-32">
+        <ContentSkeleton count={10} />
+      </div>
+    );
 
   return (
     <MainContentContainer
@@ -427,7 +463,7 @@ function ThreadPage() {
             <div className="flex-grow text-sm">
               <div className="-mt-1.5 flex items-center justify-start">
                 <p className=" font-semibold mb-0 mt-0 mr-2">
-                  {threadData.createdBy?.firstName}
+                  {threadData?.createdBy?.firstName}
                 </p>{" "}
                 <p className="mb-0 mt-0 text-xs">
                   <ReactMoment format="DD/MM/YYYY LT">
