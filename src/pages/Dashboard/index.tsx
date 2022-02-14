@@ -34,59 +34,6 @@ function DashboardPage() {
   const params = useParams();
   const navigate = useNavigate();
 
-  useKontenbaseRealtime({
-    variables: {
-      dependencies: {
-        workspaceId: params.workspaceId,
-        toUserId: params.userId,
-      },
-      service: "Messages",
-      event: "*",
-    },
-    filter: ({ event, payload }) => {
-      const isUpdate = event === "UPDATE_RECORD";
-      const isDelete = event === "DELETE_RECORD";
-
-      const isCurrentWorkspace = isUpdate
-        ? payload?.before?.workspace?.includes(params.workspaceId)
-        : payload?.workspace?.includes(params.workspaceId);
-
-      if (isDelete ? false : !isCurrentWorkspace) return false;
-      if (isUpdate && payload?.after?.createdBy === auth.user._id) return false;
-      if (payload?.createdBy === auth.user._id) return false;
-
-      return true;
-    },
-    onCreatedRecord: ({ payload }) => {
-      dispatch(
-        addMessageFromOther({
-          toUserId: payload?.createdBy,
-          message: payload,
-        })
-      );
-    },
-    onUpdatedRecord: ({ payload }) => {
-      dispatch(
-        updateMessage({
-          toUserId: payload?.after?.createdBy,
-          message: payload?.after,
-        })
-      );
-    },
-    onDeletedRecord: ({ payload }) => {
-      dispatch(
-        deleteMessage({
-          toUserId: params.userId,
-          messageId: payload?._id,
-        })
-      );
-    },
-
-    onRequestError: (error) => {
-      showToast({ message: error });
-    },
-  });
-
   const auth = useAppSelector((state) => state.auth);
   const workspace = useAppSelector((state) => state.workspace);
   const pageStatus = useAppSelector((state) => state.pageStatus);
@@ -205,6 +152,59 @@ function DashboardPage() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [params.workspaceId, auth.user.workspaces]);
+
+  useKontenbaseRealtime({
+    variables: {
+      dependencies: {
+        workspaceId: params.workspaceId,
+        toUserId: params.userId,
+      },
+      service: "Messages",
+      event: "*",
+    },
+    filter: ({ event, payload }) => {
+      const isUpdate = event === "UPDATE_RECORD";
+      const isDelete = event === "DELETE_RECORD";
+
+      const isCurrentWorkspace = isUpdate
+        ? payload?.before?.workspace?.includes(params.workspaceId)
+        : payload?.workspace?.includes(params.workspaceId);
+
+      if (isDelete ? false : !isCurrentWorkspace) return false;
+      if (isUpdate && payload?.after?.createdBy === auth.user._id) return false;
+      if (payload?.createdBy === auth.user._id) return false;
+
+      return true;
+    },
+    onCreatedRecord: ({ payload }) => {
+      dispatch(
+        addMessageFromOther({
+          toUserId: payload?.createdBy,
+          message: payload,
+        })
+      );
+    },
+    onUpdatedRecord: ({ payload }) => {
+      dispatch(
+        updateMessage({
+          toUserId: payload?.after?.createdBy,
+          message: payload?.after,
+        })
+      );
+    },
+    onDeletedRecord: ({ payload }) => {
+      dispatch(
+        deleteMessage({
+          toUserId: params.userId,
+          messageId: payload?._id,
+        })
+      );
+    },
+
+    onRequestError: (error) => {
+      showToast({ message: error });
+    },
+  });
 
   const loading =
     workspace.loading ||

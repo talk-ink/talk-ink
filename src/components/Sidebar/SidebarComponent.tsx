@@ -377,7 +377,7 @@ function SidebarComponent({
                     payload.after.tagedUsers.includes(userId))
                 ) {
                   let _currentThread;
-
+                  console.log("created user");
                   try {
                     const { data, error } = await kontenbase
                       .service("Threads")
@@ -402,8 +402,16 @@ function SidebarComponent({
                       });
                     }
                   }
-
+                  console.log(
+                    payload.before.tagedUsers.includes(userId),
+                    payload.after.tagedUsers.includes(userId),
+                    !!_currentThread.find(
+                      (item) => item._id === payload.before?._id
+                    )
+                  );
                   if (
+                    payload.before.tagedUsers.includes(userId) &&
+                    payload.after.tagedUsers.includes(userId) &&
                     _currentThread.find(
                       (item) => item._id === payload.before?._id
                     )
@@ -442,11 +450,27 @@ function SidebarComponent({
                       !params.channelId ||
                       payload?.after?.channel?.includes(params.channelId)
                     ) {
+                      const { data, error } = await kontenbase
+                        .service("Comments")
+                        .find({
+                          where: {
+                            threads: payload.after?._id,
+                          },
+                          lookup: ["subComments"],
+                          sort: {
+                            createdAt: -1,
+                          },
+                          limit: 2,
+                        });
+
+                      if (error) throw new Error(error.message);
+
                       dispatch(
                         addThread({
                           ...payload.before,
                           ...payload.after,
                           createdBy: _createdBy,
+                          comments: data,
                         })
                       );
                     }

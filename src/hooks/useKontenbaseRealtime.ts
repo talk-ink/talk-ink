@@ -1,7 +1,6 @@
 import { RealtimeEventTypes, RealtimeMessage } from "@kontenbase/sdk";
 import { kontenbase } from "lib/client";
 import { useEffect, useMemo, useState } from "react";
-import { useAppDispatch } from "./useAppDispatch";
 
 type VariablesDependencies = {
   [key: string]: any;
@@ -15,7 +14,7 @@ type HooksVariables = {
   where?: Partial<unknown>;
 };
 
-type OnEventActionTypes = "any" | "create" | "update" | "delete";
+// type OnEventActionTypes = "any" | "create" | "update" | "delete";
 type HooksProps = {
   variables?: HooksVariables;
   onRequestSuccess?: (message: RealtimeMessage | null | undefined) => any;
@@ -49,7 +48,7 @@ export const useKontenbaseRealtime = (props: HooksProps) => {
 
   useEffect(() => {
     let key: string | null | undefined;
-    console.log("useKontenbaseRealtime mount");
+    console.log("useKontenbaseRealtime mount", service);
 
     if (!variables?.dependencies?.workspaceId) return;
 
@@ -83,7 +82,7 @@ export const useKontenbaseRealtime = (props: HooksProps) => {
       .then((result) => (key = result));
 
     return () => {
-      console.log("useKontenbaseRealtime unmount");
+      console.log("useKontenbaseRealtime unmount", service);
       setActionPayload(null);
       kontenbase.realtime.unsubscribe(key);
     };
