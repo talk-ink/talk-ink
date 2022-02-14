@@ -377,7 +377,6 @@ function SidebarComponent({
                     payload.after.tagedUsers.includes(userId))
                 ) {
                   let _currentThread;
-                  console.log("created user");
                   try {
                     const { data, error } = await kontenbase
                       .service("Threads")
@@ -402,13 +401,7 @@ function SidebarComponent({
                       });
                     }
                   }
-                  console.log(
-                    payload.before.tagedUsers.includes(userId),
-                    payload.after.tagedUsers.includes(userId),
-                    !!_currentThread.find(
-                      (item) => item._id === payload.before?._id
-                    )
-                  );
+
                   if (
                     payload.before.tagedUsers.includes(userId) &&
                     payload.after.tagedUsers.includes(userId) &&
