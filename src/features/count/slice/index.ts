@@ -1,28 +1,66 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Thread } from "types";
 
-type InitPageStatusState = {
+type InitSidebarStateType = {
   inbox: Thread[];
   trash: Thread[];
 };
 
-const initialState: InitPageStatusState = {
+type AddInboxDataPayload = {
+  thread: Thread;
+};
+
+type AddBulkInboxDataPayload = {
+  threads: Thread[];
+};
+type DeleteInboxDataPayload = {
+  _id: string;
+};
+type UpdateInboxDataPayload = {
+  _id: string;
+  thread: Thread;
+};
+
+const initialState: InitSidebarStateType = {
   inbox: [],
   trash: [],
 };
 
-const countSlice = createSlice({
-  name: "count",
+const sidebarStateSlice = createSlice({
+  name: "sidebarState",
   initialState,
   reducers: {
-    setInboxCount: (state, action: PayloadAction<Thread>) => {
-      state.inbox.push(action.payload);
+    addInboxData: (state, action: PayloadAction<AddInboxDataPayload>) => {
+      state.inbox.push(action.payload.thread);
     },
-    setTrashCount: (state, action: PayloadAction<Thread>) => {
+    addBulkInboxData: (
+      state,
+      action: PayloadAction<AddBulkInboxDataPayload>
+    ) => {
+      state.inbox = [...state.inbox, ...action.payload.threads];
+    },
+    deleteInboxData: (state, action: PayloadAction<DeleteInboxDataPayload>) => {
+      state.inbox = state.inbox.filter(
+        (item) => item._id !== action.payload._id
+      );
+    },
+    updateInboxData: (state, action: PayloadAction<UpdateInboxDataPayload>) => {
+      state.inbox = state.inbox.map((item) => {
+        if (item._id !== action.payload._id) return item;
+        return { ...item, ...action.payload.thread };
+      });
+    },
+    setTrash: (state, action: PayloadAction<Thread>) => {
       state.trash.push(action.payload);
     },
   },
 });
 
-export const { setInboxCount, setTrashCount } = countSlice.actions;
-export const countReducer = countSlice.reducer;
+export const {
+  addInboxData,
+  addBulkInboxData,
+  deleteInboxData,
+  updateInboxData,
+  setTrash,
+} = sidebarStateSlice.actions;
+export const sidebarStateReduce = sidebarStateSlice.reducer;

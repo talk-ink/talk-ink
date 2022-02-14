@@ -55,6 +55,11 @@ import { Channel, CreateChannel, Thread, User } from "types";
 import { BsPlus } from "react-icons/bs";
 import { Disclosure, Popover } from "@headlessui/react";
 import DirectMessageList from "components/DirectMessage/List";
+import {
+  addBulkInboxData,
+  addInboxData,
+  updateInboxData,
+} from "features/count";
 
 type TProps = {
   isMobile: boolean;
@@ -72,6 +77,7 @@ function SidebarComponent({
   const channel = useAppSelector((state) => state.channel);
   // const thread = useAppSelector((state) => state.thread);
   const member = useAppSelector((state) => state.member);
+  const sidebarState = useAppSelector((state) => state.sidebarState);
 
   const [showToast] = useToast();
 
@@ -88,7 +94,6 @@ function SidebarComponent({
   const [settingsModal, setSettingsModal] = useState(false);
   const [addMemberModal, setAddMemberModal] = useState(false);
   const [browseChannelsModal, setBrowseChannelsModal] = useState(false);
-  const [inboxData, setInboxData] = useState<Thread[]>([]);
 
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [trashData, setTrashData] = useState<string[]>([]);
@@ -122,22 +127,18 @@ function SidebarComponent({
   }, [auth.user]);
 
   const threadData = useMemo(() => {
-    return inboxData
+    return sidebarState.inbox
       .filter((data) => !auth.user.doneThreads?.includes(data._id))
       .filter((item) => item.tagedUsers?.includes(userId));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [inboxData, auth.user, params, channelData]);
+  }, [sidebarState.inbox, auth.user, params, channelData]);
 
   const inboxLeft: number = useMemo(() => {
     return threadData.filter(
       (item) => !readedThreads.includes(item._id) && !item.isDeleted
     ).length;
   }, [threadData, readedThreads]);
-
-  // const getThreads = useCallback((): Thread[] => {
-  //   return thread.threads;
-  // }, [thread.threads]);
 
   useEffect(() => {
     if (!userId || !params.workspaceId || runOnce) return;
@@ -153,7 +154,7 @@ function SidebarComponent({
 
         if (error) throw new Error(error.message);
 
-        setInboxData(data);
+        dispatch(addBulkInboxData({ threads: data }));
         setRunOnce(true);
       } catch (error) {
         if (error instanceof Error) {
@@ -377,6 +378,7 @@ function SidebarComponent({
                     payload.after.tagedUsers.includes(userId))
                 ) {
                   let _currentThread;
+                  console.log("created user");
                   try {
                     const { data, error } = await kontenbase
                       .service("Threads")
@@ -419,15 +421,14 @@ function SidebarComponent({
                         },
                       });
 
-                      setInboxData((prev) =>
-                        prev.map((item) =>
-                          item._id === payload.before._id
-                            ? {
-                                ...payload.before,
-                                ...payload.after,
-                              }
-                            : item
-                        )
+                      dispatch(
+                        updateInboxData({
+                          _id: payload?.after?._id,
+                          thread: {
+                            ...payload.before,
+                            ...payload.after,
+                          },
+                        })
                       );
                     } catch (error) {
                       console.log("err", error);
@@ -468,13 +469,14 @@ function SidebarComponent({
                       );
                     }
 
-                    setInboxData((prev) => [
-                      ...prev,
-                      {
-                        ...payload.before,
-                        ...payload.after,
-                      },
-                    ]);
+                    dispatch(
+                      addInboxData({
+                        thread: {
+                          ...payload.before,
+                          ...payload.after,
+                        },
+                      })
+                    );
                   }
 
                   updateUserStore();
@@ -565,10 +567,11 @@ function SidebarComponent({
                   dispatch(addThread({ ...payload, createdBy: _createdBy }));
                 }
 
-                setInboxData((prev) => [
-                  ...prev,
-                  { ...payload, createdBy: _createdBy },
-                ]);
+                dispatch(
+                  addInboxData({
+                    thread: { ...payload, createdBy: _createdBy },
+                  })
+                );
 
                 updateUserStore();
                 break;
