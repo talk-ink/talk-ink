@@ -145,7 +145,6 @@ const messageSlice = createSlice({
               total: action.payload._total,
             },
           };
-          console.log("a", JSON.parse(JSON.stringify(newMessages)));
         } else {
           newMessages = {
             ...state.messages,
@@ -160,7 +159,6 @@ const messageSlice = createSlice({
               total: action.payload._total,
             },
           };
-          console.log("b", JSON.parse(JSON.stringify(newMessages)));
         }
 
         state.messages = newMessages;

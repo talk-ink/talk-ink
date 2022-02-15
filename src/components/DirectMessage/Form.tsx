@@ -101,7 +101,6 @@ const MessageForm = ({
     const _tempId = randomString();
     try {
       if (!selectedMessage) {
-        console.log("a");
         dispatch(
           addMessage({
             toUserId: params.userId,
