@@ -1,17 +1,25 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Message } from "types";
+import { filterDistinct } from "utils/helper";
 import { fetchMessages } from "./asyncThunk";
 
-type MessageState = { [key: string]: Message[] } | null;
+type MessageState = {
+  [key: string]: {
+    data: Message[];
+    total: number;
+  };
+} | null;
 
 type InitPageStatusState = {
   messages: MessageState;
   loading: boolean;
+  partialLoading: boolean;
 };
 
 const initialState: InitPageStatusState = {
   messages: null,
   loading: true,
+  partialLoading: true,
 };
 
 interface TAddMessage {
@@ -40,6 +48,12 @@ interface TUpdateMessage {
   message: Message;
 }
 
+interface IFetchMessagePayload {
+  data: Message[];
+  _toUserId: string;
+  _total?: number;
+}
+
 const messageSlice = createSlice({
   name: "message",
   initialState,
@@ -51,10 +65,10 @@ const messageSlice = createSlice({
         _tempId: action.payload?._tempId,
       };
       if (!state.messages[action.payload.toUserId]) {
-        state.messages[action.payload.toUserId] = [newMessage];
+        state.messages[action.payload.toUserId].data = [newMessage];
       } else {
-        state.messages[action.payload.toUserId] = [
-          ...state.messages[action.payload.toUserId],
+        state.messages[action.payload.toUserId].data = [
+          ...state.messages[action.payload.toUserId].data,
           newMessage,
         ];
       }
@@ -70,18 +84,18 @@ const messageSlice = createSlice({
       };
 
       if (!state.messages[action.payload.toUserId]) {
-        state.messages[action.payload.toUserId] = [newMessage];
+        state.messages[action.payload.toUserId].data = [newMessage];
       } else {
-        state.messages[action.payload.toUserId] = [
-          ...state.messages[action.payload.toUserId],
+        state.messages[action.payload.toUserId].data = [
+          ...state.messages[action.payload.toUserId].data,
           newMessage,
         ];
       }
     },
     deleteMessage: (state, action: PayloadAction<TDeleteMessage>) => {
-      state.messages[action.payload.toUserId] = state.messages[
+      state.messages[action.payload.toUserId].data = state.messages[
         action.payload.toUserId
-      ].filter((item) => {
+      ].data.filter((item) => {
         if (item._id) return item._id !== action.payload.messageId;
         return item._tempId !== action.payload.messageId;
       });
@@ -95,33 +109,68 @@ const messageSlice = createSlice({
     ) => {
       const { toUserId, _tempId, message } = payload;
 
-      state.messages[toUserId] = state.messages[toUserId].map((item) => {
-        if (item._tempId !== _tempId) return item;
-        return { ...item, ...message };
-      });
+      state.messages[toUserId].data = state.messages[toUserId].data.map(
+        (item) => {
+          if (item._tempId !== _tempId) return item;
+          return { ...item, ...message };
+        }
+      );
     },
     updateMessage: (state, { payload }: PayloadAction<TUpdateMessage>) => {
       const { toUserId, message } = payload;
 
-      state.messages[toUserId] = state.messages[toUserId].map((item) => {
-        if (item._id !== message?._id) return item;
-        return { ...item, ...message };
-      });
+      state.messages[toUserId].data = state.messages[toUserId].data.map(
+        (item) => {
+          if (item._id !== message?._id) return item;
+          return { ...item, ...message };
+        }
+      );
     },
   },
   extraReducers: (builder) => {
     builder.addCase(fetchMessages.pending, (state) => {
       state.loading = true;
+      state.partialLoading = true;
     });
     builder.addCase(
       fetchMessages.fulfilled,
-      (state, action: PayloadAction<MessageState>) => {
-        state.messages = { ...state.messages, ...action.payload };
+      (state, action: PayloadAction<IFetchMessagePayload>) => {
+        let newMessages: MessageState | null | undefined;
+
+        if (!state.messages[action.payload._toUserId]) {
+          newMessages = {
+            ...state.messages,
+            [action.payload._toUserId]: {
+              data: action.payload.data,
+              total: action.payload._total,
+            },
+          };
+          console.log("a", JSON.parse(JSON.stringify(newMessages)));
+        } else {
+          newMessages = {
+            ...state.messages,
+            [action.payload._toUserId]: {
+              data: filterDistinct(
+                [
+                  ...action.payload.data,
+                  ...state.messages[action.payload._toUserId].data,
+                ],
+                "_id"
+              ),
+              total: action.payload._total,
+            },
+          };
+          console.log("b", JSON.parse(JSON.stringify(newMessages)));
+        }
+
+        state.messages = newMessages;
         state.loading = false;
+        state.partialLoading = false;
       }
     );
     builder.addCase(fetchMessages.rejected, (state) => {
       state.loading = false;
+      state.partialLoading = false;
     });
   },
 });

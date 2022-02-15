@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 
 import { useParams } from "react-router-dom";
 
@@ -16,6 +16,8 @@ import MessageMenu from "components/DirectMessage/MobileMenu";
 import { setMessageMenu } from "features/mobileMenu";
 import ChatEmptyImage from "assets/image/chat_empty.svg";
 import ContentSkeleton from "components/Loading/ContentSkeleton";
+import useIntersection from "hooks/useIntersection";
+import { useDebounce } from "use-debounce";
 
 type Props = {};
 
@@ -45,21 +47,67 @@ const MessagePage = (props: Props) => {
     return member.members?.find((item) => item._id === params?.userId);
   }, [member.members, params?.userId]);
 
-  const messageData: Message[] = useMemo(() => {
-    if (!message?.messages?.[params.userId]) return [];
+  const memberMessage: { data: Message[]; total: number } = useMemo(() => {
+    if (!message?.messages?.[params.userId]) return { data: [], total: 0 };
     return message?.messages?.[params.userId];
   }, [message.messages, params.userId]);
 
+  const messageData: Message[] = useMemo(() => {
+    if (!memberMessage?.data) return [];
+    return memberMessage?.data;
+  }, [message.messages, params.userId]);
+
+  const observerOptions: IntersectionObserverInit = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const [observerRef, isFetchData] = useIntersection(observerOptions);
+  const [debounceIsFetchData] = useDebounce(isFetchData, 1000);
+
   useEffect(() => {
+    if (!messageData) return;
+    if (messageData?.length > 0 && memberMessage?.total > 0) return;
+    console.log("aa");
     dispatch(
       fetchMessages({
         loggedUserId: auth.user._id,
         toUserId: params.userId,
         workspaceId: params.workspaceId,
+        skip: 0,
       })
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.userId, params.workspaceId, auth.user._id]);
+  }, [params.userId, params.workspaceId, auth.user._id, messageData]);
+
+  // useEffect(() => {
+  //   if (!messageData) return;
+  //   if (messageData?.length === 0) return;
+  //   if (!debounceIsFetchData) return;
+  //   if (messageData?.length >= memberMessage?.total) return;
+  //   if (message.partialLoading) return;
+  //   console.log("bb");
+
+  //   setTimeout(() => {
+  //     dispatch(
+  //       fetchMessages({
+  //         loggedUserId: auth.user._id,
+  //         toUserId: params.userId,
+  //         workspaceId: params.workspaceId,
+  //         skip: messageData?.length,
+  //       })
+  //     );
+  //   }, 1000);
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, [
+  //   debounceIsFetchData,
+  //   params.userId,
+  //   params.workspaceId,
+  //   auth.user._id,
+  //   messageData,
+  //   message.partialLoading,
+  // ]);
 
   const loading = messageData?.length === 0 && message.loading;
 
@@ -68,6 +116,7 @@ const MessagePage = (props: Props) => {
       <MessageHeader data={memberData} />
 
       <div className="flex-grow overflow-auto min-h-0">
+        <div ref={observerRef} className="observer"></div>
         {loading && <ContentSkeleton count={10} />}
         {!loading && (
           <>

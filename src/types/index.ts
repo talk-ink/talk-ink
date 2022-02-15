@@ -189,5 +189,6 @@ export interface Message {
   toUser?: string[];
   _createdById?: string;
   _tempId?: string;
+  _toUserId?: string;
   workspace?: string[];
 }

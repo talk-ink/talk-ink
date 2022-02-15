@@ -5,11 +5,13 @@ type FetchMessagesProps = {
   toUserId: string;
   loggedUserId: string;
   workspaceId: string;
+  limit?: number;
+  skip?: number;
 };
 
 export const fetchMessages = createAsyncThunk(
   "message/fetchMessages",
-  async ({ toUserId, loggedUserId, workspaceId }: FetchMessagesProps) => {
+  async ({ toUserId, loggedUserId, workspaceId, skip }: FetchMessagesProps) => {
     const response = await kontenbase.service("Messages").find({
       where: { workspace: workspaceId },
       or: [
@@ -19,15 +21,20 @@ export const fetchMessages = createAsyncThunk(
       sort: {
         createdAt: -1,
       },
+      limit: 10,
+      skip,
     });
 
     return {
-      [toUserId]: response.data
+      data: response.data
         .map((item) => ({
           ...item,
           _createdById: item?.createdBy?._id,
         }))
         .reverse(),
+
+      _toUserId: toUserId,
+      _total: response?.count,
     };
   }
 );
