@@ -15,9 +15,12 @@ const useIntersection = (
     const observer = new IntersectionObserver(observerCallback, options);
     if (observerRef.current) observer.observe(observerRef.current);
 
+    const ref = observerRef;
+
     return () => {
-      if (observerRef.current) observer.unobserve(observerRef.current);
+      if (ref.current) observer.unobserve(ref.current);
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [observerRef, options]);
 
   return [observerRef, isVisible];

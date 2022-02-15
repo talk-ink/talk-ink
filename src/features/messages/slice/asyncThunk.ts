@@ -11,7 +11,13 @@ type FetchMessagesProps = {
 
 export const fetchMessages = createAsyncThunk(
   "message/fetchMessages",
-  async ({ toUserId, loggedUserId, workspaceId, skip }: FetchMessagesProps) => {
+  async ({
+    toUserId,
+    loggedUserId,
+    workspaceId,
+    limit = 20,
+    skip,
+  }: FetchMessagesProps) => {
     const response = await kontenbase.service("Messages").find({
       where: { workspace: workspaceId },
       or: [
@@ -21,7 +27,7 @@ export const fetchMessages = createAsyncThunk(
       sort: {
         createdAt: -1,
       },
-      limit: 10,
+      limit,
       skip,
     });
 

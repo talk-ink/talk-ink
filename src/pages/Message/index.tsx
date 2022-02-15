@@ -27,6 +27,7 @@ export type SelectedMessage = {
 };
 
 const MessagePage = (props: Props) => {
+  const scrollRef = useRef<HTMLDivElement>();
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
@@ -42,6 +43,7 @@ const MessagePage = (props: Props) => {
 
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
   const [selectedMessage, setSelectedMessage] = useState<SelectedMessage>();
+  const [firstFetch, setFirstFetch] = useState<boolean>(false);
 
   const memberData: Member = useMemo(() => {
     return member.members?.find((item) => item._id === params?.userId);
@@ -55,7 +57,7 @@ const MessagePage = (props: Props) => {
   const messageData: Message[] = useMemo(() => {
     if (!memberMessage?.data) return [];
     return memberMessage?.data;
-  }, [message.messages, params.userId]);
+  }, [memberMessage?.data]);
 
   const observerOptions: IntersectionObserverInit = {
     root: null,
@@ -66,10 +68,17 @@ const MessagePage = (props: Props) => {
   const [observerRef, isFetchData] = useIntersection(observerOptions);
   const [debounceIsFetchData] = useDebounce(isFetchData, 1000);
 
+  const scrollToBottom = () => {
+    setTimeout(() => {
+      scrollRef?.current?.scrollIntoView({ behavior: "auto" });
+    }, 100);
+  };
+
   useEffect(() => {
     if (!messageData) return;
     if (messageData?.length > 0 && memberMessage?.total > 0) return;
-    console.log("aa");
+    if (firstFetch) return;
+
     dispatch(
       fetchMessages({
         loggedUserId: auth.user._id,
@@ -78,36 +87,49 @@ const MessagePage = (props: Props) => {
         skip: 0,
       })
     );
+    setFirstFetch(true);
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [params.userId, params.workspaceId, auth.user._id, messageData]);
+  }, [
+    params.userId,
+    params.workspaceId,
+    auth.user._id,
+    messageData,
+    firstFetch,
+  ]);
 
-  // useEffect(() => {
-  //   if (!messageData) return;
-  //   if (messageData?.length === 0) return;
-  //   if (!debounceIsFetchData) return;
-  //   if (messageData?.length >= memberMessage?.total) return;
-  //   if (message.partialLoading) return;
-  //   console.log("bb");
+  useEffect(() => {
+    setFirstFetch(false);
+  }, [params.userId, params.workspaceId]);
 
-  //   setTimeout(() => {
-  //     dispatch(
-  //       fetchMessages({
-  //         loggedUserId: auth.user._id,
-  //         toUserId: params.userId,
-  //         workspaceId: params.workspaceId,
-  //         skip: messageData?.length,
-  //       })
-  //     );
-  //   }, 1000);
-  //   // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [
-  //   debounceIsFetchData,
-  //   params.userId,
-  //   params.workspaceId,
-  //   auth.user._id,
-  //   messageData,
-  //   message.partialLoading,
-  // ]);
+  useEffect(() => {
+    if (!messageData) return;
+    if (messageData?.length === 0) return;
+    if (!debounceIsFetchData) return;
+    if (messageData?.length >= memberMessage?.total) return;
+    if (message.partialLoading) return;
+
+    setTimeout(() => {
+      dispatch(
+        fetchMessages({
+          loggedUserId: auth.user._id,
+          toUserId: params.userId,
+          workspaceId: params.workspaceId,
+          skip: messageData?.length,
+          limit: 5,
+        })
+      );
+    }, 1000);
+    scrollToBottom();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    debounceIsFetchData,
+    params.userId,
+    params.workspaceId,
+    auth.user._id,
+    messageData,
+    message.partialLoading,
+  ]);
 
   const loading = messageData?.length === 0 && message.loading;
 
@@ -116,7 +138,9 @@ const MessagePage = (props: Props) => {
       <MessageHeader data={memberData} />
 
       <div className="flex-grow overflow-auto min-h-0">
-        <div ref={observerRef} className="observer"></div>
+        {!message.partialLoading && (
+          <div ref={observerRef} className="observer"></div>
+        )}
         {loading && <ContentSkeleton count={10} />}
         {!loading && (
           <>
@@ -141,17 +165,28 @@ const MessagePage = (props: Props) => {
               </div>
             )}
             {messageData?.length > 0 && (
-              <ul className="flex flex-col py-2 px-5">
-                {messageData?.map((message, idx) => (
-                  <Chat
-                    data={message}
-                    key={`${message?._tempId || message?._id}${idx}`}
-                    isOwn={message._createdById === auth.user._id}
-                    setSelectedMessage={setSelectedMessage}
-                    selectedMessage={selectedMessage}
-                  />
-                ))}
-              </ul>
+              <div>
+                {message.partialLoading && (
+                  <div className="mt-2">
+                    <p className="font-semibold text-sm text-center text-indigo-300">
+                      Loading...
+                    </p>
+                  </div>
+                )}
+                <ul className="flex flex-col py-2 px-5">
+                  {messageData?.map((message, idx) => (
+                    <Chat
+                      key={`${message?._tempId || message?._id}${idx}`}
+                      index={idx}
+                      data={message}
+                      isOwn={message._createdById === auth.user._id}
+                      setSelectedMessage={setSelectedMessage}
+                      selectedMessage={selectedMessage}
+                      scrollRef={scrollRef}
+                    />
+                  ))}
+                </ul>
+              </div>
             )}
           </>
         )}
