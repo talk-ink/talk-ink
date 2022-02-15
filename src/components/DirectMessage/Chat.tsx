@@ -25,9 +25,18 @@ type Props = {
   data?: Message;
   selectedMessage?: SelectedMessage;
   setSelectedMessage?: React.Dispatch<React.SetStateAction<SelectedMessage>>;
+  index?: number;
+  scrollRef?: React.LegacyRef<HTMLDivElement>;
 };
 
-const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
+const Chat = ({
+  isOwn,
+  data,
+  selectedMessage,
+  setSelectedMessage,
+  index,
+  scrollRef,
+}: Props) => {
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",
   });
@@ -118,6 +127,7 @@ const Chat = ({ isOwn, data, selectedMessage, setSelectedMessage }: Props) => {
       } py-2 px-3  rounded-lg mb-2 max-w-[280px] md:max-w-lg relative group`}
       {...commentBind}
     >
+      {index === 2 && <div ref={scrollRef}></div>}
       <Remirror
         remmirorProps={{ manager, onChange, state }}
         fromMessage
