@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import NameInitial from "./NameInitial";
 
 interface IProps {
@@ -14,6 +14,12 @@ const Avatar: React.FC<IProps> = ({ src, size = "medium", alt }) => {
     medium: "h-8 w-8 ",
     large: "h-10 w-10",
   };
+
+  useEffect(() => {
+    return () => {
+      setLoading(true);
+    };
+  }, [alt]);
 
   return (
     <>
