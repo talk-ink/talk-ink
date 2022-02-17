@@ -47,29 +47,31 @@ function App() {
 
       if (error) throw new Error(error.message);
 
-      await OneSignal.init({
-        appId: oneSignalId,
-        notifyButton: {
-          enable: true,
-        },
-        allowLocalhostAsSecureOrigin: true,
-        autoResubscribe: true,
-        autoRegister: true,
-        persistNotification: true,
-      });
+      if (!window.ReactNativeWebView) {
+        await OneSignal.init({
+          appId: oneSignalId,
+          notifyButton: {
+            enable: true,
+          },
+          allowLocalhostAsSecureOrigin: true,
+          autoResubscribe: true,
+          autoRegister: true,
+          persistNotification: true,
+        });
 
-      await OneSignal.showSlidedownPrompt();
+        await OneSignal.showSlidedownPrompt();
 
-      if (userData._id) {
-        const isSubscribe = await OneSignal.getSubscription();
-        const isIdSet = await OneSignal.getExternalUserId();
+        if (userData._id) {
+          const isSubscribe = await OneSignal.getSubscription();
+          const isIdSet = await OneSignal.getExternalUserId();
 
-        if (!isIdSet) {
-          await OneSignal.setExternalUserId(userData._id);
-        }
+          if (!isIdSet) {
+            await OneSignal.setExternalUserId(userData._id);
+          }
 
-        if (!isSubscribe) {
-          await OneSignal.setSubscription(true);
+          if (!isSubscribe) {
+            await OneSignal.setSubscription(true);
+          }
         }
       }
 
