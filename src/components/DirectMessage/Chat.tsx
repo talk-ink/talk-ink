@@ -96,6 +96,7 @@ const Chat = ({
     () => {
       if (!isMobile || data?._createdById !== auth.user._id) return;
       dispatch(setMessageMenu({ data, type: "open" }));
+      window.navigator.vibrate([20]);
     },
     {
       detect: LongPressDetectEvents.TOUCH,

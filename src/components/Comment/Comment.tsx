@@ -404,6 +404,7 @@ const Comment: React.FC<IProps> = ({
         dispatch(
           setCommentMenu({ data: comment, type: "open", category: "comment" })
         );
+        window.navigator.vibrate([20]);
       }
     },
     {
