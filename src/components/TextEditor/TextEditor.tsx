@@ -5,6 +5,7 @@ import Button from "components/Button/Button";
 import { Thread } from "types";
 import { useNavigate, useParams } from "react-router";
 import Remirror from "components/Remirror";
+import { editorToHTML } from "utils/helper";
 
 interface Mention {
   id: string;
@@ -33,7 +34,11 @@ function TextEditor({
   const params = useParams();
   const textEditorRef = useRef(null);
 
-  const isDisabled = !formik.values.name || !remmirorProps.state || loading;
+  const isDisabled =
+    !formik.values.name ||
+    !remmirorProps.state ||
+    !editorToHTML(remmirorProps?.state, "") ||
+    loading;
 
   const handleEnter = (
     event: KeyboardEvent<HTMLInputElement | HTMLTextAreaElement>
