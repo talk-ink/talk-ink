@@ -200,8 +200,19 @@ function SidebarComponent({
       cookies.remove("token");
       OneSignal.removeExternalUserId();
 
-      dispatch(logout());
-      navigate("/login");
+      if (!window?.ReactNativeWebView) {
+        dispatch(logout());
+        navigate("/login");
+      } else {
+        setTimeout(() => {
+          window.ReactNativeWebView &&
+            window.ReactNativeWebView.postMessage(
+              JSON.stringify({
+                action: "logout",
+              })
+            );
+        }, 0);
+      }
     } catch (error) {
       if (error instanceof Error) {
         showToast({ message: `${JSON.stringify(error?.message)}` });
