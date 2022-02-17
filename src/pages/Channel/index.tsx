@@ -204,7 +204,7 @@ function ChannelPage() {
                 <>
                   <Menu.Button as="div">
                     <IconButton size="medium">
-                      <BiFilter size={24} className="text-slate-800" />
+                      <BiFilter size={24} className="text-slate-500" />
                     </IconButton>
                   </Menu.Button>
 
@@ -249,7 +249,7 @@ function ChannelPage() {
                     <IconButton size="medium">
                       <BiDotsVerticalRounded
                         size={24}
-                        className="text-slate-800"
+                        className="text-slate-500"
                       />
                     </IconButton>
                   </Menu.Button>
