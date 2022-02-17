@@ -209,6 +209,7 @@ function SidebarComponent({
             window.ReactNativeWebView.postMessage(
               JSON.stringify({
                 action: "logout",
+                userId: auth.user._id,
               })
             );
         }, 0);
