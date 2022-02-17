@@ -133,6 +133,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
           placeholder="Type conclusion for this thread"
           onChange={formik.handleChange("closeDescription")}
           value={formik.values.closeDescription}
+          autoFocus
         />
       </div>
       <form

@@ -174,6 +174,7 @@ function ContentItem({
   const threadBind = useLongPress(
     () => {
       setSelectedThread({ thread: dataSource, type: "menu" });
+      window.navigator.vibrate([20]);
     },
     {
       detect: LongPressDetectEvents.TOUCH,

@@ -146,6 +146,7 @@ const Comment: React.FC<IProps> = ({
             category: "subComment",
           })
         );
+        window.navigator.vibrate([20]);
       }
     },
     { detect: LongPressDetectEvents.TOUCH, cancelOnMovement: true }

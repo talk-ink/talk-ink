@@ -67,7 +67,7 @@ function MobileHeader({
       <div className="flex items-center gap-4">
         <BiMenu
           size={28}
-          className="text-slate-800"
+          className="text-slate-500"
           onClick={() => setIsSidebarOpen((prev) => !prev)}
         />
         <div className="flex flex-col">
@@ -78,7 +78,7 @@ function MobileHeader({
             {privacy === "private" && (
               <Icon size={18} className="text-slate-400" />
             )}
-            <h1 className="text-lg font-semibold whitespace-nowrap max-w-[10rem] overflow-hidden text-ellipsis">
+            <h1 className="text-lg font-semibold whitespace-nowrap max-w-[10rem] overflow-hidden text-ellipsis text-slate-700">
               {header}
             </h1>
           </div>
