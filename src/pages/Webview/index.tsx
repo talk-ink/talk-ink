@@ -1,4 +1,6 @@
 import FullscreenLoading from "components/Loading/FullscreenLoading";
+import { setAuthToken, setAuthUser } from "features/auth";
+import { useAppDispatch } from "hooks/useAppDispatch";
 import { useToast } from "hooks/useToast";
 import { kontenbase } from "lib/client";
 import React, { useEffect } from "react";
@@ -19,11 +21,19 @@ const WebviewPage = (props: Props) => {
   const absolutePath: string | null | undefined = query.get("absolutePath");
   const token: string | null | undefined = query.get("token");
 
+  const dispatch = useAppDispatch();
+
   const tokenHandler = async () => {
     try {
-      console.log(kontenbase.auth.token());
       kontenbase.auth.saveToken(token);
-      console.log(kontenbase.auth.token());
+
+      const { user: userData, error } = await kontenbase.auth.user();
+
+      if (error) throw new Error(error.message);
+
+      dispatch(setAuthToken({ token }));
+      dispatch(setAuthUser(userData));
+
       setTimeout(() => {
         if (!absolutePath) {
           navigate("/");
