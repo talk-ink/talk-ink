@@ -910,7 +910,8 @@ function SidebarComponent({
                                 onClick={() => {
                                   setIsSidebarOpen(false);
                                   navigate(
-                                    `/a/${params?.workspaceId}/msg/${data?._id}`
+                                    `/a/${params?.workspaceId}/msg/${data?._id}`,
+                                    { replace: true }
                                   );
                                 }}
                               />
