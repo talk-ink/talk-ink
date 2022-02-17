@@ -67,7 +67,7 @@ function MobileHeader({
       <div className="flex items-center gap-4">
         <BiMenu
           size={28}
-          className="text-slate-700"
+          className="text-slate-500"
           onClick={() => setIsSidebarOpen((prev) => !prev)}
         />
         <div className="flex flex-col">
