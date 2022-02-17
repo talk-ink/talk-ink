@@ -96,6 +96,7 @@ const Chat = ({
     () => {
       if (!isMobile || data?._createdById !== auth.user._id) return;
       dispatch(setMessageMenu({ data, type: "open" }));
+      window.navigator.vibrate([20]);
     },
     {
       detect: LongPressDetectEvents.TOUCH,
@@ -122,8 +123,8 @@ const Chat = ({
     <li
       className={`${
         isOwn
-          ? "bg-indigo-50 self-end"
-          : "pointer-events-none bg-indigo-500 text-white self-start"
+          ? "bg-indigo-500 text-white self-end"
+          : "pointer-events-none bg-indigo-50 self-start"
       } py-2 px-3  rounded-lg mb-2 max-w-[280px] md:max-w-lg relative group`}
       {...commentBind}
     >
