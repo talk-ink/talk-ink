@@ -27,6 +27,12 @@ import { useToast } from "hooks/useToast";
 import { updateUser } from "features/auth";
 import { fetchThreads } from "features/threads/slice/asyncThunk";
 
+declare global {
+  interface Window {
+    ReactNativeWebView: any;
+  }
+}
+
 function InboxPage() {
   const isMobile = useMediaQuery({
     query: "(max-width: 600px)",

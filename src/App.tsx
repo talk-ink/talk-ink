@@ -17,6 +17,7 @@ import { kontenbase } from "lib/client";
 import { Token, TUserProfile } from "types";
 import { oneSignalId } from "utils/helper";
 import MessagePage from "pages/Message";
+import WebviewPage from "pages/Webview";
 
 const ChannelPage = lazy(() => import("pages/Channel"));
 const DashboardPage = lazy(() => import("pages/Dashboard"));
@@ -39,35 +40,38 @@ function App() {
   const checkUser = async () => {
     try {
       const localStorageToken = localStorage.getItem("token");
+      console.log("localStorageToken", localStorageToken);
       if (!localStorageToken) return;
 
       const { user: userData, error } = await kontenbase.auth.user();
 
       if (error) throw new Error(error.message);
 
-      await OneSignal.init({
-        appId: oneSignalId,
-        notifyButton: {
-          enable: true,
-        },
-        allowLocalhostAsSecureOrigin: true,
-        autoResubscribe: true,
-        autoRegister: true,
-        persistNotification: true,
-      });
+      if (!window.ReactNativeWebView) {
+        await OneSignal.init({
+          appId: oneSignalId,
+          notifyButton: {
+            enable: true,
+          },
+          allowLocalhostAsSecureOrigin: true,
+          autoResubscribe: true,
+          autoRegister: true,
+          persistNotification: true,
+        });
 
-      await OneSignal.showSlidedownPrompt();
+        await OneSignal.showSlidedownPrompt();
 
-      if (userData._id) {
-        const isSubscribe = await OneSignal.getSubscription();
-        const isIdSet = await OneSignal.getExternalUserId();
+        if (userData._id) {
+          const isSubscribe = await OneSignal.getSubscription();
+          const isIdSet = await OneSignal.getExternalUserId();
 
-        if (!isIdSet) {
-          await OneSignal.setExternalUserId(userData._id);
-        }
+          if (!isIdSet) {
+            await OneSignal.setExternalUserId(userData._id);
+          }
 
-        if (!isSubscribe) {
-          await OneSignal.setSubscription(true);
+          if (!isSubscribe) {
+            await OneSignal.setSubscription(true);
+          }
         }
       }
 
@@ -195,6 +199,7 @@ function App() {
               </RestrictedRoute>
             }
           />
+          <Route path="/webview" element={<WebviewPage />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </Suspense>
