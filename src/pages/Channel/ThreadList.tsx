@@ -96,7 +96,7 @@ const ThreadList = ({ type = "open" }: Props) => {
     }
   };
 
-  const loading = thread.loading;
+  const loading = false;
 
   return (
     <div>
