@@ -191,7 +191,7 @@ const Form: React.FC<IProps> = ({
     }
 
     const _tempId = randomString();
-    const now = moment().tz("Asia/Jakarta").toDate().toDateString();
+    const now = moment().tz("Asia/Jakarta").toDate().toISOString();
 
     dispatch(
       addComment({
