@@ -2,7 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cookies from "js-cookie";
 
 import { AuthState, Token, TUserProfile } from "types";
-import { createUniqueArray, filterDistinct } from "utils/helper";
+import { createUniqueArray } from "utils/helper";
 
 const initialState: AuthState = {
   token: null,
