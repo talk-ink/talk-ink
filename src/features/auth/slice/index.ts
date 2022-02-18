@@ -2,6 +2,7 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import cookies from "js-cookie";
 
 import { AuthState, Token, TUserProfile } from "types";
+import { createUniqueArray, filterDistinct } from "utils/helper";
 
 const initialState: AuthState = {
   token: null,
@@ -85,10 +86,19 @@ const authSlice = createSlice({
       };
     },
     deleteReadThread: (state, action: PayloadAction<string>) => {
-      let deletedIndex = state.user.readedThreads.findIndex(
+      let readedThreads = createUniqueArray(state.user.readedThreads);
+
+      let deletedIndex = readedThreads.findIndex(
         (data) => data === action.payload
       );
-      state.user.readedThreads.splice(deletedIndex, 1);
+      if (deletedIndex < 0) return;
+
+      readedThreads.splice(deletedIndex, 1);
+
+      state.user = {
+        ...state.user,
+        readedThreads,
+      };
     },
   },
 });
