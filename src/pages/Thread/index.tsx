@@ -420,6 +420,7 @@ function ThreadPage() {
                 onReopen={() => {
                   setIsShowEditor(true);
                 }}
+                fromHeader
               />
             </div>
           }
