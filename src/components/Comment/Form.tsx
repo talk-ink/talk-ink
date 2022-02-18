@@ -212,6 +212,7 @@ const Form: React.FC<IProps> = ({
         threadId,
         tagedUsers: _invitedUsers,
         isOpenedComment: threadData?.isClosed ? true : undefined,
+        _tempId,
       })
     );
 

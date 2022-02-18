@@ -233,6 +233,7 @@ const threadSlice = createSlice({
       state.threads = newThread;
     },
     refetchComment: (state, action: PayloadAction<TCommentsPayload>) => {
+      console.log("refetchComment", action.payload);
       const newThread = state.threads.map((item) =>
         item._id === action.payload.threadId
           ? {
@@ -388,6 +389,7 @@ const threadSlice = createSlice({
       createComment.fulfilled,
       (state, action: PayloadAction<IComment>) => {
         const threadId = action.payload.threads[0];
+
         const updatedThread = state.threads.map((item) =>
           item._id === threadId
             ? {
@@ -396,6 +398,7 @@ const threadSlice = createSlice({
                   if (!comment?._tempId) return comment;
                   if (comment?._tempId !== action.payload._tempId)
                     return comment;
+
                   return { ...comment, _id: action.payload._id };
                 }),
               }
