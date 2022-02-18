@@ -278,12 +278,14 @@ export const createComment = createAsyncThunk(
     tagedUsers,
     isClosedComment,
     isOpenedComment,
+    _tempId,
   }: {
     content: any;
     threadId: string;
     tagedUsers: string[];
     isClosedComment?: boolean;
     isOpenedComment?: boolean;
+    _tempId?: string;
   }) => {
     const { data } = await kontenbase.service("Comments").create({
       content,
@@ -309,7 +311,7 @@ export const createComment = createAsyncThunk(
       );
     }
 
-    return data;
+    return { ...data, _tempId };
   }
 );
 

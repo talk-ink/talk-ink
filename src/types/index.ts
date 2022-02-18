@@ -39,6 +39,7 @@ export interface IComment {
   reactions?: IReaction[];
   isClosedComment?: boolean;
   isOpenedComment?: boolean;
+  _tempId?: string;
 }
 export interface Thread {
   id?: string;
