@@ -23,9 +23,15 @@ type Props = {
     }>
   >;
   onReopen?: () => void;
+  fromHeader?: boolean;
 };
 
-const ThreadMenu = ({ dataSource, setSelectedThread, onReopen }: Props) => {
+const ThreadMenu = ({
+  dataSource,
+  setSelectedThread,
+  onReopen,
+  fromHeader,
+}: Props) => {
   const params = useParams();
   const navigate = useNavigate();
 
@@ -37,7 +43,10 @@ const ThreadMenu = ({ dataSource, setSelectedThread, onReopen }: Props) => {
   }, [dataSource?.createdBy, auth?.user?._id]);
 
   return (
-    <Menu as="div" className="relative hidden md:block">
+    <Menu
+      as="div"
+      className={`relative ${fromHeader ? "" : "hidden"} md:block`}
+    >
       {({ open }) => (
         <>
           <div className={`flex gap-2 items-center`}>

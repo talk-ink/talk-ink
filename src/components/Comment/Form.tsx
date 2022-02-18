@@ -358,9 +358,9 @@ const Form: React.FC<IProps> = ({
   }
 
   return (
-    <div className={`bg-white fixed pr-8 bottom-0 w-full max-w-4xl origin-top`}>
+    <div className={`bg-white fixed bottom-0 w-full pr-8 max-w-4xl`}>
       {!isShowEditor && (
-        <div className="flex items-center py-3">
+        <div className="flex items-start py-3">
           <div className="hidden md:block">
             {auth.user.avatar ? (
               <Avatar src={auth.user.avatar} />

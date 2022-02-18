@@ -420,6 +420,7 @@ function ThreadPage() {
                 onReopen={() => {
                   setIsShowEditor(true);
                 }}
+                fromHeader
               />
             </div>
           }
@@ -434,79 +435,81 @@ function ThreadPage() {
       }}
     >
       <div className="px-4 max-w-4xl ml-auto mr-auto -mt-16 md:-mt-4 md:-mb-16">
-        <div className="relative">
-          <div className="mb-8">
-            <h1 className="font-medium md:font-semibold  text-2xl md:text-3xl max-w-3xl break-words">
-              {threadData?.name}
-            </h1>
-            <p className="text-neutral-500 text-sm font-body">
-              {channelData?.members?.length} Participants{" "}
-              <Link
-                to={`/a/${workspaceId}/ch/${channelId}`}
-                className="text-blue-500"
-              >
-                #{channelData?.name}
-              </Link>
-            </p>
-          </div>
-          <div className="flex items-start">
-            <div className="mr-4">
-              {threadData?.createdBy?.avatar?.[0]?.url ? (
-                <Avatar src={threadData?.createdBy?.avatar?.[0]?.url} />
-              ) : (
-                <NameInitial
-                  name={getNameInitial(threadData?.createdBy?.firstName)}
-                />
-              )}
+        <div className="relative flex flex-col min-h-0">
+          <div className="flex-grow overflow-auto min-h-0">
+            <div className="mb-8">
+              <h1 className="font-medium md:font-semibold  text-2xl md:text-3xl max-w-3xl break-words">
+                {threadData?.name}
+              </h1>
+              <p className="text-neutral-500 text-sm font-body">
+                {channelData?.members?.length} Participants{" "}
+                <Link
+                  to={`/a/${workspaceId}/ch/${channelId}`}
+                  className="text-blue-500"
+                >
+                  #{channelData?.name}
+                </Link>
+              </p>
             </div>
-
-            <div className="flex-grow text-sm">
-              <div className="-mt-1.5 flex items-center justify-start">
-                <p className=" font-semibold mb-0 mt-0 mr-2">
-                  {threadData?.createdBy?.firstName}
-                </p>{" "}
-                <p className="mb-0 mt-0 text-xs">
-                  <ReactMoment format="DD/MM/YYYY LT">
-                    {threadData?.updatedAt || threadData?.createdAt}
-                  </ReactMoment>
-                </p>
+            <div className="flex items-start">
+              <div className="mr-4">
+                {threadData?.createdBy?.avatar?.[0]?.url ? (
+                  <Avatar src={threadData?.createdBy?.avatar?.[0]?.url} />
+                ) : (
+                  <NameInitial
+                    name={getNameInitial(threadData?.createdBy?.firstName)}
+                  />
+                )}
               </div>
-              {threadData?.content && (
-                <Remirror
-                  remmirorProps={{
-                    manager,
-                    state,
-                    onChange,
-                  }}
-                  readOnly
+
+              <div className="flex-grow text-sm">
+                <div className="-mt-1.5 flex items-center justify-start">
+                  <p className=" font-semibold mb-0 mt-0 mr-2">
+                    {threadData?.createdBy?.firstName}
+                  </p>{" "}
+                  <p className="mb-0 mt-0 text-xs">
+                    <ReactMoment format="DD/MM/YYYY LT">
+                      {threadData?.updatedAt || threadData?.createdAt}
+                    </ReactMoment>
+                  </p>
+                </div>
+                {threadData?.content && (
+                  <Remirror
+                    remmirorProps={{
+                      manager,
+                      state,
+                      onChange,
+                    }}
+                    readOnly
+                  />
+                )}
+              </div>
+            </div>
+            <div className="border-t-[1px] border-gray-200 mb-8 mt-8" />
+            {thread?.commentCount - threadData?.comments?.length > 0 && (
+              <p
+                className="text-sm mb-8 -mt-4 hover:opacity-80 hover:cursor-pointer"
+                onClick={loadMoreComment}
+              >
+                Show {thread?.commentCount - threadData?.comments?.length} More
+                Comments
+              </p>
+            )}
+
+            <div className={`${!isShowEditor ? "mb-14" : "mb-36"}`}>
+              {thread.commentLoading ? (
+                <LoadingSkeleton />
+              ) : (
+                <CommentList
+                  dataSource={threadData?.comments || []}
+                  listRef={listRef}
+                  memberList={memberList}
+                  threadId={threadId}
+                  threadName={threadData?.name}
+                  threadData={threadData}
                 />
               )}
             </div>
-          </div>
-          <div className="border-t-[1px] border-gray-200 mb-8 mt-8" />
-          {thread?.commentCount - threadData?.comments?.length > 0 && (
-            <p
-              className="text-sm mb-8 -mt-4 hover:opacity-80 hover:cursor-pointer"
-              onClick={loadMoreComment}
-            >
-              Show {thread?.commentCount - threadData?.comments?.length} More
-              Comments
-            </p>
-          )}
-
-          <div className={`${!isShowEditor ? "mb-10" : "mb-52"}`}>
-            {thread.commentLoading ? (
-              <LoadingSkeleton />
-            ) : (
-              <CommentList
-                dataSource={threadData?.comments || []}
-                listRef={listRef}
-                memberList={memberList}
-                threadId={threadId}
-                threadName={threadData?.name}
-                threadData={threadData}
-              />
-            )}
           </div>
           {(!threadData?.isClosed || (threadData?.isClosed && isShowEditor)) &&
             (isMember || (!isMember && isShowEditor)) && (

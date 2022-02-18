@@ -863,7 +863,11 @@ function SidebarComponent({
                     data={channel}
                     link={`/a/${workspaceData?._id}/ch/${channel._id}`}
                     isDefault
-                    count={channel.threads.length ?? 0}
+                    count={
+                      channel.threads.filter(
+                        (item) => !readedThreads?.includes(item)
+                      ).length ?? 0
+                    }
                     leaveModalHandler={(channel) => {
                       setLeaveChannelModal(true);
                       setSelectedChannel(channel);

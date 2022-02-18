@@ -84,7 +84,10 @@ const messageSlice = createSlice({
       };
 
       if (!state.messages[action.payload.toUserId]) {
-        state.messages[action.payload.toUserId].data = [newMessage];
+        state.messages[action.payload.toUserId] = {
+          data: [newMessage],
+          total: 0,
+        };
       } else {
         state.messages[action.payload.toUserId].data = [
           ...state.messages[action.payload.toUserId].data,
