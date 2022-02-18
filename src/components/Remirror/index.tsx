@@ -73,6 +73,7 @@ const MyEditor: React.FC<IProps> = ({
     return (
       <>
         <button
+          className="mt-2"
           onClick={() => {
             inputRef.current.click();
           }}
@@ -145,7 +146,7 @@ const MyEditor: React.FC<IProps> = ({
               <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
             )}
             {editorRef && <ImperativeHandle ref={editorRef} />}
-            {!readOnly && isMobile && <Menu />}
+            {!readOnly && <Menu />}
           </Remirror>
         </ThemeProvider>
       </AllStyledComponent>
