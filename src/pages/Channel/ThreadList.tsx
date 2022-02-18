@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import moment from "moment-timezone";
@@ -21,6 +21,8 @@ import { useToast } from "hooks/useToast";
 
 import { Thread } from "types";
 import MobileMenuThread from "components/Thread/MobileMenu";
+import useIntersection from "hooks/useIntersection";
+import { fetchThreadsPagination } from "features/threads/slice/asyncThunk";
 
 type Props = {
   type?: "open" | "close";
@@ -96,6 +98,38 @@ const ThreadList = ({ type = "open" }: Props) => {
     }
   };
 
+  const observerOptions: IntersectionObserverInit = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const [observerRef, isFetchData] = useIntersection(observerOptions);
+
+  useEffect(() => {
+    if (!params.channelId || !auth.user._id || !isFetchData) return;
+    if (thread.threadCount === 0 || thread.threads.length === 0) return;
+    if (thread.threads.length >= thread.threadCount) return;
+    console.log("fetchThreadsPagination");
+    dispatch(
+      fetchThreadsPagination({
+        type: "threads",
+        channelId: params.channelId,
+        userId: auth.user._id,
+        skip: thread.threads.length,
+        limit: 10,
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    params.channelId,
+    auth.user._id,
+    isFetchData,
+    isClosedThread,
+    thread.threadCount,
+    thread.threads,
+  ]);
+
   const loading = thread.loading;
 
   return (
@@ -131,6 +165,7 @@ const ThreadList = ({ type = "open" }: Props) => {
               ))}
             </>
           )}
+          <div ref={observerRef} className="h-3 w-10"></div>
         </ul>
       ) : (
         <>

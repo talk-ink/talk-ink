@@ -2,13 +2,18 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import moment from "moment-timezone";
 import { Thread, IComment, ISubComment } from "types";
 import { filterDistinct } from "utils/helper";
-import { fetchComments, fetchThreads } from "./asyncThunk";
+import {
+  fetchComments,
+  fetchThreads,
+  fetchThreadsPagination,
+} from "./asyncThunk";
 
 type InitThreadState = {
   threads: Thread[];
   loading: boolean;
   commentLoading: boolean;
   commentCount: number;
+  threadCount: number;
 };
 
 type TCommentsPayload = {
@@ -54,6 +59,7 @@ const initialState: InitThreadState = {
   loading: true,
   commentLoading: true,
   commentCount: 0,
+  threadCount: 0,
 };
 
 interface IUpdateThreadPayload extends Omit<Thread, "closedAt"> {
@@ -297,8 +303,19 @@ const threadSlice = createSlice({
     });
     builder.addCase(
       fetchThreads.fulfilled,
+      (state, action: PayloadAction<{ data: Thread[]; total: number }>) => {
+        state.threads = action.payload.data;
+        state.threadCount = action.payload.total;
+        state.loading = false;
+      }
+    );
+    builder.addCase(
+      fetchThreadsPagination.fulfilled,
       (state, action: PayloadAction<Thread[]>) => {
-        state.threads = action.payload;
+        state.threads = filterDistinct(
+          [...state.threads, ...action.payload],
+          "_id"
+        );
         state.loading = false;
       }
     );
