@@ -192,7 +192,18 @@ const MessagePage = (props: Props) => {
         )}
       </div>
 
-      <div className="sticky top-0 bg-white px-5 py-2">
+      {isMobile && (
+        <div className="sticky top-0 bg-white px-5 py-2">
+          <div className="w-full p-3 px-5 flex items-start">
+            <p className="text-sm text-slate-700">.</p>
+          </div>
+        </div>
+      )}
+      <div
+        className={`${
+          isMobile ? "fixed w-full bottom-0" : "sticky top-0"
+        } bg-white px-5 py-2`}
+      >
         <MessageForm
           isShowEditor={isShowEditor}
           setIsShowEditor={setIsShowEditor}

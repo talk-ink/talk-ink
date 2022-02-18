@@ -73,6 +73,7 @@ const MyEditor: React.FC<IProps> = ({
     return (
       <>
         <button
+          className="mt-2"
           onClick={() => {
             inputRef.current.click();
           }}
@@ -99,7 +100,13 @@ const MyEditor: React.FC<IProps> = ({
 
               const { data } = await kontenbase.storage.upload(resized);
 
-              chain.insertImage({ src: data.url }).focus().run();
+              chain
+                .insertImage({
+                  src: data.url,
+                  width: isMobile ? 100 : 300,
+                })
+                .focus()
+                .run();
             } catch (error) {
               console.log(error);
             } finally {
@@ -145,7 +152,7 @@ const MyEditor: React.FC<IProps> = ({
               <Toolbar items={toolbarItems} refocusEditor label="Top Toolbar" />
             )}
             {editorRef && <ImperativeHandle ref={editorRef} />}
-            {!readOnly && isMobile && <Menu />}
+            {!readOnly && <Menu />}
           </Remirror>
         </ThemeProvider>
       </AllStyledComponent>

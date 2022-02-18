@@ -17,7 +17,9 @@ function Button({
 }: Props) {
   return (
     <button
-      className={`flex items-center px-3 h-8 rounded-md ${className} disabled:bg-neutral-300 disabled:text-neutral-500 outline-none`}
+      className={`flex items-center px-3 h-8 rounded-md ${
+        disabled ? "bg-neutral-300 text-neutral-500" : ""
+      }  outline-none ${className} `}
       onClick={onClick}
       type={type}
       disabled={disabled}
