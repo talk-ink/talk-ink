@@ -8,22 +8,39 @@ type FetchThreadsProps = {
   channelId?: string;
   workspaceId?: string;
   userId?: string;
+  limit?: number;
+};
+type FetchThreadsPaginationProps = {
+  type: "inbox" | "threads" | "trash";
+  channelId?: string;
+  workspaceId?: string;
+  userId?: string;
+  limit?: number;
+  skip?: number;
 };
 
-export const fetchThreads = createAsyncThunk(
-  "channel/fetchThreads",
+export const fetchThreadsPagination = createAsyncThunk(
+  "channel/fetchThreadsPagination",
   async ({
     type = "threads",
     channelId,
     workspaceId,
     userId,
-  }: FetchThreadsProps) => {
+
+    limit = 30,
+    skip = 0,
+  }: FetchThreadsPaginationProps) => {
     switch (type) {
       case "threads":
         try {
           const threadResponse = await kontenbase.service("Threads").find({
-            where: { channel: channelId, isDeleted: { $ne: true } },
+            where: {
+              channel: channelId,
+              isDeleted: { $ne: true },
+            },
             lookup: ["comments"],
+            limit,
+            skip,
           });
 
           const parsedThreadsDraft: object = JSON.parse(
@@ -44,7 +61,6 @@ export const fetchThreads = createAsyncThunk(
               }))
               .filter((data) => data.channelId === channelId);
           }
-
           return [...draft, ...threadResponse.data];
         } catch (error) {
           console.log(error);
@@ -63,6 +79,8 @@ export const fetchThreads = createAsyncThunk(
             sort: {
               lastActionAt: -1,
             },
+            limit,
+            skip,
           });
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
@@ -84,6 +102,8 @@ export const fetchThreads = createAsyncThunk(
               isDeleted: true,
             },
             lookup: ["comments"],
+            limit,
+            skip,
           });
 
           if (trashResponse.error) throw new Error(trashResponse.error.message);
@@ -98,6 +118,121 @@ export const fetchThreads = createAsyncThunk(
       default:
         break;
     }
+  }
+);
+export const fetchThreads = createAsyncThunk(
+  "channel/fetchThreads",
+  async ({
+    type = "threads",
+    channelId,
+    workspaceId,
+    userId,
+    limit = 50,
+  }: FetchThreadsProps) => {
+    let returnedData: { data: Thread[]; total: number } = {
+      data: [],
+      total: 0,
+    };
+    switch (type) {
+      case "threads":
+        try {
+          const threadResponse = await kontenbase.service("Threads").find({
+            where: { channel: channelId, isDeleted: { $ne: true } },
+            lookup: ["comments"],
+            limit,
+          });
+
+          const parsedThreadsDraft: object = JSON.parse(
+            localStorage.getItem("threadsDraft")
+          );
+
+          let draft = [];
+
+          if (threadResponse.error)
+            throw new Error(threadResponse.error.message);
+
+          if (parsedThreadsDraft) {
+            draft = Object.entries(parsedThreadsDraft)
+              .map(([key, value]) => ({
+                id: key,
+                draft: true,
+                ...value,
+              }))
+              .filter((data) => data.channelId === channelId);
+          }
+
+          returnedData = {
+            data: [...draft, ...threadResponse.data],
+            total: threadResponse.count,
+          };
+        } catch (error) {
+          console.log(error);
+          returnedData = {
+            data: [],
+            total: 0,
+          };
+        }
+        break;
+
+      case "inbox":
+        try {
+          const inboxResponse = await kontenbase.service("Threads").find({
+            where: {
+              workspace: workspaceId,
+              tagedUsers: { $in: [userId] },
+              isDeleted: { $ne: true },
+            },
+            lookup: ["comments"],
+            sort: {
+              lastActionAt: -1,
+            },
+            limit,
+          });
+
+          if (inboxResponse.error) throw new Error(inboxResponse.error.message);
+
+          const threadData: Thread[] = inboxResponse.data;
+
+          returnedData = { data: threadData, total: inboxResponse.count };
+        } catch (error) {
+          console.log(error);
+          returnedData = {
+            data: [],
+            total: 0,
+          };
+        }
+        break;
+
+      case "trash":
+        try {
+          const trashResponse = await kontenbase.service("Threads").find({
+            where: {
+              workspace: workspaceId,
+              createdBy: userId,
+              isDeleted: true,
+            },
+            lookup: ["comments"],
+            limit,
+          });
+
+          if (trashResponse.error) throw new Error(trashResponse.error.message);
+
+          const threadData: Thread[] = trashResponse.data;
+
+          returnedData = { data: threadData, total: trashResponse.count };
+        } catch (error) {
+          console.log(error);
+          returnedData = {
+            data: [],
+            total: 0,
+          };
+        }
+        break;
+      default:
+        break;
+    }
+
+    return returnedData;
   }
 );
 

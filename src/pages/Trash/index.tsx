@@ -10,7 +10,10 @@ import ContentSkeleton from "components/Loading/ContentSkeleton";
 import MainContentContainer from "components/MainContentContainer/MainContentContainer";
 import Modal from "components/Modal/Modal";
 
-import { fetchThreads } from "features/threads/slice/asyncThunk";
+import {
+  fetchThreads,
+  fetchThreadsPagination,
+} from "features/threads/slice/asyncThunk";
 import { useAppDispatch } from "hooks/useAppDispatch";
 import { useAppSelector } from "hooks/useAppSelector";
 import { Thread } from "types";
@@ -20,6 +23,7 @@ import { useToast } from "hooks/useToast";
 import TrashEmpty from "components/EmptyContent/TrashEmpty";
 import MobileHeader from "components/Header/Mobile";
 import MobileMenuThread from "components/Thread/MobileMenu";
+import useIntersection from "hooks/useIntersection";
 
 function TrashPage() {
   const [showToast] = useToast();
@@ -66,6 +70,36 @@ function TrashPage() {
     }
   };
 
+  const observerOptions: IntersectionObserverInit = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const [observerRef, isFetchData] = useIntersection(observerOptions);
+
+  useEffect(() => {
+    if (!params.workspaceId || !auth.user._id || !isFetchData) return;
+    if (thread.threadCount === 0 || thread.threads.length === 0) return;
+    if (thread.threads.length >= thread.threadCount) return;
+    dispatch(
+      fetchThreadsPagination({
+        type: "trash",
+        workspaceId: params.workspaceId,
+        userId: auth.user._id,
+        skip: thread.threads.length,
+        limit: 10,
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    params.workspaceId,
+    auth.user._id,
+    isFetchData,
+    thread.threadCount,
+    thread.threads,
+  ]);
+
   return (
     <>
       <MobileHeader
@@ -97,7 +131,8 @@ function TrashPage() {
                   from="trash"
                   setSelectedThread={setSelectedThread}
                 />
-              ))}
+              ))}{" "}
+              <div ref={observerRef} className="h-3 w-10 "></div>
             </>
           ) : (
             <TrashEmpty />

@@ -277,12 +277,6 @@ const Form: React.FC<IProps> = ({
           content: [],
         });
       }
-    } else {
-      await timeout(1);
-      editorRef.current!.setContent({
-        type: "doc",
-        content: [],
-      });
     }
   };
 
