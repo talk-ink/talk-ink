@@ -100,7 +100,13 @@ const MyEditor: React.FC<IProps> = ({
 
               const { data } = await kontenbase.storage.upload(resized);
 
-              chain.insertImage({ src: data.url }).focus().run();
+              chain
+                .insertImage({
+                  src: data.url,
+                  width: isMobile ? 100 : 300,
+                })
+                .focus()
+                .run();
             } catch (error) {
               console.log(error);
             } finally {
