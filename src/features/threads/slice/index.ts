@@ -296,6 +296,40 @@ const threadSlice = createSlice({
 
       state.threads = newThread;
     },
+    updateTempSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: comment.subComments.map((subComment) => {
+                        if (!subComment?._tempId) return subComment;
+                        if (
+                          subComment?._tempId !==
+                          action.payload.subComment._tempId
+                        )
+                          return subComment;
+
+                        return {
+                          ...subComment,
+                          _id: action.payload.subComment._id,
+                        };
+                      }),
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
     deleteSubCommentToComment: (
       state,
       action: PayloadAction<TSubCommentsDeletePayload>
@@ -426,5 +460,6 @@ export const {
   deleteSubCommentToComment,
   updateThreadComment,
   updatePartialThread,
+  updateTempSubCommentToComment,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

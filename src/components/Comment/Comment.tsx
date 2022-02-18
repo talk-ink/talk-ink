@@ -29,11 +29,20 @@ import {
   deleteComment,
   updateComment,
 } from "features/threads/slice/asyncThunk";
-import { addSubCommentToComment } from "features/threads/slice";
+import {
+  addSubCommentToComment,
+  updateTempSubCommentToComment,
+} from "features/threads/slice";
 import { useToast } from "hooks/useToast";
 import { useAppSelector } from "hooks/useAppSelector";
 import NameInitial from "components/Avatar/NameInitial";
-import { draft, editorToHTML, frontendUrl, getNameInitial } from "utils/helper";
+import {
+  draft,
+  editorToHTML,
+  frontendUrl,
+  getNameInitial,
+  randomString,
+} from "utils/helper";
 import { notificationUrl } from "utils/helper";
 import Reaction from "./Reaction";
 import { useRemirror } from "@remirror/react";
@@ -43,6 +52,7 @@ import { parseContent } from "utils/helper";
 import { useParams } from "react-router";
 import { LongPressDetectEvents, useLongPress } from "use-long-press";
 import { setCommentMenu } from "features/mobileMenu/slice";
+import moment from "moment-timezone";
 
 interface IProps {
   comment: IComment;
@@ -182,6 +192,23 @@ const Comment: React.FC<IProps> = ({
         .map((item) => item.value)
         .filter((item) => item !== auth.user._id);
 
+      const now = moment().tz("Asia/Jakarta").toDate().toISOString();
+      const _tempId = randomString();
+      dispatch(
+        addSubCommentToComment({
+          subComment: {
+            content: JSON.stringify(subCommentData),
+            parent: [comment._id],
+            createdAt: now,
+            //@ts-ignore
+            createdBy: auth.user._id,
+            _tempId,
+          },
+          threadId,
+          commentId: comment._id,
+        })
+      );
+
       const { data, error } = await kontenbase.service("SubComments").create({
         content: JSON.stringify(subCommentData),
         parent: comment._id,
@@ -215,13 +242,12 @@ const Comment: React.FC<IProps> = ({
 
       if (!error) {
         dispatch(
-          addSubCommentToComment({
-            subComment: data,
+          updateTempSubCommentToComment({
+            subComment: { ...data, _tempId },
             threadId,
             commentId: comment._id,
           })
         );
-
         draft("reply").deleteByKey(comment._id);
 
         discardSubComment();

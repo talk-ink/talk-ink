@@ -16,6 +16,7 @@ export interface ISubComment {
   tagedUsers?: string[];
   updatedAt?: string | null;
   parent: string[];
+  _tempId?: string;
 }
 
 export interface IReaction {
