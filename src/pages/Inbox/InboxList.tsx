@@ -190,7 +190,7 @@ function InboxList({ type = "open" }: TProps) {
                   from="inbox"
                 />
               ))}{" "}
-              <div ref={observerRef} className="h-3 w-10 bg-red-300"></div>
+              <div ref={observerRef} className="h-3 w-10"></div>
             </ul>
           ) : (
             <>
