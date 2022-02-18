@@ -178,9 +178,9 @@ const Comment: React.FC<IProps> = ({
 
   const handleCreateSubComment = async (subCommentData: any) => {
     try {
-      const invitedUsers: string[] = selectedNotifiedOptions.map(
-        (item) => item.value
-      );
+      const invitedUsers: string[] = selectedNotifiedOptions
+        .map((item) => item.value)
+        .filter((item) => item !== auth.user._id);
 
       const { data, error } = await kontenbase.service("SubComments").create({
         content: JSON.stringify(subCommentData),
