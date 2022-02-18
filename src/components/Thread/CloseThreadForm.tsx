@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 
 import { useFormik } from "formik";
 import { kontenbase } from "lib/client";
@@ -35,6 +35,8 @@ function CloseThreadForm({ data, onClose, from }: Props) {
   const channel = useAppSelector((state) => state.channel);
   const dispatch = useAppDispatch();
 
+  const [apiLoading, setApiLoading] = useState<boolean>(false);
+
   const channelData: Channel = useMemo(() => {
     return channel.channels.find(
       (channel) => channel._id === data.channel?.[0]
@@ -46,6 +48,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
   };
 
   const handleSubmit = async (values: InitialValuesProps) => {
+    setApiLoading(true);
     try {
       const now = moment().tz("Asia/Jakarta").toDate();
 
@@ -104,6 +107,8 @@ function CloseThreadForm({ data, onClose, from }: Props) {
     } catch (error: any) {
       console.log("err", error);
       showToast({ message: `${JSON.stringify(error?.message)}` });
+    } finally {
+      setApiLoading(false);
     }
   };
 
@@ -152,6 +157,7 @@ function CloseThreadForm({ data, onClose, from }: Props) {
         <Button
           className="text-sm flex items-center justify-center bg-indigo-500 min-w-[5rem] text-white"
           type="submit"
+          disabled={apiLoading}
         >
           Close Thread
         </Button>
