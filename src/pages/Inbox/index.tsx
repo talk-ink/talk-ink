@@ -274,7 +274,6 @@ function InboxPage() {
                           setInboxModal("read");
                         }}
                         title="Mark all read"
-                        disabled={isClosedThread}
                       />
                     </Menu.Items>
                   )}
