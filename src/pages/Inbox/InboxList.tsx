@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { useNavigate, useParams } from "react-router-dom";
 import { BiCheckCircle } from "react-icons/bi";
@@ -22,6 +22,8 @@ import { deleteThread } from "features/threads";
 import { updateChannelCount } from "features/channels/slice";
 import { Thread } from "types";
 import MobileMenuThread from "components/Thread/MobileMenu";
+import { fetchThreadsPagination } from "features/threads/slice/asyncThunk";
+import useIntersection from "hooks/useIntersection";
 
 type TProps = {
   type?: "open" | "close";
@@ -123,6 +125,36 @@ function InboxList({ type = "open" }: TProps) {
     }
   };
 
+  const observerOptions: IntersectionObserverInit = {
+    root: null,
+    rootMargin: "0px",
+    threshold: 1.0,
+  };
+
+  const [observerRef, isFetchData] = useIntersection(observerOptions);
+
+  useEffect(() => {
+    if (!params.workspaceId || !auth.user._id || !isFetchData) return;
+    if (thread.threadCount === 0 || thread.threads.length === 0) return;
+    if (thread.threads.length >= thread.threadCount) return;
+    dispatch(
+      fetchThreadsPagination({
+        type: "inbox",
+        workspaceId: params.workspaceId,
+        userId: auth.user._id,
+        skip: thread.threads.length,
+        limit: 10,
+      })
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    params.workspaceId,
+    auth.user._id,
+    isFetchData,
+    thread.threadCount,
+    thread.threads,
+  ]);
+
   const loading = thread.loading;
   return (
     <div>
@@ -157,7 +189,8 @@ function InboxList({ type = "open" }: TProps) {
                   isRead={readedThreads.includes(inbox._id)}
                   from="inbox"
                 />
-              ))}
+              ))}{" "}
+              <div ref={observerRef} className="h-3 w-10 bg-red-300"></div>
             </ul>
           ) : (
             <>

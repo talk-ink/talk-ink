@@ -8,6 +8,7 @@ type FetchThreadsProps = {
   channelId?: string;
   workspaceId?: string;
   userId?: string;
+  limit?: number;
 };
 type FetchThreadsPaginationProps = {
   type: "inbox" | "threads" | "trash";
@@ -60,7 +61,6 @@ export const fetchThreadsPagination = createAsyncThunk(
               }))
               .filter((data) => data.channelId === channelId);
           }
-          console.log("awe", [...draft, ...threadResponse.data]);
           return [...draft, ...threadResponse.data];
         } catch (error) {
           console.log(error);
@@ -127,6 +127,7 @@ export const fetchThreads = createAsyncThunk(
     channelId,
     workspaceId,
     userId,
+    limit = 50,
   }: FetchThreadsProps) => {
     let returnedData: { data: Thread[]; total: number } = {
       data: [],
@@ -138,7 +139,7 @@ export const fetchThreads = createAsyncThunk(
           const threadResponse = await kontenbase.service("Threads").find({
             where: { channel: channelId, isDeleted: { $ne: true } },
             lookup: ["comments"],
-            limit: 50,
+            limit,
           });
 
           const parsedThreadsDraft: object = JSON.parse(
@@ -185,7 +186,7 @@ export const fetchThreads = createAsyncThunk(
             sort: {
               lastActionAt: -1,
             },
-            limit: 50,
+            limit,
           });
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
@@ -211,7 +212,7 @@ export const fetchThreads = createAsyncThunk(
               isDeleted: true,
             },
             lookup: ["comments"],
-            limit: 50,
+            limit,
           });
 
           if (trashResponse.error) throw new Error(trashResponse.error.message);

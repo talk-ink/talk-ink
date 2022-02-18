@@ -312,10 +312,7 @@ const threadSlice = createSlice({
     builder.addCase(
       fetchThreadsPagination.fulfilled,
       (state, action: PayloadAction<Thread[]>) => {
-        state.threads = filterDistinct(
-          [...state.threads, ...action.payload],
-          "_id"
-        );
+        state.threads = [...state.threads, ...action.payload];
         state.loading = false;
       }
     );
