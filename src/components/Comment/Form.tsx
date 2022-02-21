@@ -202,6 +202,7 @@ const Form: React.FC<IProps> = ({
           threads: [threadId],
           createdBy: { ...auth.user, avatar: [{ url: auth.user.avatar }] },
           _tempId,
+          subComments: [],
         },
         threadId,
       })

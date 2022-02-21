@@ -189,7 +189,6 @@ function ThreadPage() {
           switch (event) {
             case "CREATE_RECORD":
               if (payload?.createdBy !== auth.user._id) {
-                console.log("ewe", payload);
                 dispatch(
                   addComment({
                     threadId,
@@ -499,7 +498,9 @@ function ThreadPage() {
               </p>
             )}
 
-            <div className={`${!isShowEditor ? "mb-14" : "mb-36"}`}>
+            <div
+              className={`${!isShowEditor ? "mb-14" : "mb-36"} min-h-[50vh]`}
+            >
               {thread.commentLoading ? (
                 <LoadingSkeleton />
               ) : (
