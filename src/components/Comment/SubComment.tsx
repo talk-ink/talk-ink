@@ -170,7 +170,9 @@ const Comment: React.FC<IProps> = ({
 
   return (
     <div
-      className="flex items-start relative "
+      className={`flex items-start relative ${
+        !comment?._id ? "opacity-50" : ""
+      }`}
       ref={listRef}
       {...replyBind}
       onMouseEnter={() => setShowOption(true)}

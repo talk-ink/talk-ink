@@ -484,7 +484,7 @@ const Comment: React.FC<IProps> = ({
   }, [mobileMenu?.comment, comment?._id]);
 
   return (
-    <div key={comment._id}>
+    <div key={comment._id} className={`${!comment?._id ? "opacity-50" : ""}`}>
       {comment?.isClosedComment && (
         <div className="flex items-start mb-2">
           <div className="w-8 flex flex-col items-center">
