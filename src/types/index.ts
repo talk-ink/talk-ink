@@ -16,6 +16,7 @@ export interface ISubComment {
   tagedUsers?: string[];
   updatedAt?: string | null;
   parent: string[];
+  _tempId?: string;
 }
 
 export interface IReaction {
@@ -39,6 +40,7 @@ export interface IComment {
   reactions?: IReaction[];
   isClosedComment?: boolean;
   isOpenedComment?: boolean;
+  _tempId?: string;
 }
 export interface Thread {
   id?: string;

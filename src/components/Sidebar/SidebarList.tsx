@@ -124,7 +124,11 @@ function SidebarList({
             } rounded-full mr-2`}
           ></div>
         </div>
-        <p className="max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis text-slate-800">
+        <p
+          className={`max-w-[150px] whitespace-nowrap overflow-hidden text-ellipsis text-slate-800 ${
+            type === "channel" && count > 0 ? "font-medium" : ""
+          }`}
+        >
           {name}
         </p>
         {data?.privacy === "private" && (
@@ -144,7 +148,9 @@ function SidebarList({
                       : ""
                   }`}
                 >
-                  <p className="text-neutral-400 text-xs">{count}</p>
+                  {type !== "channel" && (
+                    <p className="text-neutral-400 text-xs">{count}</p>
+                  )}
                 </div>
                 <Menu.Button as="div">
                   <IconButton

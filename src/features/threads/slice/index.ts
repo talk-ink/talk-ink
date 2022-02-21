@@ -3,6 +3,7 @@ import moment from "moment-timezone";
 import { Thread, IComment, ISubComment } from "types";
 import { filterDistinct } from "utils/helper";
 import {
+  createComment,
   fetchComments,
   fetchThreads,
   fetchThreadsPagination,
@@ -25,6 +26,11 @@ type TCommentsPayload = {
 type TCommentPayload = {
   comment: IComment;
   threadId: string;
+};
+type TUpdateTempCommentPayload = {
+  comment: IComment;
+  threadId: string;
+  _tempId: string;
 };
 
 type TDeleteCommentPayload = {
@@ -175,6 +181,25 @@ const threadSlice = createSlice({
 
       state.threads = updatedThread;
     },
+    updateTempComment: (
+      state,
+      action: PayloadAction<TUpdateTempCommentPayload>
+    ) => {
+      const updatedThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments.map((comment) => {
+                if (!comment?._tempId) return comment;
+                if (comment?._tempId !== action.payload._tempId) return comment;
+                return { ...comment, ...action.payload.comment };
+              }),
+            }
+          : item
+      );
+
+      state.threads = updatedThread;
+    },
     deleteComment: (state, action: PayloadAction<TDeleteCommentPayload>) => {
       const filteredThread = state.threads.map((item) =>
         item._id === action.payload.threadId
@@ -208,6 +233,7 @@ const threadSlice = createSlice({
       state.threads = newThread;
     },
     refetchComment: (state, action: PayloadAction<TCommentsPayload>) => {
+      console.log("refetchComment", action.payload);
       const newThread = state.threads.map((item) =>
         item._id === action.payload.threadId
           ? {
@@ -261,6 +287,40 @@ const threadSlice = createSlice({
                           ? action.payload.subComment
                           : subComment
                       ),
+                    }
+                  : comment
+              ),
+            }
+          : item
+      );
+
+      state.threads = newThread;
+    },
+    updateTempSubCommentToComment: (
+      state,
+      action: PayloadAction<TSubCommentsPayload>
+    ) => {
+      const newThread = state.threads.map((item) =>
+        item._id === action.payload.threadId
+          ? {
+              ...item,
+              comments: item.comments?.map((comment) =>
+                comment._id === action.payload.commentId
+                  ? {
+                      ...comment,
+                      subComments: comment.subComments.map((subComment) => {
+                        if (!subComment?._tempId) return subComment;
+                        if (
+                          subComment?._tempId !==
+                          action.payload.subComment._tempId
+                        )
+                          return subComment;
+
+                        return {
+                          ...subComment,
+                          _id: action.payload.subComment._id,
+                        };
+                      }),
                     }
                   : comment
               ),
@@ -359,6 +419,29 @@ const threadSlice = createSlice({
     builder.addCase(fetchComments.rejected, (state) => {
       state.commentLoading = false;
     });
+    builder.addCase(
+      createComment.fulfilled,
+      (state, action: PayloadAction<IComment>) => {
+        const threadId = action.payload.threads[0];
+
+        const updatedThread = state.threads.map((item) =>
+          item._id === threadId
+            ? {
+                ...item,
+                comments: item.comments.map((comment) => {
+                  if (!comment?._tempId) return comment;
+                  if (comment?._tempId !== action.payload._tempId)
+                    return comment;
+
+                  return { ...comment, _id: action.payload._id };
+                }),
+              }
+            : item
+        );
+
+        state.threads = updatedThread;
+      }
+    );
   },
 });
 
@@ -377,5 +460,6 @@ export const {
   deleteSubCommentToComment,
   updateThreadComment,
   updatePartialThread,
+  updateTempSubCommentToComment,
 } = threadSlice.actions;
 export const threadReducer = threadSlice.reducer;

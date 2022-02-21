@@ -188,12 +188,15 @@ function ThreadPage() {
         if (isCurrentThread) {
           switch (event) {
             case "CREATE_RECORD":
-              dispatch(
-                addComment({
-                  threadId,
-                  comment: { ...payload, createdBy: _createdBy },
-                })
-              );
+              if (payload?.createdBy !== auth.user._id) {
+                console.log("ewe", payload);
+                dispatch(
+                  addComment({
+                    threadId,
+                    comment: { ...payload, createdBy: _createdBy },
+                  })
+                );
+              }
 
               break;
             case "UPDATE_RECORD":

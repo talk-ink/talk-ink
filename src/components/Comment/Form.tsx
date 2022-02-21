@@ -21,6 +21,7 @@ import {
   getNameInitial,
   notificationUrl,
   parseContent,
+  randomString,
 } from "utils/helper";
 import { kontenbase } from "lib/client";
 
@@ -33,6 +34,8 @@ import { frontendUrl } from "utils/helper";
 import IconButton from "components/Button/IconButton";
 import { MdSend } from "react-icons/md";
 import { useMediaQuery } from "react-responsive";
+import { addComment } from "features/threads";
+import moment from "moment-timezone";
 
 interface IProps {
   isShowEditor: boolean;
@@ -187,12 +190,29 @@ const Form: React.FC<IProps> = ({
       _invitedUsers = selectedNotifiedOptions.map((item) => item.value);
     }
 
+    const _tempId = randomString();
+    const now = moment().tz("Asia/Jakarta").toDate().toISOString();
+
+    dispatch(
+      addComment({
+        comment: {
+          content: JSON.stringify(state),
+          createdAt: now,
+          tagedUsers: _invitedUsers,
+          threads: [threadId],
+          createdBy: { ...auth.user, avatar: [{ url: auth.user.avatar }] },
+          _tempId,
+        },
+        threadId,
+      })
+    );
     dispatch(
       createComment({
         content: JSON.stringify(state),
         threadId,
         tagedUsers: _invitedUsers,
         isOpenedComment: threadData?.isClosed ? true : undefined,
+        _tempId,
       })
     );
 
