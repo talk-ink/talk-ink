@@ -1,6 +1,6 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
-import { Channel } from "types";
+import { Channel, Member, Thread } from "types";
 import { filterDistinct } from "utils/helper";
 
 type FetchChannelsProps = {
@@ -18,9 +18,15 @@ export const fetchChannels = createAsyncThunk(
   async ({ userId, workspaceId }: FetchChannelsProps) => {
     const response = await kontenbase.service("Channels").find({
       where: { members: userId, workspace: workspaceId },
+      //@ts-ignore
+      lookup: { _id: "*" },
     });
 
-    return response.data;
+    return response.data.map((item) => ({
+      ...item,
+      members: item?.members?.map((member: Member) => member?._id),
+      threads: item?.threads?.map((thread: Thread) => thread?._id),
+    }));
   }
 );
 

@@ -11,7 +11,7 @@ export const fetchWorkspaces = createAsyncThunk(
   async ({ userId }: FetchWorkspacesProps) => {
     const response = await kontenbase
       .service("Workspaces")
-      .find({ where: { peoples: userId }, lookup: ["logo"] });
+      .find({ where: { peoples: userId }, lookup: ["logo", "peoples"] });
 
     const remap = response.data.map((workspace) => {
       let logo = null;

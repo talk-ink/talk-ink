@@ -26,7 +26,6 @@ export const fetchThreadsPagination = createAsyncThunk(
     channelId,
     workspaceId,
     userId,
-
     limit = 30,
     skip = 0,
   }: FetchThreadsPaginationProps) => {
@@ -38,7 +37,7 @@ export const fetchThreadsPagination = createAsyncThunk(
               channel: channelId,
               isDeleted: { $ne: true },
             },
-            lookup: ["comments"],
+            lookup: ["*"],
             limit,
             skip,
           });
@@ -136,11 +135,19 @@ export const fetchThreads = createAsyncThunk(
     switch (type) {
       case "threads":
         try {
-          const threadResponse = await kontenbase.service("Threads").find({
+          const filter = {
             where: { channel: channelId, isDeleted: { $ne: true } },
             lookup: ["comments"],
             limit,
-          });
+          };
+          const threadResponse = await kontenbase
+            .service("Threads")
+            .find(filter);
+          const { data: dataCount } = await kontenbase
+            .service("Threads")
+            .count({
+              where: filter.where,
+            });
 
           const parsedThreadsDraft: object = JSON.parse(
             localStorage.getItem("threadsDraft")
@@ -163,7 +170,8 @@ export const fetchThreads = createAsyncThunk(
 
           returnedData = {
             data: [...draft, ...threadResponse.data],
-            total: threadResponse.count,
+            // total: threadResponse.count,
+            total: dataCount.count,
           };
         } catch (error) {
           console.log(error);
@@ -176,7 +184,7 @@ export const fetchThreads = createAsyncThunk(
 
       case "inbox":
         try {
-          const inboxResponse = await kontenbase.service("Threads").find({
+          const filter = {
             where: {
               workspace: workspaceId,
               tagedUsers: { $in: [userId] },
@@ -187,13 +195,23 @@ export const fetchThreads = createAsyncThunk(
               lastActionAt: -1,
             },
             limit,
-          });
+          };
+          const inboxResponse = await kontenbase
+            .service("Threads")
+            .find(filter);
+          const { data: dataCount } = await kontenbase
+            .service("Threads")
+            .count({ where: filter.where });
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
 
           const threadData: Thread[] = inboxResponse.data;
 
-          returnedData = { data: threadData, total: inboxResponse.count };
+          returnedData = {
+            data: threadData,
+            // total: inboxResponse.count
+            total: dataCount.count,
+          };
         } catch (error) {
           console.log(error);
           returnedData = {
@@ -219,7 +237,11 @@ export const fetchThreads = createAsyncThunk(
 
           const threadData: Thread[] = trashResponse.data;
 
-          returnedData = { data: threadData, total: trashResponse.count };
+          returnedData = {
+            data: threadData,
+            // total: trashResponse.count
+            total: 0,
+          };
         } catch (error) {
           console.log(error);
           returnedData = {

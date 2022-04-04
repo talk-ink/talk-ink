@@ -69,10 +69,13 @@ function DashboardPage() {
       );
 
       if (params?.channelId) {
-        const { data: channelData, error }: KontenbaseResponse<Channel> =
-          await kontenbase.service("Channels").find({
+        const { data: channelData, error } = await kontenbase
+          .service("Channels")
+          .find({
             where: { id: params.channelId },
-            select: ["name", "members", "privacy"],
+            // select: ["name", "members", "privacy"],
+            //@ts-ignore
+            // lookup: "*",
           });
 
         if (error) throw new Error(error.message);
@@ -118,7 +121,8 @@ function DashboardPage() {
     kontenbase.realtime
       .subscribe("Workspaces", { event: "UPDATE_RECORD" }, (message) => {
         const { payload } = message;
-        const isCurrentWorkspace = payload.after?._id === params.workspaceId;
+
+        const isCurrentWorkspace = payload?.after?._id === params.workspaceId;
         if (isCurrentWorkspace) {
           dispatch(fetchMembers({ workspaceId: params.workspaceId }));
         }
