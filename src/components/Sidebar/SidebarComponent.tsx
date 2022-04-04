@@ -348,9 +348,10 @@ function SidebarComponent({
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
+        if (!event && !payload) return;
         const isUpdate = event === "UPDATE_RECORD";
         const isDelete = event === "DELETE_RECORD";
-
+        console.log("msg", message);
         const isCurrentWorkspace = isUpdate
           ? payload?.before?.workspace?.includes(params.workspaceId)
           : payload?.workspace?.includes(params.workspaceId);

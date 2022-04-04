@@ -76,8 +76,10 @@ function ThreadPage() {
   const [isShowEditor, setIsShowEditor] = useState<boolean>(false);
   const [showTitle, setShowTitle] = useState<boolean>(false);
 
-  const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: SelectedThreadTypes }>();
+  const [selectedThread, setSelectedThread] = useState<{
+    thread: Thread;
+    type: SelectedThreadTypes;
+  }>();
 
   const channelData: Channel = useMemo(() => {
     return channel.channels.find((data) => data._id === channelId);
@@ -141,6 +143,7 @@ function ThreadPage() {
         let _subComments;
         if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
           try {
+            console.log("e");
             const { data, error } = await kontenbase.service("Users").find({
               where: {
                 id:

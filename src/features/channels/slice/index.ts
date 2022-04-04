@@ -22,11 +22,7 @@ export const fetchChannels = createAsyncThunk(
       lookup: { _id: "*" },
     });
 
-    return response.data.map((item) => ({
-      ...item,
-      members: item?.members?.map((member: Member) => member?._id),
-      threads: item?.threads?.map((thread: Thread) => thread?._id),
-    }));
+    return response.data.filter((data) => data?.workspace?.[0] === workspaceId);
   }
 );
 
