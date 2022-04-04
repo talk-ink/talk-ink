@@ -2,6 +2,7 @@ import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { kontenbase } from "lib/client";
 import { Thread } from "types";
+import { hybridLookup } from "utils/helper";
 
 type FetchThreadsProps = {
   type: "inbox" | "threads" | "trash";
@@ -37,7 +38,8 @@ export const fetchThreadsPagination = createAsyncThunk(
               channel: channelId,
               isDeleted: { $ne: true },
             },
-            lookup: ["*"],
+            // @ts-ignore
+            lookup: "*",
             limit,
             skip,
           });
@@ -60,7 +62,7 @@ export const fetchThreadsPagination = createAsyncThunk(
               }))
               .filter((data) => data.channelId === channelId);
           }
-          return [...draft, ...threadResponse.data];
+          return [...draft, ...hybridLookup(threadResponse.data, ["comments"])];
         } catch (error) {
           console.log(error);
           return [];
@@ -74,7 +76,8 @@ export const fetchThreadsPagination = createAsyncThunk(
               tagedUsers: { $in: [userId] },
               isDeleted: { $ne: true },
             },
-            lookup: ["comments"],
+            // @ts-ignore
+            lookup: "*",
             sort: {
               lastActionAt: -1,
             },
@@ -84,9 +87,9 @@ export const fetchThreadsPagination = createAsyncThunk(
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
 
-          const threadData: Thread[] = inboxResponse.data;
+          const threadData = inboxResponse.data;
 
-          return threadData;
+          return hybridLookup(threadData, ["comments"]);
         } catch (error) {
           console.log(error);
           return [];
@@ -100,7 +103,8 @@ export const fetchThreadsPagination = createAsyncThunk(
               createdBy: userId,
               isDeleted: true,
             },
-            lookup: ["comments"],
+            // @ts-ignore
+            lookup: "*",
             limit,
             skip,
           });
@@ -109,7 +113,7 @@ export const fetchThreadsPagination = createAsyncThunk(
 
           const threadData: Thread[] = trashResponse.data;
 
-          return threadData;
+          return hybridLookup(threadData, ["comments"]);
         } catch (error) {
           console.log(error);
           return [];
@@ -137,11 +141,13 @@ export const fetchThreads = createAsyncThunk(
         try {
           const filter = {
             where: { channel: channelId, isDeleted: { $ne: true } },
-            lookup: ["comments"],
+
+            lookup: "*",
             limit,
           };
           const threadResponse = await kontenbase
             .service("Threads")
+            // @ts-ignore
             .find(filter);
           const { data: dataCount } = await kontenbase
             .service("Threads")
@@ -169,7 +175,10 @@ export const fetchThreads = createAsyncThunk(
           }
 
           returnedData = {
-            data: [...draft, ...threadResponse.data],
+            data: [
+              ...draft,
+              ...hybridLookup(threadResponse.data, ["comments"]),
+            ],
             // total: threadResponse.count,
             total: dataCount.count,
           };
@@ -190,7 +199,7 @@ export const fetchThreads = createAsyncThunk(
               tagedUsers: { $in: [userId] },
               isDeleted: { $ne: true },
             },
-            lookup: ["comments"],
+            lookup: "*",
             sort: {
               lastActionAt: -1,
             },
@@ -198,6 +207,7 @@ export const fetchThreads = createAsyncThunk(
           };
           const inboxResponse = await kontenbase
             .service("Threads")
+            // @ts-ignore
             .find(filter);
           const { data: dataCount } = await kontenbase
             .service("Threads")
@@ -205,11 +215,17 @@ export const fetchThreads = createAsyncThunk(
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
 
-          const threadData: Thread[] = inboxResponse.data;
+          const threadData = hybridLookup(inboxResponse.data, [
+            "comments",
+          ]).filter(
+            (thread: any) =>
+              !!thread?.workspace?.find(
+                (workspace: any) => workspace?._id === workspaceId
+              )
+          );
 
           returnedData = {
             data: threadData,
-            // total: inboxResponse.count
             total: dataCount.count,
           };
         } catch (error) {
@@ -229,7 +245,8 @@ export const fetchThreads = createAsyncThunk(
               createdBy: userId,
               isDeleted: true,
             },
-            lookup: ["comments"],
+            // @ts-ignore
+            lookup: "*",
             limit,
           });
 
@@ -238,7 +255,7 @@ export const fetchThreads = createAsyncThunk(
           const threadData: Thread[] = trashResponse.data;
 
           returnedData = {
-            data: threadData,
+            data: hybridLookup(threadData, ["comments"]),
             // total: trashResponse.count
             total: 0,
           };
