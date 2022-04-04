@@ -620,12 +620,13 @@ function SidebarComponent({
     kontenbase.realtime
       .subscribe("Channels", { event: "*" }, async (message) => {
         const { event, payload } = message;
+        if (!event && !payload) return;
         const isUpdate = event === "UPDATE_RECORD";
 
         try {
           const { data, error } = await kontenbase.service("Users").find({
             where: {
-              id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
+              id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
             },
           });
 
@@ -682,6 +683,7 @@ function SidebarComponent({
             }
           }
         } catch (error) {
+          console.log("err 686", error);
           if (error instanceof Error) {
             showToast({ message: `${JSON.stringify(error?.message)}` });
           }

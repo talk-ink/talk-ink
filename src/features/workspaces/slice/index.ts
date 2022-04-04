@@ -9,9 +9,12 @@ type FetchWorkspacesProps = {
 export const fetchWorkspaces = createAsyncThunk(
   "workspace/fetchWorkspaces",
   async ({ userId }: FetchWorkspacesProps) => {
-    const response = await kontenbase
-      .service("Workspaces")
-      .find({ where: { peoples: userId }, lookup: ["logo", "peoples"] });
+    const response = await kontenbase.service("Workspaces").find({
+      where: { peoples: userId },
+      // lookup: ["logo", "peoples"]
+      // @ts-ignore
+      lookup: "*",
+    });
 
     const remap = response.data.map((workspace) => {
       let logo = null;
@@ -32,6 +35,7 @@ export const fetchWorkspaces = createAsyncThunk(
         ...workspace,
         logo,
         invitedEmails,
+        channels: workspace?.channels?.map((channel: any) => channel?._id),
       };
     });
 

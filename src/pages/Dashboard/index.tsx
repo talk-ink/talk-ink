@@ -69,34 +69,40 @@ function DashboardPage() {
       );
 
       if (params?.channelId) {
+        // const { data: channelData, error } = await kontenbase
+        //   .service("Channels")
+        //   .find({
+        //     where: { id: params.channelId },
+        //     // select: ["name", "members", "privacy"],
+        //     //@ts-ignore
+        //     // lookup: "*",
+        //   });
         const { data: channelData, error } = await kontenbase
           .service("Channels")
-          .find({
-            where: { id: params.channelId },
-            // select: ["name", "members", "privacy"],
-            //@ts-ignore
-            // lookup: "*",
+          .getById(params?.channelId, {
+            // @ts-ignore
+            lookup: "*",
           });
 
         if (error) throw new Error(error.message);
 
         if (
           !workspaceData?.channels?.includes(params?.channelId) ||
-          channelData.length === 0
-        )
+          !channelData
+        ) {
           return dispatch(setPageStatus("channel-notFound"));
-
+        }
         if (
-          channelData[0]?.privacy === "private" &&
-          !channelData[0]?.members?.includes(userId)
+          channelData?.privacy === "private" &&
+          !channelData?.members?.includes(userId)
         ) {
           return dispatch(setPageStatus("channel-restricted"));
         }
         if (
-          channelData[0]?.privacy === "public" &&
-          !channelData[0]?.members?.includes(userId)
+          channelData?.privacy === "public" &&
+          !channelData?.members?.includes(userId)
         ) {
-          return dispatch(addChannel(channelData[0]));
+          return dispatch(addChannel(channelData));
         }
       }
       return dispatch(setPageStatus(null));
@@ -120,7 +126,8 @@ function DashboardPage() {
     let key: string | undefined;
     kontenbase.realtime
       .subscribe("Workspaces", { event: "UPDATE_RECORD" }, (message) => {
-        const { payload } = message;
+        const { payload, event } = message;
+        if (!event && !payload) return;
 
         const isCurrentWorkspace = payload?.after?._id === params.workspaceId;
         if (isCurrentWorkspace) {
@@ -167,6 +174,7 @@ function DashboardPage() {
       event: "*",
     },
     filter: ({ event, payload }) => {
+      if (!event && !payload) return;
       const isUpdate = event === "UPDATE_RECORD";
       const isDelete = event === "DELETE_RECORD";
 
@@ -206,6 +214,7 @@ function DashboardPage() {
     },
 
     onRequestError: (error) => {
+      console.log("errawaw", error);
       showToast({ message: error });
     },
   });
