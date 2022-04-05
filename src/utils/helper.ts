@@ -444,7 +444,12 @@ export const getShortName = (name: string): string => {
   }
 };
 
-export const hybridLookup = (dataSource: any[], lookup: string[]): any[] => {
+type HybridLookupType = (dataSource: any[], lookup?: string[]) => any;
+
+export const hybridLookup: HybridLookupType = (
+  dataSource,
+  lookup = []
+): any[] => {
   return dataSource.map((data) => {
     let newObj: { [key: string]: any } = {};
     Object.keys(data).forEach((key) => {

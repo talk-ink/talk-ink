@@ -9,6 +9,7 @@ import { useAppSelector } from "hooks/useAppSelector";
 import { kontenbase } from "lib/client";
 import { WorkspaceResponse } from "types";
 import { useToast } from "hooks/useToast";
+import { hybridLookup } from "utils/helper";
 
 function InvitedWorkspacePage() {
   const [showToast] = useToast();
@@ -21,21 +22,24 @@ function InvitedWorkspacePage() {
 
   const getWorkspaceData = async () => {
     try {
-      const {
-        data: workspaceData,
-        error,
-      }: KontenbaseResponse<WorkspaceResponse> = await kontenbase
+      const { data: workspaceData, error } = await kontenbase
         .service("Workspaces")
-        .find({ where: { inviteId: params.inviteId } });
+        .find({
+          where: { inviteId: params.inviteId },
+          // @ts-ignore
+          lookup: "*",
+        });
 
       if (error) throw new Error(error.message);
 
+      let newWorkspaceData = hybridLookup(workspaceData);
+
       let toWorkspaceId = "";
       if (workspaceData.length > 0) {
-        if (workspaceData[0].peoples.includes(auth.user._id)) {
-          toWorkspaceId = `${workspaceData[0]._id}/inbox`;
+        if (newWorkspaceData[0].peoples.includes(auth.user._id)) {
+          toWorkspaceId = `${newWorkspaceData[0]._id}/inbox`;
         } else {
-          toWorkspaceId = `${workspaceData[0]._id}/join_channels`;
+          toWorkspaceId = `${newWorkspaceData[0]._id}/join_channels`;
         }
       } else {
         return navigate(`/404`);

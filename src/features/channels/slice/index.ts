@@ -22,7 +22,7 @@ export const fetchChannels = createAsyncThunk(
       lookup: { _id: "*" },
     });
 
-    return response.data.filter((data) => data?.workspace?.[0] === workspaceId);
+    return response.data;
   }
 );
 
