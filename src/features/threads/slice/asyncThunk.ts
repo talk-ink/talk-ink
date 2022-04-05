@@ -89,6 +89,8 @@ export const fetchThreadsPagination = createAsyncThunk(
 
           const threadData = inboxResponse.data;
 
+          console.log("threadData", threadData);
+
           return hybridLookup(threadData, ["comments"]);
         } catch (error) {
           console.log(error);
@@ -215,14 +217,7 @@ export const fetchThreads = createAsyncThunk(
 
           if (inboxResponse.error) throw new Error(inboxResponse.error.message);
 
-          const threadData = hybridLookup(inboxResponse.data, [
-            "comments",
-          ]).filter(
-            (thread: any) =>
-              !!thread?.workspace?.find(
-                (workspace: any) => workspace?._id === workspaceId
-              )
-          );
+          const threadData = hybridLookup(inboxResponse.data, ["comments"]);
 
           returnedData = {
             data: threadData,
