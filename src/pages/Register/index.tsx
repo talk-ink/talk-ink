@@ -16,6 +16,7 @@ import { setAuthToken, setAuthUser } from "features/auth";
 import { KontenbaseResponse } from "@kontenbase/sdk";
 import OneSignal from "react-onesignal";
 import { useToast } from "hooks/useToast";
+import { hybridLookup } from "utils/helper";
 
 const initialValues: Register = {
   email: "",
@@ -40,7 +41,9 @@ function RegisterPage() {
 
       if (error) throw new Error(error.message);
 
-      const { user: userData, error: errorUser } = await kontenbase.auth.user();
+      const { user: userData, error: errorUser } = await kontenbase.auth.user({
+        lookup: "*",
+      });
 
       if (errorUser) throw new Error(errorUser.message);
 
@@ -74,7 +77,7 @@ function RegisterPage() {
         }
 
         dispatch(setAuthToken({ token }));
-        dispatch(setAuthUser(user));
+        dispatch(setAuthUser(hybridLookup([user], ["avatar"])[0]));
 
         navigate(`/a/${toWorkspaceId}`);
       }

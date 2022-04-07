@@ -132,102 +132,112 @@ function ThreadPage() {
     let key: string;
 
     kontenbase.realtime
-      .subscribe("Comments", { event: "*" }, async (message) => {
-        const { payload, event } = message;
-        const isCurrentThread =
-          event === "UPDATE_RECORD"
-            ? payload.before.threads?.[0] === threadId
-            : payload.threads?.[0] === threadId;
+      .subscribe(
+        "Comments",
+        {
+          event: "*",
+          // where: { threads: threadId },
+        },
+        async (message) => {
+          const { payload, event } = message;
+          console.log("msg", message);
+          const isCurrentThread =
+            event === "UPDATE_RECORD"
+              ? payload.before.threads?.[0] === threadId
+              : payload.threads?.[0] === threadId;
 
-        let _createdBy;
-        let _subComments;
-        if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
-          try {
-            console.log("e");
-            const { data, error } = await kontenbase.service("Users").find({
-              where: {
-                id:
-                  event === "UPDATE_RECORD"
-                    ? payload.before.createdBy
-                    : payload.createdBy,
-              },
-            });
-
-            if (error) throw new Error(error.message);
-
-            _createdBy = data?.[0];
-          } catch (error) {
-            if (error instanceof Error) {
-              showToast({ message: `${JSON.stringify(error?.message)}` });
-            }
-          }
-
-          if (
-            event === "UPDATE_RECORD" &&
-            payload.after.subComments.length > 0
-          ) {
+          let _createdBy;
+          let _subComments;
+          if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
             try {
-              const { data, error }: KontenbaseResponse<ISubComment> =
-                await kontenbase.service("SubComments").find({
-                  where: {
-                    parent: payload.after._id,
-                  },
-                });
+              console.log("e");
+              const { data, error } = await kontenbase.service("Users").find({
+                where: {
+                  id:
+                    event === "UPDATE_RECORD"
+                      ? payload.before.createdBy
+                      : payload.createdBy,
+                },
+              });
 
               if (error) throw new Error(error.message);
 
-              _subComments = data.map((item) => ({
-                ...item,
-                createdBy: item.createdBy._id,
-              }));
+              _createdBy = data?.[0];
             } catch (error) {
               if (error instanceof Error) {
                 showToast({ message: `${JSON.stringify(error?.message)}` });
               }
             }
-          }
-        }
 
-        if (isCurrentThread) {
-          switch (event) {
-            case "CREATE_RECORD":
-              if (payload?.createdBy !== auth.user._id) {
+            if (
+              event === "UPDATE_RECORD" &&
+              payload.after.subComments.length > 0
+            ) {
+              try {
+                const { data, error }: KontenbaseResponse<ISubComment> =
+                  await kontenbase.service("SubComments").find({
+                    where: {
+                      parent: payload.after._id,
+                    },
+                  });
+
+                if (error) throw new Error(error.message);
+
+                _subComments = data.map((item) => ({
+                  ...item,
+                  createdBy: item.createdBy._id,
+                }));
+              } catch (error) {
+                if (error instanceof Error) {
+                  showToast({ message: `${JSON.stringify(error?.message)}` });
+                }
+              }
+            }
+          }
+
+          if (isCurrentThread) {
+            switch (event) {
+              case "CREATE_RECORD":
+                console.log("sww");
+                if (payload?.createdBy !== auth.user._id) {
+                  console.log("sww2");
+                  dispatch(
+                    addComment({
+                      threadId,
+                      comment: { ...payload, createdBy: _createdBy },
+                    })
+                  );
+                }
+
+                break;
+              case "UPDATE_RECORD":
                 dispatch(
-                  addComment({
+                  updateComment({
                     threadId,
-                    comment: { ...payload, createdBy: _createdBy },
+                    comment: {
+                      ...payload.before,
+                      ...payload.after,
+                      createdBy: _createdBy,
+                      subComments: _subComments,
+                    },
                   })
                 );
-              }
+                break;
+              default:
+                break;
+            }
+          }
 
-              break;
-            case "UPDATE_RECORD":
-              dispatch(
-                updateComment({
-                  threadId,
-                  comment: {
-                    ...payload.before,
-                    ...payload.after,
-                    createdBy: _createdBy,
-                    subComments: _subComments,
-                  },
-                })
-              );
-              break;
-            default:
-              break;
+          if (event === "DELETE_RECORD") {
+            dispatch(
+              deleteComment({
+                threadId,
+                deletedId: payload._id,
+              })
+            );
           }
         }
-
-        if (event === "DELETE_RECORD") {
-          dispatch(
-            deleteComment({
-              threadId,
-              deletedId: payload._id,
-            })
-          );
-        }
-      })
+      )
       .then((result) => (key = result));
 
     return () => {

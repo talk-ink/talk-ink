@@ -15,7 +15,7 @@ import { useAppDispatch } from "hooks/useAppDispatch";
 import { setAuthLoading, setAuthToken, setAuthUser } from "features/auth";
 import { kontenbase } from "lib/client";
 import { Token, TUserProfile } from "types";
-import { oneSignalId } from "utils/helper";
+import { hybridLookup, oneSignalId } from "utils/helper";
 import MessagePage from "pages/Message";
 import WebviewPage from "pages/Webview";
 
@@ -43,7 +43,9 @@ function App() {
       console.log("localStorageToken", localStorageToken);
       if (!localStorageToken) return;
 
-      const { user: userData, error } = await kontenbase.auth.user();
+      const { user: userData, error } = await kontenbase.auth.user({
+        lookup: "*",
+      });
 
       if (error) throw new Error(error.message);
 
@@ -79,7 +81,7 @@ function App() {
       const user: TUserProfile = userData;
 
       dispatch(setAuthToken(token));
-      dispatch(setAuthUser(user));
+      dispatch(setAuthUser(hybridLookup([user], ["avatar"])[0]));
     } catch (error) {
       if (error instanceof Error) {
         showToast({ message: `${JSON.stringify(error?.message)}` });

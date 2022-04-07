@@ -25,12 +25,14 @@ export const fetchMessages = createAsyncThunk(
         { toUser: loggedUserId, createdBy: toUserId },
       ],
       sort: {
-        createdAt: -1,
+        createdAt: -1 as const,
       },
       limit,
       skip,
     };
+
     const response = await kontenbase.service("Messages").find(filter);
+
     const { data: dataCount } = await kontenbase
       .service("Messages")
       .count(filter);

@@ -461,7 +461,7 @@ export const hybridLookup: HybridLookupType = (
       }
       newObj[key] = data[key]?.map((item: { _id: string }) => item?._id);
     });
-    console.log("newObj", newObj);
+
     return newObj;
   });
 };
