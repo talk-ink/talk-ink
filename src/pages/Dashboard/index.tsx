@@ -127,7 +127,7 @@ function DashboardPage() {
     kontenbase.realtime
       .subscribe("Workspaces", { event: "UPDATE_RECORD" }, (message) => {
         const { payload, event } = message;
-        if (!event && !payload) return;
+        return;
 
         const isCurrentWorkspace = payload?.after?._id === params.workspaceId;
         if (isCurrentWorkspace) {

@@ -54,6 +54,7 @@ export const useKontenbaseRealtime = (props: HooksProps) => {
 
     kontenbase.realtime
       .subscribe(service, { event, where }, (message) => {
+        return;
         try {
           if (message.error) throw new Error(message.error.message);
 

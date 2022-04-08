@@ -140,7 +140,7 @@ function ThreadPage() {
         },
         async (message) => {
           const { payload, event } = message;
-          console.log("msg", message);
+          return;
           const isCurrentThread =
             event === "UPDATE_RECORD"
               ? payload.before.threads?.[0] === threadId
@@ -163,7 +163,7 @@ function ThreadPage() {
               if (error) throw new Error(error.message);
 
               _createdBy = data?.[0];
-            } catch (error) {
+            } catch (error: any) {
               if (error instanceof Error) {
                 showToast({ message: `${JSON.stringify(error?.message)}` });
               }
@@ -187,7 +187,7 @@ function ThreadPage() {
                   ...item,
                   createdBy: item.createdBy._id,
                 }));
-              } catch (error) {
+              } catch (error: any) {
                 if (error instanceof Error) {
                   showToast({ message: `${JSON.stringify(error?.message)}` });
                 }

@@ -18,7 +18,6 @@ export const fetchChannels = createAsyncThunk(
   async ({ userId, workspaceId }: FetchChannelsProps) => {
     const response = await kontenbase.service("Channels").find({
       where: { members: userId, workspace: workspaceId },
-      //@ts-ignore
       lookup: { _id: "*" },
     });
 
