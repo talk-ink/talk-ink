@@ -33,9 +33,11 @@ function JoinChannelPage() {
   const getChannels = async () => {
     setApiLoading(true);
     try {
-      const getChannel = await kontenbase
-        .service("Channels")
-        .find({ where: { privacy: "public", workspace: params.workspaceId } });
+      const getChannel = await kontenbase.service("Channels").find({
+        where: { privacy: "public", workspace: params.workspaceId },
+        //@ts-ignore
+        lookup: { _id: "*" },
+      });
 
       if (getChannel.error) throw new Error(getChannel.error.message);
 

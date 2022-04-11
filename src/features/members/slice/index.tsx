@@ -1,6 +1,7 @@
 import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
 import { Member } from "types";
+import { hybridLookup } from "utils/helper";
 
 type FetchMembersProps = {
   workspaceId: string;
@@ -14,11 +15,13 @@ type InitThreadState = {
 export const fetchMembers = createAsyncThunk(
   "member/fetchMembers",
   async ({ workspaceId }: FetchMembersProps) => {
-    const response = await kontenbase
-      .service("Users")
-      .find({ where: { workspaces: workspaceId }, lookup: ["avatar"] });
+    const response = await kontenbase.service("Users").find({
+      where: { workspaces: workspaceId },
+      //@ts-ignore
+      lookup: "*",
+    });
 
-    return response.data;
+    return hybridLookup(response.data, ["avatar"]);
   }
 );
 

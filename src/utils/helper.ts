@@ -443,3 +443,25 @@ export const getShortName = (name: string): string => {
     return name;
   }
 };
+
+type HybridLookupType = (dataSource: any[], lookup?: string[]) => any;
+
+export const hybridLookup: HybridLookupType = (
+  dataSource,
+  lookup = []
+): any[] => {
+  return dataSource.map((data) => {
+    let newObj: { [key: string]: any } = {};
+    Object.keys(data).forEach((key) => {
+      if (
+        !(data[key] instanceof Array) ||
+        (data[key] instanceof Array && lookup.includes(key))
+      ) {
+        return (newObj[key] = data[key]);
+      }
+      newObj[key] = data[key]?.map((item: { _id: string }) => item?._id);
+    });
+
+    return newObj;
+  });
+};

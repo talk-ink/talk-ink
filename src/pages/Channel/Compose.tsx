@@ -211,6 +211,7 @@ function Compose() {
 
   const getMemberHandler = async () => {
     try {
+      console.log("c");
       const memberList = await kontenbase.service("Users").find({
         where: { workspaces: params.workspaceId, channels: params.channelId },
         lookup: ["avatar"],

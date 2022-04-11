@@ -237,7 +237,14 @@ function SidebarComponent({
       if (createChannel?.error) throw new Error(createChannel.error.message);
 
       if (createChannel.data) {
-        dispatch(addChannel(createChannel.data));
+        dispatch(
+          addChannel({
+            ...createChannel.data,
+            members: values?.members,
+            workspace: params.workspaceId,
+            threads: [],
+          })
+        );
         dispatch(
           updateWorkspace({
             _id: params.workspaceId,
@@ -348,9 +355,11 @@ function SidebarComponent({
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
+
+        return;
         const isUpdate = event === "UPDATE_RECORD";
         const isDelete = event === "DELETE_RECORD";
-
+        console.log("msg", message);
         const isCurrentWorkspace = isUpdate
           ? payload?.before?.workspace?.includes(params.workspaceId)
           : payload?.workspace?.includes(params.workspaceId);
@@ -408,7 +417,7 @@ function SidebarComponent({
                         (data) => !auth.user.doneThreads?.includes(data._id)
                       )
                       .filter((item) => item.tagedUsers?.includes(userId));
-                  } catch (error) {
+                  } catch (error: any) {
                     if (error instanceof Error) {
                       showToast({
                         message: `${JSON.stringify(error?.message)}`,
@@ -420,7 +429,7 @@ function SidebarComponent({
                     payload.before.tagedUsers.includes(userId) &&
                     payload.after.tagedUsers.includes(userId) &&
                     _currentThread.find(
-                      (item) => item._id === payload.before?._id
+                      (item: any) => item._id === payload.before?._id
                     )
                   ) {
                     try {
@@ -442,7 +451,7 @@ function SidebarComponent({
                           },
                         })
                       );
-                    } catch (error) {
+                    } catch (error: any) {
                       console.log("err", error);
                       if (error instanceof Error) {
                         showToast({
@@ -599,7 +608,7 @@ function SidebarComponent({
                 break;
             }
           }
-        } catch (error) {
+        } catch (error: any) {
           if (error instanceof Error) {
             showToast({ message: `${JSON.stringify(error?.message)}` });
           }
@@ -619,12 +628,13 @@ function SidebarComponent({
     kontenbase.realtime
       .subscribe("Channels", { event: "*" }, async (message) => {
         const { event, payload } = message;
+        return;
         const isUpdate = event === "UPDATE_RECORD";
 
         try {
           const { data, error } = await kontenbase.service("Users").find({
             where: {
-              id: isUpdate ? payload?.before?.createdBy : payload.createdBy,
+              id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
             },
           });
 
@@ -680,7 +690,8 @@ function SidebarComponent({
                 break;
             }
           }
-        } catch (error) {
+        } catch (error: any) {
+          console.log("err 686", error);
           if (error instanceof Error) {
             showToast({ message: `${JSON.stringify(error?.message)}` });
           }

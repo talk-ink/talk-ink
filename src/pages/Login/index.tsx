@@ -16,6 +16,7 @@ import { Login, TUserProfile, Workspace, WorkspaceResponse } from "types";
 import { useToast } from "hooks/useToast";
 import Hero from "../../assets/image/landing/thread.svg";
 import OneSignal from "react-onesignal";
+import { hybridLookup } from "utils/helper";
 
 const initialValues: Login = {
   email: "",
@@ -39,7 +40,9 @@ function LoginPage() {
 
       if (error) throw new Error(error.message);
 
-      const { user: userData, error: errorUser } = await kontenbase.auth.user();
+      const { user: userData, error: errorUser } = await kontenbase.auth.user({
+        lookup: "*",
+      });
 
       if (errorUser) throw new Error(errorUser.message);
 
@@ -88,7 +91,7 @@ function LoginPage() {
         }
 
         dispatch(setAuthToken({ token }));
-        dispatch(setAuthUser(user));
+        dispatch(setAuthUser(hybridLookup([user], ["avatar"])[0]));
 
         navigate(`/a/${toWorkspaceId}`);
       }

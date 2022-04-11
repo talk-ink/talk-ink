@@ -39,8 +39,10 @@ const ThreadList = ({ type = "open" }: Props) => {
 
   const dispatch = useAppDispatch();
 
-  const [selectedThread, setSelectedThread] =
-    useState<{ thread: Thread; type: SelectedThreadTypes }>();
+  const [selectedThread, setSelectedThread] = useState<{
+    thread: Thread;
+    type: SelectedThreadTypes;
+  }>();
 
   const isClosedThread = useMemo(() => {
     return type === "close";
@@ -159,7 +161,7 @@ const ThreadList = ({ type = "open" }: Props) => {
                   isRead={
                     readedThreads.includes(thread._id) ||
                     (readedThreads.includes(thread._id) &&
-                      thread.createdBy?._id === auth.user._id)
+                      thread?.createdBy?._id === auth.user._id)
                   }
                 />
               ))}

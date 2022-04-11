@@ -18,18 +18,24 @@ export const fetchMessages = createAsyncThunk(
     limit = 20,
     skip,
   }: FetchMessagesProps) => {
-    const response = await kontenbase.service("Messages").find({
+    const filter = {
       where: { workspace: workspaceId },
       or: [
         { toUser: toUserId, createdBy: loggedUserId },
         { toUser: loggedUserId, createdBy: toUserId },
       ],
       sort: {
-        createdAt: -1,
+        createdAt: -1 as const,
       },
       limit,
       skip,
-    });
+    };
+
+    const response = await kontenbase.service("Messages").find(filter);
+
+    const { data: dataCount } = await kontenbase
+      .service("Messages")
+      .count(filter);
 
     return {
       data: response.data
@@ -40,7 +46,8 @@ export const fetchMessages = createAsyncThunk(
         .reverse(),
 
       _toUserId: toUserId,
-      _total: response?.count,
+      // _total: response?.count,
+      _total: dataCount.count,
     };
   }
 );
