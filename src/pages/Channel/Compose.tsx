@@ -162,8 +162,8 @@ function Compose() {
       const createThread = await kontenbase.service("Threads").create({
         name: values.name,
         content: values.content,
-        channel: params.channelId,
-        workspace: params.workspaceId,
+        channel: [params.channelId],
+        workspace: [params.workspaceId],
         tagedUsers: _invitedUsers,
         lastActionAt: now,
       });
@@ -211,7 +211,6 @@ function Compose() {
 
   const getMemberHandler = async () => {
     try {
-      console.log("c");
       const memberList = await kontenbase.service("Users").find({
         where: { workspaces: params.workspaceId, channels: params.channelId },
         lookup: ["avatar"],

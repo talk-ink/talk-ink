@@ -115,8 +115,8 @@ const MessageForm = ({
 
         const { data, error } = await kontenbase.service("Messages").create({
           content: JSON.stringify(state),
-          toUser: params.userId,
-          workspace: params.workspaceId,
+          toUser: [params.userId],
+          workspace: [params.workspaceId],
         });
 
         dispatch(

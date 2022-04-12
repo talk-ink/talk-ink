@@ -54,7 +54,11 @@ export const useKontenbaseRealtime = (props: HooksProps) => {
 
     kontenbase.realtime
       .subscribe(service, { event, where }, (message) => {
-        return;
+        if (["LINK_RECORD", "GET_RECORD"].includes(event)) {
+          return;
+        }
+
+        console.log(message, "msg");
         try {
           if (message.error) throw new Error(message.error.message);
 

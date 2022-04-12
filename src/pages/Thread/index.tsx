@@ -140,7 +140,11 @@ function ThreadPage() {
         },
         async (message) => {
           const { payload, event } = message;
-          return;
+          if (["LINK_RECORD", "GET_RECORD"].includes(event)) {
+            return;
+          }
+
+          console.log(message, "msg");
           const isCurrentThread =
             event === "UPDATE_RECORD"
               ? payload.before.threads?.[0] === threadId
@@ -151,18 +155,18 @@ function ThreadPage() {
           if (event === "CREATE_RECORD" || event === "UPDATE_RECORD") {
             try {
               console.log("e");
-              const { data, error } = await kontenbase.service("Users").find({
-                where: {
-                  id:
-                    event === "UPDATE_RECORD"
-                      ? payload.before.createdBy
-                      : payload.createdBy,
-                },
-              });
+              const { data, error } = await kontenbase
+                .service("Users")
+                .getById(
+                  event === "UPDATE_RECORD"
+                    ? payload.before.createdBy
+                    : payload.createdBy,
+                  { lookup: { _id: "*" } }
+                );
 
               if (error) throw new Error(error.message);
 
-              _createdBy = data?.[0];
+              _createdBy = data;
             } catch (error: any) {
               if (error instanceof Error) {
                 showToast({ message: `${JSON.stringify(error?.message)}` });
