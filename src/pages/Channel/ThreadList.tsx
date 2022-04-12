@@ -113,30 +113,15 @@ const ThreadList = ({ type = "open" }: Props) => {
     if (thread.threadCount === 0 || thread.threads.length === 0) return;
     if (thread.threads.length >= thread.threadCount) return;
 
-    console.log(
-      !params.channelId || !auth.user._id || !isFetchData,
-      thread.threadCount === 0 || thread.threads.length === 0,
-      thread.threads.length >= thread.threadCount
+    dispatch(
+      fetchThreadsPagination({
+        type: "threads",
+        channelId: params.channelId,
+        userId: auth.user._id,
+        skip: thread.threads.length,
+        limit: 10,
+      })
     );
-    console.log(
-      params.channelId,
-      auth.user._id,
-      isFetchData,
-      thread.threadCount,
-      thread.threads.length,
-      thread.threads.length,
-      thread.threadCount
-    );
-    console.log("fetchThreadsPagination");
-    // dispatch(
-    //   fetchThreadsPagination({
-    //     type: "threads",
-    //     channelId: params.channelId,
-    //     userId: auth.user._id,
-    //     skip: thread.threads.length,
-    //     limit: 10,
-    //   })
-    // );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     params.channelId,

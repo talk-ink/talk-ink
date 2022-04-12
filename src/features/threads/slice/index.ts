@@ -101,6 +101,7 @@ const threadSlice = createSlice({
       );
       if (deletedIndex >= 0) {
         state.threads.splice(deletedIndex, 1);
+        state.threadCount = state.threadCount - 1;
       }
     },
     updateThread: (state, action: PayloadAction<IUpdateThreadPayload>) => {
