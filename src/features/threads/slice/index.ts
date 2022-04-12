@@ -153,6 +153,7 @@ const threadSlice = createSlice({
       state.threads = updatedThread;
     },
     addComment: (state, action: PayloadAction<TCommentPayload>) => {
+      console.log("addComment");
       const newThread = state.threads.map((item) =>
         item._id === action.payload.threadId
           ? {

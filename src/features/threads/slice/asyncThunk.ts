@@ -327,23 +327,29 @@ export const createComment = createAsyncThunk(
       isClosedComment,
       isOpenedComment,
     });
+    try {
+      if (tagedUsers.length > 0) {
+        const commentHooksUrl: string =
+          process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
+        const basicAuth: { username: string; password: string } = {
+          username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
+          password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
+        };
 
-    if (tagedUsers.length > 0) {
-      const commentHooksUrl: string =
-        process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
-      const basicAuth: { username: string; password: string } = {
-        username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
-        password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
-      };
-
-      await axios.post(
-        commentHooksUrl,
-        { taggedUsers: tagedUsers, threadId },
-        {
-          auth: basicAuth,
-        }
-      );
+        await axios.post(
+          commentHooksUrl,
+          { taggedUsers: tagedUsers, threadId },
+          {
+            auth: basicAuth,
+          }
+        );
+      }
+    } catch (error) {
+      console.log("err tag createComment");
+      console.error(error);
     }
+
+    console.log("createComment", tagedUsers);
 
     return { ...data, _tempId };
   }
