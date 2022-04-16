@@ -211,7 +211,7 @@ const Comment: React.FC<IProps> = ({
 
       const { data, error } = await kontenbase.service("SubComments").create({
         content: JSON.stringify(subCommentData),
-        parent: comment._id,
+        parent: [comment._id],
       });
 
       if (invitedUsers.length > 0) {

@@ -40,7 +40,6 @@ function App() {
   const checkUser = async () => {
     try {
       const localStorageToken = localStorage.getItem("token");
-      console.log("localStorageToken", localStorageToken);
       if (!localStorageToken) return;
 
       const { user: userData, error } = await kontenbase.auth.user({

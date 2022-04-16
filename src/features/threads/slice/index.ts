@@ -101,6 +101,7 @@ const threadSlice = createSlice({
       );
       if (deletedIndex >= 0) {
         state.threads.splice(deletedIndex, 1);
+        state.threadCount = state.threadCount - 1;
       }
     },
     updateThread: (state, action: PayloadAction<IUpdateThreadPayload>) => {
@@ -153,6 +154,7 @@ const threadSlice = createSlice({
       state.threads = updatedThread;
     },
     addComment: (state, action: PayloadAction<TCommentPayload>) => {
+      console.log("addComment");
       const newThread = state.threads.map((item) =>
         item._id === action.payload.threadId
           ? {

@@ -1,3 +1,4 @@
+import { FindOption } from "@kontenbase/sdk";
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import { kontenbase } from "lib/client";
 
@@ -15,27 +16,31 @@ export const fetchMessages = createAsyncThunk(
     toUserId,
     loggedUserId,
     workspaceId,
-    limit = 20,
+    limit = 20 as const,
     skip,
   }: FetchMessagesProps) => {
     const filter = {
       where: { workspace: workspaceId },
+      sort: {
+        createdAt: -1 as const,
+      },
       or: [
         { toUser: toUserId, createdBy: loggedUserId },
         { toUser: loggedUserId, createdBy: toUserId },
       ],
-      sort: {
-        createdAt: -1 as const,
-      },
       limit,
       skip,
     };
 
-    const response = await kontenbase.service("Messages").find(filter);
+    console.log(filter);
+
+    const response = await kontenbase
+      .service("Messages")
+      .find({ ...filter, or: filter.or });
 
     const { data: dataCount } = await kontenbase
       .service("Messages")
-      .count(filter);
+      .count({ where: filter.where, or: filter.or });
 
     return {
       data: response.data

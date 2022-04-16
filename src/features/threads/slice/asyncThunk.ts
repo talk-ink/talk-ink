@@ -274,23 +274,33 @@ export const fetchComments = createAsyncThunk(
   "channel/thread/fetchComments",
   async ({ threadId, skip }: { threadId: string; skip: number }) => {
     try {
-      //@ts-ignore
-      const { data, count, error } = await kontenbase.service("Comments").find({
+      const filter = {
         where: { threads: threadId },
-        lookup: ["subComments"],
+        lookup: "*",
         skip,
         limit: 2,
         sort: {
-          createdAt: -1,
+          createdAt: -1 as const,
         },
-      });
+      };
+
+      console.log(filter, "filter");
+
+      const { data, error } = await kontenbase
+        .service("Comments")
+        // @ts-ignore
+        .find({ ...filter });
 
       if (error) throw new Error(error.message);
+      const { data: count, error: countError } = await kontenbase
+        .service("Comments")
+        .count(filter);
+      if (countError) throw new Error(countError.message);
 
       return {
-        comments: data,
+        comments: hybridLookup(data, ["subComments"]),
         threadId,
-        count,
+        count: count.count,
       };
     } catch (error) {
       console.log(error);
@@ -327,23 +337,29 @@ export const createComment = createAsyncThunk(
       isClosedComment,
       isOpenedComment,
     });
+    try {
+      if (tagedUsers.length > 0) {
+        const commentHooksUrl: string =
+          process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
+        const basicAuth: { username: string; password: string } = {
+          username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
+          password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
+        };
 
-    if (tagedUsers.length > 0) {
-      const commentHooksUrl: string =
-        process.env.REACT_APP_FUNCTION_HOOKS_COMMENT_URL;
-      const basicAuth: { username: string; password: string } = {
-        username: process.env.REACT_APP_FUNCTION_HOOKS_USERNAME,
-        password: process.env.REACT_APP_FUNCTION_HOOKS_PASSWORD,
-      };
-
-      await axios.post(
-        commentHooksUrl,
-        { taggedUsers: tagedUsers, threadId },
-        {
-          auth: basicAuth,
-        }
-      );
+        await axios.post(
+          commentHooksUrl,
+          { taggedUsers: tagedUsers, threadId },
+          {
+            auth: basicAuth,
+          }
+        );
+      }
+    } catch (error) {
+      console.log("err tag createComment");
+      console.error(error);
     }
+
+    console.log("createComment", tagedUsers);
 
     return { ...data, _tempId };
   }

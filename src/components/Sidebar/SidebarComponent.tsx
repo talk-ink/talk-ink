@@ -60,6 +60,7 @@ import {
   addInboxData,
   updateInboxData,
 } from "features/count";
+import { hybridLookup } from "utils/helper";
 
 type TProps = {
   isMobile: boolean;
@@ -231,7 +232,7 @@ function SidebarComponent({
       const createChannel = await kontenbase.service("Channels").create({
         ...values,
         members: values?.members,
-        workspace: params.workspaceId,
+        workspace: [params.workspaceId],
       });
 
       if (createChannel?.error) throw new Error(createChannel.error.message);
@@ -351,15 +352,19 @@ function SidebarComponent({
 
   useEffect(() => {
     let key: string | undefined;
-
     kontenbase.realtime
       .subscribe("Threads", { event: "*" }, async (message) => {
         const { event, payload } = message;
 
-        return;
+        //@ts-ignore
+        if (["LINK_RECORD", "GET_RECORD"].includes(event)) {
+          return;
+        }
+        console.log(message, "msg");
+
         const isUpdate = event === "UPDATE_RECORD";
         const isDelete = event === "DELETE_RECORD";
-        console.log("msg", message);
+
         const isCurrentWorkspace = isUpdate
           ? payload?.before?.workspace?.includes(params.workspaceId)
           : payload?.workspace?.includes(params.workspaceId);
@@ -376,15 +381,16 @@ function SidebarComponent({
 
         try {
           if (!isDelete) {
-            const { data, error } = await kontenbase.service("Users").find({
-              where: {
-                id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
-              },
-            });
+            const { data, error } = await kontenbase
+              .service("Users")
+              .getById(
+                isUpdate ? payload?.before?.createdBy : payload?.createdBy,
+                { lookup: { _id: "*" } }
+              );
 
             if (error) throw new Error(error.message);
 
-            _createdBy = data?.[0];
+            _createdBy = data;
           }
 
           if (
@@ -628,19 +634,26 @@ function SidebarComponent({
     kontenbase.realtime
       .subscribe("Channels", { event: "*" }, async (message) => {
         const { event, payload } = message;
-        return;
+
         const isUpdate = event === "UPDATE_RECORD";
 
+        if (["LINK_RECORD", "GET_RECORD"].includes(event)) {
+          return;
+        }
+
+        console.log(message, "msg");
+
         try {
-          const { data, error } = await kontenbase.service("Users").find({
-            where: {
-              id: isUpdate ? payload?.before?.createdBy : payload?.createdBy,
-            },
-          });
+          const { data, error } = await kontenbase
+            .service("Users")
+            .getById(
+              isUpdate ? payload?.before?.createdBy : payload?.createdBy,
+              { lookup: { _id: "*" } }
+            );
 
           if (error) throw new Error(error.message);
 
-          const createdBy = data?.[0];
+          const createdBy = data;
 
           const channelCurrentWorkspace = isUpdate
             ? payload.before.workspace.includes(params.workspaceId)

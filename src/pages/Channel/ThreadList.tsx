@@ -112,7 +112,7 @@ const ThreadList = ({ type = "open" }: Props) => {
     if (!params.channelId || !auth.user._id || !isFetchData) return;
     if (thread.threadCount === 0 || thread.threads.length === 0) return;
     if (thread.threads.length >= thread.threadCount) return;
-    console.log("fetchThreadsPagination");
+
     dispatch(
       fetchThreadsPagination({
         type: "threads",
