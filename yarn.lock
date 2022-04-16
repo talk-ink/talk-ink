@@ -1469,10 +1469,10 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "sourcemap-codec" "1.4.8"
 
-"@kontenbase/sdk@^0.8.6":
-  "integrity" "sha512-jOHJlM3LYq6XQy6DMK+actYFbLzUoTM/Wu5UH4BEtPlC7TuMiPQB99ODuiZ6BcTRbXwCIknmO8id/CGxGLeHhA=="
-  "resolved" "https://registry.npmjs.org/@kontenbase/sdk/-/sdk-0.8.6.tgz"
-  "version" "0.8.6"
+"@kontenbase/sdk@^0.8.7":
+  "integrity" "sha512-bzqLAvWyxosgQnTpS2g+nomdAoV+L4Ekxn5DsPvC5AYxDR7HkISZkm2qRIi0WS13Mo38AFUwnSd0F6iRAHAxvQ=="
+  "resolved" "https://registry.npmjs.org/@kontenbase/sdk/-/sdk-0.8.7.tgz"
+  "version" "0.8.7"
   dependencies:
     "axios" "^0.26.1"
     "centrifuge" "^2.8.4"

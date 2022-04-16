@@ -109,18 +109,35 @@ const MessagePage = (props: Props) => {
     if (messageData?.length >= memberMessage?.total) return;
     if (message.partialLoading) return;
 
-    setTimeout(() => {
-      dispatch(
-        fetchMessages({
-          loggedUserId: auth.user._id,
-          toUserId: params.userId,
-          workspaceId: params.workspaceId,
-          skip: messageData?.length,
-          limit: 5,
-        })
-      );
-    }, 1000);
-    scrollToBottom();
+    console.log(
+      !messageData,
+      messageData?.length === 0,
+      !debounceIsFetchData,
+      messageData?.length >= memberMessage?.total,
+      message.partialLoading
+    );
+
+    console.log(
+      messageData,
+      messageData?.length,
+      debounceIsFetchData,
+      messageData?.length,
+      memberMessage?.total,
+      message.partialLoading
+    );
+
+    // setTimeout(() => {
+    //   dispatch(
+    //     fetchMessages({
+    //       loggedUserId: auth.user._id,
+    //       toUserId: params.userId,
+    //       workspaceId: params.workspaceId,
+    //       skip: messageData?.length,
+    //       limit: 5,
+    //     })
+    //   );
+    // }, 1000);
+    // scrollToBottom();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     debounceIsFetchData,
